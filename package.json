@@ -1,0 +1,25 @@
+{
+  "name": "restify",
+  "description": "REST framework specifically meant for API web services",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mcavage/node-resty.git"
+  },
+  "author": "Mark Cavage <mcavage@gmail.com> (http://www.joyent.com)",
+  "main": "lib/restify.js",
+  "dependencies": {
+    "node-uuid": ">=1.1.0"
+  },
+  "scripts": {
+    "test": "nodeunit tst"
+  },
+  "devDependencies": {
+    "httpu": ">=0.0.1",
+    "jshint": ">=0.1.9",
+    "nodeunit": ">=0.5.1"
+  },
+  "engines": {
+    "node": ">=0.4"
+  }
+}
