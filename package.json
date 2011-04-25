@@ -1,6 +1,6 @@
 {
   "name": "restify",
-  "description": "REST framework specifically meant for API web services",
+  "description": "REST framework specifically meant for web service APIs",
   "version": "0.1.0",
   "repository": {
     "type": "git",
