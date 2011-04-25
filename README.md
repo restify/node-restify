@@ -5,10 +5,11 @@ build a web service API.
 
 ## Why does this exist?
 
-After starting with express it because obvious I only needed about 10% of what
-Connect gives you, and the parts they gave me I still had to write a lot of
-extension code over the top to do what I needed (mainly properly parse
-request parameters and respond with JS objects).
+After starting with express for several backend, machine-consumed projects
+it because obvious I only needed about 10% of what connect gives you, and the
+parts they gave me still required  writing a lot of extension code over the top
+to do what I needed (mainly properly parse request parameters and respond with
+JS objects).
 
 I wanted something smaller and more purposed to this use case.  If this isn't
 you, move along, nothing to see here.
