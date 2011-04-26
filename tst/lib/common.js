@@ -11,7 +11,7 @@ module.exports = {
     test.ok(response.headers.connection);
     test.ok(response.headers.date);
     test.ok(response.headers['x-api-version']);
-    test.ok(response.headers['x-requestid']);
+    test.ok(response.headers['x-request-id']);
     test.ok(response.headers['x-response-time']);
 
     test.equal(response.headers.server, 'RESTify');

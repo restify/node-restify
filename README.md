@@ -90,7 +90,7 @@ RESTify sends the following headers in all API calls:
 
 * Date             // RFC1123 format (in UTC)
 * X-Api-Version    // The version of the server api
-* X-RequestId      // a unique id for this request (uuid)
+* X-Request-Id      // a unique id for this request (uuid)
 * X-Response-Time  // Time taken (server side) in milliseconds
 * Access-Control-Allow-Origin: *
 * Access-Control-Allow-Methods: HEAD, GET, POST, PUT, DELETE
@@ -155,7 +155,7 @@ Would produce a full response to the client like:
      Connection: close
      Date: Mon, 25 Apr 2011 21:52:45 GMT
      X-API-Version: 2011-004-25
-     X-RequestId: C94A6FD8-9C37-405D-B66A-47E7B7D0F800
+     X-Request-Id: C94A6FD8-9C37-405D-B66A-47E7B7D0F800
      X-Response-Time: 13
      Content-Type: application/json
      Content-Length: 123
