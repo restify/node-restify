@@ -166,6 +166,9 @@ Would produce a full response to the client like:
         "message": "Some human parsable error string"
      }
 
+To leverage the built in error codes, pick up `restify.RestCodes`.  Also, HTTP
+constants are defined on `restify.HttpCodes`.
+
 ### Routes
 
 Like every other framework on the planet, I liberally made this look like
@@ -243,7 +246,7 @@ As described above, grab the error creation function with:
     var newError = require('restify').newError;
 
     response.send(newError({
-      httpCode: 404,
+      httpCode: HttpCodes.NotFound,
       restCode: 'ClientParsableString',
       message: 'Some string meant for a human'
     });
