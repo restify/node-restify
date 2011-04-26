@@ -224,6 +224,9 @@ object:
 * requestId: a uuid generated at request acceptance time.  Send this to your
 downstreams for tracking.
 * params: an object containing a merge of querystring, uri and body parameters.
+* body: the raw body data that came in.
+* startTime: the time the request was received at the server (not when data
+  was finished processing).
 
 ### Response
 
