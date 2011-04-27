@@ -20,7 +20,7 @@ module.exports = testCase({
 
     this.server.post('/:name', function(req, res) {
       var obj = {
-        name: req.params.name
+        name: req.uriParams.name
       };
 
       if (req.params.query) obj.query = req.params.query;
