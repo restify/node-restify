@@ -16,7 +16,6 @@ module.exports = testCase({
       apiVersion: '1.2.3',
       serverName: 'RESTify'
     });
-    // this.server.logLevel(resty.LogLevel.Debug);
 
     this.server.post('/:name', function(req, res) {
       var obj = {
@@ -58,7 +57,7 @@ module.exports = testCase({
     var self = this;
     this.options.appendPath('/' + uuid());
 
-    test.expect(14);
+    test.expect(13);
     http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 404);

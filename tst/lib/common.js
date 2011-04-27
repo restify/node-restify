@@ -6,7 +6,9 @@ module.exports = {
   checkResponse: function(test, response) {
     test.ok(response);
     test.ok(response.headers['access-control-allow-origin']);
-    test.ok(response.headers['access-control-allow-methods']);
+    if (response.statusCode !== 404) {
+      test.ok(response.headers['access-control-allow-methods']);
+    }
     test.ok(response.headers.server);
     test.ok(response.headers.connection);
     test.ok(response.headers.date);
