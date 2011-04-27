@@ -241,6 +241,7 @@ I tacked quite a bit onto the response object:
 * send(code, body, headers): serializes body into whatever was sent for Accept.
 * sendError(error):  use restify.newError() (see below)
 * startTime: what it sounds like (ms since epoch)
+* sentError: if you sent an error, it's saved off so you can log it later.
 
 ### Errors
 
