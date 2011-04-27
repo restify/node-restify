@@ -22,7 +22,7 @@ you, move along, nothing to see here.
 
     server.get('/my/:name', function(req, res) {
       res.send(200, {
-        name: req.params.name
+        name: req.uriParams.name
       });
     });
 
@@ -229,7 +229,8 @@ object:
 * contentType(): returns the content-type sent, or RFC-defined default.
 * requestId: a uuid generated at request acceptance time.  Send this to your
 downstreams for tracking.
-* params: an object containing a merge of querystring, uri and body parameters.
+* uriParams: an object containing all the params you specified in the uri route
+* params: an object containing a merge of querystring and body parameters.
 * body: the raw body data that came in.
 * startTime: the time the request was received at the server (not when data
   was finished processing).
