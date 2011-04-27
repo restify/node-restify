@@ -1,5 +1,5 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
-var httpu = require('httpu');
+var http = require('http');
 var testCase = require('nodeunit').testCase;
 var uuid = require('node-uuid');
 
@@ -47,7 +47,7 @@ module.exports = testCase({
     this.options.method = 'GET';
 
     test.expect(14);
-    httpu.request(self.options, function(res) {
+    http.request(self.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 405);
       test.done();
@@ -59,7 +59,7 @@ module.exports = testCase({
     this.options.appendPath('/' + uuid());
 
     test.expect(14);
-    httpu.request(this.options, function(res) {
+    http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 404);
       test.done();
@@ -70,7 +70,7 @@ module.exports = testCase({
     var self = this;
 
     test.expect(14);
-    httpu.request(this.options, function(res) {
+    http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       test.done();
@@ -82,7 +82,7 @@ module.exports = testCase({
     this.options.appendPath('?query=foo');
 
     test.expect(23);
-    httpu.request(this.options, function(res) {
+    http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {
@@ -98,7 +98,7 @@ module.exports = testCase({
     this.options.headers['Content-Type'] = 'application/json';
 
     test.expect(23);
-    var req = httpu.request(this.options, function(res) {
+    var req = http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {
@@ -119,7 +119,7 @@ module.exports = testCase({
     this.options.headers['Content-Length'] = content.length;
 
     test.expect(23);
-    var req = httpu.request(this.options, function(res) {
+    var req = http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {
@@ -138,7 +138,7 @@ module.exports = testCase({
     this.options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 
     test.expect(23);
-    var req = httpu.request(this.options, function(res) {
+    var req = http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {
@@ -159,7 +159,7 @@ module.exports = testCase({
     this.options.headers['Content-Length'] = content.length;
 
     test.expect(23);
-    var req = httpu.request(this.options, function(res) {
+    var req = http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {
@@ -181,7 +181,7 @@ module.exports = testCase({
     this.options.headers['Content-Length'] = content.length;
 
     test.expect(25);
-    var req = httpu.request(this.options, function(res) {
+    var req = http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 200);
       common.checkContent(test, res, function() {

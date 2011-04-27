@@ -202,8 +202,9 @@ You create a server with the createServer(options) call:
 
     var server = restify.createServer({
       apiVersion: '2011-04-25', // Kicked back in X-Api-Version response header
-      serverName: 'RESTify', // Kicked back in Server response header
-      requireApiVersion: true // Enforce clients sending you a version header
+      serverName: 'RESTify',    // Kicked back in Server response header
+      requireApiVersion: true,  // Enforce clients sending you a version header
+      installExceptionHandler: true // Handle uncaught exceptions with a 500
     });
 
 Supported parameters in options are listed above.  `apiVersion` is enforced if
@@ -211,8 +212,10 @@ sent in the `x-api-version` HTTP header.  Setting `requireApiVersion` requires
 a client to send it (typically you want this with a web service API so you're
 not supporting some weird version 0 for all of time).  Note that if you don't
 set `apiVersion` the default set in lib/constants.js is sent back (which is a
-YYYY-MM-DD string), so that's probably not what you want.  Set it ;-).  Lastly,
-setting `serverName` lets you set the `server` header on all responses.
+YYYY-MM-DD string), so that's probably not what you want.  Set it ;-).  Setting
+`serverName` lets you set the `server` header on all responses.  The
+`installExceptionHandler` flag gets you a generic 500 response if you didn't
+catch an exception.
 
 ### Routes
 

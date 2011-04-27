@@ -1,5 +1,5 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
-var httpu = require('httpu');
+var http = require('http');
 var testCase = require('nodeunit').testCase;
 var uuid = require('node-uuid');
 
@@ -38,7 +38,7 @@ module.exports = testCase({
     this.options.method = 'POST';
 
     test.expect(14);
-    httpu.request(self.options, function(res) {
+    http.request(self.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 405);
       test.done();
@@ -50,7 +50,7 @@ module.exports = testCase({
     this.options.appendPath('/' + uuid());
 
     test.expect(14);
-    httpu.request(this.options, function(res) {
+    http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 404);
       test.done();
@@ -61,7 +61,7 @@ module.exports = testCase({
     var self = this;
 
     test.expect(14);
-    httpu.request(this.options, function(res) {
+    http.request(this.options, function(res) {
       common.checkResponse(test, res);
       test.equals(res.statusCode, 204);
       test.done();
