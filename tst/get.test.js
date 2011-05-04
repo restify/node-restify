@@ -1,5 +1,5 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
-var http = require('http');
+var http = require('httpu');
 var testCase = require('nodeunit').testCase;
 var uuid = require('node-uuid');
 
@@ -16,7 +16,6 @@ module.exports = testCase({
       serverName: 'RESTify',
       requireApiVersion: true
     });
-    // this.server.logLevel(restify.LogLevel.Trace);
 
     this.server.get('/', function(req, res) {
       res.send(200);

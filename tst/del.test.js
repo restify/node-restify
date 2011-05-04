@@ -1,10 +1,11 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
-var http = require('http');
+var http = require('httpu');
 var testCase = require('nodeunit').testCase;
 var uuid = require('node-uuid');
 
 var common = require('./lib/common');
 var restify = require('../lib/restify');
+
 
 module.exports = testCase({
 
