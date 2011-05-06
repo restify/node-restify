@@ -69,7 +69,7 @@ module.exports = {
       }
     };
 
-    //    _this.options.headers['X-Api-Version'] = '2011-04-24';
+    _this.options.headers['X-Api-Version'] = '1.2.3';
   }
 
 };
