@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-resty.git"
