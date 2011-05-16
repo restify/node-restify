@@ -15,13 +15,13 @@ NODEUNIT = nodeunit
 
 .PHONY: check test clean all docs
 
-all:: check test doc
+all:: check test docs
 
 docs:
 	(cd docs && ls *.md | xargs ronn --style screen,toc)
 
 clean:
-	rm -fr docs/*.3*
+	rm -fr docs/*.3* docs/*.7*
 
 check:: lint glint
 
