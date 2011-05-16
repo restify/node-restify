@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-resty.git"
@@ -12,7 +12,11 @@
     "node-uuid": ">=1.1.0"
   },
   "scripts": {
-    "test": "nodeunit tst"
+    "test": "./node_modules/nodeunit/bin/nodeunit tst"
+  },
+  "man": {
+    "name": "restify",
+    "man": ["./docs/restify.3", "./docs/request.3", "./docs/response.3", "./docs/log.3"]
   },
   "devDependencies": {
     "httpu": ">=0.0.1",

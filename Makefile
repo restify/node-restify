@@ -13,11 +13,15 @@ GLINT_ARGS = --nojsdoc -x lib/sprintf.js -e node_modules -r .
 
 NODEUNIT = nodeunit
 
-.PHONY: check test clean all
+.PHONY: check test clean all doc
 
-all:: check test
+all:: check test doc
+
+doc:
+	(cd docs && ls *.md | xargs ronn)
 
 clean:
+	rm -fr docs/*.3*
 
 check:: lint glint
 
