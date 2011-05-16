@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>restify-request(7) - The Request Object</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+  <style type='text/css' media='screen'>
+  /* style: screen */
+  body {margin:0}
+  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
+  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
+  #man h2 {margin:10px 0 0 0}
+  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
+  #man h3 {margin:0 0 0 4ex}
+  #man dt {margin:0;clear:left}
+  #man dt.flush {float:left;width:8ex}
+  #man dd {margin:0 0 0 9ex}
+  #man h1,#man h2,#man h3,#man h4 {clear:left}
+  #man pre {margin-bottom:20px}
+  #man pre+h2,#man pre+h3 {margin-top:22px}
+  #man h2+pre,#man h3+pre {margin-top:5px}
+  #man img {display:block;margin:auto}
+  #man h1.man-title {display:none}
+  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  #man h2,#man ol.man {font-size:16px;line-height:1.25
+  }
+  #man h1 {font-size:20px;line-height:2}
+  #man {text-align:justify;background:#fff}
+  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
+  #man h1,#man h2,#man h3,#man h4 {color:#030201}
+  #man ol.man,#man ol.man li {color:#636261}
+  #man code,#man strong,#man b {font-weight:bold;color:#131211}
+  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
+  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
+  #man pre code {font-weight:normal;background:inherit}
+  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  #man ol.man {width:100%}
+  #man ol.man li.tl {text-align:left}
+  #man ol.man li.tc {text-align:center;letter-spacing:4px}
+  #man ol.man li.tr {text-align:right;float:right}
+  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
+  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#SUPPORTED-CONTENT-TYPES">SUPPORTED CONTENT TYPES</a>
+    <a href="#COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>restify-request(7)</li>
+    <li class='tc'></li>
+    <li class='tr'>restify-request(7)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>restify-request</code> - <span class="man-whatis">The Request Object</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<pre><code>request: {
+  body, 'Raw data sent from client',
+  contentType: function() {
+    return 'application/json'
+  }
+  params: {
+    foo: 'bar'
+  },
+  requestId: uuid(),
+  startTime: new Date().getTime(),
+  uriParams: {
+    foo: 'bar'
+  },
+  url: sanitized(request.url),
+  _url: url.parse(request.url),
+}
+</code></pre>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>The restify request object is simply a set of extensions over the standard
+node.js http request object.</p>
+
+<p>The additional parameters placed on the request object are:</p>
+
+<dl>
+<dt class="flush">body</dt><dd>Contains a UTF-8 string that is the complete message sent from the client for
+this request.  Note that the body is subject to the <code>maxRequestSize</code> set at
+server creation time.  You're not really expected to use this, as the body
+is parsed for you if it's in one of restify's supported formats.</dd>
+<dt>contentType</dt><dd>A function that returns a parsed out content-type header for the content sent
+from the client.</dd>
+<dt class="flush">params</dt><dd>Assuming <code>body</code> was either form-urlencoded or application/json, body is a JS
+Object containing all the key value pairs sent from the client.  Note that
+nested Object parameters are not supported in form-urlencoded, so if you need
+to support that, your API should only support JSON.</dd>
+<dt>requestId</dt><dd>requestId is a randomly generated type IV uuid, which is sent back to the
+client automagically in the <code>x-request-id</code> header.  You really should log
+this, as the intent is that a client of your API can provide this to you for
+debugging/repudation purposes.</dd>
+<dt>startTime</dt><dd>The time this request arrived at the server.  Note that this timestamp is when
+node.js gives us the request object; so before the body is read, but after the
+headers are. It's in milliseconds since epoch.</dd>
+<dt>uriParams</dt><dd>The uriParams object contains a set of key/value pairs for filled in
+parameters from your route description.  It is kept separate from the params
+object so that you can name uri parameters the same name as api parameters
+in your requests.</dd>
+<dt class="flush">url</dt><dd>restify overwrites the node.js request.url value with a 'santized' version of
+the url.  What that really means is that any repeated '/' params are
+collapsed and any trailing '/' params are erased.</dd>
+<dt class="flush"><em>url</em></dt><dd>url is the result of the node.js url.parse method.</dd>
+</dl>
+
+
+<h2 id="SUPPORTED-CONTENT-TYPES">SUPPORTED CONTENT TYPES</h2>
+
+<p>Currently restify supports the following content type when parsing requests:</p>
+
+<ul>
+<li>application/json</li>
+<li>application/application/x-www-form-urlencoded</li>
+</ul>
+
+
+<p>Plans to support multipart form data are on the short-term roadmap.</p>
+
+<h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
+
+<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#109;&#x63;&#97;&#x76;&#x61;&#x67;&#x65;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;" data-bare-link="true">&#109;&#99;&#97;&#x76;&#x61;&#103;&#101;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a></p>
+
+<p>This software is licensed under the MIT License.</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><a href="restify.3.html" class="man-ref">restify<span class="s">(3)</span></a>, <a href="restify-routes.7.html" class="man-ref">restify-routes<span class="s">(7)</span></a></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>May 2011</li>
+    <li class='tr'>restify-request(7)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

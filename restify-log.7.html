@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>restify-log(7) - The restify Logger</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+  <style type='text/css' media='screen'>
+  /* style: screen */
+  body {margin:0}
+  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
+  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
+  #man h2 {margin:10px 0 0 0}
+  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
+  #man h3 {margin:0 0 0 4ex}
+  #man dt {margin:0;clear:left}
+  #man dt.flush {float:left;width:8ex}
+  #man dd {margin:0 0 0 9ex}
+  #man h1,#man h2,#man h3,#man h4 {clear:left}
+  #man pre {margin-bottom:20px}
+  #man pre+h2,#man pre+h3 {margin-top:22px}
+  #man h2+pre,#man h3+pre {margin-top:5px}
+  #man img {display:block;margin:auto}
+  #man h1.man-title {display:none}
+  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  #man h2,#man ol.man {font-size:16px;line-height:1.25
+  }
+  #man h1 {font-size:20px;line-height:2}
+  #man {text-align:justify;background:#fff}
+  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
+  #man h1,#man h2,#man h3,#man h4 {color:#030201}
+  #man ol.man,#man ol.man li {color:#636261}
+  #man code,#man strong,#man b {font-weight:bold;color:#131211}
+  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
+  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
+  #man pre code {font-weight:normal;background:inherit}
+  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  #man ol.man {width:100%}
+  #man ol.man li.tl {text-align:left}
+  #man ol.man li.tc {text-align:center;letter-spacing:4px}
+  #man ol.man li.tr {text-align:right;float:right}
+  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
+  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>restify-log(7)</li>
+    <li class='tc'></li>
+    <li class='tr'>restify-log(7)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>restify-log</code> - <span class="man-whatis">The restify Logger</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<pre><code>var restify = require('restify');
+var log = restify.log;
+
+log.level(restify.LogLevel.Debug);
+
+if (log.debug()) {
+  log.debug('Here's an object: %o', { foo: 'bar' });
+}
+</code></pre>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>The restify logger is a minimal log4j-esque logger that restify uses
+internally, and is generally useful for most projects.  It logs a standard
+formatted message to <code>stderr</code>, and prefixes like:</p>
+
+<pre><code>YYYY-MM-DD HH:MM:SSZ &lt;LEVEL>: sprintf formatted message here.
+</code></pre>
+
+<p>Level is one of the following, in descending order:</p>
+
+<ul>
+<li>Fatal</li>
+<li>Error</li>
+<li>Warn</li>
+<li>Info</li>
+<li>Debug</li>
+<li>Trace</li>
+</ul>
+
+
+<p>Descending means if you set the level to say 'Warn', then the logger will only
+output messages that are of level Fatal/Error/Warn.  Everything else will be
+surpressed.  The default level is Info.</p>
+
+<p>Each level is accessed by a lower-case method of the same name:</p>
+
+<ul>
+<li>log.fatal()</li>
+<li>log.error()</li>
+<li>log.warn()</li>
+<li>log.info()</li>
+<li>log.debug()</li>
+<li>log.trace()</li>
+</ul>
+
+
+<p>These methods take an <code>sprintf</code> style message, where the following format
+qualifiers are supported:</p>
+
+<ul>
+<li>%d Number</li>
+<li>%s String</li>
+<li>%o Object (uses node.js util.inspect())</li>
+</ul>
+
+
+<p>You can check for a level being enabled in your code by calling these functions
+with no arguments:</p>
+
+<pre><code>if (log.debug()) {
+   // Some expensive calculation
+   log.debug('Here's %s object: %o', 'foo', {});
+}
+</code></pre>
+
+<p>The restify framework uses Fatal/Error/Warn/Info/Trace.  To get verbose internal
+logging from restify, set the level to Trace.  Debug is intended to be used by
+applications as a useful way to generate debug logs.</p>
+
+<p>Finally, set the level with <code>log.level</code>.  The level params are on the:
+<code>restify.LogLevel</code> object.</p>
+
+<h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
+
+<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#58;&#109;&#x63;&#97;&#x76;&#x61;&#x67;&#101;&#x40;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#109;&#x63;&#97;&#x76;&#97;&#x67;&#101;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;</a></p>
+
+<p>This software is licensed under the MIT License.</p>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><a href="restify.3.html" class="man-ref">restify<span class="s">(3)</span></a></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>May 2011</li>
+    <li class='tr'>restify-log(7)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
