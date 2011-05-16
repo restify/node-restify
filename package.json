@@ -20,7 +20,7 @@
             "./docs/restify-log.7",
             "./docs/restify-request.7",
             "./docs/restify-response.7",
-            "./docs/restify-routes.7",
+            "./docs/restify-routes.7"
            ]
   },
   "devDependencies": {
