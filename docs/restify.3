@@ -1,0 +1,241 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "RESTIFY" "3" "May 2011" "" ""
+.
+.SH "NAME"
+\fBrestify\fR \- Getting Started with restify
+.
+.SH "SYNOPSIS"
+.
+.nf
+
+var restify = require(\'restify\');
+var server = restify\.createServer();
+
+server\.get(\'/my/:name\', function(req, res) {
+  res\.send(200, {
+    message: \'Hello \' + req\.uriParams\.name
+  });
+});
+
+server\.listen(8080);
+.
+.fi
+.
+.SH "DESCRIPTION"
+restify is a node\.js module built specifically to enable you to build correct REST web services\. restify is \fBnot\fR an MVC framework and does not come bundled with unnecessary functionality (such as templating)\. restify lets you do one thing, which is easily build machine\-consumable web service APIs that correctly implement HTTP\.
+.
+.P
+restify\'s external API looks very similar to some amalgam of sinatra and express\. This man page contains basic getting started information, and plenty of references to more details on the API\.
+.
+.SH "INSTALLATION"
+.
+.nf
+
+npm install restify
+.
+.fi
+.
+.SH "GETTING STARTED"
+To create an instance of the restify HTTP server, simply call the \fBcreateServer\fR api on the top\-level module\. This method takes an optional \fBoptions\fR Object, of the following syntax:
+.
+.IP "" 4
+.
+.nf
+
+{
+  apiVersion: \'1\.2\.3\',   // a semver string (see [VERSIONING] below)
+  serverName: \'MySite\',  // returned in the HTTP \'Server:` header
+  exceptionHandler: function(e) {}, // calls function(2) on uncaught errors
+  maxRequestSize: 8192,  // Any request body larger than this gets a 400
+  clockSkew: 300,        // Allow up to N seconds of skew in the Date header
+  accept: [\'application/json\']  // Allow these Accept types
+}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Defaults/Details for the paramters above:
+.
+.TP
+apiVersion
+By default, there is no version handling invoked\. However, if you do specify this header, then \fBx\-api\-version: 1\.2\.3\fR will be returned in all HTTP responses\. Additionally, clients are expected to send an \fBx\-api\-version\fR header that matches\. In the \fBvery\fR near future, expect this parameter to support versioned routes (i\.e\., so you can map handlers to versions)\.
+.
+.TP
+serverName
+Simple string that is not interpreted and returned in the \'Server:\' HTTP header\. Defaults to \fBnode\.js\fR\.
+.
+.TP
+exceptionHandler
+Installs your function to handle all uncaught JS exceptions\. If you \fBdon\'t\fR provide one, restify installs a default handler that simply returns 500 Internal Server Error, and logs a warning\.
+.
+.TP
+maxRequestSize
+Caps the amount of data a client can send to your HTTP server, in bytes\. Defaults to 8192 (8k)\.
+.
+.TP
+clockSkew
+If the client sends a \'Date\' header, it is checked to be within \fBclockSkew\fR seconds, in either direction\. Defaults to 300s (5m)\.
+.
+.TP
+accept
+An array of Acceptable content types this server can process\. Defaults to \fBapplication/json\fR\. Not really useful as of yet\.
+.
+.SH "ROUTING"
+As of v0\.1\.6, routes are simple exact matches, and do not support RegEx matching\. This is on the feature list however\. Routes are installed on the server object with the HTTP verb to map to, a paramterized URL, and any combination of functions or array of functions as arguments\.
+.
+.IP "" 4
+.
+.nf
+
+server\.head(\'/foo/:id\', [pre1, pre2], handler, [post1]);
+server\.get(\'/foo/:id\', [pre1, pre2], handler, [post1]);
+server\.post(\'/foo\', [pre1, pre2], handler, [post1]);
+server\.put(\'/foo/:id\', [pre1, pre2], handler, [post1]);
+server\.del(\'/foo/:id\', [pre1, pre2], handler, [post1]);
+.
+.fi
+.
+.IP "" 0
+.
+.P
+All functions passed in are expected to be of the form:
+.
+.IP "" 4
+.
+.nf
+
+function(request, response, next);
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Note that you \fBmust\fR call return next(); in your function when done if you want the chain to carry through (sometimes you might not want to do that)\.
+.
+.P
+All :parameter names you specify in the URL route get parsed into the \fBrequest\.uriParams\fR object\. For example, in the routes above, you could access \fBid\fR at \fBrequest\.uriParams\.id\fR\. Note these parameters are \fBnot\fR on the \fBrequest\.params\fR object, which is where any API parameters a client sends in are placed\.
+.
+.SH "REQUEST PARAMETERS"
+restify supports API parameters in form\-urlencoded content and application/json bodies\. All parameters are placed on the \fBrequest\.parameters\fR object\. For example, a request like:
+.
+.IP "" 4
+.
+.nf
+
+server\.post(\'/foo/:id\', function(req, res, next) {});
+
+POST /foo/123?param1=dog&param2=cat
+Host: example\.com
+Content\-Type: application/x\-www\-form\-urlencoded
+
+param3=bird&param4=turtle
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Would result in a request object like:
+.
+.IP "" 4
+.
+.nf
+
+{
+  uriParams: {
+    id: \'123\'
+  },
+  params: {
+    param1: \'dog\',
+param2: \'cat\',
+param3: \'bird\',
+param4: \'turtle\'
+  }
+}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Note that restify supports form\-urlencoded parameter parsing, as well as application/json parsing\. Any parameters are merged with query string parameters\.
+.
+.P
+For more details on the request object, see \fBnpm help restify\-request\fR\.
+.
+.SH "SENDING RESPONSE"
+Responses are sent by your handler using either the \fBsend\fR or \fBsendError\fR api\.
+.
+.P
+The \fBsend\fR method can be invoked in one of two forms:
+.
+.IP "" 4
+.
+.nf
+
+response\.send(code, body, headers);
+response\.send({
+  code: 200,
+  body: {
+    message: \'Hello World\'
+  }
+  headers: {
+    \'x\-foo\': \'bar\'
+  }
+});
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The first form being more common, the latter form being preferable for advanced use cases\. In the first form, code is a \fBNumber\fR, body is a JS \fBObject\fR, and headers is an optional JS \fBObject\fR\.
+.
+.P
+For more details on the respose object, see \fBnpm help restify\-response\fR\.
+.
+.SH "LOGGING"
+restify ships with a minimal approximation of the log4j logger\. You are not required to use it in any way\. You can tune the restify logging level with \fBrestify\.log\.level(restify\.LogLevel\.<Level>)\fR, where \fILevel\fR is one of:
+.
+.IP "\(bu" 4
+Fatal
+.
+.IP "\(bu" 4
+Error
+.
+.IP "\(bu" 4
+Warn
+.
+.IP "\(bu" 4
+Info
+.
+.IP "\(bu" 4
+Debug
+.
+.IP "\(bu" 4
+Trace
+.
+.IP "" 0
+.
+.P
+The default level is Info\. To get verbose internal logging from restify, set the level to Trace\.
+.
+.P
+For more details on logging, see \fBnpm help restify\-log\fR\.
+.
+.SH "SECURITY CONSIDERATIONS"
+restify does not provide you any built\-in authentication or authorization\. It is typical that you will need to implement 2 \fBpre\fR filters to handle these\. You should additionally consider always adding an audit \fBpost\fR filter on all requests\.
+.
+.SH "COPYRIGHT/LICENSE"
+Copyright 2011 Mark Cavage \fImcavage@gmail\.com\fR
+.
+.P
+This software is licensed under the MIT License\.
+.
+.SH "SEE ALSO"
+restify\-request(7), restify\-response(7), restify\-routes(7), restify\-log(7)

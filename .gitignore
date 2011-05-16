@@ -1,4 +1,3 @@
 node_modules
 docs/*.html
-docs/*.3
-docs/*.7
+*.log
