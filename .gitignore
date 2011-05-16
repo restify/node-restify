@@ -1,2 +1,4 @@
 node_modules
-docs/*.3*
+docs/*.html
+docs/*.3
+docs/*.7

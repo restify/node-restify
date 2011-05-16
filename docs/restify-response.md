@@ -1,4 +1,4 @@
-restify-response(3) -- The Response Object
+restify-response(7) -- The Response Object
 ==========================================
 
 ## SYNOPSIS
@@ -163,4 +163,4 @@ This software is licensed under the MIT License.
 
 ## SEE ALSO
 
-restify(3), restify-request(3)
+restify(3), restify-request(7)

@@ -188,4 +188,4 @@ This software is licensed under the MIT License.
 
 ## SEE ALSO
 
-restify-request(3), restify-response(3), restify-log(3)
+restify-request(7), restify-response(7), restify-routes(7), restify-log(7)

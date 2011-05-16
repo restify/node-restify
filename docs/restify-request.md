@@ -1,4 +1,4 @@
-restify-request(3) -- The Request Object
+restify-request(7) -- The Request Object
 ========================================
 
 ## SYNOPSIS
@@ -78,4 +78,4 @@ This software is licensed under the MIT License.
 
 ## SEE ALSO
 
-restify(3), restify-routes(3)
+restify(3), restify-routes(7)

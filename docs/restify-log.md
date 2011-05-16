@@ -1,4 +1,4 @@
-restify-log(3) -- The restify Logger
+restify-log(7) -- The restify Logger
 ====================================
 
 ## SYNOPSIS
