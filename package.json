@@ -12,7 +12,8 @@
     "node-uuid": ">=1.1.0"
   },
   "scripts": {
-    "test": "./node_modules/nodeunit/bin/nodeunit tst"
+    "pretest": "./node_modules/.bin/jshint lib tst",
+    "test": "./node_modules/.bin/whiskey -t \"`find tst -name *.test.js | xargs`\""
   },
   "man": [
     "./docs/restify.3",
@@ -24,7 +25,7 @@
   "devDependencies": {
     "httpu": ">=0.0.1",
     "jshint": ">=0.1.9",
-    "nodeunit": ">=0.5.1"
+    "whiskey": ">=0.3.3"
   },
   "engines": {
     "node": ">=0.4"

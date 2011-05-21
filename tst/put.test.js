@@ -1,71 +1,77 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 var http = require('httpu');
-var testCase = require('nodeunit').testCase;
 var uuid = require('node-uuid');
 
 var common = require('./lib/common');
 var restify = require('../lib/restify');
 
-module.exports = testCase({
 
-  setUp: function(callback) {
-    common.setup(this);
-    this.options.method = 'PUT';
-    this.options.path = '/test/unit';
-    this.server = restify.createServer({
-      apiVersion: '1.2.3',
-      serverName: 'RESTify'
-    });
 
-    this.server.put('/test/:name', function(req, res) {
-      res.send(204);
-    });
+// --- Globals
 
-    this.server.listen(this.options.socketPath, function() {
-      callback();
-    });
-  },
+var options = {};
+var server = null;
+var socket = '/tmp/.' + uuid();
 
-  tearDown: function(callback) {
-    this.server.on('close', function() {
-      callback();
-    });
-    this.server.close();
-  },
 
-  invalidMethod: function(test) {
-    var self = this;
-    this.options.method = 'POST';
 
-    test.expect(14);
-    http.request(self.options, function(res) {
-      common.checkResponse(test, res);
-      test.equals(res.statusCode, 405);
-      test.done();
-    }).end();
-  },
+// --- Tests
 
-  invalidPath: function(test) {
-    var self = this;
-    this.options.appendPath('/' + uuid());
+exports.setUp = function(test, assert) {
+  server = restify.createServer({
+    apiVersion: '1.2.3',
+    serverName: 'RESTify'
+  });
 
-    test.expect(13);
-    http.request(this.options, function(res) {
-      common.checkResponse(test, res);
-      test.equals(res.statusCode, 404);
-      test.done();
-    }).end();
-  },
+  server.put('/test/:name', function(req, res) {
+    res.send(204);
+  });
 
-  basicSuccess: function(test) {
-    var self = this;
+  server.listen(socket, function() {
+    test.finish();
+  });
+};
 
-    test.expect(14);
-    http.request(this.options, function(res) {
-      common.checkResponse(test, res);
-      test.equals(res.statusCode, 204);
-      test.done();
-    }).end();
-  }
 
-});
+exports.test_bad_method = function(test, assert) {
+  var opts = common.newOptions(socket, '/test/unit');
+  opts.method = 'POST';
+
+  http.request(opts, function(res) {
+    common.checkResponse(assert, res);
+    assert.equal(res.statusCode, 405);
+    test.finish();
+  }).end();
+};
+
+
+exports.test_not_found = function(test, assert) {
+  var opts = common.newOptions(socket, '/' + uuid());
+  opts.method = 'PUT';
+
+  http.request(opts, function(res) {
+    common.checkResponse(assert, res);
+    assert.equal(res.statusCode, 404);
+    test.finish();
+  }).end();
+};
+
+
+exports.test_success = function(test, assert) {
+  var opts = common.newOptions(socket, '/test/unit');
+  opts.method = 'PUT';
+
+  http.request(opts, function(res) {
+    common.checkResponse(assert, res);
+    assert.equal(res.statusCode, 204);
+    test.finish();
+  }).end();
+};
+
+
+exports.tearDown = function(test, assert) {
+  server.on('close', function() {
+    test.finish();
+  });
+  server.close();
+};
