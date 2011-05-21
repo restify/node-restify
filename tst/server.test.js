@@ -409,6 +409,57 @@ exports.test_log_off = function(test, assert) {
       common.checkResponse(assert, res);
       assert.equal(res.statusCode, 200);
       server.on('close', function() {
+        log.level(log.Level.Trace);
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_options_with_resource = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.put('/', _handler);
+  server.del('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.method = 'OPTIONS';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      assert.ok(res.headers.allow);
+      assert.ok(res.headers.allow, 'GET, PUT, DELETE');
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_options_wildcard_resource = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.put('/', _handler);
+  server.del('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '*');
+    opts.method = 'OPTIONS';
+
+    http.request(opts, function(res) {
+      res._skipAllowedMethods = true;
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      assert.ok(!res.headers.allow);
+      server.on('close', function() {
         test.finish();
       });
       server.close();
