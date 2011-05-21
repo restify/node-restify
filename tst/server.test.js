@@ -5,7 +5,8 @@ var uuid = require('node-uuid');
 var common = require('./lib/common');
 var restify = require('../lib/restify');
 
-restify.log.level(restify.LogLevel.Trace);
+var log = restify.log;
+log.level(log.Level.Trace);
 
 
 
@@ -362,6 +363,51 @@ exports.test_clock_skew = function(test, assert) {
     http.request(opts, function(res) {
       common.checkResponse(assert, res);
       assert.equal(res.statusCode, 400);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_log_stdout = function(test, assert) {
+  var server = restify.createServer({
+    logTo: process.stdout
+  });
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        log.writeTo(process.stderr);
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_log_off = function(test, assert) {
+  log.level(log.Level.Off);
+
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
       server.on('close', function() {
         test.finish();
       });
