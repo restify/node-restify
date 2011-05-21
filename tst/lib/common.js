@@ -13,13 +13,10 @@ module.exports = {
     assert.ok(response.headers.server);
     assert.ok(response.headers.connection);
     assert.ok(response.headers.date);
-    assert.ok(response.headers['x-api-version']);
     assert.ok(response.headers['x-request-id']);
     assert.ok(response.headers['x-response-time']);
 
-    assert.equal(response.headers.server, 'RESTify');
     assert.equal(response.headers.connection, 'close');
-    assert.equal(response.headers['x-api-version'], '1.2.3');
 
     assert.equal(response.httpVersion, '1.1');
   },

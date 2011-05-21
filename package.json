@@ -13,7 +13,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst",
-    "test": "./node_modules/.bin/whiskey -t \"`find tst -name *.test.js | xargs`\""
+    "test": "./node_modules/.bin/whiskey --sequential -t \"`find tst -name *.test.js | xargs`\""
   },
   "man": [
     "./docs/restify.3",
@@ -24,7 +24,7 @@
   ],
   "devDependencies": {
     "httpu": ">=0.0.1",
-    "jshint": ">=0.1.9",
+    "jshint": ">=0.2.1",
     "whiskey": ">=0.3.3"
   },
   "engines": {
