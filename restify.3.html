@@ -161,10 +161,10 @@ the following syntax:</p>
 <pre><code>{
   apiVersion: '1.2.3',   // a semver string (see [VERSIONING] below)
   serverName: 'MySite',  // returned in the HTTP 'Server:` header
-  exceptionHandler: function(e) {}, // calls function(2) on uncaught errors
   maxRequestSize: 8192,  // Any request body larger than this gets a 400
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-  accept: ['application/json']  // Allow these Accept types
+  accept: ['application/json'],  // Allow these Accept types
+  logTo: process.stderr  // Where to direct log output
 }
 </code></pre>
 
@@ -178,15 +178,14 @@ header that matches.  In the <strong>very</strong> near future, expect this para
 support versioned routes (i.e., so you can map handlers to versions).</dd>
 <dt>serverName</dt><dd>Simple string that is not interpreted and returned in the 'Server:' HTTP
 header.  Defaults to <code>node.js</code>.</dd>
-<dt>exceptionHandler</dt><dd>Installs your function to handle all uncaught JS exceptions.  If you <strong>don't</strong>
-provide one, restify installs a default handler that simply returns 500
-Internal Server Error, and logs a warning.</dd>
 <dt>maxRequestSize</dt><dd>Caps the amount of data a client can send to your HTTP server, in bytes.
 Defaults to 8192 (8k).</dd>
 <dt>clockSkew</dt><dd>If the client sends a 'Date' header, it is checked to be within <code>clockSkew</code>
 seconds, in either direction. Defaults to 300s (5m).</dd>
 <dt class="flush">accept</dt><dd>An array of Acceptable content types this server can process. Defaults to
 <code>application/json</code>.  Not really useful as of yet.</dd>
+<dt class="flush">logTo</dt><dd>An instance of <code>Writable Stream</code>.  All restify.log messages will go to that.
+Defaults to process.stderr.</dd>
 </dl>
 
 
@@ -241,9 +240,9 @@ param3=bird&amp;param4=turtle
   },
   params: {
     param1: 'dog',
-param2: 'cat',
-param3: 'bird',
-param4: 'turtle'
+    param2: 'cat',
+    param3: 'bird',
+    param4: 'turtle'
   }
 }
 </code></pre>
@@ -310,7 +309,7 @@ requests.</p>
 
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#97;&#105;&#108;&#x74;&#111;&#x3a;&#x6d;&#x63;&#97;&#118;&#x61;&#103;&#x65;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#109;" data-bare-link="true">&#109;&#99;&#97;&#x76;&#x61;&#103;&#x65;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#109;&#x63;&#97;&#x76;&#x61;&#103;&#x65;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;" data-bare-link="true">&#109;&#99;&#x61;&#118;&#97;&#x67;&#101;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#99;&#111;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
