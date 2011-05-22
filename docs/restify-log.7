@@ -38,6 +38,9 @@ YYYY\-MM\-DD HH:MM:SSZ <LEVEL>: sprintf formatted message here\.
 Level is one of the following, in descending order:
 .
 .IP "\(bu" 4
+Off
+.
+.IP "\(bu" 4
 Fatal
 .
 .IP "\(bu" 4
@@ -58,7 +61,7 @@ Trace
 .IP "" 0
 .
 .P
-Descending means if you set the level to say \'Warn\', then the logger will only output messages that are of level Fatal/Error/Warn\. Everything else will be surpressed\. The default level is Info\.
+Descending means if you set the level to say \'Warn\', then the logger will only output messages that are of level Fatal/Error/Warn\. Everything else will be surpressed\. The default level is Info\. Off disables logging altogether\.
 .
 .P
 Each level is accessed by a lower\-case method of the same name:

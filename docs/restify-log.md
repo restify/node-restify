@@ -22,6 +22,7 @@ formatted message to `stderr`, and prefixes like:
 
 Level is one of the following, in descending order:
 
+* Off
 * Fatal
 * Error
 * Warn
@@ -31,7 +32,7 @@ Level is one of the following, in descending order:
 
 Descending means if you set the level to say 'Warn', then the logger will only
 output messages that are of level Fatal/Error/Warn.  Everything else will be
-surpressed.  The default level is Info.
+surpressed.  The default level is Info.  Off disables logging altogether.
 
 Each level is accessed by a lower-case method of the same name:
 

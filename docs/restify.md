@@ -39,10 +39,10 @@ the following syntax:
     {
       apiVersion: '1.2.3',   // a semver string (see [VERSIONING] below)
       serverName: 'MySite',  // returned in the HTTP 'Server:` header
-      exceptionHandler: function(e) {}, // calls function(2) on uncaught errors
       maxRequestSize: 8192,  // Any request body larger than this gets a 400
       clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-      accept: ['application/json']  // Allow these Accept types
+      accept: ['application/json'],  // Allow these Accept types
+      logTo: process.stderr  // Where to direct log output
     }
 
 Defaults/Details for the paramters above:
@@ -56,10 +56,6 @@ Defaults/Details for the paramters above:
 * serverName:
   Simple string that is not interpreted and returned in the 'Server:' HTTP
   header.  Defaults to `node.js`.
-* exceptionHandler:
-  Installs your function to handle all uncaught JS exceptions.  If you **don't**
-  provide one, restify installs a default handler that simply returns 500
-  Internal Server Error, and logs a warning.
 * maxRequestSize:
   Caps the amount of data a client can send to your HTTP server, in bytes.
   Defaults to 8192 (8k).
@@ -69,6 +65,9 @@ Defaults/Details for the paramters above:
 * accept:
   An array of Acceptable content types this server can process. Defaults to
   `application/json`.  Not really useful as of yet.
+* logTo:
+  An instance of `Writable Stream`.  All restify.log messages will go to that.
+  Defaults to process.stderr.
 
 ## ROUTING
 
@@ -118,9 +117,9 @@ Would result in a request object like:
       },
       params: {
         param1: 'dog',
-	param2: 'cat',
-	param3: 'bird',
-	param4: 'turtle'
+        param2: 'cat',
+        param3: 'bird',
+        param4: 'turtle'
       }
     }
 

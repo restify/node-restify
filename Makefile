@@ -11,11 +11,9 @@ GLINT = gjslint
 # Skip the files that have > 80 columns that aren't fixable
 GLINT_ARGS = --nojsdoc -x lib/sprintf.js -e node_modules -r .
 
-NODEUNIT = nodeunit
-
 .PHONY: check test clean all docs
 
-all:: check test docs
+all:: glint test docs
 
 docs:
 	(cd docs && ls *.md | xargs ronn --style screen,toc)
@@ -33,4 +31,4 @@ lint:
 	${LINT} ${LINT_ARGS} tst/*.js
 
 test:
-	${NODEUNIT} tst
+	npm test

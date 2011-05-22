@@ -75,7 +75,8 @@ The `send(options)` form has the following parameters:
       headers: {},
       body: {},
       noClose: boolean,
-      noEnd: boolean
+      noEnd: boolean,
+      noContentMD5: boolean
     });
 
 This method is used if you want to send back content that restify really doesn't

@@ -47,10 +47,10 @@ To create an instance of the restify HTTP server, simply call the \fBcreateServe
 {
   apiVersion: \'1\.2\.3\',   // a semver string (see [VERSIONING] below)
   serverName: \'MySite\',  // returned in the HTTP \'Server:` header
-  exceptionHandler: function(e) {}, // calls function(2) on uncaught errors
   maxRequestSize: 8192,  // Any request body larger than this gets a 400
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-  accept: [\'application/json\']  // Allow these Accept types
+  accept: [\'application/json\'],  // Allow these Accept types
+  logTo: process\.stderr  // Where to direct log output
 }
 .
 .fi
@@ -69,10 +69,6 @@ serverName
 Simple string that is not interpreted and returned in the \'Server:\' HTTP header\. Defaults to \fBnode\.js\fR\.
 .
 .TP
-exceptionHandler
-Installs your function to handle all uncaught JS exceptions\. If you \fBdon\'t\fR provide one, restify installs a default handler that simply returns 500 Internal Server Error, and logs a warning\.
-.
-.TP
 maxRequestSize
 Caps the amount of data a client can send to your HTTP server, in bytes\. Defaults to 8192 (8k)\.
 .
@@ -83,6 +79,10 @@ If the client sends a \'Date\' header, it is checked to be within \fBclockSkew\f
 .TP
 accept
 An array of Acceptable content types this server can process\. Defaults to \fBapplication/json\fR\. Not really useful as of yet\.
+.
+.TP
+logTo
+An instance of \fBWritable Stream\fR\. All restify\.log messages will go to that\. Defaults to process\.stderr\.
 .
 .SH "ROUTING"
 As of v0\.1\.6, routes are simple exact matches, and do not support RegEx matching\. This is on the feature list however\. Routes are installed on the server object with the HTTP verb to map to, a paramterized URL, and any combination of functions or array of functions as arguments\.
@@ -152,9 +152,9 @@ Would result in a request object like:
   },
   params: {
     param1: \'dog\',
-param2: \'cat\',
-param3: \'bird\',
-param4: \'turtle\'
+    param2: \'cat\',
+    param3: \'bird\',
+    param4: \'turtle\'
   }
 }
 .
