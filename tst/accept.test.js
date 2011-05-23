@@ -61,13 +61,15 @@ function _rfc822(date) {
 
 // --- Tests
 
-exports.test_create_no_options = function(test, assert) {
+exports.test_accept_default = function(test, assert) {
   var server = restify.createServer();
   var socket = '/tmp/.' + uuid();
 
   server.get('/', _handler);
   server.listen(socket, function() {
     var opts = common.newOptions(socket, '/');
+    opts.headers.accept = 'application/json';
+
     http.request(opts, function(res) {
       common.checkResponse(assert, res);
       assert.equal(res.headers.server, 'node.js');
@@ -81,109 +83,112 @@ exports.test_create_no_options = function(test, assert) {
 };
 
 
-exports.test_create_empty_options = function(test, assert) {
-  var server = restify.createServer({});
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.headers.server, 'node.js');
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_server_name = function(test, assert) {
-  var server = restify.createServer({
-    serverName: 'foo'
-  });
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.headers.server, 'foo');
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_max_request_size = function(test, assert) {
-  var server = restify.createServer({
-    maxRequestSize: 5
-  });
-  var socket = '/tmp/.' + uuid();
-
-  server.post('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    opts.method = 'POST';
-
-    var req = http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 413);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    });
-
-    req.write(JSON.stringify({ ThisIsALongString: uuid()}, null, 2));
-    req.end();
-  });
-};
-
-
-exports.test_clock_ok = function(test, assert) {
+exports.test_accept_bad = function(test, assert) {
   var server = restify.createServer();
   var socket = '/tmp/.' + uuid();
 
   server.get('/', _handler);
   server.listen(socket, function() {
     var opts = common.newOptions(socket, '/');
-    opts.headers.Date = _rfc822(new Date());
-
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_clock_skew = function(test, assert) {
-  var server = restify.createServer();
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    opts.headers.Date = _rfc822(new Date(1995, 11, 17, 3, 24, 0));
+    opts.headers.accept = 'application/xml';
 
     http.request(opts, function(res) {
       res._skipAllowedMethods = true;
       common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 400);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 406);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_accept_partial_wildcard = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers.accept = 'application/*';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_accept_double_wildcard = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers.accept = '*/*';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_accept_explicit = function(test, assert) {
+  var server = restify.createServer({
+    accept: ['text/html']
+  });
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers.accept = 'text/html';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_multiple_accept = function(test, assert) {
+  var server = restify.createServer({
+    accept: ['text/html', 'text/xml']
+  });
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers.accept = 'text/xml';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
       server.on('close', function() {
         test.finish();
       });

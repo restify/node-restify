@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst",
-    "test": "./node_modules/.bin/whiskey -t \"`find tst -name *.test.js | xargs`\""
+    "test": "./node_modules/.bin/whiskey --timeout 500 -t \"`find tst -name *.test.js | xargs`\""
   },
   "man": [
     "./docs/restify.3",

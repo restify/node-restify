@@ -61,17 +61,22 @@ function _rfc822(date) {
 
 // --- Tests
 
-exports.test_create_no_options = function(test, assert) {
+exports.test_options_with_resource = function(test, assert) {
   var server = restify.createServer();
   var socket = '/tmp/.' + uuid();
 
   server.get('/', _handler);
+  server.put('/', _handler);
+  server.del('/', _handler);
   server.listen(socket, function() {
     var opts = common.newOptions(socket, '/');
+    opts.method = 'OPTIONS';
+
     http.request(opts, function(res) {
       common.checkResponse(assert, res);
-      assert.equal(res.headers.server, 'node.js');
       assert.equal(res.statusCode, 200);
+      assert.ok(res.headers.allow);
+      assert.ok(res.headers.allow, 'GET, PUT, DELETE');
       server.on('close', function() {
         test.finish();
       });
@@ -81,109 +86,66 @@ exports.test_create_no_options = function(test, assert) {
 };
 
 
-exports.test_create_empty_options = function(test, assert) {
-  var server = restify.createServer({});
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.headers.server, 'node.js');
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_server_name = function(test, assert) {
-  var server = restify.createServer({
-    serverName: 'foo'
-  });
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.headers.server, 'foo');
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_max_request_size = function(test, assert) {
-  var server = restify.createServer({
-    maxRequestSize: 5
-  });
-  var socket = '/tmp/.' + uuid();
-
-  server.post('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    opts.method = 'POST';
-
-    var req = http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 413);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    });
-
-    req.write(JSON.stringify({ ThisIsALongString: uuid()}, null, 2));
-    req.end();
-  });
-};
-
-
-exports.test_clock_ok = function(test, assert) {
+exports.test_options_wildcard_resource = function(test, assert) {
   var server = restify.createServer();
   var socket = '/tmp/.' + uuid();
 
   server.get('/', _handler);
+  server.put('/', _handler);
+  server.del('/', _handler);
   server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    opts.headers.Date = _rfc822(new Date());
-
-    http.request(opts, function(res) {
-      common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 200);
-      server.on('close', function() {
-        test.finish();
-      });
-      server.close();
-    }).end();
-  });
-};
-
-
-exports.test_clock_skew = function(test, assert) {
-  var server = restify.createServer();
-  var socket = '/tmp/.' + uuid();
-
-  server.get('/', _handler);
-  server.listen(socket, function() {
-    var opts = common.newOptions(socket, '/');
-    opts.headers.Date = _rfc822(new Date(1995, 11, 17, 3, 24, 0));
+    var opts = common.newOptions(socket, '*');
+    opts.method = 'OPTIONS';
 
     http.request(opts, function(res) {
       res._skipAllowedMethods = true;
       common.checkResponse(assert, res);
-      assert.equal(res.statusCode, 400);
+      assert.equal(res.statusCode, 200);
+      assert.ok(!res.headers.allow);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_create_default_version = function(test, assert) {
+  var server = restify.createServer({
+    apiVersion: '1.2.3'
+  });
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers['x-api-version'], '1.2.3');
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_explicit_version = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('1.2.3', '/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers['x-api-version'], '1.2.3');
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
       server.on('close', function() {
         test.finish();
       });
