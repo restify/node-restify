@@ -74,6 +74,7 @@ exports.test_put_expect = function(test, assert) {
 exports.test_put_no_expect = function(test, assert) {
   var req = {
     path: '/test/foo',
+    expect: [204],
     body: {
       foo: 'bar',
       code: 204
@@ -250,6 +251,37 @@ exports.test_retries = function(test, assert) {
     assert.equal(err.restCode, 'RetriesExceeded');
     assert.equal(err.message, 'Maximum number of retries exceeded: 2');
     assert.ok(err.details);
+    test.finish();
+  });
+};
+
+
+exports.test_form_url_encoding = function(test, assert) {
+  var _client = restify.createClient({
+    socketPath: socket,
+    version: '1.2.3',
+    contentType: 'application/x-www-form-urlencoded',
+    retryOptions: {
+      retries: 1
+    }
+  });
+
+  var req = {
+    path: '/test/foo',
+    body: {
+      foo: 'bar'
+    },
+    query: {
+      code: 200
+    }
+  };
+
+  _client.post(req, function(err, obj, headers) {
+    assert.ifError(err);
+    assert.ok(obj);
+    assert.ok(headers);
+    assert.equal(obj.name, 'foo');
+    assert.equal(obj.foo, 'bar');
     test.finish();
   });
 };
