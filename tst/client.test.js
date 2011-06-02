@@ -287,6 +287,51 @@ exports.test_form_url_encoding = function(test, assert) {
 };
 
 
+exports.test_head_string = function(test, assert) {
+  client.head('/test/foo?code=204', function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
+exports.test_get_string = function(test, assert) {
+  client.get('/test/foo', function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
+exports.test_put_string = function(test, assert) {
+  client.put('/test/foo', function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
+exports.test_post_string = function(test, assert) {
+  client.post('/test/foo', function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
+exports.test_del_string = function(test, assert) {
+  client.del('/test/foo', function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
 exports.tearDown = function(test, assert) {
   server.on('close', function() {
     test.finish();
