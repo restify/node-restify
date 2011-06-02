@@ -191,3 +191,23 @@ exports.test_clock_skew = function(test, assert) {
     }).end();
   });
 };
+
+
+exports.test_regex_route = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get(/^\/users?(?:\/(\d+)(?:\.\.(\d+))?)?/, _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/users/1..15');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
