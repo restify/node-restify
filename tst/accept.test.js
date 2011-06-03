@@ -196,3 +196,29 @@ exports.test_multiple_accept = function(test, assert) {
     }).end();
   });
 };
+
+
+exports.test_firefox_accept = function(test, assert) {
+  var server = restify.createServer({
+  });
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/', _handler);
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers.accept =
+      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers.server, 'node.js');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+

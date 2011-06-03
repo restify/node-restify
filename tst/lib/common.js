@@ -7,7 +7,10 @@ module.exports = {
   checkResponse: function(assert, response) {
     assert.ok(response);
     assert.ok(response.headers['access-control-allow-origin']);
-    if (response.statusCode !== 404 && !response._skipAllowedMethods) {
+    if (response.statusCode !== 400 &&
+        response.statusCode !== 404 &&
+        response.statusCode !== 406 &&
+        !response._skipAllowedMethods) {
       assert.ok(response.headers['access-control-allow-methods']);
     }
     assert.ok(response.headers.server);
