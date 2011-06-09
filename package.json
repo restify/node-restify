@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -27,6 +27,7 @@
   ],
   "devDependencies": {
     "jshint": ">=0.2.1",
+    "node-uuid": ">=1.2.0",
     "whiskey": ">=0.3.3"
   },
   "engines": {
