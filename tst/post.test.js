@@ -18,6 +18,8 @@ var socket = '/tmp/.' + uuid();
 // --- Tests
 
 exports.setUp = function(test, assert) {
+  restify.log.level(restify.LogLevel.Trace);
+
   server = restify.createServer({
     apiVersion: '1.2.3',
     serverName: 'RESTify'
@@ -39,6 +41,7 @@ exports.setUp = function(test, assert) {
     test.finish();
   });
 };
+
 
 exports.test_bad_method = function(test, assert) {
   var opts = common.newOptions(socket, '/test/unit');
@@ -176,6 +179,26 @@ exports.test_merge_params = function(test, assert) {
 };
 
 
+exports.test_multibyte = function(test, assert) {
+  var content = '\u00bd + \u00bc = \u00be';
+  var  opts = common.newOptions(socket, '/test/' + uuid());
+  opts.method = 'POST';
+  opts.headers['Content-Type'] = 'text/plain';
+  opts.headers['Content-Length'] = 12;
+
+  var req = http.request(opts, function(res) {
+    common.checkResponse(assert, res);
+    // We know the server checks content-len before
+    // it checks content-type, so good enough.
+    assert.equal(res.statusCode, 415);
+    test.finish();
+  });
+
+  req.write(content);
+  req.end();
+
+
+};
 exports.tearDown = function(test, assert) {
   server.on('close', function() {
     test.finish();
