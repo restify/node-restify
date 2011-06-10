@@ -332,6 +332,42 @@ exports.test_del_string = function(test, assert) {
 };
 
 
+exports.test_url_in_constructor = function(test, assert) {
+  var client = restify.createClient({
+    path: '/test/foo',
+    socketPath: socket,
+    version: '1.2.3',
+    retryOptions: {
+      retries: 1
+    }
+  });
+
+  client.del(function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
+exports.test_url_prefix = function(test, assert) {
+  var client = restify.createClient({
+    path: '/test',
+    socketPath: socket,
+    version: '1.2.3',
+    retryOptions: {
+      retries: 1
+    }
+  });
+
+  client.del({ path: '/foo' }, function(err, headers) {
+    assert.ifError(err);
+    assert.ok(headers);
+    test.finish();
+  });
+};
+
+
 exports.tearDown = function(test, assert) {
   server.on('close', function() {
     test.finish();
