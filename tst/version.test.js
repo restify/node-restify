@@ -133,8 +133,8 @@ exports.test_multiple_version = function(test, assert) {
   });
   var socket = '/tmp/.' + uuid();
 
-  server.get('/', function(req, res, next) { return res.send(200) ; });
-  server.get('1.2.4', '/', function(req, res, next) { return res.send(201) ; });
+  server.get('/', function(req, res, next) { return res.send(200); });
+  server.get('1.2.4', '/', function(req, res, next) { return res.send(201); });
   server.listen(socket, function() {
     var opts = common.newOptions(socket, '/');
     http.request(opts, function(res) {

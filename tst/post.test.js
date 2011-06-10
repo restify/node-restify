@@ -181,7 +181,7 @@ exports.test_merge_params = function(test, assert) {
 
 exports.test_multibyte = function(test, assert) {
   var content = '\u00bd + \u00bc = \u00be';
-  var  opts = common.newOptions(socket, '/test/' + uuid());
+  var opts = common.newOptions(socket, '/test/' + uuid());
   opts.method = 'POST';
   opts.headers['Content-Type'] = 'text/plain';
   opts.headers['Content-Length'] = 12;
