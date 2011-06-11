@@ -26,17 +26,17 @@ exports.setUp = function(test, assert) {
   });
 
   var throttle = restify.createThrottle({
-    requests: 1,
-    seconds: 2,
+    burst: 1,
+    rate: .5,
     username: true,
     overrides: {
       'admin': {
-        requests: 0,
-        seconds: 0
+        burst: 0,
+        rate: 0
       },
       'special': {
-        requests: 3,
-        seconds: 1
+        burst: 3,
+        rate: 1
       }
     }
   });
@@ -82,7 +82,7 @@ exports.test_throttled = function(test, assert) {
       assert.ok(res.params);
       assert.equal(res.params.code, 'RequestThrottled');
       assert.ok(res.params.message);
-      setTimeout(function() { test.finish(); }, 1000);
+      setTimeout(function() { test.finish(); }, 2100);
     });
   }).end();
 };

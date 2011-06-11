@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -16,7 +16,7 @@
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint lib tst && which gjslint; if [[ \"$?\" = 0 ]] ; then  gjslint --nojsdoc -r . -x lib/sprintf.js -e node_modules; else echo \"Missing gjslint. Skipping lint\"; fi",
-    "test": "./node_modules/.bin/whiskey --timeout 2000 -t \"`find tst -name *.test.js | xargs`\""
+    "test": "./node_modules/.bin/whiskey --sequential --timeout 4000 -t \"`find tst -name *.test.js | xargs`\""
   },
   "man": [
     "./docs/restify.3",
