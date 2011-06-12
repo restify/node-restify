@@ -40,7 +40,7 @@ exports.test_bad_method = function(test, assert) {
 
   http.request(opts, function(res) {
     common.checkResponse(assert, res);
-    assert.equal(res.statusCode, 405);
+    assert.equal(405, res.statusCode);
     test.finish();
   }).end();
 };

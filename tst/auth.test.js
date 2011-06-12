@@ -26,12 +26,9 @@ exports.setUp = function(test, assert) {
   });
 
   function authenticate(req, res, next) {
-    if (req.authorization.basic) {
-      if (req.authorization.basic.username !== username ||
-          req.authorization.basic.password !== password) {
-        res.send(403);
-      }
-    } else {
+    if (!req.authorization.basic ||
+        req.authorization.basic.username !== username ||
+        req.authorization.basic.password !== password) {
       res.send(401);
     }
     return next();
@@ -74,7 +71,7 @@ exports.test_no_auth = function(test, assert) {
 };
 
 
-exports.test_forbidden = function(test, assert) {
+exports.test_bad_user = function(test, assert) {
   var opts = common.newOptions(socket, '/test/unit');
   opts.method = 'GET';
   opts.headers.authorization = 'Basic ' +
@@ -82,7 +79,7 @@ exports.test_forbidden = function(test, assert) {
 
   http.request(opts, function(res) {
     common.checkResponse(assert, res);
-    assert.equal(res.statusCode, 403);
+    assert.equal(res.statusCode, 401);
     test.finish();
   }).end();
 };

@@ -27,7 +27,7 @@ exports.setUp = function(test, assert) {
 
   var throttle = restify.createThrottle({
     burst: 1,
-    rate: .5,
+    rate: 0.5,
     username: true,
     overrides: {
       'admin': {
@@ -77,7 +77,7 @@ exports.test_throttled = function(test, assert) {
 
   http.request(opts, function(res) {
     common.checkResponse(assert, res);
-    assert.equal(res.statusCode, 403);
+    assert.equal(res.statusCode, 420);
     common.checkContent(assert, res, function() {
       assert.ok(res.params);
       assert.equal(res.params.code, 'RequestThrottled');

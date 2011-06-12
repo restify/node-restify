@@ -70,7 +70,6 @@ exports.test_no_version = function(test, assert) {
     var opts = common.newOptions(socket, '/');
     http.request(opts, function(res) {
       common.checkResponse(assert, res);
-      console.log('apiVersion: ' + res.headers['x-api-version']);
       assert.equal(res.statusCode, 200);
       assert.ok(!res.headers['x-api-version']);
       assert.equal(res.headers.server, 'node.js');
@@ -129,17 +128,17 @@ exports.test_explicit_version = function(test, assert) {
 
 exports.test_multiple_version = function(test, assert) {
   var server = restify.createServer({
-    apiVersion: '1.2.3'
+    version: '1.2.3'
   });
   var socket = '/tmp/.' + uuid();
 
-  server.get('/', function(req, res, next) { return res.send(200); });
   server.get('1.2.4', '/', function(req, res, next) { return res.send(201); });
+  server.get('/', function(req, res, next) { return res.send(200); });
   server.listen(socket, function() {
     var opts = common.newOptions(socket, '/');
     http.request(opts, function(res) {
       common.checkResponse(assert, res);
-      assert.equal(res.headers['x-api-version'], '1.2.3');
+      assert.ok(res.headers['x-api-version'], '1.2.3');
       assert.equal(res.headers.server, 'node.js');
       assert.equal(res.statusCode, 200);
 
@@ -154,6 +153,70 @@ exports.test_multiple_version = function(test, assert) {
         });
         server.close();
       }).end();
+    }).end();
+  });
+};
+
+
+exports.test_no_semver = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('v1', '/', function(req, res, next) { return res.send(200); });
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers['X-Api-Version'] = 'v1';
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers['x-api-version'], 'v1');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_semver = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('1.2.3', '/', function(req, res, next) { return res.send(200); });
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers['X-Api-Version'] = '>=1.2';
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.headers['x-api-version'], '1.2.3');
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
+
+
+exports.test_invalid_version = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('1.2.3', '/', function(req, res, next) { return res.send(200); });
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+    opts.headers['X-Api-Version'] = '>=2.2';
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 449);
+      assert.ok(res.headers['x-api-versions']);
+      console.log(JSON.stringify(res.headers, null, 2));
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
     }).end();
   });
 };
