@@ -211,3 +211,15 @@ exports.test_regex_route = function(test, assert) {
     }).end();
   });
 };
+
+
+exports.test_create_ssl = function(test, assert) {
+  var server = restify.createServer({
+    cert: fs.readFileSync(__dirname + '/test_cert.pem', 'ascii'),
+    key: fs.readFileSync(__dirname + '/test_key.pem', 'ascii')
+  });
+  assert.ok(server);
+  assert.ok(server.cert);
+  assert.ok(server.key);
+  test.finish();
+};
