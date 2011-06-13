@@ -41,42 +41,11 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
-  <style type='text/css' media='screen'>
-  /* style: screen */
-  body {margin:0}
-  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
-  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
-  #man h2 {margin:10px 0 0 0}
-  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
-  #man h3 {margin:0 0 0 4ex}
-  #man dt {margin:0;clear:left}
-  #man dt.flush {float:left;width:8ex}
-  #man dd {margin:0 0 0 9ex}
-  #man h1,#man h2,#man h3,#man h4 {clear:left}
-  #man pre {margin-bottom:20px}
-  #man pre+h2,#man pre+h3 {margin-top:22px}
-  #man h2+pre,#man h3+pre {margin-top:5px}
-  #man img {display:block;margin:auto}
-  #man h1.man-title {display:none}
-  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  #man h2,#man ol.man {font-size:16px;line-height:1.25
-  }
-  #man h1 {font-size:20px;line-height:2}
-  #man {text-align:justify;background:#fff}
-  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
-  #man h1,#man h2,#man h3,#man h4 {color:#030201}
-  #man ol.man,#man ol.man li {color:#636261}
-  #man code,#man strong,#man b {font-weight:bold;color:#131211}
-  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
-  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
-  #man pre code {font-weight:normal;background:inherit}
-  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  #man ol.man {width:100%}
-  #man ol.man li.tl {text-align:left}
-  #man ol.man li.tc {text-align:center;letter-spacing:4px}
-  #man ol.man li.tr {text-align:right;float:right}
-  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
-  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  <style type='text/css' media='print'>
+  /* style: print */
+  .mp {max-width:none}
+  .man-navigation {display:none !important}
+  .mp a[href]:not([href^="#"]):not([data-bare-link]):after {content:" " attr(href)}
   </style>
   <style type='text/css' media='all'>
   /* style: toc */
@@ -138,10 +107,10 @@ server.listen(8080);
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <p>restify is a node.js module built specifically to enable you to build correct
-REST web services.  restify is <strong>not</strong> an MVC framework and  does not come
-bundled with unnecessary functionality (such as templating).  restify lets you
-do one thing, which is easily build machine-consumable web service APIs that
-correctly implement HTTP.</p>
+REST web services.  restify is <strong>not</strong> an MVC framework and does not come
+bundled with unnecessary functionality for this use case (such as templating).
+restify lets you do one thing, which is easily build machine-consumable web
+service APIs that correctly implement HTTP.</p>
 
 <p>restify's external API looks very similar to some amalgam of sinatra and
 express.  This man page contains basic getting started information, and plenty
@@ -159,23 +128,26 @@ api on the top-level module.  This method takes an optional <code>options</code>
 the following syntax:</p>
 
 <pre><code>{
-  apiVersion: '1.2.3',   // a semver string (see [VERSIONING] below)
+  version: '1.2.3',      // The default version  (see restify-versions(7))
   serverName: 'MySite',  // returned in the HTTP 'Server:` header
   maxRequestSize: 8192,  // Any request body larger than this gets a 400
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-  accept: ['application/json'],  // Allow these Accept types
-  logTo: process.stderr  // Where to direct log output
+  accept: [
+    'application/json'   // Allow these Accept types
+  ],
+  key: &lt;PEM>,            // Together with `cert`, create an SSL server
+  cert: &lt;PEM>            // Together with `key`, create an SSL server
 }
 </code></pre>
 
 <p>Defaults/Details for the paramters above:</p>
 
 <dl>
-<dt>apiVersion</dt><dd>By default, there is no version handling invoked.  However, if you do specify
+<dt class="flush">version</dt><dd>By default, there is no version handling invoked.  However, if you do specify
 this header, then <code>x-api-version: 1.2.3</code> will be returned in all HTTP
-responses.  Additionally, clients are expected to send an <code>x-api-version</code>
-header that matches.  In the <strong>very</strong> near future, expect this parameter to
-support versioned routes (i.e., so you can map handlers to versions).</dd>
+responses.  Additionally, clients MUST send an <code>x-api-version</code> header that
+satisfies that version.  See  <a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a> for more details, as this is
+a large feature set.</dd>
 <dt>serverName</dt><dd>Simple string that is not interpreted and returned in the 'Server:' HTTP
 header.  Defaults to <code>node.js</code>.</dd>
 <dt>maxRequestSize</dt><dd>Caps the amount of data a client can send to your HTTP server, in bytes.
@@ -184,23 +156,53 @@ Defaults to 8192 (8k).</dd>
 seconds, in either direction. Defaults to 300s (5m).</dd>
 <dt class="flush">accept</dt><dd>An array of Acceptable content types this server can process. Defaults to
 <code>application/json</code>.  Not really useful as of yet.</dd>
-<dt class="flush">logTo</dt><dd>An instance of <code>Writable Stream</code>.  All restify.log messages will go to that.
-Defaults to process.stderr.</dd>
 </dl>
 
 
 <h2 id="ROUTING">ROUTING</h2>
 
-<p>As of v0.1.6, routes are simple exact matches, and do not support RegEx
-matching.  This is on the feature list however.  Routes are installed on the
-server object with the HTTP verb to map to, a paramterized URL, and any
-combination of functions or array of functions as arguments.</p>
+<p>Routing is similar to, but different than, express.  Defining a route still
+looks like a <code>method</code> name tacked onto the server object, but you can (1)
+pass in versions (so you can define a versioned route), (2) you can pass in
+whatever combination of functions you see fit, with the exception that if
+<em>both the first and last</em> handlers are an array of functions, they are treated
+as <code>pre</code> and <code>post</code> interceptors.  This has the following semnatics:</p>
+
+<ul>
+<li><code>pre[0]</code> is guaranteed to be called.  If you do not call <code>response.send</code> or
+<code>response.sendError</code> in your <code>pre</code> chain, and your pre functions all call
+<code>next()</code>, your <code>main</code> chain will get invoked. If your pre chain calls
+<code>response.send</code> or <code>response.sendError</code>, your <code>main</code> chain will be skipped,
+and <code>post[0]</code> will be invoked next (assuming you are still calling <code>next()</code>).</li>
+<li>Once in your <code>main</code> chain, if you call <code>response.sendError</code>, restify will
+stop processing your <code>main</code> handlers, and skip to <code>post</code>.  Calling
+<code>response.send</code> does not have this effect, as you are expected to call
+<code>response.send</code> as part of a "normal" request.</li>
+<li>Once your <code>post</code> chain is invoked, restify stops playing with ordering.</li>
+</ul>
+
+
+<p>Note that for this to work as described, you <em>still have to call next()</em>
+in your functions!</p>
+
+<p>Also note that if you're not using an array of functions for the first and last
+handlers, restify does not perform the logic above.  It instead falls back to
+what express does, and it's up to you to manage your call chain.</p>
+
+<p>As to URL definitions, note that they can be either parameterized string URLs,
+(e.g., <code>/:user/stuff/:id</code>) or a <code>RegExp</code>.  In either case, the parameters are
+available to your handler functions as <code>request.uriParams</code>.  In the non-regex
+case, they're as you named them (minus the ':', of course).  In the <code>RegExp</code>
+case, they're available in the array <code>RegExp.exec()</code> returns.</p>
+
+<p>As some examples:</p>
 
 <pre><code>server.head('/foo/:id', [pre1, pre2], handler, [post1]);
 server.get('/foo/:id', [pre1, pre2], handler, [post1]);
 server.post('/foo', [pre1, pre2], handler, [post1]);
-server.put('/foo/:id', [pre1, pre2], handler, [post1]);
-server.del('/foo/:id', [pre1, pre2], handler, [post1]);
+server.put('/foo/:id', [pre1, pre2], handler1, handler2, [post1]);
+server.del('/foo/:id', handler1, handler2, handler3);
+server.get(/^\/media\/img\/*/, function(req, res, next) {...});
 </code></pre>
 
 <p>All functions passed in are expected to be of the form:</p>
@@ -208,14 +210,13 @@ server.del('/foo/:id', [pre1, pre2], handler, [post1]);
 <pre><code>function(request, response, next);
 </code></pre>
 
-<p>Note that you <strong>must</strong> call return next(); in your function when done if you
-want the chain to carry through (sometimes you might not want to do that).</p>
+<p>Lastly, you can version your routes, as such:</p>
 
-<p>All :parameter names you specify in the URL route get parsed into the
-<code>request.uriParams</code> object.  For example, in the routes above, you could access
-<code>id</code> at <code>request.uriParams.id</code>.  Note these parameters are <strong>not</strong> on the
-<code>request.params</code> object, which is where any API parameters a client sends in are
-placed.</p>
+<pre><code>server.get('1.2.3', '/:user/foo/:id', [pre], [handlers], [post]);
+server.get('1.2.2', '/:user/foo/:id', myLegacyHandler);
+</code></pre>
+
+<p>Again, see <a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a> to understand how versioning works.</p>
 
 <h2 id="REQUEST-PARAMETERS">REQUEST PARAMETERS</h2>
 
@@ -280,7 +281,7 @@ a JS <code>Object</code>, and headers is an optional JS <code>Object</code>.</p>
 
 <h2 id="LOGGING">LOGGING</h2>
 
-<p>restify ships with a minimal approximation of the log4j logger.  You are
+<p>restify ships with a minimal interpretation of the log4j logger.  You are
 not required to use it in any way.  You can tune the restify logging level
 with <code>restify.log.level(restify.LogLevel.&lt;Level>)</code>, where <var>Level</var> is one
 of:</p>
@@ -296,7 +297,13 @@ of:</p>
 
 
 <p>The default level is Info.  To get verbose internal logging from restify, set
-the level to Trace.</p>
+the level to Trace. All messages from these apis go to stderr.</p>
+
+<p>Note that for the handful of cases where restify doesn't invoke your handlers,
+(e.g., 404, 405, 406), restify will output a w3c-compliant message to stdout.</p>
+
+<p>You can redirect stdout/stderr by passing a <code>WriteableStream</code> to
+<code>log.stdout(stream)</code> and <code>log.stderr(stream)</code>, respectively.</p>
 
 <p>For more details on logging, see <code>npm help restify-log</code>.</p>
 
@@ -309,18 +316,19 @@ requests.</p>
 
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#109;&#x63;&#97;&#x76;&#x61;&#103;&#x65;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;" data-bare-link="true">&#109;&#99;&#x61;&#118;&#97;&#x67;&#101;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#99;&#111;&#109;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#58;&#109;&#99;&#97;&#x76;&#97;&#103;&#101;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#109;&#x63;&#x61;&#118;&#97;&#103;&#x65;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><a href="restify-request.7.html" class="man-ref">restify-request<span class="s">(7)</span></a>, <a href="restify-response.7.html" class="man-ref">restify-response<span class="s">(7)</span></a>, <a href="restify-routes.7.html" class="man-ref">restify-routes<span class="s">(7)</span></a>, <a href="restify-log.7.html" class="man-ref">restify-log<span class="s">(7)</span></a></p>
+<p><a href="restify-request.7.html" class="man-ref">restify-request<span class="s">(7)</span></a>, <a href="restify-response.7.html" class="man-ref">restify-response<span class="s">(7)</span></a>, <a href="restify-routes.7.html" class="man-ref">restify-routes<span class="s">(7)</span></a>, <a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a>,
+<a href="restify-log.7.html" class="man-ref">restify-log<span class="s">(7)</span></a>, <a href="restify-client.7.html" class="man-ref">restify-client<span class="s">(7)</span></a>, <a href="restify-throttle.7.html" class="man-ref">restify-throttle<span class="s">(7)</span></a></p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2011</li>
     <li class='tr'>restify(3)</li>
   </ol>
 

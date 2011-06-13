@@ -41,42 +41,11 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
-  <style type='text/css' media='screen'>
-  /* style: screen */
-  body {margin:0}
-  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
-  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
-  #man h2 {margin:10px 0 0 0}
-  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
-  #man h3 {margin:0 0 0 4ex}
-  #man dt {margin:0;clear:left}
-  #man dt.flush {float:left;width:8ex}
-  #man dd {margin:0 0 0 9ex}
-  #man h1,#man h2,#man h3,#man h4 {clear:left}
-  #man pre {margin-bottom:20px}
-  #man pre+h2,#man pre+h3 {margin-top:22px}
-  #man h2+pre,#man h3+pre {margin-top:5px}
-  #man img {display:block;margin:auto}
-  #man h1.man-title {display:none}
-  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  #man h2,#man ol.man {font-size:16px;line-height:1.25
-  }
-  #man h1 {font-size:20px;line-height:2}
-  #man {text-align:justify;background:#fff}
-  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
-  #man h1,#man h2,#man h3,#man h4 {color:#030201}
-  #man ol.man,#man ol.man li {color:#636261}
-  #man code,#man strong,#man b {font-weight:bold;color:#131211}
-  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
-  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
-  #man pre code {font-weight:normal;background:inherit}
-  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  #man ol.man {width:100%}
-  #man ol.man li.tl {text-align:left}
-  #man ol.man li.tc {text-align:center;letter-spacing:4px}
-  #man ol.man li.tr {text-align:right;float:right}
-  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
-  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  <style type='text/css' media='print'>
+  /* style: print */
+  .mp {max-width:none}
+  .man-navigation {display:none !important}
+  .mp a[href]:not([href^="#"]):not([data-bare-link]):after {content:" " attr(href)}
   </style>
   <style type='text/css' media='all'>
   /* style: toc */
@@ -99,6 +68,8 @@
     <a href="#NAME">NAME</a>
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#W3C-LOGGING">W3C LOGGING</a>
+    <a href="#OUTPUT-REDIRECTION">OUTPUT REDIRECTION</a>
     <a href="#COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</a>
     <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
@@ -121,9 +92,8 @@ var log = restify.log;
 
 log.level(restify.LogLevel.Debug);
 
-if (log.debug()) {
+if (log.debug())
   log.debug('Here's an object: %o', { foo: 'bar' });
-}
 </code></pre>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
@@ -170,7 +140,7 @@ qualifiers are supported:</p>
 <ul>
 <li>%d Number</li>
 <li>%s String</li>
-<li>%o Object (uses node.js util.inspect())</li>
+<li>%o Object</li>
 </ul>
 
 
@@ -190,9 +160,38 @@ applications as a useful way to generate debug logs.</p>
 <p>Finally, set the level with <code>log.level</code>.  The level params are on the:
 <code>restify.LogLevel</code> object.</p>
 
+<h2 id="W3C-LOGGING">W3C LOGGING</h2>
+
+<p>In addition to the "human" output functions above, the log also ships with a W3C
+compliant interceptor that you can use anywhere after <code>response.send</code> has been
+invoked.  W3C log messages are basically this:</p>
+
+<pre><code>127.0.0.1 - admin [12/05/2011:18:31:49 GMT] "GET /foo/bar HTTP/1.1" 200 79 58
+</code></pre>
+
+<p>Where you have (in order) IP, username, timestamp, the HTTP request-line,
+response code, bytes sent, and the time (ms) it took to respond.  The response
+time is not technically part of the W3C specification, but a lot of HTTP servers
+do it, and it's useful, so restify does it.  The user above comes from
+<code>req.username</code>, which automatically gets set if you're using HTTP Basic
+Authentication.  If your clients are not authenticating with that, you will have
+to set it in somewhere before the logger gets invoked.  Otherwise you'll just
+get a '-' character in it's place (which is what the spec says to do).</p>
+
+<p>To use this logger, just add <code>log.w3c</code> to your request chain (somewhere after a
+handler that will have called <code>response.send</code>.</p>
+
+<h2 id="OUTPUT-REDIRECTION">OUTPUT REDIRECTION</h2>
+
+<p>By default, <code>log.w3c</code> writes to stdout, and the debug/info/... functions write
+to <code>stderr</code>.  To redirect these, pass a node.js <code>WriteableStream</code> into the
+functions <code>log.stdout</code> and <code>log.stderr</code> respectively.  For example, you could
+write a <code>WriteableStream</code> that is actually a rolling file appender.  That'd be
+cool...</p>
+
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#109;&#99;&#x61;&#118;&#97;&#x67;&#x65;&#64;&#x67;&#109;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#x6d;&#x63;&#x61;&#118;&#x61;&#x67;&#101;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#99;&#111;&#x6d;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#109;&#99;&#97;&#x76;&#x61;&#103;&#x65;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#x6d;" data-bare-link="true">&#109;&#x63;&#x61;&#118;&#x61;&#x67;&#101;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#x6f;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
@@ -203,7 +202,7 @@ applications as a useful way to generate debug logs.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2011</li>
     <li class='tr'>restify-log(7)</li>
   </ol>
 

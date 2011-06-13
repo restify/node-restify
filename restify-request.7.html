@@ -41,42 +41,11 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
-  <style type='text/css' media='screen'>
-  /* style: screen */
-  body {margin:0}
-  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
-  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
-  #man h2 {margin:10px 0 0 0}
-  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
-  #man h3 {margin:0 0 0 4ex}
-  #man dt {margin:0;clear:left}
-  #man dt.flush {float:left;width:8ex}
-  #man dd {margin:0 0 0 9ex}
-  #man h1,#man h2,#man h3,#man h4 {clear:left}
-  #man pre {margin-bottom:20px}
-  #man pre+h2,#man pre+h3 {margin-top:22px}
-  #man h2+pre,#man h3+pre {margin-top:5px}
-  #man img {display:block;margin:auto}
-  #man h1.man-title {display:none}
-  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  #man h2,#man ol.man {font-size:16px;line-height:1.25
-  }
-  #man h1 {font-size:20px;line-height:2}
-  #man {text-align:justify;background:#fff}
-  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
-  #man h1,#man h2,#man h3,#man h4 {color:#030201}
-  #man ol.man,#man ol.man li {color:#636261}
-  #man code,#man strong,#man b {font-weight:bold;color:#131211}
-  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
-  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
-  #man pre code {font-weight:normal;background:inherit}
-  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  #man ol.man {width:100%}
-  #man ol.man li.tl {text-align:left}
-  #man ol.man li.tc {text-align:center;letter-spacing:4px}
-  #man ol.man li.tr {text-align:right;float:right}
-  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
-  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  <style type='text/css' media='print'>
+  /* style: print */
+  .mp {max-width:none}
+  .man-navigation {display:none !important}
+  .mp a[href]:not([href^="#"]):not([data-bare-link]):after {content:" " attr(href)}
   </style>
   <style type='text/css' media='all'>
   /* style: toc */
@@ -168,6 +137,25 @@ in your requests.</dd>
 the url.  What that really means is that any repeated '/' params are
 collapsed and any trailing '/' params are erased.</dd>
 <dt class="flush"><em>url</em></dt><dd>url is the result of the node.js url.parse method.</dd>
+<dt>authorization</dt><dd><p>If there was an Authorization header, restify will parse as much of it as it
+can.  The resulting object is available under the authorization param.  The
+object is guaranteed to have <code>scheme</code> and <code>credentials</code>.  Credentials is the
+untouched string after being split off from the scheme. Scheme is, obviously,
+the scheme.  As an example <code>Authorization: Basic abc123</code> would result in an
+object of <code>{ scheme: 'Basic', credentials: 'abc123' }</code>.  If the scheme is
+<code>Basic</code>, restify will fully parse out the header as shown below:</p>
+
+<p>  {</p>
+
+<pre><code>scheme: 'Basic',
+credentials: 'abc123',
+basic: {
+  username: 'mark'
+  password: 'secret'
+}
+</code></pre>
+
+<p>  }</p></dd>
 </dl>
 
 
@@ -177,7 +165,7 @@ collapsed and any trailing '/' params are erased.</dd>
 
 <ul>
 <li>application/json</li>
-<li>application/application/x-www-form-urlencoded</li>
+<li>application/x-www-form-urlencoded</li>
 </ul>
 
 
@@ -185,7 +173,7 @@ collapsed and any trailing '/' params are erased.</dd>
 
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x6d;&#99;&#97;&#118;&#97;&#103;&#101;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;" data-bare-link="true">&#x6d;&#x63;&#x61;&#118;&#97;&#103;&#x65;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#58;&#109;&#x63;&#x61;&#118;&#x61;&#103;&#x65;&#x40;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;" data-bare-link="true">&#x6d;&#x63;&#97;&#x76;&#x61;&#x67;&#x65;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
@@ -196,7 +184,7 @@ collapsed and any trailing '/' params are erased.</dd>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2011</li>
     <li class='tr'>restify-request(7)</li>
   </ol>
 

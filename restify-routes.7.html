@@ -41,42 +41,11 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
-  <style type='text/css' media='screen'>
-  /* style: screen */
-  body {margin:0}
-  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
-  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
-  #man h2 {margin:10px 0 0 0}
-  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
-  #man h3 {margin:0 0 0 4ex}
-  #man dt {margin:0;clear:left}
-  #man dt.flush {float:left;width:8ex}
-  #man dd {margin:0 0 0 9ex}
-  #man h1,#man h2,#man h3,#man h4 {clear:left}
-  #man pre {margin-bottom:20px}
-  #man pre+h2,#man pre+h3 {margin-top:22px}
-  #man h2+pre,#man h3+pre {margin-top:5px}
-  #man img {display:block;margin:auto}
-  #man h1.man-title {display:none}
-  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
-  #man h2,#man ol.man {font-size:16px;line-height:1.25
-  }
-  #man h1 {font-size:20px;line-height:2}
-  #man {text-align:justify;background:#fff}
-  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
-  #man h1,#man h2,#man h3,#man h4 {color:#030201}
-  #man ol.man,#man ol.man li {color:#636261}
-  #man code,#man strong,#man b {font-weight:bold;color:#131211}
-  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
-  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
-  #man pre code {font-weight:normal;background:inherit}
-  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
-  #man ol.man {width:100%}
-  #man ol.man li.tl {text-align:left}
-  #man ol.man li.tc {text-align:center;letter-spacing:4px}
-  #man ol.man li.tr {text-align:right;float:right}
-  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
-  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
+  <style type='text/css' media='print'>
+  /* style: print */
+  .mp {max-width:none}
+  .man-navigation {display:none !important}
+  .mp a[href]:not([href^="#"]):not([data-bare-link]):after {content:" " attr(href)}
   </style>
   <style type='text/css' media='all'>
   /* style: toc */
@@ -102,6 +71,7 @@
     <a href="#HTTP-VERBS">HTTP VERBS</a>
     <a href="#RESTIFY-ERROR-RESPONSES">RESTIFY ERROR RESPONSES</a>
     <a href="#ACCESS-CONTROL-ALLOW-METHODS">ACCESS-CONTROL-ALLOW-METHODS</a>
+    <a href="#HTTP-OPTIONS">HTTP OPTIONS</a>
     <a href="#COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</a>
     <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
@@ -140,34 +110,83 @@ var pre = [
 ];
 
 var post = [
+  log.w3c,
   audit
 ];
 
-server.get('/your/:param/:id', pre, function(req, res, next) {
+server.get('1.2.3', '/your/:param/:id', pre, function(req, res, next) {
   res.send(200, {
     id: req.uriParams.id,
     message: 'You sent ' + req.uriParams.param,
-sent: req.params
+    sent: req.params
   });
   return next();
 }, post);
+
+server.get(/^\/img\/*/, function(req, res, next) {
+  fs.readFile('./media' + req.url, 'utf8', function(err, file) {
+    if (err) {
+      res.writeHead(500);
+      response.end();
+      return next();
+    }
+
+    res.writeHead(200);
+    res.write(file);
+    res.end();
+    return next();
+  });
+};
 </code></pre>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p>Restify routing looks like a simplified version of Sinatra.  Basically, you
-define an HTTP resource path, and optionally paramterize any section of it
-with <code>:parameters</code>, and restify will do the work of mapping an HTTP verb and
-resource to your handler chain.  Anything in the syntax <code>:param</code> in your uri
-gets set on the <code>request.uriParams</code> object with that name.</p>
+<p>Restify routing is similar to, but different than, express and sinatra.
+You define, at minimum, a URL which is optionally parameretized (with ':'
+prefixes), and any number of handler functions.  You can substitute a <code>RegExp</code>
+for the string URL if you like.  Additionally, you can version a route; see
+<a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a> for details on versioning.  Last but not least, a key
+feature of restify is that you can set up <code>pre</code> and <code>post</code> handlers that run
+before and after your <code>main</code> handlers (can be any number of functions or arrays
+of functions).</p>
 
-<p>Everythng after the first argument is any combination of filters/interceptors
-that run in the order you define them.  Each function is responsible for calling
-<code>next()</code>, otherwise the chain stops.  While you can do whatever you want here,
-the author recommends a pattern of an array of <code>pre</code> interceptors, a route
-specific <code>handler</code>, followed by an array of <code>post</code> interceptors.  Also, note
-that restify does not come bundled with any functions to perform common tasks,
-like authenticate/authorize/audit, as these are often domain-specific.</p>
+<p>When using the string syntax for a URL, you can optionally paramterize any
+section of it with <code>:parameters</code>, and anything in the syntax <code>:param</code> in your
+url gets set on the <code>request.uriParams</code> object with that name.</p>
+
+<p>Each function in your chain is responsible for calling <code>next()</code> otherwise the
+processing chain will stop.</p>
+
+<p>A special pattern in restify is the notion of passing in an array for the first
+and last handlers.  Doing so makes restify automatically treat them as <code>pre</code> and
+<code>post</code>, respectively. This has the following semnatics:</p>
+
+<ul>
+<li><code>pre[0]</code> is guaranteed to be called.  If you do not call <code>response.send</code> or
+<code>response.sendError</code> in your <code>pre</code> chain, and your pre functions all call
+<code>next()</code>, your <code>main</code> chain will get invoked. If your pre chain calls
+<code>response.send</code> or <code>response.sendError</code>, your <code>main</code> chain will be skipped,
+and <code>post[0]</code> will be invoked next (assuming you are still calling <code>next()</code>).</li>
+<li>Once in your <code>main</code> chain, if you call <code>response.sendError</code>, restify will
+stop processing your <code>main</code> handlers, and skip to <code>post</code>.  Calling
+<code>response.send</code> does not have this effect, as you are expected to call
+<code>response.send</code> as part of a "normal" request.</li>
+<li>Once your <code>post</code> chain is invoked, restify stops playing with ordering.</li>
+</ul>
+
+
+<p>Note that for this to work as described, you <em>still have to call next()</em>
+in your functions. If you don't, your chain gets dropped. It's that simple.</p>
+
+<p>Also note that if you're not using an array of functions for the first and last
+handlers, restify does not perform the logic above.  It instead falls back to
+what express does, and it's up to you to manage your call chain.</p>
+
+<p>As to URL parameters, note that they can be either parameterized string URLs,
+(e.g., <code>/:user/stuff/:id</code>) or a <code>RegExp</code>.  In either case, the parameters are
+available to your handler functions as <code>request.uriParams</code>.  In the non-regex
+case, they're as you named them (minus the ':', of course).  In the <code>RegExp</code>
+case, they're available in the array <code>RegExp.exec()</code> returns.</p>
 
 <h2 id="HTTP-VERBS">HTTP VERBS</h2>
 
@@ -186,8 +205,11 @@ like authenticate/authorize/audit, as these are often domain-specific.</p>
 
 <p>When a request comes in, and there is no matching resource at all, restify will
 return a 404 error message to the client.  If the resource does exist, but there
-is not a matching route for the given verb, restify will return a 405. This is
-what RFC 2616 tells us we should do, so that's what we do.</p>
+is not a matching route for the given verb, restify will return a 405. Lastly,
+if there is both a resource and a URL, but not a matching version, restify will
+return a 449 with an <code>x-api-versions</code>.  449 is a Microsoft HTTP extension status
+code that means 'retry-with'; I chose to snag that and use it here to mean
+'retry with a different version'. Restify does not pass back any MS headers.</p>
 
 <h2 id="ACCESS-CONTROL-ALLOW-METHODS">ACCESS-CONTROL-ALLOW-METHODS</h2>
 
@@ -204,20 +226,26 @@ server.del('/foo', function(req, res, next) { ... });
 <p>Would result in restify sending back an access-control-allow-methods header that
 was the array <code>[GET, PUT, DELETE]</code> when a request was issued against <code>/foo</code>.</p>
 
+<h2 id="HTTP-OPTIONS">HTTP OPTIONS</h2>
+
+<p>Restify automatically supports the HTTP OPTIONS verb based on your routes.  You
+can call OPTIONS against either a specific resource or <code>*</code>.  Either way, restify
+handles it, and currently does not expose the ability to override it.</p>
+
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#109;&#x61;&#105;&#108;&#116;&#x6f;&#58;&#x6d;&#99;&#x61;&#x76;&#97;&#x67;&#101;&#x40;&#x67;&#109;&#x61;&#x69;&#108;&#46;&#99;&#111;&#109;" data-bare-link="true">&#109;&#x63;&#x61;&#118;&#x61;&#103;&#101;&#x40;&#x67;&#109;&#97;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x6d;&#99;&#x61;&#118;&#97;&#x67;&#101;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#46;&#99;&#x6f;&#109;" data-bare-link="true">&#109;&#x63;&#x61;&#x76;&#x61;&#103;&#101;&#x40;&#103;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p><a href="restify.3.html" class="man-ref">restify<span class="s">(3)</span></a></p>
+<p><a href="restify.3.html" class="man-ref">restify<span class="s">(3)</span></a>, <a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a></p>
 
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>May 2011</li>
+    <li class='tc'>June 2011</li>
     <li class='tr'>restify-routes(7)</li>
   </ol>
 
