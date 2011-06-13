@@ -3,17 +3,6 @@ in node.js that is correct as per the HTTP RFC. That's it. It's not MVC, it
 doesn't bring in a lot of baggage, it's just a small framework to let you
 build a web service API.
 
-## Why does this exist?
-
-After starting with express for several backend, machine-consumed projects
-it because obvious I only needed about 10% of what connect gives you, and the
-parts they gave me still required  writing a lot of extension code over the top
-to do what I needed (mainly properly parse request parameters and respond with
-JS objects).
-
-I wanted something smaller and more purposed to this use case.  If this isn't
-you, move along, nothing to see here.
-
 ## Usage
 
     var restify = require('restify');
