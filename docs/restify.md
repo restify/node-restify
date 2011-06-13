@@ -17,10 +17,10 @@ restify(3) -- Getting Started with restify
 ## DESCRIPTION
 
 restify is a node.js module built specifically to enable you to build correct
-REST web services.  restify is **not** an MVC framework and  does not come
-bundled with unnecessary functionality (such as templating).  restify lets you
-do one thing, which is easily build machine-consumable web service APIs that
-correctly implement HTTP.
+REST web services.  restify is **not** an MVC framework and does not come
+bundled with unnecessary functionality for this use case (such as templating).
+restify lets you do one thing, which is easily build machine-consumable web
+service APIs that correctly implement HTTP.
 
 restify's external API looks very similar to some amalgam of sinatra and
 express.  This man page contains basic getting started information, and plenty
@@ -37,22 +37,25 @@ api on the top-level module.  This method takes an optional `options` Object, of
 the following syntax:
 
     {
-      apiVersion: '1.2.3',   // a semver string (see [VERSIONING] below)
+      version: '1.2.3',      // The default version  (see restify-versions(7))
       serverName: 'MySite',  // returned in the HTTP 'Server:` header
       maxRequestSize: 8192,  // Any request body larger than this gets a 400
       clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-      accept: ['application/json'],  // Allow these Accept types
-      logTo: process.stderr  // Where to direct log output
+      accept: [
+        'application/json'   // Allow these Accept types
+      ],
+      key: <PEM>,            // Together with `cert`, create an SSL server
+      cert: <PEM>            // Together with `key`, create an SSL server
     }
 
 Defaults/Details for the paramters above:
 
-* apiVersion:
+* version:
   By default, there is no version handling invoked.  However, if you do specify
   this header, then `x-api-version: 1.2.3` will be returned in all HTTP
-  responses.  Additionally, clients are expected to send an `x-api-version`
-  header that matches.  In the **very** near future, expect this parameter to
-  support versioned routes (i.e., so you can map handlers to versions).
+  responses.  Additionally, clients MUST send an `x-api-version` header that
+  satisfies that version.  See  restify-versions(7) for more details, as this is
+  a large feature set.
 * serverName:
   Simple string that is not interpreted and returned in the 'Server:' HTTP
   header.  Defaults to `node.js`.
@@ -65,35 +68,59 @@ Defaults/Details for the paramters above:
 * accept:
   An array of Acceptable content types this server can process. Defaults to
   `application/json`.  Not really useful as of yet.
-* logTo:
-  An instance of `Writable Stream`.  All restify.log messages will go to that.
-  Defaults to process.stderr.
 
 ## ROUTING
 
-As of v0.1.6, routes are simple exact matches, and do not support RegEx
-matching.  This is on the feature list however.  Routes are installed on the
-server object with the HTTP verb to map to, a paramterized URL, and any
-combination of functions or array of functions as arguments.
+Routing is similar to, but different than, express.  Defining a route still
+looks like a `method` name tacked onto the server object, but you can (1)
+pass in versions (so you can define a versioned route), (2) you can pass in
+whatever combination of functions you see fit, with the exception that if
+*both the first and last* handlers are an array of functions, they are treated
+as `pre` and `post` interceptors.  This has the following semnatics:
+
+* `pre[0]` is guaranteed to be called.  If you do not call `response.send` or
+  `response.sendError` in your `pre` chain, and your pre functions all call
+  `next()`, your `main` chain will get invoked. If your pre chain calls
+  `response.send` or `response.sendError`, your `main` chain will be skipped,
+  and `post[0]` will be invoked next (assuming you are still calling `next()`).
+* Once in your `main` chain, if you call `response.sendError`, restify will
+  stop processing your `main` handlers, and skip to `post`.  Calling
+  `response.send` does not have this effect, as you are expected to call
+  `response.send` as part of a "normal" request.
+* Once your `post` chain is invoked, restify stops playing with ordering.
+
+Note that for this to work as described, you *still have to call next()*
+in your functions!
+
+Also note that if you're not using an array of functions for the first and last
+handlers, restify does not perform the logic above.  It instead falls back to
+what express does, and it's up to you to manage your call chain.
+
+As to URL definitions, note that they can be either parameterized string URLs,
+(e.g., `/:user/stuff/:id`) or a `RegExp`.  In either case, the parameters are
+available to your handler functions as `request.uriParams`.  In the non-regex
+case, they're as you named them (minus the ':', of course).  In the `RegExp`
+case, they're available in the array `RegExp.exec()` returns.
+
+As some examples:
 
     server.head('/foo/:id', [pre1, pre2], handler, [post1]);
     server.get('/foo/:id', [pre1, pre2], handler, [post1]);
     server.post('/foo', [pre1, pre2], handler, [post1]);
-    server.put('/foo/:id', [pre1, pre2], handler, [post1]);
-    server.del('/foo/:id', [pre1, pre2], handler, [post1]);
+    server.put('/foo/:id', [pre1, pre2], handler1, handler2, [post1]);
+    server.del('/foo/:id', handler1, handler2, handler3);
+    server.get(/^\/media\/img\/*/, function(req, res, next) {...});
 
 All functions passed in are expected to be of the form:
 
     function(request, response, next);
 
-Note that you **must** call return next(); in your function when done if you
-want the chain to carry through (sometimes you might not want to do that).
+Lastly, you can version your routes, as such:
 
-All :parameter names you specify in the URL route get parsed into the
-`request.uriParams` object.  For example, in the routes above, you could access
-`id` at `request.uriParams.id`.  Note these parameters are **not** on the
-`request.params` object, which is where any API parameters a client sends in are
-placed.
+    server.get('1.2.3', '/:user/foo/:id', [pre], [handlers], [post]);
+    server.get('1.2.2', '/:user/foo/:id', myLegacyHandler);
+
+Again, see restify-versions(7) to understand how versioning works.
 
 ## REQUEST PARAMETERS
 
@@ -155,7 +182,7 @@ For more details on the respose object, see `npm help restify-response`.
 
 ## LOGGING
 
-restify ships with a minimal approximation of the log4j logger.  You are
+restify ships with a minimal interpretation of the log4j logger.  You are
 not required to use it in any way.  You can tune the restify logging level
 with `restify.log.level(restify.LogLevel.<Level>)`, where <Level> is one
 of:
@@ -168,7 +195,13 @@ of:
 * Trace
 
 The default level is Info.  To get verbose internal logging from restify, set
-the level to Trace.
+the level to Trace. All messages from these apis go to stderr.
+
+Note that for the handful of cases where restify doesn't invoke your handlers,
+(e.g., 404, 405, 406), restify will output a w3c-compliant message to stdout.
+
+You can redirect stdout/stderr by passing a `WriteableStream` to
+`log.stdout(stream)` and `log.stderr(stream)`, respectively.
 
 For more details on logging, see `npm help restify-log`.
 
@@ -187,4 +220,5 @@ This software is licensed under the MIT License.
 
 ## SEE ALSO
 
-restify-request(7), restify-response(7), restify-routes(7), restify-log(7)
+restify-request(7), restify-response(7), restify-routes(7), restify-versions(7),
+restify-log(7), restify-authorization(7), restify-client(7), restify-throttle(7)

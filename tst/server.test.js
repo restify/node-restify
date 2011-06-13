@@ -6,6 +6,7 @@ var uuid = require('node-uuid');
 var common = require('./lib/common');
 var restify = require('../lib/restify');
 
+var newError = restify.newError;
 var log = restify.log;
 log.level(log.Level.Trace);
 
@@ -222,4 +223,133 @@ exports.test_create_ssl = function(test, assert) {
   assert.ok(server.cert);
   assert.ok(server.key);
   test.finish();
+};
+
+
+exports.test_abort_pre_send = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/',
+             [function(req, res, next) {
+               res.send(200);
+               return next();
+             }],
+             function(req, res, next) {
+               assert.ok(false, 'FAIL! main handler invoked');
+             },
+             [function(req, res, next) {
+               server.on('close', function() {
+                 test.finish();
+               });
+               server.close();
+             }]);
+
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+    }).end();
+  });
+};
+
+exports.test_abort_pre_error = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/',
+             [function(req, res, next) {
+               res.sendError(newError());
+               return next();
+             }],
+             function(req, res, next) {
+               assert.ok(false, 'FAIL! main handler invoked');
+             },
+             [function(req, res, next) {
+               server.on('close', function() {
+                 test.finish();
+               });
+               server.close();
+             }]);
+
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 500);
+    }).end();
+  });
+};
+
+
+exports.test_abort_main_error = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/',
+             [function(req, res, next) {
+               return next();
+             }],
+             function(req, res, next) {
+               res.sendError(newError());
+               return next();
+             },
+             function(req, res, next) {
+               assert.ok(false, 'FAIL! main handler invoked');
+             },
+             [function(req, res, next) {
+               server.on('close', function() {
+                 test.finish();
+               });
+               server.close();
+             }]);
+
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 500);
+    }).end();
+  });
+};
+
+
+exports.test_main_no_abort = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  var called = false;
+
+  server.get('/',
+             [function(req, res, next) {
+               return next();
+             }],
+             function(req, res, next) {
+               res.send(200);
+               return next();
+             },
+             function(req, res, next) {
+               called = true;
+               return next();
+             },
+             [function(req, res, next) {
+               server.on('close', function() {
+                 test.finish();
+               });
+               assert.ok(called);
+               server.close();
+             }]);
+
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+    }).end();
+  });
 };
