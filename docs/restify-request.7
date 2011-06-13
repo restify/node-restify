@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "RESTIFY\-REQUEST" "7" "May 2011" "" ""
+.TH "RESTIFY\-REQUEST" "7" "June 2011" "" ""
 .
 .SH "NAME"
 \fBrestify\-request\fR \- The Request Object
@@ -67,6 +67,31 @@ restify overwrites the node\.js request\.url value with a \'santized\' version o
 \fIurl\fR
 url is the result of the node\.js url\.parse method\.
 .
+.TP
+authorization
+If there was an Authorization header, restify will parse as much of it as it can\. The resulting object is available under the authorization param\. The object is guaranteed to have \fBscheme\fR and \fBcredentials\fR\. Credentials is the untouched string after being split off from the scheme\. Scheme is, obviously, the scheme\. As an example \fBAuthorization: Basic abc123\fR would result in an object of \fB{ scheme: \'Basic\', credentials: \'abc123\' }\fR\. If the scheme is \fBBasic\fR, restify will fully parse out the header as shown below:
+.
+.IP
+{
+.
+.IP "" 4
+.
+.nf
+
+scheme: \'Basic\',
+credentials: \'abc123\',
+basic: {
+  username: \'mark\'
+  password: \'secret\'
+}
+.
+.fi
+.
+.IP "" 0
+.
+.IP
+}
+.
 .SH "SUPPORTED CONTENT TYPES"
 Currently restify supports the following content type when parsing requests:
 .
@@ -74,7 +99,7 @@ Currently restify supports the following content type when parsing requests:
 application/json
 .
 .IP "\(bu" 4
-application/application/x\-www\-form\-urlencoded
+application/x\-www\-form\-urlencoded
 .
 .IP "" 0
 .

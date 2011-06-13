@@ -60,13 +60,30 @@ The additional parameters placed on the request object are:
   collapsed and any trailing '/' params are erased.
 * _url:
   _url is the result of the node.js url.parse method.
+* authorization:
+  If there was an Authorization header, restify will parse as much of it as it
+  can.  The resulting object is available under the authorization param.  The
+  object is guaranteed to have `scheme` and `credentials`.  Credentials is the
+  untouched string after being split off from the scheme. Scheme is, obviously,
+  the scheme.  As an example `Authorization: Basic abc123` would result in an
+  object of `{ scheme: 'Basic', credentials: 'abc123' }`.  If the scheme is
+  `Basic`, restify will fully parse out the header as shown below:
+
+    {
+      scheme: 'Basic',
+      credentials: 'abc123',
+      basic: {
+        username: 'mark'
+        password: 'secret'
+      }
+    }
 
 ## SUPPORTED CONTENT TYPES
 
 Currently restify supports the following content type when parsing requests:
 
 * application/json
-* application/application/x-www-form-urlencoded
+* application/x-www-form-urlencoded
 
 Plans to support multipart form data are on the short-term roadmap.
 

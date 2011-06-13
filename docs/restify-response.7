@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "RESTIFY\-RESPONSE" "7" "May 2011" "" ""
+.TH "RESTIFY\-RESPONSE" "7" "June 2011" "" ""
 .
 .SH "NAME"
 \fBrestify\-response\fR \- The Response Object
@@ -134,7 +134,7 @@ response\.send({
   code: 200,
   headers: {
     \'Content\-Type\': \'text/html\',
-\'Trailer\': \'Content\-MD5\',
+    \'Trailer\': \'Content\-MD5\',
   },
   noEnd: true
 };
@@ -197,6 +197,12 @@ response\.sendError(restify\.newError({
 HttpCodes are defined on \fBrestify\.HttpCodes\fR, and there are some standard REST code strings on \fBrestify\.RestCodes\fR\. RestCodes has the following:
 .
 .IP "\(bu" 4
+BadRequest: \'BadRequest\'
+.
+.IP "\(bu" 4
+InternalError: \'InternalError\'
+.
+.IP "\(bu" 4
 InvalidArgument: \'InvalidArgument\'
 .
 .IP "\(bu" 4
@@ -206,16 +212,28 @@ InvalidCredentials: \'InvalidCredentials\'
 InvalidHeader: \'InvalidHeader\'
 .
 .IP "\(bu" 4
+InvalidVersion: \'InvalidVersion\'
+.
+.IP "\(bu" 4
 MissingParameter: \'MissingParameter\'
 .
 .IP "\(bu" 4
 NotAuthorized: \'NotAuthorized\'
 .
 .IP "\(bu" 4
+RequestThrottled: \'RequestThrottled\'
+.
+.IP "\(bu" 4
 RequestTooLarge: \'RequestTooLarge\'
 .
 .IP "\(bu" 4
+ResourceMoved: \'ResourceMoved\'
+.
+.IP "\(bu" 4
 ResourceNotFound: \'ResourceNotFound\'
+.
+.IP "\(bu" 4
+RetriesExceeded: \'RetriesExceeded\'
 .
 .IP "\(bu" 4
 UnknownError: \'UnknownError\'
@@ -226,7 +244,7 @@ UnknownError: \'UnknownError\'
 If you don\'t set \fBrestCode\fR, restify sets it to \fIUnknownError\fR\. If you don\'t set \fBmessage\fR, restify sets it to \fIUnknown error occured\.\fR\. Details and error are not required, and are not set if not present\.
 .
 .SH "SECURITY CONSIDERATIONS"
-Don\'t send back \fBerror\fR objects on the \fBsendError\fR in production usage\. That will have your stack traces, etc\. Bad news\.
+Don\'t send back JS \fBError\fR objects on the \fBsendError\fR in production usage\. That will have your stack traces, etc\. Bad news\.
 .
 .SH "COPYRIGHT/LICENSE"
 Copyright 2011 Mark Cavage \fImcavage@gmail\.com\fR

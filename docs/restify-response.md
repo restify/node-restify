@@ -89,7 +89,7 @@ to invoke `send` as such:
       code: 200,
       headers: {
         'Content-Type': 'text/html',
-	'Trailer': 'Content-MD5',
+        'Trailer': 'Content-MD5',
       },
       noEnd: true
     };
@@ -138,13 +138,19 @@ You can create one of these with `restify.newError` as such:
 HttpCodes are defined on `restify.HttpCodes`, and there are some standard
 REST code strings on `restify.RestCodes`.  RestCodes has the following:
 
+* BadRequest: 'BadRequest'
+* InternalError: 'InternalError'
 * InvalidArgument: 'InvalidArgument'
 * InvalidCredentials: 'InvalidCredentials'
 * InvalidHeader: 'InvalidHeader'
+* InvalidVersion: 'InvalidVersion'
 * MissingParameter: 'MissingParameter'
 * NotAuthorized: 'NotAuthorized'
+* RequestThrottled: 'RequestThrottled'
 * RequestTooLarge: 'RequestTooLarge'
+* ResourceMoved: 'ResourceMoved'
 * ResourceNotFound: 'ResourceNotFound'
+* RetriesExceeded: 'RetriesExceeded'
 * UnknownError: 'UnknownError'
 
 If you don't set `restCode`, restify sets it to _UnknownError_.  If you don't
@@ -153,7 +159,7 @@ are not required, and are not set if not present.
 
 ## SECURITY CONSIDERATIONS
 
-Don't send back `error` objects on the `sendError`  in production usage.
+Don't send back JS `Error` objects on the `sendError`  in production usage.
 That will have your stack traces, etc.  Bad news.
 
 ## COPYRIGHT/LICENSE

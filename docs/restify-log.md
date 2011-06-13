@@ -8,9 +8,9 @@ restify-log(7) -- The restify Logger
 
     log.level(restify.LogLevel.Debug);
 
-    if (log.debug()) {
+    if (log.debug())
       log.debug('Here's an object: %o', { foo: 'bar' });
-    }
+
 
 ## DESCRIPTION
 
@@ -48,7 +48,7 @@ qualifiers are supported:
 
 * %d Number
 * %s String
-* %o Object (uses node.js util.inspect())
+* %o Object
 
 You can check for a level being enabled in your code by calling these functions
 with no arguments:
@@ -64,6 +64,34 @@ applications as a useful way to generate debug logs.
 
 Finally, set the level with `log.level`.  The level params are on the:
 `restify.LogLevel` object.
+
+## W3C LOGGING
+
+In addition to the "human" output functions above, the log also ships with a W3C
+compliant interceptor that you can use anywhere after `response.send` has been
+invoked.  W3C log messages are basically this:
+
+    127.0.0.1 - admin [12/05/2011:18:31:49 GMT] "GET /foo/bar HTTP/1.1" 200 79 58
+
+Where you have (in order) IP, username, timestamp, the HTTP request-line,
+response code, bytes sent, and the time (ms) it took to respond.  The response
+time is not technically part of the W3C specification, but a lot of HTTP servers
+do it, and it's useful, so restify does it.  The user above comes from
+`req.username`, which automatically gets set if you're using HTTP Basic
+Authentication.  If your clients are not authenticating with that, you will have
+to set it in somewhere before the logger gets invoked.  Otherwise you'll just
+get a '-' character in it's place (which is what the spec says to do).
+
+To use this logger, just add `log.w3c` to your request chain (somewhere after a
+handler that will have called `response.send`.
+
+## OUTPUT REDIRECTION
+
+By default, `log.w3c` writes to stdout, and the debug/info/... functions write
+to `stderr`.  To redirect these, pass a node.js `WriteableStream` into the
+functions `log.stdout` and `log.stderr` respectively.  For example, you could
+write a `WriteableStream` that is actually a rolling file appender.  That'd be
+cool...
 
 ## COPYRIGHT/LICENSE
 

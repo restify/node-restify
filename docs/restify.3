@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "RESTIFY" "3" "May 2011" "" ""
+.TH "RESTIFY" "3" "June 2011" "" ""
 .
 .SH "NAME"
 \fBrestify\fR \- Getting Started with restify
@@ -24,7 +24,7 @@ server\.listen(8080);
 .fi
 .
 .SH "DESCRIPTION"
-restify is a node\.js module built specifically to enable you to build correct REST web services\. restify is \fBnot\fR an MVC framework and does not come bundled with unnecessary functionality (such as templating)\. restify lets you do one thing, which is easily build machine\-consumable web service APIs that correctly implement HTTP\.
+restify is a node\.js module built specifically to enable you to build correct REST web services\. restify is \fBnot\fR an MVC framework and does not come bundled with unnecessary functionality for this use case (such as templating)\. restify lets you do one thing, which is easily build machine\-consumable web service APIs that correctly implement HTTP\.
 .
 .P
 restify\'s external API looks very similar to some amalgam of sinatra and express\. This man page contains basic getting started information, and plenty of references to more details on the API\.
@@ -45,12 +45,15 @@ To create an instance of the restify HTTP server, simply call the \fBcreateServe
 .nf
 
 {
-  apiVersion: \'1\.2\.3\',   // a semver string (see [VERSIONING] below)
+  version: \'1\.2\.3\',      // The default version  (see restify\-versions(7))
   serverName: \'MySite\',  // returned in the HTTP \'Server:` header
   maxRequestSize: 8192,  // Any request body larger than this gets a 400
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
-  accept: [\'application/json\'],  // Allow these Accept types
-  logTo: process\.stderr  // Where to direct log output
+  accept: [
+    \'application/json\'   // Allow these Accept types
+  ],
+  key: <PEM>,            // Together with `cert`, create an SSL server
+  cert: <PEM>            // Together with `key`, create an SSL server
 }
 .
 .fi
@@ -61,8 +64,8 @@ To create an instance of the restify HTTP server, simply call the \fBcreateServe
 Defaults/Details for the paramters above:
 .
 .TP
-apiVersion
-By default, there is no version handling invoked\. However, if you do specify this header, then \fBx\-api\-version: 1\.2\.3\fR will be returned in all HTTP responses\. Additionally, clients are expected to send an \fBx\-api\-version\fR header that matches\. In the \fBvery\fR near future, expect this parameter to support versioned routes (i\.e\., so you can map handlers to versions)\.
+version
+By default, there is no version handling invoked\. However, if you do specify this header, then \fBx\-api\-version: 1\.2\.3\fR will be returned in all HTTP responses\. Additionally, clients MUST send an \fBx\-api\-version\fR header that satisfies that version\. See restify\-versions(7) for more details, as this is a large feature set\.
 .
 .TP
 serverName
@@ -80,12 +83,31 @@ If the client sends a \'Date\' header, it is checked to be within \fBclockSkew\f
 accept
 An array of Acceptable content types this server can process\. Defaults to \fBapplication/json\fR\. Not really useful as of yet\.
 .
-.TP
-logTo
-An instance of \fBWritable Stream\fR\. All restify\.log messages will go to that\. Defaults to process\.stderr\.
-.
 .SH "ROUTING"
-As of v0\.1\.6, routes are simple exact matches, and do not support RegEx matching\. This is on the feature list however\. Routes are installed on the server object with the HTTP verb to map to, a paramterized URL, and any combination of functions or array of functions as arguments\.
+Routing is similar to, but different than, express\. Defining a route still looks like a \fBmethod\fR name tacked onto the server object, but you can (1) pass in versions (so you can define a versioned route), (2) you can pass in whatever combination of functions you see fit, with the exception that if \fIboth the first and last\fR handlers are an array of functions, they are treated as \fBpre\fR and \fBpost\fR interceptors\. This has the following semnatics:
+.
+.IP "\(bu" 4
+\fBpre[0]\fR is guaranteed to be called\. If you do not call \fBresponse\.send\fR or \fBresponse\.sendError\fR in your \fBpre\fR chain, and your pre functions all call \fBnext()\fR, your \fBmain\fR chain will get invoked\. If your pre chain calls \fBresponse\.send\fR or \fBresponse\.sendError\fR, your \fBmain\fR chain will be skipped, and \fBpost[0]\fR will be invoked next (assuming you are still calling \fBnext()\fR)\.
+.
+.IP "\(bu" 4
+Once in your \fBmain\fR chain, if you call \fBresponse\.sendError\fR, restify will stop processing your \fBmain\fR handlers, and skip to \fBpost\fR\. Calling \fBresponse\.send\fR does not have this effect, as you are expected to call \fBresponse\.send\fR as part of a "normal" request\.
+.
+.IP "\(bu" 4
+Once your \fBpost\fR chain is invoked, restify stops playing with ordering\.
+.
+.IP "" 0
+.
+.P
+Note that for this to work as described, you \fIstill have to call next()\fR in your functions!
+.
+.P
+Also note that if you\'re not using an array of functions for the first and last handlers, restify does not perform the logic above\. It instead falls back to what express does, and it\'s up to you to manage your call chain\.
+.
+.P
+As to URL definitions, note that they can be either parameterized string URLs, (e\.g\., \fB/:user/stuff/:id\fR) or a \fBRegExp\fR\. In either case, the parameters are available to your handler functions as \fBrequest\.uriParams\fR\. In the non\-regex case, they\'re as you named them (minus the \':\', of course)\. In the \fBRegExp\fR case, they\'re available in the array \fBRegExp\.exec()\fR returns\.
+.
+.P
+As some examples:
 .
 .IP "" 4
 .
@@ -94,8 +116,9 @@ As of v0\.1\.6, routes are simple exact matches, and do not support RegEx matchi
 server\.head(\'/foo/:id\', [pre1, pre2], handler, [post1]);
 server\.get(\'/foo/:id\', [pre1, pre2], handler, [post1]);
 server\.post(\'/foo\', [pre1, pre2], handler, [post1]);
-server\.put(\'/foo/:id\', [pre1, pre2], handler, [post1]);
-server\.del(\'/foo/:id\', [pre1, pre2], handler, [post1]);
+server\.put(\'/foo/:id\', [pre1, pre2], handler1, handler2, [post1]);
+server\.del(\'/foo/:id\', handler1, handler2, handler3);
+server\.get(/^\e/media\e/img\e/*/, function(req, res, next) {\.\.\.});
 .
 .fi
 .
@@ -115,10 +138,21 @@ function(request, response, next);
 .IP "" 0
 .
 .P
-Note that you \fBmust\fR call return next(); in your function when done if you want the chain to carry through (sometimes you might not want to do that)\.
+Lastly, you can version your routes, as such:
+.
+.IP "" 4
+.
+.nf
+
+server\.get(\'1\.2\.3\', \'/:user/foo/:id\', [pre], [handlers], [post]);
+server\.get(\'1\.2\.2\', \'/:user/foo/:id\', myLegacyHandler);
+.
+.fi
+.
+.IP "" 0
 .
 .P
-All :parameter names you specify in the URL route get parsed into the \fBrequest\.uriParams\fR object\. For example, in the routes above, you could access \fBid\fR at \fBrequest\.uriParams\.id\fR\. Note these parameters are \fBnot\fR on the \fBrequest\.params\fR object, which is where any API parameters a client sends in are placed\.
+Again, see restify\-versions(7) to understand how versioning works\.
 .
 .SH "REQUEST PARAMETERS"
 restify supports API parameters in form\-urlencoded content and application/json bodies\. All parameters are placed on the \fBrequest\.parameters\fR object\. For example, a request like:
@@ -200,7 +234,7 @@ The first form being more common, the latter form being preferable for advanced 
 For more details on the respose object, see \fBnpm help restify\-response\fR\.
 .
 .SH "LOGGING"
-restify ships with a minimal approximation of the log4j logger\. You are not required to use it in any way\. You can tune the restify logging level with \fBrestify\.log\.level(restify\.LogLevel\.<Level>)\fR, where \fILevel\fR is one of:
+restify ships with a minimal interpretation of the log4j logger\. You are not required to use it in any way\. You can tune the restify logging level with \fBrestify\.log\.level(restify\.LogLevel\.<Level>)\fR, where \fILevel\fR is one of:
 .
 .IP "\(bu" 4
 Fatal
@@ -223,7 +257,13 @@ Trace
 .IP "" 0
 .
 .P
-The default level is Info\. To get verbose internal logging from restify, set the level to Trace\.
+The default level is Info\. To get verbose internal logging from restify, set the level to Trace\. All messages from these apis go to stderr\.
+.
+.P
+Note that for the handful of cases where restify doesn\'t invoke your handlers, (e\.g\., 404, 405, 406), restify will output a w3c\-compliant message to stdout\.
+.
+.P
+You can redirect stdout/stderr by passing a \fBWriteableStream\fR to \fBlog\.stdout(stream)\fR and \fBlog\.stderr(stream)\fR, respectively\.
 .
 .P
 For more details on logging, see \fBnpm help restify\-log\fR\.
@@ -238,4 +278,4 @@ Copyright 2011 Mark Cavage \fImcavage@gmail\.com\fR
 This software is licensed under the MIT License\.
 .
 .SH "SEE ALSO"
-restify\-request(7), restify\-response(7), restify\-routes(7), restify\-log(7)
+restify\-request(7), restify\-response(7), restify\-routes(7), restify\-versions(7), restify\-log(7), restify\-client(7), restify\-throttle(7)

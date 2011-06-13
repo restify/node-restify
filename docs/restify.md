@@ -221,4 +221,4 @@ This software is licensed under the MIT License.
 ## SEE ALSO
 
 restify-request(7), restify-response(7), restify-routes(7), restify-versions(7),
-restify-log(7), restify-authorization(7), restify-client(7), restify-throttle(7)
+restify-log(7), restify-client(7), restify-throttle(7)
