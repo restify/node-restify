@@ -353,3 +353,38 @@ exports.test_main_no_abort = function(test, assert) {
     }).end();
   });
 };
+
+
+exports.test_gh_27 = function(test, assert) {
+  var server = restify.createServer();
+
+  var called = false;
+  function before(req, res, next) {
+    function anything() {
+      return next();
+    }
+
+    return anything();
+  }
+
+  server.get('/foo', [before], function(req, res, next) {
+    called = true;
+    res.send(200);
+    return next();
+  });
+
+  var socket = '/tmp/.' + uuid();
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/foo');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      server.on('close', function() {
+        test.finish();
+      });
+      assert.ok(called);
+      server.close();
+    }).end();
+  });
+};
