@@ -1,6 +1,7 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 var fs = require('fs');
 var http = require('httpu');
+var https = require('httpu');
 var uuid = require('node-uuid');
 
 var common = require('./lib/common');
@@ -222,7 +223,14 @@ exports.test_create_ssl = function(test, assert) {
   assert.ok(server);
   assert.ok(server.cert);
   assert.ok(server.key);
-  test.finish();
+  server.get('/', function(req, res, next) { res.send(200); return next(); });
+  server.listen(socket, function() {
+    // Can't actually drive requests over httpu for SSL.
+    server.on('close', function() {
+      test.finish();
+    });
+    server.close();
+  });
 };
 
 
