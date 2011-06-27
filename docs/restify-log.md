@@ -6,7 +6,7 @@ restify-log(7) -- The restify Logger
     var restify = require('restify');
     var log = restify.log;
 
-    log.level(restify.LogLevel.Debug);
+    log.level('Debug');
 
     if (log.debug())
       log.debug('Here's an object: %o', { foo: 'bar' });
@@ -62,8 +62,8 @@ The restify framework uses Fatal/Error/Warn/Info/Trace.  To get verbose internal
 logging from restify, set the level to Trace.  Debug is intended to be used by
 applications as a useful way to generate debug logs.
 
-Finally, set the level with `log.level`.  The level params are on the:
-`restify.LogLevel` object.
+Finally, set the level with `log.level`.  The level params are on the
+`restify.LogLevel` object; you can pass either the enum value or a string.
 
 ## W3C LOGGING
 

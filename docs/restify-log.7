@@ -13,7 +13,7 @@
 var restify = require(\'restify\');
 var log = restify\.log;
 
-log\.level(restify\.LogLevel\.Debug);
+log\.level(\'Debug\');
 
 if (log\.debug())
   log\.debug(\'Here\'s an object: %o\', { foo: \'bar\' });
@@ -119,7 +119,7 @@ if (log\.debug()) {
 The restify framework uses Fatal/Error/Warn/Info/Trace\. To get verbose internal logging from restify, set the level to Trace\. Debug is intended to be used by applications as a useful way to generate debug logs\.
 .
 .P
-Finally, set the level with \fBlog\.level\fR\. The level params are on the: \fBrestify\.LogLevel\fR object\.
+Finally, set the level with \fBlog\.level\fR\. The level params are on the \fBrestify\.LogLevel\fR object; you can pass either the enum value or a string\.
 .
 .SH "W3C LOGGING"
 In addition to the "human" output functions above, the log also ships with a W3C compliant interceptor that you can use anywhere after \fBresponse\.send\fR has been invoked\. W3C log messages are basically this:
