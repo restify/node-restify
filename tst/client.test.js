@@ -250,7 +250,6 @@ exports.test_retries = function(test, assert) {
     assert.equal(err.httpCode, 503);
     assert.equal(err.restCode, 'RetriesExceeded');
     assert.equal(err.message, 'Maximum number of retries exceeded: 2');
-    assert.ok(err.details);
     test.finish();
   });
 };
