@@ -41,11 +41,42 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
-  <style type='text/css' media='print'>
-  /* style: print */
-  .mp {max-width:none}
-  .man-navigation {display:none !important}
-  .mp a[href]:not([href^="#"]):not([data-bare-link]):after {content:" " attr(href)}
+  <style type='text/css' media='screen'>
+  /* style: screen */
+  body {margin:0}
+  #man {max-width:88ex;padding:0 2ex 1ex 2ex}
+  #man p,#man pre,#man ul,#man ol,#man dl {margin:0 0 20px 0}
+  #man h2 {margin:10px 0 0 0}
+  #man > p,#man > pre,#man > ul,#man > ol,#man > dl {margin-left:8ex}
+  #man h3 {margin:0 0 0 4ex}
+  #man dt {margin:0;clear:left}
+  #man dt.flush {float:left;width:8ex}
+  #man dd {margin:0 0 0 9ex}
+  #man h1,#man h2,#man h3,#man h4 {clear:left}
+  #man pre {margin-bottom:20px}
+  #man pre+h2,#man pre+h3 {margin-top:22px}
+  #man h2+pre,#man h3+pre {margin-top:5px}
+  #man img {display:block;margin:auto}
+  #man h1.man-title {display:none}
+  #man,#man code,#man pre,#man tt,#man kbd,#man samp,#man h3,#man h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  #man h2,#man ol.man {font-size:16px;line-height:1.25
+  }
+  #man h1 {font-size:20px;line-height:2}
+  #man {text-align:justify;background:#fff}
+  #man,#man code,#man pre,#man pre code,#man tt,#man kbd,#man samp {color:#131211}
+  #man h1,#man h2,#man h3,#man h4 {color:#030201}
+  #man ol.man,#man ol.man li {color:#636261}
+  #man code,#man strong,#man b {font-weight:bold;color:#131211}
+  #man em,#man var,#man u {font-style:italic;color:#434241;text-decoration:none}
+  #man pre {background:#edeceb;padding:5px 1ex;border-left:1ex solid #ddd}
+  #man pre code {font-weight:normal;background:inherit}
+  #man ol.man,#man ol.man li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  #man ol.man {width:100%}
+  #man ol.man li.tl {text-align:left}
+  #man ol.man li.tc {text-align:center;letter-spacing:4px}
+  #man ol.man li.tr {text-align:right;float:right}
+  #man div.man-navigation {position:fixed;top:0;left:96ex;height:100%;width:100%;padding:1ex 0 0 2ex;border-left:0.25ex solid #DCDCDC;background-color: #F5F5F5}
+  #man div.man-navigation a {display:block;margin-bottom:1.5ex}
   </style>
   <style type='text/css' media='all'>
   /* style: toc */
@@ -133,8 +164,24 @@ the following syntax:</p>
   maxRequestSize: 8192,  // Any request body larger than this gets a 400
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
   accept: [
-    'application/json'   // Allow these Accept types
+    'application/json',  // Allow these Accept types
+    'application/foo'
   ],
+  contentHandlers: {     // A hash of custom content-type handlers
+    'application/foo': function(body) {
+      return JSON.parse(body);
+    }
+  },
+  contentWriters: {      // A hash of custom serializers
+    'application/foo': function(obj) {
+      return JSON.stringify(obj);
+    }
+  },
+  headers: {             // A hash of customer headers
+    'X-Foo': function(res) {
+      return 'bar';
+    }
+  },
   key: &lt;PEM>,            // Together with `cert`, create an SSL server
   cert: &lt;PEM>            // Together with `key`, create an SSL server
 }
@@ -142,21 +189,58 @@ the following syntax:</p>
 
 <p>Defaults/Details for the paramters above:</p>
 
-<dl>
-<dt class="flush">version</dt><dd>By default, there is no version handling invoked.  However, if you do specify
+<ul>
+<li>version:
+By default, there is no version handling invoked.  However, if you do specify
 this header, then <code>x-api-version: 1.2.3</code> will be returned in all HTTP
 responses.  Additionally, clients MUST send an <code>x-api-version</code> header that
 satisfies that version.  See  <a href="restify-versions.7.html" class="man-ref">restify-versions<span class="s">(7)</span></a> for more details, as this is
-a large feature set.</dd>
-<dt>serverName</dt><dd>Simple string that is not interpreted and returned in the 'Server:' HTTP
-header.  Defaults to <code>node.js</code>.</dd>
-<dt>maxRequestSize</dt><dd>Caps the amount of data a client can send to your HTTP server, in bytes.
-Defaults to 8192 (8k).</dd>
-<dt>clockSkew</dt><dd>If the client sends a 'Date' header, it is checked to be within <code>clockSkew</code>
-seconds, in either direction. Defaults to 300s (5m).</dd>
-<dt class="flush">accept</dt><dd>An array of Acceptable content types this server can process. Defaults to
-<code>application/json</code>.  Not really useful as of yet.</dd>
-</dl>
+a large feature set.</li>
+<li>serverName:
+Simple string that is not interpreted and returned in the 'Server:' HTTP
+header.  Defaults to <code>node.js</code>.</li>
+<li>maxRequestSize:
+Caps the amount of data a client can send to your HTTP server, in bytes.
+Defaults to 8192 (8k).</li>
+<li>clockSkew:
+If the client sends a 'Date' header, it is checked to be within <code>clockSkew</code>
+seconds, in either direction. Defaults to 300s (5m).</li>
+<li>accept:
+An array of Acceptable content types this server can process. Defaults to
+<code>application/json</code>.  Not really useful as of yet.</li>
+<li>contentHandlers:
+By default, restify supports (and doesn't let you override) clients sending
+content in <code>application/json</code>, <code>application/x-www-form-urlencoded</code> and
+<code>multipart/form-data</code>.  If you want your clients to be able to send content
+in a custom format, you can specify it in this option; keys are (lowercase)
+MIME type, value is a function that takes a (UTF-8 string) body, and returns
+an object of k/v pairs that get merged into <code>request.params</code>.  Note that
+this is only for parsing, not for using <code>res.send</code>.</li>
+<li>contentWriters:
+By default, restify supports (and doesn't let you override) servers sending
+content in <code>application/json</code>, <code>application/x-www-form-urlencoded</code>. If you
+want to use <code>res.send</code> with custom content types, you will need to add a
+custom writer to this object.  <em>You must additionally set the</em> <code>accept</code>
+<em>array to allow it!</em>.  Using this dictionary, you can then use the
+<code>res.send</code> naturally with content-types not built-in to restify.</li>
+<li>headers:
+An object of global headers that are sent back on all requests. Restify
+automatically sets the list below.  If you don't set those particular keys,
+restify fills in default functions; if you do set them, you can fully override
+restify's defaults. Note that like contentWriters, this is an object with a
+string key as the header name, and the value is a function of the form
+f(response) which must return a string.  Defaults:
+
+<ul>
+<li>X-Api-Version (if versioned)</li>
+<li>X-Request-Id</li>
+<li>X-Response-Time</li>
+<li>Content-(Length|Type|MD5)</li>
+<li>Access-Control-Allow-(Origin|Methods|Headers)</li>
+<li>Access-Control-Expose-Headers</li>
+</ul>
+</li>
+</ul>
 
 
 <h2 id="ROUTING">ROUTING</h2>
@@ -316,7 +400,7 @@ requests.</p>
 
 <h2 id="COPYRIGHT-LICENSE">COPYRIGHT/LICENSE</h2>
 
-<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;&#58;&#109;&#99;&#97;&#x76;&#97;&#103;&#101;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;" data-bare-link="true">&#109;&#x63;&#x61;&#118;&#97;&#103;&#x65;&#x40;&#x67;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a></p>
+<p>Copyright 2011 Mark Cavage <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#58;&#109;&#99;&#x61;&#118;&#97;&#103;&#x65;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;" data-bare-link="true">&#x6d;&#x63;&#x61;&#118;&#x61;&#103;&#x65;&#x40;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#109;</a></p>
 
 <p>This software is licensed under the MIT License.</p>
 
@@ -328,7 +412,7 @@ requests.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>June 2011</li>
+    <li class='tc'>July 2011</li>
     <li class='tr'>restify(3)</li>
   </ol>
 
