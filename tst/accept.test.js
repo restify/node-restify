@@ -221,4 +221,3 @@ exports.test_firefox_accept = function(test, assert) {
   });
 };
 
-

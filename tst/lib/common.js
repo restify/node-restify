@@ -24,12 +24,14 @@ module.exports = {
     assert.equal(response.httpVersion, '1.1');
   },
 
-  checkContent: function(assert, response, callback) {
+  checkContent: function(assert, response, callback, contentType) {
     assert.ok(response.headers['content-length']);
     assert.ok(response.headers['content-type']);
     assert.ok(response.headers['content-md5']);
 
-    assert.equal(response.headers['content-type'], 'application/json');
+    if (!contentType)
+      contentType = 'application/json';
+    assert.equal(response.headers['content-type'], contentType);
     assert.equal(response.headers.connection, 'close');
 
     response.setEncoding(encoding = 'utf8');

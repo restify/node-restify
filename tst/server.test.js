@@ -396,3 +396,55 @@ exports.test_gh_27 = function(test, assert) {
     }).end();
   });
 };
+
+
+exports.test_custom_content = function(test, assert) {
+  var server = restify.createServer({
+    contentHandlers: {
+      'application/foo': function(body) {
+        assert.ok(body);
+
+        return JSON.parse(body);
+      }
+    },
+    contentWriters: {
+      'application/foo': function(obj) {
+        assert.ok(obj);
+
+        return JSON.stringify(obj);
+      }
+    },
+    accept: ['application/json', 'application/foo']
+  });
+
+  server.post('/custom_content', function(req, res, next) {
+    assert.equal(req.params.json, 'foo');
+    res.send(200, {foo: 'bar'});
+    return next();
+  });
+
+  var socket = '/tmp/.' + uuid();
+  server.listen(socket, function() {
+    var content = JSON.stringify({json: 'foo'});
+    var opts = common.newOptions(socket, '/custom_content');
+    opts.method = 'POST';
+    opts.headers.Accept = 'application/foo';
+    opts.headers['Content-Type'] = 'application/foo';
+    opts.headers['Content-Length'] = content.length;
+
+    var req = http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      common.checkContent(assert, res, function() {
+        assert.equal(res.params.foo, 'bar');
+        server.on('close', function() {
+          test.finish();
+        });
+        server.close();
+      }, 'application/foo');
+    });
+    req.write(content);
+    req.end();
+
+  });
+};

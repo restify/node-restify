@@ -42,8 +42,19 @@ the following syntax:
       maxRequestSize: 8192,  // Any request body larger than this gets a 400
       clockSkew: 300,        // Allow up to N seconds of skew in the Date header
       accept: [
-        'application/json'   // Allow these Accept types
+        'application/json',  // Allow these Accept types
+	'application/foo'
       ],
+      contentHandlers: {     // A hash of custom content-type handlers
+        'application/foo': function(body) {
+	  return JSON.parse(body);
+	}
+      },
+      contentWriters: {      // A hash of custom serializers
+        'application/foo': function(obj) {
+	  return JSON.stringify(obj);
+	}
+      },
       key: <PEM>,            // Together with `cert`, create an SSL server
       cert: <PEM>            // Together with `key`, create an SSL server
     }
@@ -68,6 +79,21 @@ Defaults/Details for the paramters above:
 * accept:
   An array of Acceptable content types this server can process. Defaults to
   `application/json`.  Not really useful as of yet.
+* contentHandlers:
+  By default, restify supports (and doesn't let you override) clients sending
+  content in `application/json`, `application/x-www-form-urlencoded` and
+  `multipart/form-data`.  If you want your clients to be able to send content
+  in a custom format, you can specify it in this option; keys are (lowercase)
+  MIME type, value is a function that takes a (UTF-8 string) body, and returns
+  an object of k/v pairs that get merged into `request.params`.  Note that
+  this is only for parsing, not for using `res.send`.
+* contentWriters:
+  By default, restify supports (and doesn't let you override) servers sending
+  content in `application/json`, `application/x-www-form-urlencoded`. If you
+  want to use `res.send` with custom content types, you will need to add a
+  custom writer to this object.  *You must additionally set the* `accept`
+  *array to allow it!*.  Using this dictionary, you can then use the
+  `res.send` naturally with content-types not built-in to restify.
 
 ## ROUTING
 
