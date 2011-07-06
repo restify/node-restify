@@ -43,17 +43,22 @@ the following syntax:
       clockSkew: 300,        // Allow up to N seconds of skew in the Date header
       accept: [
         'application/json',  // Allow these Accept types
-	'application/foo'
+        'application/foo'
       ],
       contentHandlers: {     // A hash of custom content-type handlers
         'application/foo': function(body) {
-	  return JSON.parse(body);
-	}
+          return JSON.parse(body);
+        }
       },
       contentWriters: {      // A hash of custom serializers
         'application/foo': function(obj) {
-	  return JSON.stringify(obj);
-	}
+          return JSON.stringify(obj);
+        }
+      },
+      headers: {             // A hash of customer headers
+        'X-Foo': function(res) {
+          return 'bar';
+        }
       },
       key: <PEM>,            // Together with `cert`, create an SSL server
       cert: <PEM>            // Together with `key`, create an SSL server
@@ -94,6 +99,21 @@ Defaults/Details for the paramters above:
   custom writer to this object.  *You must additionally set the* `accept`
   *array to allow it!*.  Using this dictionary, you can then use the
   `res.send` naturally with content-types not built-in to restify.
+* headers:
+  An object of global headers that are sent back on all requests. Restify
+  automatically sets the list below.  If you don't set those particular keys,
+  restify fills in default functions; if you do set them, you can fully override
+  restify's defaults. Note that like contentWriters, this is an object with a
+  string key as the header name, and the value is a function of the form
+  f(response) which must return a string.  Defaults:
+   - X-Api-Version (if versioned)
+   - X-Request-Id
+   - X-Response-Time
+   - Content-(Length|Type|MD5)
+   - Access-Control-Allow-(Origin|Methods|Headers)
+   - Access-Control-Expose-Headers
+
+
 
 ## ROUTING
 

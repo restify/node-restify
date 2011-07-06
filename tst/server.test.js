@@ -448,3 +448,44 @@ exports.test_custom_content = function(test, assert) {
 
   });
 };
+
+
+exports.test_custom_headers = function(test, assert) {
+  var server = restify.createServer({
+    headers: {
+      'access-control-allow-headers': function(res) {
+        return [
+          'x-unit-test'
+        ].join(', ');
+      },
+      'X-Unit-Test': function(res) {
+        return 'foo';
+      }
+    }
+  });
+
+  server.get('/custom_headers', function(req, res, next) {
+    res.send(200);
+    return next();
+  });
+
+  var socket = '/tmp/.' + uuid();
+  server.listen(socket, function() {
+    var content = JSON.stringify({json: 'foo'});
+    var opts = common.newOptions(socket, '/custom_headers');
+    var req = http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 200);
+      console.log(res.headers);
+      assert.equal(res.headers['access-control-allow-headers'], 'x-unit-test');
+      assert.equal(res.headers['x-unit-test'], 'foo');
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    });
+    req.write(content);
+    req.end();
+
+  });
+};

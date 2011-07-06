@@ -51,17 +51,22 @@ To create an instance of the restify HTTP server, simply call the \fBcreateServe
   clockSkew: 300,        // Allow up to N seconds of skew in the Date header
   accept: [
     \'application/json\',  // Allow these Accept types
-\'application/foo\'
+    \'application/foo\'
   ],
   contentHandlers: {     // A hash of custom content\-type handlers
     \'application/foo\': function(body) {
-  return JSON\.parse(body);
-}
+      return JSON\.parse(body);
+    }
   },
   contentWriters: {      // A hash of custom serializers
     \'application/foo\': function(obj) {
-  return JSON\.stringify(obj);
-}
+      return JSON\.stringify(obj);
+    }
+  },
+  headers: {             // A hash of customer headers
+    \'X\-Foo\': function(res) {
+      return \'bar\';
+    }
   },
   key: <PEM>,            // Together with `cert`, create an SSL server
   cert: <PEM>            // Together with `key`, create an SSL server
@@ -74,33 +79,51 @@ To create an instance of the restify HTTP server, simply call the \fBcreateServe
 .P
 Defaults/Details for the paramters above:
 .
-.TP
-version
-By default, there is no version handling invoked\. However, if you do specify this header, then \fBx\-api\-version: 1\.2\.3\fR will be returned in all HTTP responses\. Additionally, clients MUST send an \fBx\-api\-version\fR header that satisfies that version\. See restify\-versions(7) for more details, as this is a large feature set\.
+.IP "\(bu" 4
+version: By default, there is no version handling invoked\. However, if you do specify this header, then \fBx\-api\-version: 1\.2\.3\fR will be returned in all HTTP responses\. Additionally, clients MUST send an \fBx\-api\-version\fR header that satisfies that version\. See restify\-versions(7) for more details, as this is a large feature set\.
 .
-.TP
-serverName
-Simple string that is not interpreted and returned in the \'Server:\' HTTP header\. Defaults to \fBnode\.js\fR\.
+.IP "\(bu" 4
+serverName: Simple string that is not interpreted and returned in the \'Server:\' HTTP header\. Defaults to \fBnode\.js\fR\.
 .
-.TP
-maxRequestSize
-Caps the amount of data a client can send to your HTTP server, in bytes\. Defaults to 8192 (8k)\.
+.IP "\(bu" 4
+maxRequestSize: Caps the amount of data a client can send to your HTTP server, in bytes\. Defaults to 8192 (8k)\.
 .
-.TP
-clockSkew
-If the client sends a \'Date\' header, it is checked to be within \fBclockSkew\fR seconds, in either direction\. Defaults to 300s (5m)\.
+.IP "\(bu" 4
+clockSkew: If the client sends a \'Date\' header, it is checked to be within \fBclockSkew\fR seconds, in either direction\. Defaults to 300s (5m)\.
 .
-.TP
-accept
-An array of Acceptable content types this server can process\. Defaults to \fBapplication/json\fR\. Not really useful as of yet\.
+.IP "\(bu" 4
+accept: An array of Acceptable content types this server can process\. Defaults to \fBapplication/json\fR\. Not really useful as of yet\.
 .
-.TP
-contentHandlers
-By default, restify supports (and doesn\'t let you override) clients sending content in \fBapplication/json\fR, \fBapplication/x\-www\-form\-urlencoded\fR and \fBmultipart/form\-data\fR\. If you want your clients to be able to send content in a custom format, you can specify it in this option; keys are (lowercase) MIME type, value is a function that takes a (UTF\-8 string) body, and returns an object of k/v pairs that get merged into \fBrequest\.params\fR\. Note that this is only for parsing, not for using \fBres\.send\fR\.
+.IP "\(bu" 4
+contentHandlers: By default, restify supports (and doesn\'t let you override) clients sending content in \fBapplication/json\fR, \fBapplication/x\-www\-form\-urlencoded\fR and \fBmultipart/form\-data\fR\. If you want your clients to be able to send content in a custom format, you can specify it in this option; keys are (lowercase) MIME type, value is a function that takes a (UTF\-8 string) body, and returns an object of k/v pairs that get merged into \fBrequest\.params\fR\. Note that this is only for parsing, not for using \fBres\.send\fR\.
 .
-.TP
-contentWriters
-By default, restify supports (and doesn\'t let you override) servers sending content in \fBapplication/json\fR, \fBapplication/x\-www\-form\-urlencoded\fR\. If you want to use \fBres\.send\fR with custom content types, you will need to add a custom writer to this object\. \fIYou must additionally set the\fR \fBaccept\fR \fIarray to allow it!\fR\. Using this dictionary, you can then use the \fBres\.send\fR naturally with content\-types not built\-in to restify\.
+.IP "\(bu" 4
+contentWriters: By default, restify supports (and doesn\'t let you override) servers sending content in \fBapplication/json\fR, \fBapplication/x\-www\-form\-urlencoded\fR\. If you want to use \fBres\.send\fR with custom content types, you will need to add a custom writer to this object\. \fIYou must additionally set the\fR \fBaccept\fR \fIarray to allow it!\fR\. Using this dictionary, you can then use the \fBres\.send\fR naturally with content\-types not built\-in to restify\.
+.
+.IP "\(bu" 4
+.
+.IP "\(bu" 4
+X\-Api\-Version (if versioned)
+.
+.IP "\(bu" 4
+X\-Request\-Id
+.
+.IP "\(bu" 4
+X\-Response\-Time
+.
+.IP "\(bu" 4
+Content\-(Length|Type|MD5)
+.
+.IP "\(bu" 4
+Access\-Control\-Allow\-(Origin|Methods|Headers)
+.
+.IP "\(bu" 4
+Access\-Control\-Expose\-Headers
+.
+.IP "" 0
+
+.
+.IP "" 0
 .
 .SH "ROUTING"
 Routing is similar to, but different than, express\. Defining a route still looks like a \fBmethod\fR name tacked onto the server object, but you can (1) pass in versions (so you can define a versioned route), (2) you can pass in whatever combination of functions you see fit, with the exception that if \fIboth the first and last\fR handlers are an array of functions, they are treated as \fBpre\fR and \fBpost\fR interceptors\. This has the following semnatics:
