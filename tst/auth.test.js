@@ -101,7 +101,7 @@ exports.test_bad_scheme = function(test, assert) {
 exports.test_bad_basic = function(test, assert) {
   var opts = common.newOptions(socket, '/test/unit');
   opts.method = 'GET';
-  opts.headers.authorization = 'Basic ' + uuid();
+  opts.headers.authorization = 'Basic ImNotValidBase64';
 
   http.request(opts, function(res) {
     common.checkResponse(assert, res);
