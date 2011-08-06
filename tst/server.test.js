@@ -489,3 +489,28 @@ exports.test_custom_headers = function(test, assert) {
 
   });
 };
+
+
+exports.test_send_error = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/foo', function(req, res, next) {
+    return next(newError());
+  });
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/users/1..15');
+
+    http.get({
+      path: '/foo',
+      socketPath: socket
+    }, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 500);
+      server.on('close', function() {
+        test.finish();
+      });
+      server.close();
+    }).end();
+  });
+};
