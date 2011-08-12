@@ -31,7 +31,7 @@
   ],
   "devDependencies": {
     "jshint": "0.2.3",
-    "whiskey": "0.4.0"
+    "whiskey": "0.4.1"
   },
   "engines": {
     "node": ">=0.4"
