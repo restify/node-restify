@@ -31,8 +31,8 @@ exports.setUp = function(test, assert) {
     };
 
     if (req.params.query) obj.query = req.params.query;
-      if (req.params.json) obj.json = req.params.json;
-      if (req.params.form) obj.form = req.params.form;
+    if (req.params.json) obj.json = req.params.json;
+    if (req.params.form) obj.form = req.params.form;
 
     res.send(200, obj);
   });
@@ -196,9 +196,9 @@ exports.test_multibyte = function(test, assert) {
 
   req.write(content);
   req.end();
-
-
 };
+
+
 exports.tearDown = function(test, assert) {
   server.on('close', function() {
     test.finish();
