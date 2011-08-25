@@ -18,8 +18,8 @@ restify-client(7) -- The restify client
       if (err)
         return console.log(err);
 
-      console.log(Body: ' + body);
-      console.log(Headers: ' + JSON.stringify(headers, null, 2));
+      console.log('Body: ' + body);
+      console.log('Headers: ' + JSON.stringify(headers, null, 2));
     });
 
     var req = {
@@ -40,7 +40,7 @@ restify-client(7) -- The restify client
       if (err)
         return console.log(err);
 
-      console.log(Headers: ' + JSON.stringify(headers, null, 2));
+      console.log('Headers: ' + JSON.stringify(headers, null, 2));
     });
 
 
