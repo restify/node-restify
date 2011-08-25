@@ -1,6 +1,6 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
-.
+,-..,mm.
 .TH "RESTIFY\-CLIENT" "7" "July 2011" "" ""
 .
 .SH "NAME"
@@ -25,8 +25,8 @@ client\.get(\'/users\', function(err, body, headers) {
   if (err)
     return console\.log(err);
 
-  console\.log(Body: \' + body);
-  console\.log(Headers: \' + JSON\.stringify(headers, null, 2));
+  console\.log(\'Body: \' + body);
+  console\.log(\'Headers: \' + JSON\.stringify(headers, null, 2));
 });
 
 var req = {
@@ -47,7 +47,7 @@ client\.head(\'/mark\', function(err, headers) {
   if (err)
     return console\.log(err);
 
-  console\.log(Headers: \' + JSON\.stringify(headers, null, 2));
+  console\.log(\'Headers: \' + JSON\.stringify(headers, null, 2));
 });
 .
 .fi
