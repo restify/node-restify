@@ -41,7 +41,8 @@ module.exports = {
     });
 
     response.on('end', function() {
-      assert.equal(Buffer.byteLength(response.body), response.headers['content-length']);
+      assert.equal(Buffer.byteLength(response.body),
+                   response.headers['content-length']);
 
       var hash = crypto.createHash('md5');
       hash.update(response.body);

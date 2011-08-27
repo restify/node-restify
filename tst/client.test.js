@@ -67,7 +67,7 @@ exports.test_put_utf8 = function(test, assert) {
     assert.equal(obj.foo, 'Iñtërnâtiônàlizætiøn');
     test.finish();
   });
-}
+};
 
 exports.test_put_expect = function(test, assert) {
   var req = {
