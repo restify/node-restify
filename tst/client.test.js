@@ -50,6 +50,24 @@ exports.setUp = function(test, assert) {
   });
 };
 
+exports.test_put_utf8 = function(test, assert) {
+  var req = {
+    path: '/test/foo',
+    expect: 200,
+    body: {
+      foo: 'Iñtërnâtiônàlizætiøn',
+      code: 200
+    }
+  };
+
+  client.put(req, function(err, obj) {
+    assert.ifError(err);
+    assert.ok(obj);
+    assert.equal(obj.name, 'foo');
+    assert.equal(obj.foo, 'Iñtërnâtiônàlizætiøn');
+    test.finish();
+  });
+}
 
 exports.test_put_expect = function(test, assert) {
   var req = {
