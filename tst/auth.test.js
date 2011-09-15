@@ -14,6 +14,7 @@ var server = null;
 var socket = '/tmp/.' + uuid();
 var username = uuid();
 var password = uuid();
+var trickyPassword = 'pass:word';
 
 
 
@@ -28,7 +29,8 @@ exports.setUp = function(test, assert) {
   function authenticate(req, res, next) {
     if (!req.authorization.basic ||
         req.authorization.basic.username !== username ||
-        req.authorization.basic.password !== password) {
+        (req.authorization.basic.password !== password  &&
+         req.authorization.basic.password !== trickyPassword)) {
       res.send(401);
     }
     return next();
@@ -58,6 +60,18 @@ exports.test_ok = function(test, assert) {
   }).end();
 };
 
+exports.test_tricky_password = function(test, assert) {
+  var opts = common.newOptions(socket, '/test/unit');
+  opts.method = 'GET';
+  opts.headers.authorization = 'Basic ' +
+    new Buffer(username + ':' + 'pass:word', 'utf8').toString('base64');
+
+  http.request(opts, function(res) {
+    common.checkResponse(assert, res);
+    assert.equal(res.statusCode, 200);
+    test.finish();
+  }).end();
+};
 
 exports.test_no_auth = function(test, assert) {
   var opts = common.newOptions(socket, '/test/unit');
@@ -109,7 +123,6 @@ exports.test_bad_basic = function(test, assert) {
     test.finish();
   }).end();
 };
-
 
 exports.tearDown = function(test, assert) {
   server.on('close', function() {
