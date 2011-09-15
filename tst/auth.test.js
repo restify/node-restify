@@ -29,7 +29,7 @@ exports.setUp = function(test, assert) {
   function authenticate(req, res, next) {
     if (!req.authorization.basic ||
         req.authorization.basic.username !== username ||
-        (req.authorization.basic.password !== password  &&
+        (req.authorization.basic.password !== password &&
          req.authorization.basic.password !== trickyPassword)) {
       res.send(401);
     }
