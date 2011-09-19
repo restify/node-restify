@@ -124,7 +124,14 @@ that has the following fields:
       }
     }
 
-You can create one of these with `restify.newError` as such:
+There are built-ins for all codes defined in `restify.RestCodes`, and you can
+chuck them into `next()` like so:
+
+    server.get('/foo', function(req, res, next) {
+      return next(new restify.BadRequestError('you did something wrong'));
+    });
+
+In previous versions of restify, you used like `restify.newError`:
 
     response.sendError(restify.newError({
       httpCode: 409,
