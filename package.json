@@ -1,7 +1,7 @@
 {
   "name": "restify",
   "description": "REST framework specifically meant for web service APIs",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -13,7 +13,8 @@
     "httpu": "0.0.1",
     "node-uuid": "1.2.0",
     "retry": "0.4.0",
-    "semver": "~1.0.8"
+    "semver": "~1.0.8",
+    "xml2js": "0.1.10"
   },
   "scripts": {
     "pretest": "gjslint --nojsdoc -r . -x lib/sprintf.js -e node_modules; jshint lib tst",
