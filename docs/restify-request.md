@@ -4,7 +4,7 @@ restify-request(7) -- The Request Object
 ## SYNOPSIS
 
     request: {
-      body, 'Raw data sent from client',
+      body: 'Raw data sent from client',
       contentType: function() {
         return 'application/json'
       }
