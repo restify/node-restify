@@ -514,3 +514,40 @@ exports.test_send_error = function(test, assert) {
     }).end();
   });
 };
+
+
+// GH-49
+exports.test_route_with_content_type_suffix = function(test, assert) {
+  var server = restify.createServer();
+  var socket = '/tmp/.' + uuid();
+
+  server.get('/:foo', function(req, res, next) {
+    assert.ok(req.uriParams.foo);
+    var found = false;
+    if (req.uriParams.foo === 'blah' || req.uriParams.foo === 'mark.cavage')
+      found = true;
+
+    assert.ok(found);
+    res.send(202);
+    return next();
+  });
+  server.on('close', function() {
+    test.finish();
+  });
+  server.listen(socket, function() {
+    var opts = common.newOptions(socket, '/blah.xml');
+
+    http.request(opts, function(res) {
+      common.checkResponse(assert, res);
+      assert.equal(res.statusCode, 202);
+
+      opts = common.newOptions(socket, '/mark.cavage');
+
+      http.request(opts, function(res) {
+        common.checkResponse(assert, res);
+        assert.equal(res.statusCode, 202);
+        server.close();
+      }).end();
+    }).end();
+  });
+};
