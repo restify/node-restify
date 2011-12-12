@@ -1,0 +1,110 @@
+// Copyright 2011 Mark Cavage, Inc.  All rights reserved.
+
+var EventEmitter = require('events').EventEmitter;
+var test = require('tap').test;
+
+var log4js = require('../lib/log4js_stub');
+var Request = require('../lib/Request');
+
+
+
+///--- Helpers
+
+function getRequest() {
+  var stub = new EventEmitter();
+  stub.connection = {
+    encrypted: true
+  };
+  stub.headers = {
+    'content-type': 'application/xml'
+  };
+  stub.httpVersion = '1.1';
+  stub.method = 'GET';
+  stub.url = '//foo/bar/';
+
+  var r = new Request({
+    log4js: log4js,
+    request: stub
+  });
+  r.accept = [
+    {
+      type: 'application',
+      subtype: 'json'
+    },
+    {
+      type: 'text',
+      subtype: '*',
+    },
+    {
+      type: '*',
+      subtype: 'foo',
+    }
+  ];
+  return r;
+}
+
+
+///--- Tests
+
+test('throws on missing options', function(t) {
+  t.throws(function() {
+    new Request();
+  }, new TypeError('options (Object) required'));
+  t.end();
+});
+
+
+test('throws on missing log4js', function(t) {
+  t.throws(function() {
+    new Request({});
+  }, new TypeError('options.log4js (Object) required'));
+  t.end();
+});
+
+
+test('throws on missing request', function(t) {
+  t.throws(function() {
+    new Request({
+      log4js: {}
+    });
+  }, new TypeError('options.request (http.IncomingMessage) required'));
+  t.end();
+});
+
+
+test('properties', function(t) {
+  var req = getRequest();
+  t.ok(req.contentType);
+  t.ok(req.connection);
+  t.ok(req.headers);
+  t.ok(req.httpVersion);
+  t.ok(req.id);
+  t.ok(req.method);
+  t.ok(req.path);
+  t.ok(req.secure);
+  t.ok(req.trailers);
+  t.ok(req.url);
+  t.end();
+});
+
+
+test('accepts', function(t) {
+  var req = getRequest();
+  t.ok(req.accepts);
+  t.ok(req.accepts('application/json'));
+  t.ok(req.accepts('json'));
+  t.ok(req.accepts('text/plain'));
+  t.notOk(req.accepts('foo/plain'));
+  t.ok(req.accepts('bar/foo'));
+  t.end();
+});
+
+
+test('is', function(t) {
+  var req = getRequest();
+  t.equal(req.contentType, 'application/xml');
+  t.ok(req.is('application/xml'));
+  t.ok(req.is('xml'));
+  t.notOk(req.is('json'));
+  t.end();
+});
