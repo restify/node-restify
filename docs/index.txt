@@ -1,9 +1,0 @@
-# manuals
-restify(3)              restify.3.ronn
-restify-log(7)          restify-log.7.ronn
-restify-request(7)      restify-request.7.ronn
-restify-response(7)     restify-response.7.ronn
-restify-routes(7)       restify-routes.7.ronn
-restify-versions(7)     restify-versions.7.ronn
-restify-throttle(7)     restify-throttle.7.ronn
-restify-client(7)       restify-client.7.ronn
