@@ -1,12 +1,13 @@
 {
   "author": "Mark Cavage <mcavage@gmail.com>",
-  "name": "kahu",
-  "homepage": "http://mcavage.github.com/node-kahu",
+  "name": "restify",
+  "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "private": true,
   "repository": {
     "type": "git",
-    "url": "git://github.com/mcavage/node-kahu.git"
+    "url": "git://github.com/mcavage/node-restify.git"
   },
   "main": "lib/index.js",
   "directories": {
