@@ -4,44 +4,10 @@ var EventEmitter = require('events').EventEmitter;
 var test = require('tap').test;
 
 var log4js = require('../lib/log4js_stub');
-var Request = require('../lib/Request');
+var Request = require('../lib/request');
 
+var getRequest = require('./stubs').getRequest;
 
-
-///--- Helpers
-
-function getRequest() {
-  var stub = new EventEmitter();
-  stub.connection = {
-    encrypted: true
-  };
-  stub.headers = {
-    'content-type': 'application/xml'
-  };
-  stub.httpVersion = '1.1';
-  stub.method = 'GET';
-  stub.url = '//foo/bar/';
-
-  var r = new Request({
-    log4js: log4js,
-    request: stub
-  });
-  r.accept = [
-    {
-      type: 'application',
-      subtype: 'json'
-    },
-    {
-      type: 'text',
-      subtype: '*',
-    },
-    {
-      type: '*',
-      subtype: 'foo',
-    }
-  ];
-  return r;
-}
 
 
 ///--- Tests
@@ -90,7 +56,9 @@ test('properties', function(t) {
 
 test('accepts', function(t) {
   var req = getRequest();
-  t.ok(req.accepts);
+  t.throws(function() {
+    req.accepts(123);
+  }, new TypeError('type (String) required'));
   t.ok(req.accepts('application/json'));
   t.ok(req.accepts('json'));
   t.ok(req.accepts('text/plain'));
@@ -99,6 +67,15 @@ test('accepts', function(t) {
   t.end();
 });
 
+
+test('header', function(t) {
+  var req = getRequest();
+  t.throws(function() {
+    req.header(123);
+  }, new TypeError('name (String) required'));
+  t.equal(req.header('Content-Type'), 'application/xml; charset=en_us');
+  t.end();
+});
 
 test('is', function(t) {
   var req = getRequest();
