@@ -73,7 +73,7 @@ setup: dep
 # endif
 
 lint:
-	${LINT} lib/*.js tst/*.js
+	${LINT} lib/*.js lib/plugins/*.js tst/*.js
 
 
 doc: dep
