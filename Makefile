@@ -11,7 +11,17 @@ RESTDOWN_VERSION=1.2.13
 
 # Commands
 
+MAKE = make
+TAR = tar
+UNAME := $(shell uname)
+ifeq ($(UNAME), SunOS)
+	MAKE = gmake
+	TAR = gtar
+endif
+
 NPM := npm_config_tar=$(TAR) npm
+
+LINT = ./node_modules/.javascriptlint/build/install/jsl --conf ./tools/jsl.conf
 
 RESTDOWN = ./node_modules/.restdown/bin/restdown \
 	-b ./docs/branding \
@@ -19,12 +29,6 @@ RESTDOWN = ./node_modules/.restdown/bin/restdown \
 	-D mediaroot=media
 
 TAP = ./node_modules/.bin/tap
-
-TAR = tar
-UNAME := $(shell uname)
-ifeq ($(UNAME), SunOS)
-	TAR = gtar
-endif
 
 # Targets
 
@@ -34,12 +38,21 @@ all:: test
 
 node_modules/.npm.installed:
 	$(NPM) install
+
 	if [[ ! -d node_modules/.restdown ]]; then \
 		git clone git://github.com/trentm/restdown.git node_modules/.restdown; \
 	else \
 		(cd node_modules/.restdown && git fetch origin); \
 	fi
+
+	if [[ ! -d node_modules/.javascriptlint ]]; then \
+		git clone https://github.com/davepacheco/javascriptlint node_modules/.javascriptlint; \
+	else \
+		(cd node_modules/.javascriptlint && git fetch origin); \
+	fi
+
 	@(cd ./node_modules/.restdown && git checkout $(RESTDOWN_VERSION))
+	@(cd ./node_modules/.javascriptlint && $(MAKE) install)
 	@touch ./node_modules/.npm.installed
 
 dep:	./node_modules/.npm.installed
@@ -58,6 +71,10 @@ setup: dep
 # 	@echo "*    http://code.google.com/closure/utilities/docs/linter_howto.html"
 # 	@echo "* * *"
 # endif
+
+lint:
+	${LINT} lib/*.js
+
 
 doc: dep
 	@rm -rf ${DOCPKGDIR}

@@ -23,7 +23,7 @@ module.exports = {
     stub.httpVersion = '1.1';
     stub.method = 'GET';
     stub.url = '//foo/bar';
-
+  
     var r = new Request({
       log4js: log4js,
       request: stub

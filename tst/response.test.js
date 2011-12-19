@@ -185,6 +185,7 @@ test('send(buffer)', function(t) {
     t.end();
   });
 
+  res.contentType = 'binary';
   res.send(new Buffer('hello world'));
 });
 
@@ -239,10 +240,8 @@ test('check headers', function(t) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Access-Control-Allow-Origin'], '*');
-    t.equal(headers['Access-Control-Allow-Headers'],
-            'Accept, Content-Type, Content-Length, Date, X-Api-Version');
-    t.equal(headers['Access-Control-Expose-Headers'],
-            'X-Api-Version, X-Request-Id, X-Response-Time');
+    t.ok(['Access-Control-Allow-Headers']);
+    t.ok(headers['Access-Control-Expose-Headers']);
     t.equal(headers['Access-Control-Allow-Methods'], 'GET');
     t.equal(headers['Content-Type'], 'application/json');
     t.ok(headers['Content-Length']);

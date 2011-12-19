@@ -242,14 +242,12 @@ test('test matches version', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/car',
-    headers: {
-      'x-api-version': '~1.2'
-    }
+    url: '/foo/car'
   }), { bar: 'car' });
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/car'
+    url: '/foo/car',
+    version: '3.2.1'
   }));
   t.end();
 });
