@@ -5,8 +5,8 @@ var http = require('http');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
-var HttpError = require('../lib/err').HttpError;
-var RestError = require('../lib/err').RestError;
+var HttpError = require('../lib/errors').HttpError;
+var RestError = require('../lib/errors').RestError;
 var log4js = require('../lib/log4js_stub');
 var parsers = require('../lib/parsers');
 var Request = require('../lib/request');
