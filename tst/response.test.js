@@ -18,7 +18,7 @@ var getResponse = require('./stubs').getResponse;
 
 test('throws on missing options', function(t) {
   t.throws(function() {
-    new Response();
+    return new Response();
   }, new TypeError('options (Object) required'));
   t.end();
 });
@@ -26,7 +26,7 @@ test('throws on missing options', function(t) {
 
 test('throws on missing log4js', function(t) {
   t.throws(function() {
-    new Response({});
+    return new Response({});
   }, new TypeError('options.log4js (Object) required'));
   t.end();
 });
@@ -34,7 +34,7 @@ test('throws on missing log4js', function(t) {
 
 test('throws on missing response', function(t) {
   t.throws(function() {
-    new Response({
+    return new Response({
       log4js: {}
     });
   }, new TypeError('options.response (http.OutgoingMessage) required'));
@@ -44,7 +44,7 @@ test('throws on missing response', function(t) {
 
 test('throws on missing request', function(t) {
   t.throws(function() {
-    new Response({
+    return new Response({
       log4js: {},
       response: {}
     });
@@ -55,7 +55,7 @@ test('throws on missing request', function(t) {
 
 test('throws on bad version type', function(t) {
   t.throws(function() {
-    new Response({
+    return new Response({
       log4js: {},
       response: {},
       request: getRequest(),
@@ -235,7 +235,7 @@ test('send(RestError)', function(t) {
 
 test('check headers', function(t) {
   var res = getResponse();
-  res.methods.push('GET')
+  res.methods.push('GET');
   res.res.on('end', function(code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);

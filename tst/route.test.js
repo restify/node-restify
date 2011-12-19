@@ -11,7 +11,7 @@ var Route = require('../lib/route');
 
 test('throws on missing options', function(t) {
   t.throws(function() {
-    new Route();
+    return new Route();
   }, new TypeError('options (Object) required'));
   t.end();
 });
@@ -19,7 +19,7 @@ test('throws on missing options', function(t) {
 
 test('throws on missing log4js', function(t) {
   t.throws(function() {
-    new Route({});
+    return new Route({});
   }, new TypeError('options.log4js (Object) required'));
   t.end();
 });
@@ -27,7 +27,7 @@ test('throws on missing log4js', function(t) {
 
 test('throws on missing url', function(t) {
   t.throws(function() {
-    new Route({
+    return new Route({
       log4js: log4js
     });
   }, new TypeError('options.url (String) required'));
@@ -37,7 +37,7 @@ test('throws on missing url', function(t) {
 
 test('throws on url wrong type', function(t) {
   t.throws(function() {
-    new Route({
+    return new Route({
       log4js: log4js,
       url: 123
     });
@@ -60,7 +60,7 @@ test('throws on setting url incorrectly', function(t) {
 
 test('throws on bad version', function(t) {
   t.throws(function() {
-    new Route({
+    return new Route({
       log4js: log4js,
       url: '/foo/bar',
       version: 123
@@ -72,7 +72,7 @@ test('throws on bad version', function(t) {
 
 test('throws on bad handlers (not array)', function(t) {
   t.throws(function() {
-    new Route({
+    return new Route({
       log4js: log4js,
       url: '/foo/bar',
       handlers: 123
@@ -84,7 +84,7 @@ test('throws on bad handlers (not array)', function(t) {
 
 test('throws on bad handlers (not function)', function(t) {
   t.throws(function() {
-    new Route({
+    return new Route({
       log4js: log4js,
       url: '/foo/bar',
       handlers: [123]
@@ -102,7 +102,7 @@ test('construct with default method and name', function(t) {
   t.ok(route);
   t.equal(route.method, 'GET');
   t.equal(route.url, '/foo/:bar');
-  t.equal(route.name, 'GET /foo/:bar')
+  t.equal(route.name, 'GET /foo/:bar');
   t.end();
 });
 
@@ -280,10 +280,7 @@ test('run routes', function(t) {
   });
 
   // Stub this out
-  var res = {
-    send: function() {}
-  };
-  route.run({}, res)
+  route.run({}, { send: function() {} });
 });
 
 

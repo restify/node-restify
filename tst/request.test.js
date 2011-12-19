@@ -14,7 +14,7 @@ var getRequest = require('./stubs').getRequest;
 
 test('throws on missing options', function(t) {
   t.throws(function() {
-    new Request();
+    return new Request();
   }, new TypeError('options (Object) required'));
   t.end();
 });
@@ -22,7 +22,7 @@ test('throws on missing options', function(t) {
 
 test('throws on missing log4js', function(t) {
   t.throws(function() {
-    new Request({});
+    return new Request({});
   }, new TypeError('options.log4js (Object) required'));
   t.end();
 });
@@ -30,7 +30,7 @@ test('throws on missing log4js', function(t) {
 
 test('throws on missing request', function(t) {
   t.throws(function() {
-    new Request({
+    return new Request({
       log4js: {}
     });
   }, new TypeError('options.request (http.IncomingMessage) required'));

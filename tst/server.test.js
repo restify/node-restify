@@ -24,7 +24,7 @@ var PORT = process.env.UNIT_TEST_PORT || 12345;
 
 test('throws on missing options', function(t) {
   t.throws(function() {
-    new Server();
+    return new Server();
   }, new TypeError('options (Object) required'));
   t.end();
 });
@@ -32,7 +32,7 @@ test('throws on missing options', function(t) {
 
 test('throws on missing log4js', function(t) {
   t.throws(function() {
-    new Server({});
+    return new Server({});
   }, new TypeError('options.log4js (Object) required'));
   t.end();
 });
@@ -52,7 +52,7 @@ test('ok (ssl)', function(t) {
       certificate: 'hello',
       key: 'world'
     }));
-    t.fail('HTTPS server not created')
+    t.fail('HTTPS server not created');
   } catch (e) {
     // noop
   }
@@ -65,7 +65,7 @@ test('listen and close (port only)', function(t) {
   server.listen(PORT, function() {
     server.close(function() {
       t.end();
-    })
+    });
   });
 });
 
@@ -75,7 +75,7 @@ test('listen and close (port and hostname)', function(t) {
   server.listen(PORT, '127.0.0.1', function() {
     server.close(function() {
       t.end();
-    })
+    });
   });
 });
 
@@ -85,7 +85,7 @@ test('listen and close (socketPath)', function(t) {
   server.listen('/tmp/.' + uuid(), function() {
     server.close(function() {
       t.end();
-    })
+    });
   });
 });
 
@@ -112,9 +112,9 @@ test('get (path only)', function(t) {
       if (++done == 2) {
         server.close(function() {
           t.end();
-        })
+        });
       }
-    })
+    });
   });
 
   server.on('after', function(req, res) {
@@ -123,7 +123,7 @@ test('get (path only)', function(t) {
     if (++done == 2) {
       server.close(function() {
         t.end();
-      })
+      });
     }
   });
 });
@@ -157,9 +157,9 @@ test('get (path and version ok)', function(t) {
       if (++done == 2) {
         server.close(function() {
           t.end();
-        })
+        });
       }
-    })
+    });
   });
 
   server.on('after', function(req, res) {
@@ -168,7 +168,7 @@ test('get (path and version ok)', function(t) {
     if (++done == 2) {
       server.close(function() {
         t.end();
-      })
+      });
     }
   });
 });
@@ -179,7 +179,7 @@ test('get (path and version not ok)', function(t) {
   server.get({
     path: '/foo/:id',
     version: '1.2.3'
-  }, function tester(req, res, next) {
+  }, function(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
     res.send();
@@ -189,14 +189,13 @@ test('get (path and version not ok)', function(t) {
   server.get({
     path: '/foo/:id',
     version: '1.2.4'
-  }, function tester(req, res, next) {
+  }, function(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
     res.send();
     return next();
   });
 
-  var done = 0;
   server.listen(PORT, function() {
     var opts = {
       hostname: 'localhost',
@@ -262,11 +261,11 @@ test('use + get (path only)', function(t) {
 test('rm', function(t) {
   var server = new Server({ log4js: log4js });
 
-  server.get('/foo/:id', function tester(req, res, next) {
+  server.get('/foo/:id', function(req, res, next) {
     return next();
   });
 
-  server.get('/bar/:id', function tester(req, res, next) {
+  server.get('/bar/:id', function(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'foo');
     res.send();
@@ -285,8 +284,8 @@ test('rm', function(t) {
     http.get(opts, function(res) {
       t.equal(res.statusCode, 404);
       opts.path = '/bar/foo';
-      http.get(opts, function(res) {
-        t.equal(res.statusCode, 200);
+      http.get(opts, function(res2) {
+        t.equal(res2.statusCode, 200);
         server.close(function() {
           t.end();
         });
