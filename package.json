@@ -18,16 +18,14 @@
     "node": ">=0.6"
   },
   "dependencies": {
-    "dtrace-provider": "0.0.3",
-    "eventemitter2": "0.4.1",
+    "dtrace-provider": "0.0.5",
     "mime": "1.2.4",
     "node-uuid": "1.2.0",
-    "nopt": "1.0.10",
     "sprintf": "0.1.1",
     "semver": "1.0.12"
   },
   "devDependencies": {
-    "tap": "0.1.2"
+    "tap": "0.1.3"
   },
   "scripts": {
     "test": "./node_modules/.bin/tap ./tst/*.test.js"
