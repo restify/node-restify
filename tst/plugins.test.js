@@ -122,7 +122,7 @@ test('query ok', function(t) {
 });
 
 
-test('body urlok', function(t) {
+test('body url-encoded ok', function(t) {
   SERVER.post('/bodyurl/:id', function(req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
@@ -146,6 +146,37 @@ test('body urlok', function(t) {
     t.end();
   });
   client.write('phone=(206)%20555-1212&name=somethingelse');
+  client.end();
+});
+
+
+test('body json ok', function(t) {
+  SERVER.post('/bodyjson/:id', function(req, res, next) {
+    t.equal(req.params.id, 'foo');
+    t.equal(req.params.name, 'markc');
+    t.equal(req.params.phone, '(206) 555-1212');
+    res.send();
+    return next();
+  });
+
+  var opts = {
+    hostname: '127.0.0.1',
+    port: PORT,
+    path: '/bodyurl/foo?name=markc',
+    agent: false,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  var client = http.request(opts, function(res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+  client.write(JSON.stringify({
+    phone: '(206) 555-1212',
+    name: 'somethingelse'
+  }));
   client.end();
 });
 
