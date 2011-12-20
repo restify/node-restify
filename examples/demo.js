@@ -109,20 +109,48 @@ server.listen(9080, function() {
 // d script that breaks down the route -start and -done, and then you'd want
 // to see which handler is taking longest from there.
 //
-//
 // $ node demo.js
 // $ curl localhost:9080/foo/bar
 // $ sudo ./handler-timing.d
+// ^C
+//   getfoo-6
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
 //
+//   getfoo-parseAccept
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
 //
-// ***GetFoo Latency Breakdown****
+//   getfoo-parseAuthorization
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
 //
-// HANDLER                             LATENCY
-// getfoo-slowHandler                   2505us
-// getfoo-6                                0us
-// getfoo-sendResult                       7us
-// getfoo-parseAccept                      2us
-// getfoo-parseAuthorization               1us
-// getfoo-parseDate                        0us
-// getfoo-parseQueryString                 1us
+//   getfoo-parseDate
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
 //
+//   getfoo-parseQueryString
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
+//
+//   getfoo-sendResult
+//            value  ------------- Distribution ------------- count
+//               -1 |                                         0
+//                0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//                1 |                                         0
+//
+//   getfoo-slowHandler
+//            value  ------------- Distribution ------------- count
+//               64 |                                         0
+//              128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 6
+//              256 |                                         0
