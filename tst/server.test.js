@@ -132,7 +132,7 @@ test('get (path only)', function(t) {
 test('get (path and version ok)', function(t) {
   var server = new Server({ log4js: log4js });
   server.get({
-    path: '/foo/:id',
+    url: '/foo/:id',
     version: '1.2.3'
   }, function tester(req, res, next) {
     t.ok(req.params);
@@ -177,7 +177,7 @@ test('get (path and version ok)', function(t) {
 test('get (path and version not ok)', function(t) {
   var server = new Server({ log4js: log4js });
   server.get({
-    path: '/foo/:id',
+    url: '/foo/:id',
     version: '1.2.3'
   }, function(req, res, next) {
     t.ok(req.params);
@@ -187,7 +187,7 @@ test('get (path and version not ok)', function(t) {
   });
 
   server.get({
-    path: '/foo/:id',
+    url: '/foo/:id',
     version: '1.2.4'
   }, function(req, res, next) {
     t.ok(req.params);

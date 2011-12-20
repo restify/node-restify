@@ -290,18 +290,21 @@ test('toString', function(t) {
     url: '/foo/:bar',
     method: 'GET'
   }).toString(), 'GET /foo/:bar');
+
   t.equal(new Route({
     log4js: log4js,
     url: '/foo/:bar',
     method: 'GET',
     version: '1.2.3'
   }).toString(), 'GET /foo/:bar (version=1.2.3)');
+
   t.equal(new Route({
     log4js: log4js,
     url: '/foo/:bar',
     method: 'GET',
     version: '1.2.3',
     name: 'GetFoo'
-  }).toString(), 'GET /foo/:bar (name=GetFoo, version=1.2.3)');
+  }).toString(), 'GET /foo/:bar (version=1.2.3)');
+
   t.end();
 });
