@@ -8,7 +8,7 @@ var uuid = require('node-uuid');
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
 var log4js = require('../lib/log4js_stub');
-var parsers = require('../lib/plugins');
+var plugins = require('../lib/plugins');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
 var Server = require('../lib/server');
@@ -28,6 +28,10 @@ function request(path, headers, callback) {
   if (typeof(path) === 'function') {
     callback = path;
     path = headers = false;
+  }
+  if (typeof(headers) === 'function') {
+    callback = headers;
+    headers = false;
   }
 
   var opts = {
@@ -52,10 +56,11 @@ test('setup', function(t) {
     log4js: log4js
   });
 
-  SERVER.use(parsers.acceptParser(SERVER.acceptable));
-  SERVER.use(parsers.authorizationParser());
-  SERVER.use(parsers.dateParser());
-  SERVER.use(parsers.queryParser());
+  SERVER.use(plugins.acceptParser(SERVER.acceptable));
+  SERVER.use(plugins.authorizationParser());
+  SERVER.use(plugins.dateParser());
+  SERVER.use(plugins.queryParser());
+  SERVER.use(plugins.urlEncodedBodyParser());
 
   SERVER.get('/foo/:id', function(req, res, next) {
     res.send();
@@ -98,6 +103,65 @@ test('authorization basic invalid', function(t) {
   request('/foo/bar', { authorization: authz }, function(res) {
     t.equal(res.statusCode, 400);
     t.end();
+  }).end();
+});
+
+
+test('query ok', function(t) {
+  SERVER.get('/query/:id', function(req, res, next) {
+    t.equal(req.params.id, 'foo');
+    t.equal(req.params.name, 'markc');
+    res.send();
+    return next();
+  });
+
+  request('/query/foo?id=bar&name=markc', function(res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  }).end();
+});
+
+
+test('body urlok', function(t) {
+  SERVER.post('/bodyurl/:id', function(req, res, next) {
+    t.equal(req.params.id, 'foo');
+    t.equal(req.params.name, 'markc');
+    t.equal(req.params.phone, '(206) 555-1212');
+    res.send();
+    return next();
+  });
+
+  var opts = {
+    hostname: '127.0.0.1',
+    port: PORT,
+    path: '/bodyurl/foo?name=markc',
+    agent: false,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  var req = http.request(opts, function(res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+  req.write('phone=(206)%20555-1212&name=somethingelse');
+  req.end();
+});
+
+
+test('date expired', function(t) {
+  request('/foo/bar', { date: 'Tue, 15 Nov 1994 08:12:31 GMT' }, function(res) {
+    t.equal(res.statusCode, 400);
+    res.setEncoding('utf8');
+    res.body = '';
+    res.on('data', function(chunk) {
+      res.body += chunk;
+    });
+    res.on('end', function() {
+      t.equal(JSON.parse(res.body).message, 'Date header is too old');
+      t.end();
+    });
   }).end();
 });
 
