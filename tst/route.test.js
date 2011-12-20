@@ -149,15 +149,15 @@ test('test matches no params', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/bar'
+    path: '/foo/bar'
   }), {});
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/boo'
+    path: '/foo/boo'
   }));
   t.notOk(route.matches({
     method: 'PUT',
-    url: '/foo/bar'
+    path: '/foo/bar'
   }));
   t.end();
 });
@@ -172,15 +172,15 @@ test('test matches params', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/car'
+    path: '/foo/car'
   }), { bar: 'car' });
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/boo/bar'
+    path: '/foo/boo/bar'
   }));
   t.notOk(route.matches({
     method: 'PUT',
-    url: '/foo/bar'
+    path: '/foo/bar'
   }));
   t.end();
 });
@@ -195,15 +195,15 @@ test('test matches multiple params', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/car/bar/chevy'
+    path: '/foo/car/bar/chevy'
   }), { one: 'car', two: 'chevy' });
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/boo/bar'
+    path: '/foo/boo/bar'
   }));
   t.notOk(route.matches({
     method: 'PUT',
-    url: '/foo/bar'
+    path: '/foo/bar'
   }));
   t.end();
 });
@@ -218,15 +218,15 @@ test('test matches regex', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/car'
+    path: '/foo/car'
   }), ['car']);
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/boo/bar'
+    path: '/foo/boo/bar'
   }));
   t.notOk(route.matches({
     method: 'PUT',
-    url: '/foo/bar'
+    path: '/foo/bar'
   }));
   t.end();
 });
@@ -242,11 +242,11 @@ test('test matches version', function(t) {
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    url: '/foo/car'
+    path: '/foo/car'
   }), { bar: 'car' });
   t.notOk(route.matches({
     method: 'GET',
-    url: '/foo/car',
+    path: '/foo/car',
     version: '3.2.1'
   }));
   t.end();

@@ -141,12 +141,12 @@ test('body urlok', function(t) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
-  var req = http.request(opts, function(res) {
+  var client = http.request(opts, function(res) {
     t.equal(res.statusCode, 200);
     t.end();
   });
-  req.write('phone=(206)%20555-1212&name=somethingelse');
-  req.end();
+  client.write('phone=(206)%20555-1212&name=somethingelse');
+  client.end();
 });
 
 

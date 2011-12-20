@@ -22,6 +22,7 @@ module.exports = {
     };
     stub.httpVersion = '1.1';
     stub.method = 'GET';
+    stub.path = '/foo/bar';
     stub.url = '//foo/bar';
 
     var r = new Request({
