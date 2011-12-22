@@ -1,6 +1,8 @@
 var restify = require('../lib');
 var log4js = require('../lib/log4js_stub');
 
+log4js.setGlobalLogLevel('TRACE');
+
 var log = log4js.getLogger('main');
 
 var server = restify.createServer({
@@ -39,6 +41,7 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.authorizationParser());
 server.use(restify.dateParser());
 server.use(restify.queryParser());
+server.use(restify.urlEncodedBodyParser());
 
 server.use(function slowHandler(req, res, next) {
   setTimeout(function() { return next(); }, 250);
@@ -50,6 +53,30 @@ server.get({url: '/foo/:id', name: 'GetFoo'}, function (req, res, next) {
   res.send({
     hello: req.params.id
   });
+  return next();
+});
+
+server.head('/foo/:id', function (req, res, next) {
+  res.send({
+    hello: req.params.id
+  });
+  return next();
+});
+
+server.put('/foo/:id', function (req, res, next) {
+  res.send({
+    hello: req.params.id
+  });
+  return next();
+});
+
+server.post('/foo/:id', function (req, res, next) {
+  res.json(201, req.params);
+  return next();
+});
+
+server.del('/foo/:id', function (req, res, next) {
+  res.send(204);
   return next();
 });
 
