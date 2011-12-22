@@ -2,6 +2,7 @@
 
 var http = require('http');
 
+var d = require('dtrace-provider');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
@@ -17,6 +18,7 @@ var Server = require('../lib/server');
 
 ///--- Globals
 
+var DTRACE = d.createDTraceProvider('restifyUnitTest');
 var PORT = process.env.UNIT_TEST_PORT || 12345;
 var SERVER;
 
@@ -53,6 +55,7 @@ function request(path, headers, callback) {
 
 test('setup', function(t) {
   SERVER = new Server({
+    dtrace: DTRACE,
     log4js: log4js
   });
 

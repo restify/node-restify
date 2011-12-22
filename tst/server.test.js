@@ -2,6 +2,7 @@
 
 var http = require('http');
 
+var d = require('dtrace-provider');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
@@ -16,6 +17,7 @@ var Server = require('../lib/server');
 
 ///--- Globals
 
+var DTRACE = d.createDTraceProvider('restifyUnitTest');
 var PORT = process.env.UNIT_TEST_PORT || 12345;
 
 
@@ -33,13 +35,21 @@ test('throws on missing options', function(t) {
 test('throws on missing log4js', function(t) {
   t.throws(function() {
     return new Server({});
+  }, new TypeError('options.dtrace (Object) required'));
+  t.end();
+});
+
+
+test('throws on missing log4js', function(t) {
+  t.throws(function() {
+    return new Server({ dtrace: {} });
   }, new TypeError('options.log4js (Object) required'));
   t.end();
 });
 
 
 test('ok', function(t) {
-  t.ok(new Server({ log4js: log4js }));
+  t.ok(new Server({ dtrace: DTRACE, log4js: log4js }));
   t.end();
 });
 
@@ -48,6 +58,7 @@ test('ok (ssl)', function(t) {
   // Lame, just make sure we go down the https path
   try {
     t.ok(new Server({
+      dtrace: DTRACE,
       log4js: log4js,
       certificate: 'hello',
       key: 'world'
@@ -61,7 +72,7 @@ test('ok (ssl)', function(t) {
 
 
 test('listen and close (port only)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.listen(PORT, function() {
     server.close(function() {
       t.end();
@@ -71,7 +82,7 @@ test('listen and close (port only)', function(t) {
 
 
 test('listen and close (port and hostname)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.listen(PORT, '127.0.0.1', function() {
     server.close(function() {
       t.end();
@@ -81,7 +92,7 @@ test('listen and close (port and hostname)', function(t) {
 
 
 test('listen and close (socketPath)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.listen('/tmp/.' + uuid(), function() {
     server.close(function() {
       t.end();
@@ -91,7 +102,7 @@ test('listen and close (socketPath)', function(t) {
 
 
 test('get (path only)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.get('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
@@ -130,7 +141,7 @@ test('get (path only)', function(t) {
 
 
 test('get (path and version ok)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.get({
     url: '/foo/:id',
     version: '1.2.3'
@@ -175,7 +186,7 @@ test('get (path and version ok)', function(t) {
 
 
 test('get (path and version not ok)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   server.get({
     url: '/foo/:id',
     version: '1.2.3'
@@ -226,7 +237,7 @@ test('get (path and version not ok)', function(t) {
 
 
 test('use + get (path only)', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
   var handler = 0;
   server.use(function(req, res, next) {
     handler++;
@@ -259,7 +270,7 @@ test('use + get (path only)', function(t) {
 
 
 test('rm', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
 
   server.get('/foo/:id', function(req, res, next) {
     return next();
@@ -296,7 +307,7 @@ test('rm', function(t) {
 
 
 test('405', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
 
   server.post('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -324,7 +335,7 @@ test('405', function(t) {
 
 
 test('PUT ok', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
 
   server.put('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -352,7 +363,7 @@ test('PUT ok', function(t) {
 
 
 test('HEAD ok', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
 
   server.head('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -383,7 +394,7 @@ test('HEAD ok', function(t) {
 
 
 test('DELETE ok', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
 
   server.del('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -414,7 +425,8 @@ test('DELETE ok', function(t) {
 
 
 test('OPTIONS', function(t) {
-  var server = new Server({ log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
   server.get('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');

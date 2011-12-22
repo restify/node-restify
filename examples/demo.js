@@ -48,13 +48,13 @@ server.get({url: '/foo/:id', name: 'GetFoo'}, function (req, res, next) {
   return next();
 }, function sendResult(req, res, next) {
   res.send({
-    hello: 'world'
+    hello: req.params.id
   });
   return next();
 });
 
 server.on('after', function(req, res, name) {
-  req.log.info('%s just finished.', name);
+  req.log.info('%s just finished: %d.', name, res.code);
 });
 
 server.on('NotFound', function(req, res) {
