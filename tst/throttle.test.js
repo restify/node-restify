@@ -88,7 +88,7 @@ test('ok', function(t) {
 test('throttled', function(t) {
   client.get('/test/throttleMe', function(err, req, res, body) {
     t.ok(err);
-    t.equal(err.code, 429);
+    t.equal(err.statusCode, 429);
     t.ok(err.message);
     t.equal(res.statusCode, 429);
     setTimeout(function() { t.end(); }, 2100);
