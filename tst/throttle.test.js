@@ -6,7 +6,7 @@ var d = require('dtrace-provider');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
-var createClient = require('../lib/clients').createClient;
+var createClient = require('../lib').createClient;
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
 var log4js = require('../lib/log4js_stub');
@@ -67,7 +67,7 @@ test('setup', function(t) {
       dtrace: DTRACE,
       log4js: log4js,
       name: 'throttleUnitTest',
-      type: 'text/plain',
+      type: 'string',
       url: 'http://127.0.0.1:' + PORT
     });
     t.ok(client);
