@@ -10,15 +10,15 @@
   "main": "lib/restify.js",
   "dependencies": {
     "formidable": "1.0.8",
-    "httpu": "0.0.1",
-    "node-uuid": "1.2.0",
-    "retry": "0.4.0",
-    "semver": "1.0.12",
-    "xml2js": "0.1.10"
+    "httpu": "1.0.1",
+    "node-uuid": "1.3.1",
+    "retry": "0.5.0",
+    "semver": "1.0.13",
+    "xml2js": "0.1.13"
   },
   "scripts": {
-    "pretest": "gjslint --nojsdoc -r . -x lib/sprintf.js -e node_modules; jshint lib tst",
-    "test": "whiskey --quiet --sequential --timeout 4000 -t \"`find tst -name *.test.js | xargs`\""
+    "pretest": "gjslint --nojsdoc -r . -x lib/sprintf.js -e node_modules",
+    "test": "./node_modules/.bin/whiskey --quiet --sequential --timeout 4000 -t \"`find tst -name *.test.js | xargs`\""
   },
   "man": [
     "./docs/restify.3",
@@ -31,8 +31,7 @@
     "./docs/restify-versions.7"
   ],
   "devDependencies": {
-    "jshint": "0.2.3",
-    "whiskey": "0.4.1"
+    "whiskey": "0.6.3"
   },
   "engines": {
     "node": ">=0.4"

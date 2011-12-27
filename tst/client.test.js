@@ -26,7 +26,7 @@ exports.setUp = function(test, assert) {
   function handle(req, res, next) {
     var code = req.params.code || 200;
     req.params.name = req.uriParams.name;
-    res.send(code, req.method !== 'HEAD' ? req.params : null);
+    res.send(code, req.params);
   }
 
   server.put('/test/:name', handle);
@@ -235,6 +235,7 @@ exports.test_head_expect = function(test, assert) {
   client.head(req, function(err, headers) {
     assert.ifError(err);
     assert.ok(headers);
+    assert.ok(headers['content-length']);
     test.finish();
   });
 };
