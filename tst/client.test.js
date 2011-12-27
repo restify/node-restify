@@ -234,11 +234,64 @@ test('create raw client', function(t) {
   client = restify.createClient({
     log4js: log4js,
     url: 'http://127.0.0.1:' + PORT,
-    type: 'http'
+    type: 'http',
+    accept: 'text/plain'
   });
   t.ok(client);
   t.ok(client instanceof restify.HttpClient);
   t.end();
+});
+
+
+test('GET raw', function(t) {
+  client.get('/str/mcavage', function(connectErr, req) {
+    t.ifError(connectErr);
+    t.ok(req);
+
+    req.on('result', function(err, res) {
+      t.ifError(err);
+      res.body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        res.body += chunk;
+      });
+
+      res.on('end', function() {
+        t.equal(res.body, 'hello mcavage');
+        t.end();
+      });
+    });
+  });
+});
+
+
+test('POST raw', function(t) {
+  var opts = {
+    path: '/str/mcavage',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+  };
+  client.post(opts, function(connectErr, req) {
+    t.ifError(connectErr);
+
+    req.write('hello=snoopy');
+    req.end();
+
+    req.on('result', function(err, res) {
+      t.ifError(err);
+      res.body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        res.body += chunk;
+      });
+
+      res.on('end', function() {
+        t.equal(res.body, 'hello snoopy');
+        t.end();
+      });
+    });
+  });
 });
 
 
@@ -247,3 +300,7 @@ test('teardown', function(t) {
     t.end();
   });
 });
+
+
+
+
