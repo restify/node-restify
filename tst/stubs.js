@@ -50,20 +50,22 @@ module.exports = {
   getResponse: function getResponse() {
     var stub = new EventEmitter();
     stub.data = [];
-    stub.headers = {};
+    stub._headers = {};
     stub.writeContinue = function() {};
     stub.setHeader = function(k, v) {
-      stub.headers[k] = v;
+      stub._headers[k] = v;
     };
     stub.getHeader = function(k) {
-      return stub.headers[k];
+      return stub._headers[k];
     };
     stub.removeHeader = function(k) {
-      delete stub.headers[k];
+      delete stub._headers[k];
     };
     stub.writeHead = function(status, headers) {
-      stub.statusCode = status;
-      stub.headers = headers;
+      if (status)
+        stub.statusCode = status;
+      if (headers)
+        stub._headers = headers;
     };
     stub.write = function(data) {
       stub.data.push(data);
@@ -72,7 +74,7 @@ module.exports = {
     stub.end = function(data) {
       if (data)
         stub.data.push(data);
-      stub.emit('end', stub.statusCode, stub.headers, stub.data);
+      stub.emit('end', stub.statusCode, stub._headers, stub.data);
     };
     stub.statusCode = 200;
     stub.writeable = true;
