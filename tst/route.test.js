@@ -219,7 +219,7 @@ test('test matches regex', function(t) {
   t.equivalent(route.matches({
     method: 'GET',
     path: '/foo/car'
-  }), ['car']);
+  }), {0: 'car'});
   t.notOk(route.matches({
     method: 'GET',
     path: '/foo/boo/bar'

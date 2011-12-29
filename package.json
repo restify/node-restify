@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "dtrace-provider": "0.0.5",
+    "http-signature": "0.9.7",
     "mime": "1.2.4",
     "node-uuid": "1.2.0",
     "request": "2.2.9",
