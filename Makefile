@@ -24,9 +24,9 @@ NPM := npm_config_tar=$(TAR) npm
 LINT = ./node_modules/.javascriptlint/build/install/jsl --conf ./tools/jsl.conf
 
 RESTDOWN = ./node_modules/.restdown/bin/restdown \
-	-b ./docs/branding \
 	-m ${DOCPKGDIR} \
 	-D mediaroot=media
+#	-b ./docs/branding \
 
 TAP = ./node_modules/.bin/tap
 
@@ -59,19 +59,6 @@ dep:	./node_modules/.npm.installed
 install: dep
 setup: dep
 
-# gjslint:
-# 	gjslint --nojsdoc -r lib -r tst
-
-# ifeq ($(HAVE_GJSLINT), yes)
-# lint: gjslint
-# else
-# lint:
-# 	@echo "* * *"
-# 	@echo "* Warning: Cannot lint with gjslint. Install it from:"
-# 	@echo "*    http://code.google.com/closure/utilities/docs/linter_howto.html"
-# 	@echo "* * *"
-# endif
-
 lint:
 	${LINT} lib/*.js lib/plugins/*.js tst/*.js
 
@@ -79,14 +66,7 @@ lint:
 doc: dep
 	@rm -rf ${DOCPKGDIR}
 	@mkdir -p ${DOCPKGDIR}
-	# ${RESTDOWN} ./docs/client.md
-	# ${RESTDOWN} ./docs/dn.md
-	# ${RESTDOWN} ./docs/errors.md
-	# ${RESTDOWN} ./docs/examples.md
-	# ${RESTDOWN} ./docs/filters.md
-	# ${RESTDOWN} ./docs/guide.md
-	# ${RESTDOWN} ./docs/index.md
-	# ${RESTDOWN} ./docs/server.md
+	${RESTDOWN} ./docs/guide.md
 	rm docs/*.json
 	mv docs/*.html ${DOCPKGDIR}
 	(cd ${DOCPKGDIR} && $(TAR) -czf ${SRC}/${NAME}-docs-`git log -1 --pretty='format:%h'`.tar.gz *)

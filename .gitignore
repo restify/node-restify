@@ -1,4 +1,7 @@
 coverage
 node_modules
 docs/*.html
+docs/pkg
 *.log
+*.tar.gz
+
