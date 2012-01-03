@@ -30,7 +30,7 @@ test('throws on missing url', function(t) {
     return new Route({
       log4js: log4js
     });
-  }, new TypeError('options.url (String) required'));
+  }, new TypeError('url must be a String'));
   t.end();
 });
 
@@ -41,7 +41,7 @@ test('throws on url wrong type', function(t) {
       log4js: log4js,
       url: 123
     });
-  }, new TypeError('options.url (String) required'));
+  }, new TypeError('url must be a String'));
   t.end();
 });
 
