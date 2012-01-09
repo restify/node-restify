@@ -7,7 +7,7 @@ endif
 DOCPKGDIR = ./docs/pkg
 NAME=restify
 SRC := $(shell pwd)
-RESTDOWN_VERSION=1.2.13
+RESTDOWN_VERSION=1.2.15
 
 # Commands
 

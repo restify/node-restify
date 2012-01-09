@@ -186,6 +186,29 @@ test('test matches params', function(t) {
 });
 
 
+test('test matches params url-encoded', function(t) {
+  var route = new Route({
+    log4js: log4js,
+    url: '/foo/:bar',
+    method: 'GET'
+  });
+  t.ok(route);
+  t.equivalent(route.matches({
+    method: 'GET',
+    path: '/foo/a%40b.com'
+  }), { bar: 'a@b.com' });
+  t.equivalent(route.matches({
+    method: 'GET',
+    path: '/foo/a@b.com'
+  }), { bar: 'a@b.com' });
+  t.notOk(route.matches({
+    method: 'GET',
+    path: '/foo/a%40b.com/bar'
+  }));
+  t.end();
+});
+
+
 test('test matches multiple params', function(t) {
   var route = new Route({
     log4js: log4js,
