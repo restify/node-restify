@@ -149,7 +149,7 @@ below (and `listen()` takes the same arguments as node's
 ||key||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
 ||log4js||Object||You can optionally pass in a log4js handle; note log4js is not required||
-||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider (default is _restify_)||
+||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider; default is `restify` ||
 ||version||String||A default version to set for all routes||
 
 ## Common handlers: server.use()
@@ -167,6 +167,8 @@ you can use, specifically:
 * Query string parsing
 * Body parsing (JSON/URL-encoded)
 * Throttling
+
+Here's some example code using all the shipped plugins:
 
     var server = restify.createServer();
     server.use(restify.acceptParser(server.acceptable));
@@ -461,7 +463,7 @@ You can always add your own by subclassing `restify.RestError` like:
     util.inherits(MyError, restify.RestError);
 
 Basically, a `RestError` takes a statusCode, a restCode, a message,
-and a "constructorOpt" so that V8 correctly captures omits your code
+and a "constructorOpt" so that V8 correctly omits your code
 from the stack trace (you dont' *have* to do that, but you probably
 want it).  In the example above, we also set the name property so
 `console.log(new MyError());` looks correct.
@@ -758,7 +760,11 @@ start and finish, and uses the names found to do so. If there's no
 names, it fills in based on the method, url and index in the chain.
 The probe signatures generated look like:
 
+### Start Probes
+
 `$route-start and $route-$handler-start`
+
+||*Field*||*Type*||*Description*||
 ||id||int||cookie you can use to correlate request/response||
 ||url||char *||request url||
 ||user-agent||char *||value of user-agent header||
@@ -766,7 +772,11 @@ The probe signatures generated look like:
 ||content-type||char *||value of content-type header||
 ||content-length||int||value of content-length header||
 
+### Done Probes
+
 `$route-done and $route-$handler-done`
+
+||*Field*||*Type*||*Description*||
 ||id||int||cookie you can use to correlate request/response||
 ||statusCode||int||HTTP response code||
 ||content-type||char *||value of content-type header||
