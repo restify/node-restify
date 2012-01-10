@@ -196,7 +196,7 @@ server.listen(8080);
 <tr><td>key</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
 <tr><td>formatters</td><td>Object</td><td>Custom response formatters for <code>res.send()</code></td></tr>
 <tr><td>log4js</td><td>Object</td><td>You can optionally pass in a log4js handle; note log4js is not required</td></tr>
-<tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, and also will name the DTrace provider (default is _restify_)</td></tr>
+<tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, and also will name the DTrace provider; default is <code>restify</code></td></tr>
 <tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
 </tbody>
 </table>
@@ -216,9 +216,12 @@ you can use, specifically:</p>
 <li>Date header parsing</li>
 <li>Query string parsing</li>
 <li>Body parsing (JSON/URL-encoded)</li>
-<li><p>Throttling</p>
+<li>Throttling</li>
+</ul>
 
-<p>var server = restify.createServer();
+<p>Here's some example code using all the shipped plugins:</p>
+
+<pre><code>var server = restify.createServer();
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.authorizationParser());
 server.use(restify.dateParser());
@@ -234,8 +237,8 @@ server.use(restify.throttle({
       burst: 0
     }
   }
-}));</p></li>
-</ul>
+}));
+</code></pre>
 
 <p>Note that in all calls to <code>use()</code> and the routes below, you can pass
 in any combination of <code>function(res, res, next)</code> and
@@ -526,7 +529,7 @@ util.inherits(MyError, restify.RestError);
 </code></pre>
 
 <p>Basically, a <code>RestError</code> takes a statusCode, a restCode, a message,
-and a "constructorOpt" so that V8 correctly captures omits your code
+and a "constructorOpt" so that V8 correctly omits your code
 from the stack trace (you dont' <em>have</em> to do that, but you probably
 want it).  In the example above, we also set the name property so
 <code>console.log(new MyError());</code> looks correct.</p>
@@ -847,19 +850,35 @@ start and finish, and uses the names found to do so. If there's no
 names, it fills in based on the method, url and index in the chain.
 The probe signatures generated look like:</p>
 
-<p><code>$route-start and $route-$handler-start</code>
-||id||int||cookie you can use to correlate request/response||
-||url||char *||request url||
-||user-agent||char *||value of user-agent header||
-||user||char *||req.username (i.e., the authenticated party)||
-||content-type||char *||value of content-type header||
-||content-length||int||value of content-length header||</p>
+<h3>Start Probes</h3>
 
-<p><code>$route-done and $route-$handler-done</code>
-||id||int||cookie you can use to correlate request/response||
-||statusCode||int||HTTP response code||
-||content-type||char *||value of content-type header||
-||content-length||int||value of content-length header||</p>
+<p><code>$route-start and $route-$handler-start</code></p>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
+<tr><td>url</td><td>char *</td><td>request url</td></tr>
+<tr><td>user-agent</td><td>char *</td><td>value of user-agent header</td></tr>
+<tr><td>user</td><td>char *</td><td>req.username (i.e., the authenticated party)</td></tr>
+<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
+<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+</tbody>
+</table>
+
+<h3>Done Probes</h3>
+
+<p><code>$route-done and $route-$handler-done</code></p>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
+<tr><td>statusCode</td><td>int</td><td>HTTP response code</td></tr>
+<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
+<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+</tbody>
+</table>
 
 <p>Now, if you wanted to say get a breakdown of latency by handler, you
 could do something like this:</p>
