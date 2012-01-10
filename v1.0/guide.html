@@ -183,7 +183,7 @@ var server = restify.createServer({
   certificate: ...,
   key: ...,
   log4js: log4js,
-  name: 'MyApp,
+  name: 'MyApp',
 });
 
 server.listen(8080);
@@ -322,21 +322,22 @@ server.listen(8080);
 <pre class="shell"><code>curl -s localhost:8080/hello/mark
 "hello: mark"
 $ curl -s -H 'accept-version: ~1' localhost:8080/hello/mark
-"hello: mark
+"hello: mark"
 $ curl -s -H 'accept-version: ~2' localhost:8080/hello/mark
 {"hello":"mark"}
 $ curl -s -H 'accept-version: ~3' localhost:8080/hello/mark | json
 {
-  "code":"InvalidVersion",
-  "message":"GET /hello/mark supports versions: 1.1.3, 2.0.0"
+  "code": "InvalidVersion",
+  "message": "GET /hello/mark supports versions: 1.1.3, 2.0.0"
 }
 </code></pre>
 
-<p>Note in the first case, we didn't specify a an <code>Accept-Version</code> header
-at all, so restify treats that like sending a <code>*</code> (much as not sending
-an <code>Accept</code> header means the client gets the server's choice).  In the
-second case, we explicitly asked for for V1, which got us the same
-response, but then we asked for V2 and got back JSON.  Finally,
+<p>In the first case, we didn't specify an <code>Accept-Version</code> header
+at all, so restify treats that like sending a <code>*</code>. Much as not sending
+an <code>Accept</code> header means the client gets the server's choice. Restify
+will choose the first matching route, in the order specified in the
+code. In the second case, we explicitly asked for for V1, which got
+us the same response, but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an <code>Accept</code> header, so we got a JSON response).  Which
 segues us nicely into content negotiation.</p>
@@ -530,7 +531,7 @@ util.inherits(MyError, restify.RestError);
 
 <p>Basically, a <code>RestError</code> takes a statusCode, a restCode, a message,
 and a "constructorOpt" so that V8 correctly omits your code
-from the stack trace (you dont' <em>have</em> to do that, but you probably
+from the stack trace (you don't <em>have</em> to do that, but you probably
 want it).  In the example above, we also set the name property so
 <code>console.log(new MyError());</code> looks correct.</p>
 
@@ -549,7 +550,7 @@ will emit this event. Note that restify checks for listeners on this
 event, and if there are none, responds with a default 404 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h3>Event: MethodNotAllowed'</h3>
+<h3>Event: 'MethodNotAllowed'</h3>
 
 <p><code>function (request, response) {}</code></p>
 
@@ -559,7 +560,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 405 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h3>Event: VersionNotAllowed'</h3>
+<h3>Event: 'VersionNotAllowed'</h3>
 
 <p><code>function (request, response) {}</code></p>
 
@@ -569,7 +570,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h3>Event: after</h3>
+<h3>Event: 'after'</h3>
 
 <p><code>function (request, response, name) {}</code></p>
 
@@ -585,7 +586,7 @@ the name of the route that ran.</p>
 
 <table>
 <tbody>
-<tr><td><em>Name</em></td><td><em>Type</em>*</td><td><strong>Description</strong></td></tr>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>name</td><td>String</td><td>name of the server</td></tr>
 <tr><td>version</td><td>String</td><td>default version to use in all routes</td></tr>
 <tr><td>log4js</td><td>Object</td><td>log4js handle (might be a stub)</td></tr>
@@ -997,11 +998,11 @@ the <a href="https://api.us-west-1.joyentcloud.com">Joyent CloudAPI</a>:</p>
 
 // Creates a JSON client
 var client = restify.createJsonClient({
-  url: https://us-west-1.api.joyentcloud.com'
+  url: 'https://us-west-1.api.joyentcloud.com'
 });
 
 
-client.basicAuth('$login', '$password);
+client.basicAuth('$login', '$password');
 client.get('/my/machines', function(err, req, res, obj) {
   assert.ifError(err);
 
@@ -1019,7 +1020,7 @@ headers):</p>
   headers: {
     'x-foo': 'bar'
   },
-  {
+  retry: {
     'retries': 0
   },
   agent: false
@@ -1203,7 +1204,9 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 basically just some sugar over the top of node's http/https modules
 (with HTTP methods like the other clients).  It is useful if you want
 to stream with restify.  Note that the event below is unfortunately
-named <code>result</code> and not <code>response</code>.</p>
+named <code>result</code> and not <code>response</code> (because
+<a href="http://nodejs.org/docs/latest/api/all.html#event_response_">Event 'response'</a>
+is already used).</p>
 
 <pre><code>client = restify.createClient({
   url: 'http://127.0.0.1'
@@ -1233,11 +1236,8 @@ client.get('/str/mcavage', function(err, req) {
 <pre><code>client.post(opts, function(err, req) {
   assert.ifError(connectErr);
 
-  req.write('hello world');
-  req.end();
-
   req.on('result', function(err, res) {
-    assertt.ifError(err);
+    assert.ifError(err);
     res.body = '';
     res.setEncoding('utf8');
     res.on('data', function(chunk) {
@@ -1248,6 +1248,9 @@ client.get('/str/mcavage', function(err, req) {
       console.log(res.body);
     });
   });
+
+  req.write('hello world');
+  req.end();
 });
 </code></pre>
 
