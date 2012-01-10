@@ -32,7 +32,6 @@ ul {
 
 ul > li {
   list-style:disc;
-  list-style-position:inside;
   margin:10px 0px;
 }
 
@@ -88,6 +87,7 @@ h4 {
 /* tables still need cellspacing="0" in the markup */
 table {
   border-collapse:collapse; border-spacing:0;
+  margin: 20px 0;
 }
 th,
 td {
@@ -96,6 +96,7 @@ td {
   line-height: 23px;
   padding: 0 12px;
   text-align: left;
+  vertical-align: text-bottom;
 }
 th {
   border-collapse: separate;
