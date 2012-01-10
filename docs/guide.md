@@ -1108,9 +1108,6 @@ Or a write:
     client.post(opts, function(err, req) {
       assert.ifError(connectErr);
 
-      req.write('hello world');
-      req.end();
-
       req.on('result', function(err, res) {
         assertt.ifError(err);
         res.body = '';
@@ -1123,6 +1120,9 @@ Or a write:
           console.log(res.body);
         });
       });
+
+      req.write('hello world');
+      req.end();
     });
 
 Note that get/head/del all call `req.end()` for you, so you can't
