@@ -139,7 +139,7 @@ below (and `listen()` takes the same arguments as node's
       certificate: ...,
       key: ...,
       log4js: log4js,
-      name: 'MyApp,
+      name: 'MyApp',
     });
 
     server.listen(8080);
@@ -266,26 +266,28 @@ Try hitting with:
     $ curl -s localhost:8080/hello/mark
     "hello: mark"
     $ curl -s -H 'accept-version: ~1' localhost:8080/hello/mark
-    "hello: mark
+    "hello: mark"
     $ curl -s -H 'accept-version: ~2' localhost:8080/hello/mark
     {"hello":"mark"}
     $ curl -s -H 'accept-version: ~3' localhost:8080/hello/mark | json
     {
-      "code":"InvalidVersion",
-      "message":"GET /hello/mark supports versions: 1.1.3, 2.0.0"
+      "code": "InvalidVersion",
+      "message": "GET /hello/mark supports versions: 1.1.3, 2.0.0"
     }
 
-Note in the first case, we didn't specify a an `Accept-Version` header
-at all, so restify treats that like sending a `*` (much as not sending
-an `Accept` header means the client gets the server's choice).  In the
-second case, we explicitly asked for for V1, which got us the same
-response, but then we asked for V2 and got back JSON.  Finally,
+In the first case, we didn't specify an `Accept-Version` header
+at all, so restify treats that like sending a `*`. Much as not sending
+an `Accept` header means the client gets the server's choice. Restify
+will choose the first matching route, in the order specified in the
+code. In the second case, we explicitly asked for for V1, which got
+us the same response, but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an `Accept` header, so we got a JSON response).  Which
 segues us nicely into content negotiation.
 
 Lastly, note that you can default the versions on routes by passing in
 a version field at server creation time.
+
 
 ## Content Negotiation
 
@@ -464,7 +466,7 @@ You can always add your own by subclassing `restify.RestError` like:
 
 Basically, a `RestError` takes a statusCode, a restCode, a message,
 and a "constructorOpt" so that V8 correctly omits your code
-from the stack trace (you dont' *have* to do that, but you probably
+from the stack trace (you don't *have* to do that, but you probably
 want it).  In the example above, we also set the name property so
 `console.log(new MyError());` looks correct.
 
@@ -483,7 +485,7 @@ will emit this event. Note that restify checks for listeners on this
 event, and if there are none, responds with a default 404 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: MethodNotAllowed'
+### Event: 'MethodNotAllowed'
 
 `function (request, response) {}`
 
@@ -493,7 +495,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 405 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: VersionNotAllowed'
+### Event: 'VersionNotAllowed'
 
 `function (request, response) {}`
 
@@ -503,7 +505,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: after
+### Event: 'after'
 
 `function (request, response, name) {}`
 
@@ -517,7 +519,7 @@ the name of the route that ran.
 
 A restify server has the following properties on it:
 
-||*Name*||*Type**||**Description**||
+||**Name**||**Type**||**Description**||
 ||name||String||name of the server||
 ||version||String||default version to use in all routes||
 ||log4js||Object||log4js handle (might be a stub)||
@@ -892,11 +894,11 @@ the [Joyent CloudAPI](https://api.us-west-1.joyentcloud.com):
 
     // Creates a JSON client
     var client = restify.createJsonClient({
-      url: https://us-west-1.api.joyentcloud.com'
+      url: 'https://us-west-1.api.joyentcloud.com'
     });
 
 
-    client.basicAuth('$login', '$password);
+    client.basicAuth('$login', '$password');
     client.get('/my/machines', function(err, req, res, obj) {
       assert.ifError(err);
 
@@ -913,7 +915,7 @@ headers):
       headers: {
         'x-foo': 'bar'
       },
-      {
+      retry: {
         'retries': 0
       },
       agent: false
@@ -1079,7 +1081,9 @@ Just like `post`:
 basically just some sugar over the top of node's http/https modules
 (with HTTP methods like the other clients).  It is useful if you want
 to stream with restify.  Note that the event below is unfortunately
-named `result` and not `response`.
+named `result` and not `response` (because
+[Event 'response'](http://nodejs.org/docs/latest/api/all.html#event_response_)
+is already used).
 
     client = restify.createClient({
       url: 'http://127.0.0.1'
@@ -1109,7 +1113,7 @@ Or a write:
       assert.ifError(connectErr);
 
       req.on('result', function(err, res) {
-        assertt.ifError(err);
+        assert.ifError(err);
         res.body = '';
         res.setEncoding('utf8');
         res.on('data', function(chunk) {
