@@ -195,7 +195,8 @@ in any combination of `function(res, res, next)` and
 restify routing, in 'basic' mode, is pretty much identical to express/sinatra,
 in that HTTP verbs are used with a parameterized resource to determine
 what chain of handlers to run.  Values associated with named
-placeholders are available in `req.params`.
+placeholders are available in `req.params`. Note that values will be
+URL-decoded before being passed to you.
 
      function send(req, res, next) {
        res.send(hello ' + req.params.name);
@@ -215,7 +216,8 @@ placeholders are available in `req.params`.
      });
 
 You can also pass in a [RegExp](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/RegExp)
-object and access the capture group with `req.params`:
+object and access the capture group with `req.params` (which will not
+be interpreted in any way):
 
     server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {
       console.log(req.params[0]);
@@ -858,4 +860,271 @@ in this pipeline
 
 # Client API
 
-TODO
+There are actually three separate clients shipped in restify:
+
+* **JsonClient:** sends and expects application/json
+* **StringClient:** sends url-encoded request and expects text/plain
+* **HttpClient:** thin wrapper over node's http/https libraries
+
+The idea being that if you want to support "typical" control-plane
+REST APIs, you probably want the `JsonClient`, or if you're using some
+other serialization (like XML) you'd write your own client that
+extends the `StringClient`. If you need streaming support, you'll need
+to do some work on top of the `HttpClient`, as `StringClient` and
+friends buffer requests/responses.
+
+All clients support retry with exponential backoff for getting a TCP
+connection; they do not perform retries on 5xx error codes like
+previous versions of the restify client.  Here's an example of hitting
+the [Joyent CloudAPI](https://api.us-west-1.joyentcloud.com):
+
+    var restify = require('restify');
+
+    // Creates a JSON client
+    var client = restify.createJsonClient({
+      url: https://us-west-1.api.joyentcloud.com'
+    });
+
+
+    client.basicAuth('$login', '$password);
+    client.get('/my/machines', function(err, req, res, obj) {
+      assert.ifError(err);
+
+      console.log(JSON.stringify(obj, null, 2));
+    });
+
+Note that all further documentation refers to the "short-hand" form of
+methods like `get/put/del` which take a string path.  You can also
+pass in an object to any of those methods with extra params (notably
+headers):
+
+    var options = {
+      path: '/foo/bar',
+      headers: {
+        'x-foo': 'bar'
+      },
+      {
+        'retries': 0
+      },
+      agent: false
+    };
+
+    client.get(options, function(err, req, res) { .. });
+
+## JsonClient
+
+The JSON Client is the highest-level client bundled with restify; it
+exports a set of methods that map directly to HTTP verbs.  All
+callbacks look like `function(err, req, res, [obj])`, where `obj` is
+optional, depending on if content was returned. HTTP status codes are
+not interpreted, so if the server returned 4xx or something with a
+JSON payload, `obj` will be the JSON payload.  `err` however will be
+set if the server returned a status code >= 400 (it will be one of the
+restify HTTP errors).  If `obj` looks like a `RestError`:
+
+    {
+      "code": "FooError",
+      "message": "some foo happened"
+    }
+
+then `err` gets "upconverted" into a `RestError` for you.  Otherwise
+it will be an `HttpError`.
+
+### createJsonClient(options)
+
+    var client = restify.createJsonClient({
+      url: 'https://api.us-west-1.joyentcloud.com',
+      version: '*'
+    });
+
+Options:
+
+||*Name*||*Type*||*Description*||
+||url||String||Fully-qualified URL to connect to||
+||headers||Object||HTTP headers to set in all requests||
+||accept||String||Accept header to send||
+||userAgent||String||user-agent string to use; restify inserts one, but you can override it||
+||version||String||semver string to set the accept-version||
+||retry||Object||options to provide to node-retry; defaults to 3 retries||
+||dtrace||Object||node-dtrace-provider handle||
+||log4js||Object||log4js handle||
+
+### get(path, callback)
+
+Performs an HTTP get; if no payload was returned, `obj` defaults to
+`{}` for you (so you don't get a bunch of null pointer errors).
+
+    client.get('/foo/bar', function(err, req, res, obj) {
+      assert.ifError(err);
+      console.log('%j', obj);
+    });
+
+### head(path, callback)
+
+Just like `get`, but without `obj`:
+
+    client.head('/foo/bar', function(err, req, res) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+    });
+
+### post(path, object, callback)
+
+Takes a complete object to serialize and send to the server.
+
+    client.post('/foo', { hello: 'world' }, function(err, req, res, obj) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+      console.log('%j', obj);
+    });
+
+### put(path, object, callback)
+
+Just like `post`:
+
+    client.put('/foo', { hello: 'world' }, function(err, req, res, obj) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+      console.log('%j', obj);
+    });
+
+### del(path, callback)
+
+`del` doesn't take content, since you know, it should't:
+
+    client.del('/foo/bar', function(err, req, res) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+    });
+
+## StringClient
+
+`StringClient` is what `JsonClient` is built on, and provides a base
+for you to write other buffering/parsing clients (like say an XML
+client). If you need to talk to some "raw" HTTP server, then
+`StringClient` is what you want, as it by default will provide you
+with content uploads in `application/x-www-form-url-encoded` and
+downloads as `text/plain`.  To extend a `StringClient`, take a look at
+the source for `JsonClient`. Effectively, you extend it, and set the
+appropriate options in the constructor and implement a `write` (for
+put/post) and `parse` method (for all HTTP bodies), and that's it.
+
+### createStringClient(options)
+
+    var client = restify.createStringClient({
+      url: 'https://example.com'
+    })
+
+### get(path, callback)
+
+Performs an HTTP get; if no payload was returned, `data` defaults to
+`''` for you (so you don't get a bunch of null pointer errors).
+
+    client.get('/foo/bar', function(err, req, res, data) {
+      assert.ifError(err);
+      console.log('%s', data);
+    });
+
+### head(path, callback)
+
+Just like `get`, but without `data`:
+
+    client.head('/foo/bar', function(err, req, res) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+    });
+
+### post(path, object, callback)
+
+Takes a complete object to serialize and send to the server.
+
+    client.post('/foo', { hello: 'world' }, function(err, req, res, data) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+      console.log('%s', data);
+    });
+
+### put(path, object, callback)
+
+Just like `post`:
+
+    client.put('/foo', { hello: 'world' }, function(err, req, res, data) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+      console.log('%s', data);
+    });
+
+### del(path, callback)
+
+`del` doesn't take content, since you know, it should't:
+
+    client.del('/foo/bar', function(err, req, res) {
+      assert.ifError(err);
+      console.log('%d -> %j', res.statusCode, res.headers);
+    });
+
+## HttpClient
+
+`HttpClient` is the lowest-level client shipped in restify, and is
+basically just some sugar over the top of node's http/https modules
+(with HTTP methods like the other clients).  It is useful if you want
+to stream with restify.  Note that the event below is unfortunately
+named `result` and not `response`.
+
+    client = restify.createClient({
+      url: 'http://127.0.0.1'
+    });
+
+    client.get('/str/mcavage', function(err, req) {
+      assert.ifError(err); // connection error
+
+      req.on('result', function(err, res) {
+        assert.ifError(err); // HTTP status code >= 400
+
+        res.body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+          res.body += chunk;
+        });
+
+        res.on('end', function() {
+          console.log(body);
+        });
+      });
+    });
+
+Or a write:
+
+    client.post(opts, function(err, req) {
+      assert.ifError(connectErr);
+
+      req.write('hello world');
+      req.end();
+
+      req.on('result', function(err, res) {
+        assertt.ifError(err);
+        res.body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+          res.body += chunk;
+        });
+
+        res.on('end', function() {
+          console.log(res.body);
+        });
+      });
+    });
+
+Note that get/head/del all call `req.end()` for you, so you can't
+write data over those. Otherwise, all the same methods exist as
+`JsonClient/StringClient`.
+
+One wishing to extend the `HttpClient` should look at the internals
+and note that `read` and `write` probably need to be overridden.
+
+### basicAuth(username, password)
+
+Since it hasn't been mentioned yet, this convenience method (available
+on all clients), just sets the `Authorization` header for all HTTP requests:
+
+    client.basicAuth('mark', 'mysupersecretpassword');
