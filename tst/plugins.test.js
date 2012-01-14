@@ -70,7 +70,7 @@ test('setup', function(t) {
     return next();
   });
 
-  SERVER.listen(PORT, '127.0.0.1', false, function() {
+  SERVER.listen(PORT, '127.0.0.1', function() {
     t.end();
   });
 });
