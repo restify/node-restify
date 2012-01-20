@@ -3,8 +3,8 @@
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.0-1-rc",
+  "publishConfig": { "tag": "beta" },
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
