@@ -507,11 +507,11 @@ is expected that if you listen for this event, you respond to the client.
 
 ### Event: 'after'
 
-`function (request, response, name) {}`
+`function (request, response, route) {}`
 
 Emitted after a route has finished all the handlers you registered.
-You can use this to write audit logs, etc.  The name parameter will be
-the name of the route that ran.
+You can use this to write audit logs, etc.  The route parameter will be
+the `Route` object that ran.
 
 ## Properties and other methods
 
