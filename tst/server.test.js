@@ -1,8 +1,10 @@
 // Copyright 2011 Mark Cavage, Inc.  All rights reserved.
 
+var fs = require('fs');
 var http = require('http');
 
 var d = require('dtrace-provider');
+var filed = require('filed');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
@@ -450,4 +452,76 @@ test('OPTIONS', function(t) {
       });
     }).end();
   });
+});
+
+
+test('GH-56 streaming with filed (download)', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
+  server.get('/foo.txt', function tester(req, res, next) {
+    filed(__filename).pipe(res);
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/foo.txt',
+      method: 'GET',
+      agent: false
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 200);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        t.ok(body.length > 0);
+        server.close(function() {
+          t.end();
+        });
+      });
+    }).end();
+  });
+
+});
+
+
+test('GH-56 streaming with filed (upload)', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var file = '/tmp/.' + uuid();
+  server.put('/foo', function tester(req, res, next) {
+    req.pipe(filed(file)).pipe(res);
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/foo',
+      method: 'PUT',
+      agent: false
+    };
+
+    var req = http.request(opts, function(res) {
+      t.equal(res.statusCode, 201);
+      res.on('end', function() {
+        fs.readFile(file, 'utf8', function(err, data) {
+          t.ifError(err);
+          t.equal(data, 'hello world');
+          server.close(function() {
+            fs.unlink(file, function() {
+              t.end();
+            });
+          });
+        });
+      });
+    });
+
+    req.write('hello world');
+    req.end();
+  });
+
 });
