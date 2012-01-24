@@ -1,6 +1,6 @@
 # restify Changelog
 
-## 1.0.0-rc2
+## 1.0.0-rc2 (not yet released)
 
 - [Issue 56] Support streaming downloads
 - Modify server.on('after') to emit the `Route` object, rather than the name.
