@@ -34,7 +34,7 @@ test('throws on missing options', function(t) {
 });
 
 
-test('throws on missing log4js', function(t) {
+test('throws on missing dtrace', function(t) {
   t.throws(function() {
     return new Server({});
   }, new TypeError('options.dtrace (Object) required'));
