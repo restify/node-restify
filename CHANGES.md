@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- GH-59 routes with just '/' are returning 404
 - DTrace *-done actually firing content-length (was always 0)
 - [Issue 56] Support streaming downloads
 - Modify server.on('after') to emit the `Route` object, rather than the name.
