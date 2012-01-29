@@ -1,5 +1,13 @@
 {
   "author": "Mark Cavage <mcavage@gmail.com>",
+  "contributors": [
+    "Pedro Calazon",
+    "Ben Howes",
+    "Trent Mick",
+    "Isaac Schlueter",
+    "Matt Smillie",
+    "Diego Torres"
+  ],
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",

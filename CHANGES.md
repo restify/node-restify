@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- GH-57 range versioning on server (Diego Torres)
 - GH-59 routes with just '/' are returning 404
 - DTrace *-done actually firing content-length (was always 0)
 - [Issue 56] Support streaming downloads
