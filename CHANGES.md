@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- Make Error objects backwards compatible with older restify (httpCode/restCode)
 - GH-57 range versioning on server (Diego Torres)
 - GH-59 routes with just '/' are returning 404
 - DTrace *-done actually firing content-length (was always 0)
