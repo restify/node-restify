@@ -526,6 +526,44 @@ test('GH-59 Query params with / result in a 404', function(t) {
 
 });
 
+
+test('GH-63 res.send 204 is sending a body', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
+  server.del('/hello/:name', function tester(req, res, next) {
+    res.send(204);
+    return next();
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/hello/mark',
+      method: 'DELETE',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 204);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        t.notOk(body);
+        server.close(function() {
+          t.end();
+        });
+      });
+    }).end();
+  });
+
+});
+
 /*
  * Disabled, as Heroku (travis) doesn't allow us to write to /tmp
  *
