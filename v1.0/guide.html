@@ -23,6 +23,7 @@
     <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
     <li><div><a href="#Events"><span class="method name"><span class="name">Events</span></span></a></div></li>
     <li><div><a href="#Properties-and-other-methods"><span class="method name"><span class="name">Properties and other methods</span></span></a></div></li>
+    <li><div><a href="#Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></a></div></li>
     <li><div><a href="#Request-API"><span class="method name"><span class="name">Request API</span></span></a></div></li>
     <li><div><a href="#Response-API"><span class="method name"><span class="name">Response API</span></span></a></div></li>
     <li><div><a href="#DTrace"><span class="method name"><span class="name">DTrace</span></span></a></div></li>
@@ -207,38 +208,7 @@ server.listen(8080);
 the form <code>function (req, res, next)</code>.   Note that restify runs
 handlers in the order they are registered on a server, so if you want
 some common handlers to run before any of your routes, issue calls to
-<code>use()</code> before defining routes.  restify ships with several handlers
-you can use, specifically:</p>
-
-<ul>
-<li>Accept header parsing</li>
-<li>Authorization header parsing</li>
-<li>Date header parsing</li>
-<li>Query string parsing</li>
-<li>Body parsing (JSON/URL-encoded)</li>
-<li>Throttling</li>
-</ul>
-
-<p>Here's some example code using all the shipped plugins:</p>
-
-<pre><code>var server = restify.createServer();
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.bodyParser());
-server.use(restify.throttle({
-  burst: 100,
-  rate: 50,
-  ip: true,
-  overrides: {
-    '192.168.1.1': {
-      rate: 0,        // unlimited
-      burst: 0
-    }
-  }
-}));
-</code></pre>
+<code>use()</code> before defining routes.</p>
 
 <p>Note that in all calls to <code>use()</code> and the routes below, you can pass
 in any combination of <code>function(res, res, next)</code> and
@@ -572,11 +542,11 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h3>Event: 'after'</h3>
 
-<p><code>function (request, response, name) {}</code></p>
+<p><code>function (request, response, route) {}</code></p>
 
 <p>Emitted after a route has finished all the handlers you registered.
-You can use this to write audit logs, etc.  The name parameter will be
-the name of the route that ran.</p>
+You can use this to write audit logs, etc.  The route parameter will be
+the <code>Route</code> object that ran.</p>
 
 <h2 id="Properties-and-other-methods"><span class="method name"><span class="name">Properties and other methods</span></span></h2>
 
@@ -608,6 +578,161 @@ the name of the route that ran.</p>
 <h4>close()</h4>
 
 <p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.close">close()</a>.</p>
+
+<h2 id="Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></h2>
+
+<p>restify ships with several handlers
+you can use, specifically:</p>
+
+<ul>
+<li>Accept header parsing</li>
+<li>Authorization header parsing</li>
+<li>Date header parsing</li>
+<li>Query string parsing</li>
+<li>Body parsing (JSON/URL-encoded)</li>
+<li>Throttling</li>
+</ul>
+
+<p>Here's some example code using all the shipped plugins:</p>
+
+<pre><code>var server = restify.createServer();
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.authorizationParser());
+server.use(restify.dateParser());
+server.use(restify.queryParser());
+server.use(restify.bodyParser());
+server.use(restify.throttle({
+  burst: 100,
+  rate: 50,
+  ip: true,
+  overrides: {
+    '192.168.1.1': {
+      rate: 0,        // unlimited
+      burst: 0
+    }
+  }
+}));
+</code></pre>
+
+<h3>Accept Parser</h3>
+
+<p>Parses out the <code>Accept</code> header, and ensures that the server can respond to what
+the client asked for.  You almost always want to just pass in
+<code>server.acceptable</code> here, as that's an array of content types the server knows
+how to respond to (with the formatters you've registered).  If the request is
+for a non-handled type, this plugin will return an error of <code>406</code>.</p>
+
+<pre><code>server.use(restify.acceptParser(server.acceptable));
+</code></pre>
+
+<h3>Authorization Parser</h3>
+
+<pre><code>server.use(restify.authorizationParser());
+</code></pre>
+
+<p>Parses out the <code>Authorization</code> header as best restify can.  Currently only
+HTTP Basic Auth and
+<a href="https://github.com/joyent/node-http-signature">HTTP Signature</a>
+schemes are supported.   When this is used, <code>req.authorization</code> will be set
+to something like:</p>
+
+<pre><code>{
+  scheme: &lt;Basic|Signature|...&gt;,
+  credentials: &lt;Undecoded value of header&gt;,
+  basic: {
+    username: $user
+    password: $password
+  }
+}
+</code></pre>
+
+<p><code>req.username</code> will also be set, and defaults to 'anonymous'.  If the scheme
+is unrecognized, the only thing avaiable in <code>req.authorization</code> will be
+<code>scheme</code> and <code>credentials</code> - it will be up to you to parse out the rest.</p>
+
+<h3>Date Parser</h3>
+
+<pre><code>server.use(restify.dateParser());
+</code></pre>
+
+<p>Parses out the HTTP Date header (if present) and checks for clock skew (default
+allowed clock skew is 300s, like Kerberos).  You can pass in a number, which is
+interpreted in seconds, to allow for clock skew.</p>
+
+<pre><code>// Allows clock skew of 1m
+server.use(restify.dateParser(60));
+</code></pre>
+
+<h3>QueryParser</h3>
+
+<pre><code>server.use(restify.queryParser());
+</code></pre>
+
+<p>Parses the HTTP query string (i.e., <code>/foo?id=bar&amp;name=mark</code>).  If you use this,
+the parsed content will always be available in <code>req.query</code>, additionally params
+are merged into <code>req.params</code>.  You can disable by passing in <code>mapParams: false</code>
+in the options object:</p>
+
+<pre><code>server.use(restify.queryParser({ mapParams: false }));
+</code></pre>
+
+<h3>BodyParser</h3>
+
+<p>Blocks your chain on reading and parsing the HTTP request body.  Switches on
+<code>Content-Type</code> and does the appropriate logic.  <code>application/json</code> and
+<code>application/x-www-form-urlencoded</code> are currently supported.</p>
+
+<pre><code>server.use(restify.bodyParser({ mapParams: false }));
+</code></pre>
+
+<p>You can pass in an options object; currently the only parameter honored is
+<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from
+the request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with
+the parsed object.  The default is to map params into <code>req.params</code>.</p>
+
+<h3>Throttle</h3>
+
+<p>restify ships with a fairly comprehensive implementation of
+<a href="http://en.wikipedia.org/wiki/Token_bucket">Token bucket</a>, with the ability to
+throttle on IP (or x-forwarded-for) and username (from <code>req.username</code>).  You
+define "global" request rate and burst rate, and you can define overrides for
+specific keys.  Note that you can always place this on per-URL routes to enable
+different request rates to different resources (if for example, one route, like
+<code>/my/slow/database</code> is much easier to overwhlem than <code>/my/fast/memcache</code>).</p>
+
+<pre><code>server.use(restify.throttle({
+  burst: 100,
+  rate: 50,
+  ip: true,
+  overrides: {
+    '192.168.1.1': {
+      rate: 0,        // unlimited
+      burst: 0
+    }
+  }
+}));
+</code></pre>
+
+<p>If a client has consumed all of their available rate/burst, an HTTP response
+code of <code>429</code>
+<a href="http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4">Too Many Requests</a>
+is returned.</p>
+
+<p>Options:</p>
+
+<table>
+<tbody>
+<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>rate</td><td>Number</td><td>Steady state number of requests/second to allow</td></tr>
+<tr><td>burst</td><td>Number</td><td>If available, the amount of requests to burst to</td></tr>
+<tr><td>ip</td><td>Boolean</td><td>Do throttling on a /32 (source IP)</td></tr>
+<tr><td>xff</td><td>Boolean</td><td>Do throttling on a /32 (X-Forwarded-For)</td></tr>
+<tr><td>username</td><td>Boolean</td><td>Do throttling on <code>req.username</code></td></tr>
+<tr><td>overrides</td><td>Object</td><td>Per "key" overrides</td></tr>
+</tbody>
+</table>
+
+<p>Note that <code>ip</code>, <code>xff</code> and <code>username</code> are XOR'd.</p>
 
 <h2 id="Request-API"><span class="method name"><span class="name">Request API</span></span></h2>
 
