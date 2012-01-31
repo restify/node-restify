@@ -122,6 +122,27 @@ test('construct with explicit method and version', function(t) {
   t.end();
 });
 
+test('construct with range versioning', function(t){
+  var route = new Route({
+    log4js: log4js,
+    url: '/foo/:bar',
+    version: '>=1.2',
+    rangeVersioning: true
+  });
+  t.ok(route);
+  t.end();
+});
+
+test('bad version. Sent range instead', function(t){
+  t.throws(function(){
+    return new Route({
+      log4js: log4js,
+      url: '/foo/:bar',
+      version: '>=1.2'
+    });
+  }, new Error('only semver versions are allowed'));
+  t.end();
+});
 
 test('construct with regex url and chain', function(t) {
   var route = new Route({
