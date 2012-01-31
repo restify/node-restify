@@ -2,10 +2,11 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- JsonClient should "upcast" errors to RestErrors if it can
 - GH-63 res.send(204) returning a body of 204
 - GH-61 Make bodyParser merging into req.params optional
 - Make Error objects backwards compatible with older restify (httpCode/restCode)
-- GH-57 range versioning on server (Diego Torres)
+- GH-57, GH-62 range versioning on server (Diego Torres)
 - GH-59 routes with just '/' are returning 404
 - DTrace *-done actually firing content-length (was always 0)
 - [Issue 56] Support streaming downloads
