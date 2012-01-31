@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- GH-61 Make bodyParser merging into req.params optional
 - Make Error objects backwards compatible with older restify (httpCode/restCode)
 - GH-57 range versioning on server (Diego Torres)
 - GH-59 routes with just '/' are returning 404

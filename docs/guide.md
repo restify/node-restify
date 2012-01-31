@@ -158,35 +158,7 @@ A restify server has a `use()` method on it, which takes handlers of
 the form `function (req, res, next)`.   Note that restify runs
 handlers in the order they are registered on a server, so if you want
 some common handlers to run before any of your routes, issue calls to
-`use()` before defining routes.  restify ships with several handlers
-you can use, specifically:
-
-* Accept header parsing
-* Authorization header parsing
-* Date header parsing
-* Query string parsing
-* Body parsing (JSON/URL-encoded)
-* Throttling
-
-Here's some example code using all the shipped plugins:
-
-    var server = restify.createServer();
-    server.use(restify.acceptParser(server.acceptable));
-    server.use(restify.authorizationParser());
-    server.use(restify.dateParser());
-    server.use(restify.queryParser());
-    server.use(restify.bodyParser());
-    server.use(restify.throttle({
-      burst: 100,
-      rate: 50,
-      ip: true,
-      overrides: {
-        '192.168.1.1': {
-          rate: 0,        // unlimited
-          burst: 0
-        }
-      }
-    }));
+`use()` before defining routes.
 
 Note that in all calls to `use()` and the routes below, you can pass
 in any combination of `function(res, res, next)` and
@@ -539,6 +511,145 @@ Wrap's node's [listen()](http://nodejs.org/docs/latest/api/net.html#server.liste
 #### close()
 
 Wrap's node's [close()](http://nodejs.org/docs/latest/api/net.html#server.close).
+
+## Bundled Plugins
+
+restify ships with several handlers
+you can use, specifically:
+
+* Accept header parsing
+* Authorization header parsing
+* Date header parsing
+* Query string parsing
+* Body parsing (JSON/URL-encoded)
+* Throttling
+
+Here's some example code using all the shipped plugins:
+
+    var server = restify.createServer();
+    server.use(restify.acceptParser(server.acceptable));
+    server.use(restify.authorizationParser());
+    server.use(restify.dateParser());
+    server.use(restify.queryParser());
+    server.use(restify.bodyParser());
+    server.use(restify.throttle({
+      burst: 100,
+      rate: 50,
+      ip: true,
+      overrides: {
+        '192.168.1.1': {
+          rate: 0,        // unlimited
+          burst: 0
+        }
+      }
+    }));
+
+### Accept Parser
+
+Parses out the `Accept` header, and ensures that the server can respond to what
+the client asked for.  You almost always want to just pass in
+`server.acceptable` here, as that's an array of content types the server knows
+how to respond to (with the formatters you've registered).  If the request is
+for a non-handled type, this plugin will return an error of `406`.
+
+    server.use(restify.acceptParser(server.acceptable));
+
+### Authorization Parser
+
+    server.use(restify.authorizationParser());
+
+Parses out the `Authorization` header as best restify can.  Currently only
+HTTP Basic Auth and
+[HTTP Signature](https://github.com/joyent/node-http-signature)
+schemes are supported.   When this is used, `req.authorization` will be set
+to something like:
+
+    {
+      scheme: <Basic|Signature|...>,
+      credentials: <Undecoded value of header>,
+      basic: {
+        username: $user
+        password: $password
+      }
+    }
+
+`req.username` will also be set, and defaults to 'anonymous'.  If the scheme
+is unrecognized, the only thing avaiable in `req.authorization` will be
+`scheme` and `credentials` - it will be up to you to parse out the rest.
+
+### Date Parser
+
+    server.use(restify.dateParser());
+
+Parses out the HTTP Date header (if present) and checks for clock skew (default
+allowed clock skew is 300s, like Kerberos).  You can pass in a number, which is
+interpreted in seconds, to allow for clock skew.
+
+    // Allows clock skew of 1m
+    server.use(restify.dateParser(60));
+
+### QueryParser
+
+    server.use(restify.queryParser());
+
+Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`).  If you use this,
+the parsed content will always be available in `req.query`, additionally params
+are merged into `req.params`.  You can disable by passing in `mapParams: false`
+in the options object:
+
+    server.use(restify.queryParser({ mapParams: false }));
+
+### BodyParser
+
+Blocks your chain on reading and parsing the HTTP request body.  Switches on
+`Content-Type` and does the appropriate logic.  `application/json` and
+`application/x-www-form-urlencoded` are currently supported.
+
+    server.use(restify.bodyParser({ mapParams: false }));
+
+You can pass in an options object; currently the only parameter honored is
+`mapParams`, which you can set to `false` to disable copying k/v pairs from
+the request body into `req.params`; instead, `req.body` will be overwritten with
+the parsed object.  The default is to map params into `req.params`.
+
+### Throttle
+
+restify ships with a fairly comprehensive implementation of
+[Token bucket](http://en.wikipedia.org/wiki/Token_bucket), with the ability to
+throttle on IP (or x-forwarded-for) and username (from `req.username`).  You
+define "global" request rate and burst rate, and you can define overrides for
+specific keys.  Note that you can always place this on per-URL routes to enable
+different request rates to different resources (if for example, one route, like
+`/my/slow/database` is much easier to overwhlem than `/my/fast/memcache`).
+
+    server.use(restify.throttle({
+      burst: 100,
+      rate: 50,
+      ip: true,
+      overrides: {
+        '192.168.1.1': {
+          rate: 0,        // unlimited
+          burst: 0
+        }
+      }
+    }));
+
+If a client has consumed all of their available rate/burst, an HTTP response
+code of `429`
+[Too Many Requests](http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4)
+is returned.
+
+Options:
+
+||*Name*||*Type*||*Description*||
+||rate||Number||Steady state number of requests/second to allow||
+||burst||Number||If available, the amount of requests to burst to||
+||ip||Boolean||Do throttling on a /32 (source IP)||
+||xff||Boolean||Do throttling on a /32 (X-Forwarded-For)||
+||username||Boolean||Do throttling on `req.username`||
+||overrides||Object||Per "key" overrides||
+
+Note that `ip`, `xff` and `username` are XOR'd.
 
 ## Request API
 

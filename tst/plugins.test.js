@@ -63,13 +63,13 @@ test('setup', function(t) {
   SERVER.use(plugins.authorizationParser());
   SERVER.use(plugins.dateParser());
   SERVER.use(plugins.queryParser());
-  SERVER.use(plugins.urlEncodedBodyParser());
 
   SERVER.get('/foo/:id', function(req, res, next) {
     res.send();
     return next();
   });
 
+  DTRACE.enable();
   SERVER.listen(PORT, '127.0.0.1', function() {
     t.end();
   });
@@ -114,6 +114,7 @@ test('query ok', function(t) {
   SERVER.get('/query/:id', function(req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
+    t.equal(req.query.name, 'markc');
     res.send();
     return next();
   });
@@ -126,7 +127,7 @@ test('query ok', function(t) {
 
 
 test('body url-encoded ok', function(t) {
-  SERVER.post('/bodyurl/:id', function(req, res, next) {
+  SERVER.post('/bodyurl/:id', plugins.bodyParser(), function(req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
     t.equal(req.params.phone, '(206) 555-1212');
@@ -153,8 +154,41 @@ test('body url-encoded ok', function(t) {
 });
 
 
+test('body url-encoded ok (no params)', function(t) {
+  SERVER.post('/bodyurl2/:id',
+              plugins.bodyParser({ mapParams: false }),
+              function(req, res, next) {
+                t.equal(req.params.id, 'foo');
+                t.equal(req.params.name, 'markc');
+                t.notOk(req.params.phone);
+                t.equal(req.body.phone, '(206) 555-1212');
+                res.send();
+                return next();
+              });
+
+  var opts = {
+    hostname: '127.0.0.1',
+    port: PORT,
+    path: '/bodyurl2/foo?name=markc',
+    agent: false,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  };
+  var client = http.request(opts, function(res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+  client.write('phone=(206)%20555-1212&name=somethingelse');
+  client.end();
+});
+
+
 test('body json ok', function(t) {
-  SERVER.post('/bodyjson/:id', function(req, res, next) {
+  SERVER.post('/bodyjson/:id',
+              plugins.bodyParser(),
+              function(req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
     t.equal(req.params.phone, '(206) 555-1212');
@@ -165,7 +199,41 @@ test('body json ok', function(t) {
   var opts = {
     hostname: '127.0.0.1',
     port: PORT,
-    path: '/bodyurl/foo?name=markc',
+    path: '/bodyjson/foo?name=markc',
+    agent: false,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  var client = http.request(opts, function(res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+  client.write(JSON.stringify({
+    phone: '(206) 555-1212',
+    name: 'somethingelse'
+  }));
+  client.end();
+});
+
+
+test('body json ok (no params)', function(t) {
+  SERVER.post('/bodyjson2/:id',
+              plugins.bodyParser({ mapParams: false }),
+              function(req, res, next) {
+                t.equal(req.params.id, 'foo');
+                t.equal(req.params.name, 'markc');
+                t.notOk(req.params.phone);
+                t.equal(req.body.phone, '(206) 555-1212');
+                res.send();
+                return next();
+              });
+
+  var opts = {
+    hostname: '127.0.0.1',
+    port: PORT,
+    path: '/bodyjson2/foo?name=markc',
     agent: false,
     method: 'POST',
     headers: {
