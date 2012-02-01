@@ -512,6 +512,21 @@ Wrap's node's [listen()](http://nodejs.org/docs/latest/api/net.html#server.liste
 
 Wrap's node's [close()](http://nodejs.org/docs/latest/api/net.html#server.close).
 
+### pre()
+
+Allows you to add in handlers that run *before* routing occurs. This gives you
+a hook to change request headers and the like if you need to. Note that
+`req.params` will be undefined, as that's filled in _after_ routing.
+
+    server.pre(function(req, res, next) {
+      req.headers.accept = 'application/json';  // screw you client!
+      return next();
+    });
+
+### use()
+
+Allows you to add in handlers that run no matter what the route.
+
 ## Bundled Plugins
 
 restify ships with several handlers

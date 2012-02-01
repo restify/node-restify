@@ -564,6 +564,91 @@ test('GH-63 res.send 204 is sending a body', function(t) {
 
 });
 
+
+test('GH-64 prerouting chain', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
+  server.pre(function(req, res, next) {
+    req.headers.accept = 'application/json';
+    return next();
+  });
+
+  server.get('/hello/:name', function tester(req, res, next) {
+    res.send(req.params.name);
+    return next();
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/hello/mark',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 200);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        t.equal(body, '\"mark\"');
+        server.close(function() {
+          t.end();
+        });
+      });
+    }).end();
+  });
+
+});
+
+
+test('GH-64 prerouting chain with error', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
+  server.pre(function(req, res, next) {
+    return next(new RestError(400, 'BadRequest', 'screw you client'));
+  });
+
+  server.get('/hello/:name', function tester(req, res, next) {
+    res.send(req.params.name);
+    return next();
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/hello/mark',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 400);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        t.equal(body, 'screw you client');
+        server.close(function() {
+          t.end();
+        });
+      });
+    }).end();
+  });
+
+});
+
 /*
  * Disabled, as Heroku (travis) doesn't allow us to write to /tmp
  *
@@ -604,3 +689,4 @@ test('GH-56 streaming with filed (upload)', function(t) {
 
 });
 */
+

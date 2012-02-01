@@ -26,6 +26,7 @@
     "node": ">=0.6"
   },
   "dependencies": {
+    "async": "0.1.15",
     "dtrace-provider": "0.0.5",
     "http-signature": "0.9.7",
     "mime": "1.2.4",
