@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- http-client should auto insert the date header
 - GH-64 Support for a pre-routing chain
 - JsonClient should "upcast" errors to RestErrors if it can
 - GH-63 res.send(204) returning a body of 204
