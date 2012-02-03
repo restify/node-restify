@@ -236,6 +236,7 @@ test('send(RestError)', function(t) {
 test('check headers', function(t) {
   var res = getResponse();
   res.methods.push('GET');
+  res.defaultHeaders();
   res.res.on('end', function(code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);

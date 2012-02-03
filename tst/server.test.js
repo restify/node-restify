@@ -649,6 +649,49 @@ test('GH-64 prerouting chain with error', function(t) {
 
 });
 
+
+test('GH-67 extend access-control headers', function(t) {
+  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+
+  server.get('/hello/:name', function tester(req, res, next) {
+    res.header('Access-Control-Allow-Headers',
+               (res.header('Access-Control-Allow-Headers') +
+                ', If-Match, If-None-Match'));
+
+    res.send(req.params.name);
+    return next();
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/hello/mark',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 200);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function(chunk) {
+        body += chunk;
+      });
+      res.on('end', function() {
+        t.equal(body, 'mark');
+        server.close(function() {
+          t.ok(res.headers['access-control-allow-headers'].indexOf('If-Match'));
+          t.end();
+        });
+      });
+    }).end();
+  });
+
+});
+
 /*
  * Disabled, as Heroku (travis) doesn't allow us to write to /tmp
  *

@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- GH-67 Set some default response headers earlier (access-control-*)
 - http-client should auto insert the date header
 - GH-64 Support for a pre-routing chain
 - JsonClient should "upcast" errors to RestErrors if it can
