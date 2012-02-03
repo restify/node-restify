@@ -1,6 +1,11 @@
 # restify Changelog
 
-## 1.0.0-rc2 (not yet released)
+## 1.0.0-rc3 (not yet released)
+
+- date plugin has bad log check
+
+
+## 1.0.0-rc2
 
 - GH-66 Support for charSets in responses
 - GH-65 Initial version of etag plugin (Falco Nogatz)
