@@ -257,3 +257,17 @@ test('check headers', function(t) {
 
   res.send('hello world');
 });
+
+
+test('GH-68 res.header() shoud take a Date object', function(t) {
+  var res = getResponse();
+
+  res.res.on('end', function(code, headers, data) {
+    t.ok(headers.foo);
+    t.ok(/\w{3}, \d{2} \w{3} \d{4} (\d{2}:){2}/.test(headers.foo));
+    t.end();
+  });
+
+  res.header('foo', new Date());
+  res.send('hello world');
+});

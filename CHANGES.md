@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc2 (not yet released)
 
+- GH-68 res.header() can serialize Date objects to RFC1123
 - GH-67 Set some default response headers earlier (access-control-*)
 - http-client should auto insert the date header
 - GH-64 Support for a pre-routing chain
