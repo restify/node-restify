@@ -12,7 +12,7 @@
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.0.0-1-rc",
+  "version": "1.0.0-1-rc2",
   "publishConfig": { "tag": "beta" },
   "repository": {
     "type": "git",

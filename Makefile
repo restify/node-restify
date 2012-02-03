@@ -22,7 +22,7 @@ endif
 NPM := npm_config_tar=$(TAR) npm
 
 LINT = ./node_modules/.javascriptlint/build/install/jsl --conf ./tools/jsl.conf
-
+RELEASE = python ./node_modules/.cutarelease/cutarelease.py -f package.json
 RESTDOWN = ./node_modules/.restdown/bin/restdown \
 	-m ${DOCPKGDIR} \
 	-D mediaroot=media
@@ -49,6 +49,10 @@ node_modules/.npm.installed:
 		git clone https://github.com/davepacheco/javascriptlint node_modules/.javascriptlint; \
 	else \
 		(cd node_modules/.javascriptlint && git fetch origin); \
+	fi
+
+	if [[ ! -d node_modules/.cutarelease ]]; then \
+		git clone https://github.com/trentm/cutarelease node_modules/.cutarelease; \
 	fi
 
 	@(cd ./node_modules/.restdown && git checkout $(RESTDOWN_VERSION))
@@ -82,3 +86,13 @@ clean:
 
 distclean: clean
 	@rm -fr node_modules
+
+release: lint test doc
+	$(RELEASE)
+	git checkout gh-pages
+	git pull --rebase
+	cp -r docs/pkg/* v1.0
+	git add v1.0
+	git commit -m 'release docs'
+	git push origin gh-pages
+	git checkout master
