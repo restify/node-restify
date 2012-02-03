@@ -579,6 +579,22 @@ the <code>Route</code> object that ran.</p>
 
 <p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.close">close()</a>.</p>
 
+<h3>pre()</h3>
+
+<p>Allows you to add in handlers that run <em>before</em> routing occurs. This gives you
+a hook to change request headers and the like if you need to. Note that
+<code>req.params</code> will be undefined, as that's filled in _after_ routing.</p>
+
+<pre><code>server.pre(function(req, res, next) {
+  req.headers.accept = 'application/json';  // screw you client!
+  return next();
+});
+</code></pre>
+
+<h3>use()</h3>
+
+<p>Allows you to add in handlers that run no matter what the route.</p>
+
 <h2 id="Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></h2>
 
 <p>restify ships with several handlers
@@ -840,6 +856,9 @@ res.header('Content-Length', 123);
 
 res.header('Content-Length');
 // =&gt; 123
+
+res.header('foo', new Date());
+// =&gt; Fri, 03 Feb 2012 20:09:58 GMT
 </code></pre>
 
 <h3>cache([type], [options])</h3>
@@ -886,6 +905,7 @@ res.send({hello: 'world'});
 <tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
 <tr><td>code</td><td>Number</td><td>HTTP status code</td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
+<tr><td>charSet</td><td>String</td><td>In conjunction with <code>contentType</code>, you can explicitly set the charSet to be written in the content-type header</td></tr>
 <tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
 <tr><td>headers</td><td>Object</td><td>response headers</td></tr>
 <tr><td>id</td><td>String</td><td>A unique request id (x-request-id)</td></tr>
