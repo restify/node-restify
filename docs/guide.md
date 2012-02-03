@@ -765,6 +765,9 @@ Get or set the response header key.
     res.header('Content-Length');
     // => 123
 
+    res.header('foo', new Date());
+    // => Fri, 03 Feb 2012 20:09:58 GMT
+
 ### cache([type], [options])
 
 Sets the cache-control header.  `type` defaults to _public_, and
@@ -803,6 +806,7 @@ Short-hand for:
 ||*Name*||*Type*||*Description*||
 ||code||Number||HTTP status code||
 ||contentLength||Number||short hand for the header content-length||
+||charSet||String||In conjunction with `contentType`, you can explicitly set the charSet to be written in the content-type header||
 ||contentType||String||short hand for the header content-type||
 ||headers||Object||response headers||
 ||id||String||A unique request id (x-request-id)||

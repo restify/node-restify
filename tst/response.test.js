@@ -112,7 +112,7 @@ test('send plain string no code', function(t) {
   res.res.on('end', function(code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
-    t.equal(headers['Content-Type'], 'text/plain');
+    t.equal(headers['Content-Type'], 'text/plain; charset=UTF-8');
     t.equal(data[0], 'hello world');
     t.end();
   });
@@ -126,7 +126,7 @@ test('send plain string with code', function(t) {
   res.res.on('end', function(code, headers, data) {
     t.equal(code, 100);
     t.ok(headers);
-    t.equal(headers['Content-Type'], 'text/plain');
+    t.equal(headers['Content-Type'], 'text/plain; charset=UTF-8');
     t.equal(data[0], 'hello world');
     t.end();
   });
@@ -269,5 +269,19 @@ test('GH-68 res.header() shoud take a Date object', function(t) {
   });
 
   res.header('foo', new Date());
+  res.send('hello world');
+});
+
+
+test('GH-66 support res.charSet=...', function(t) {
+  var res = getResponse();
+
+  res.res.on('end', function(code, headers, data) {
+    t.equal(headers['Content-Type'], 'text/plain; charset=iso-8859-1');
+    t.end();
+  });
+
+  res.charSet = 'iso-8859-1';
+  res.contentType = 'text/plain';
   res.send('hello world');
 });
