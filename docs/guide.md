@@ -538,6 +538,7 @@ you can use, specifically:
 * Query string parsing
 * Body parsing (JSON/URL-encoded)
 * Throttling
+* Conditional request handling
 
 Here's some example code using all the shipped plugins:
 
@@ -558,6 +559,7 @@ Here's some example code using all the shipped plugins:
         }
       }
     }));
+    server.use(restify.conditionalRequest());
 
 ### Accept Parser
 
@@ -665,6 +667,25 @@ Options:
 ||overrides||Object||Per "key" overrides||
 
 Note that `ip`, `xff` and `username` are XOR'd.
+
+### Conditional Request Handler
+
+    server.use(restify.conditionalRequest());
+
+Checks for already set `res.header('ETag')` and 
+`res.header('Last-Modified')` to handle conditional requests. Depending 
+on the client's headers (If-Match, If-None-Match, If-Modified-Sinde, 
+If-Unmodified-Since) and its entities this handler might result in a 304 
+(Not Modified) or 412 (Precondition Failed) and skips the handler chain.
+
+    server.use(function setETag(req, res, next) {
+      res.header('ETag', 'myETag');
+      res.header('Last-Modified', new Date());
+    });
+		server.use(restify.conditionalRequest());
+    server.get('/hello/:name', function(req, res, next) {
+      res.send('hello ' + req.params.name);
+    });
 
 ## Request API
 
