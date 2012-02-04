@@ -2,6 +2,8 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- order formatters on response such that JSON/text are before custom ones
+- RestErrors can use format strings
 - date plugin has bad log check
 
 
