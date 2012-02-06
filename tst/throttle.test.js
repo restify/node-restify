@@ -3,13 +3,13 @@
 var http = require('http');
 
 var d = require('dtrace-provider');
+var Logger = require('bunyan');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
 var createClient = require('../lib').createClient;
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
-var log4js = require('../lib/log4js_stub');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
 var Server = require('../lib/server');
@@ -31,7 +31,10 @@ var password = uuid();
 //--- Tests
 
 test('setup', function(t) {
-  server = new Server({ dtrace: DTRACE, log4js: log4js });
+  server = new Server({
+    dtrace: DTRACE,
+    Logger: new Logger({service: 'restify/test/throttle'})
+  });
   t.ok(server);
 
   server.use(function(req, res, next) {
@@ -65,7 +68,7 @@ test('setup', function(t) {
   server.listen(PORT, '127.0.0.1', function() {
     client = createClient({
       dtrace: DTRACE,
-      log4js: log4js,
+      Logger: new Logger({service: 'restify/test/throttle'}),
       name: 'throttleUnitTest',
       type: 'string',
       url: 'http://127.0.0.1:' + PORT

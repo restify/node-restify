@@ -3,12 +3,12 @@
 var http = require('http');
 
 var d = require('dtrace-provider');
+var Logger = require('bunyan');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
-var log4js = require('../lib/log4js_stub');
 var plugins = require('../lib/plugins');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
@@ -56,7 +56,7 @@ function request(path, headers, callback) {
 test('setup', function(t) {
   SERVER = new Server({
     dtrace: DTRACE,
-    log4js: log4js
+    Logger: new Logger({service: 'restify/test/plugins'})
   });
 
   SERVER.use(plugins.acceptParser(SERVER.acceptable));
@@ -69,7 +69,6 @@ test('setup', function(t) {
     return next();
   });
 
-  DTRACE.enable();
   SERVER.listen(PORT, '127.0.0.1', function() {
     t.end();
   });

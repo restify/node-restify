@@ -132,13 +132,11 @@ Creating a server is straightforward, as you simply invoke the
 below (and `listen()` takes the same arguments as node's
 [http.Server.listen](http://nodejs.org/docs/latest/api/http.html#server.listen)):
 
-    var log4js = require('log4js);
     var restify = require('restify');
 
     var server = restify.createServer({
       certificate: ...,
       key: ...,
-      log4js: log4js,
       name: 'MyApp',
     });
 
@@ -148,7 +146,7 @@ below (and `listen()` takes the same arguments as node's
 ||certificate||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||key||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
-||log4js||Object||You can optionally pass in a log4js handle; note log4js is not required||
+||Logger||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) handle; not required||
 ||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider; default is `restify` ||
 ||version||String||A default version to set for all routes||
 
@@ -494,7 +492,7 @@ A restify server has the following properties on it:
 ||**Name**||**Type**||**Description**||
 ||name||String||name of the server||
 ||version||String||default version to use in all routes||
-||log4js||Object||log4js handle (might be a stub)||
+||log||Object||bunyan Logger||
 ||acceptable||Array(String)||list of content-types this server can respond with||
 ||url||String||Once listen() is called, this will be filled in with where the server is running||
 
@@ -672,17 +670,31 @@ Note that `ip`, `xff` and `username` are XOR'd.
 
     server.use(restify.conditionalRequest());
 
-Checks for already set `res.header('ETag')` and 
-`res.header('Last-Modified')` to handle conditional requests. Depending 
-on the client's headers (If-Match, If-None-Match, If-Modified-Sinde, 
-If-Unmodified-Since) and its entities this handler might result in a 304 
-(Not Modified) or 412 (Precondition Failed) and skips the handler chain.
+You can use this handler to let clients do nice HTTP semantics with the
+"match" headers.  Specifically, with this plugin in place, you would set
+`res.etag=$yourhashhere`, and then this plugin will do one of:
+
+- return 304 (Not Modified) [and stop the handler chain]
+- return 412 (Precondition Failed) [and stop the handler chain]
+- Allow the request to go through the handler chain.
+
+The specific headers this plugin looks at are:
+
+- `Last-Modified`
+- `If-Match`
+- `If-None-Match`
+- `If-Modified-Since`
+- `If-Unmodified-Since`
+
+Some example usage:
 
     server.use(function setETag(req, res, next) {
       res.header('ETag', 'myETag');
       res.header('Last-Modified', new Date());
     });
-		server.use(restify.conditionalRequest());
+
+    server.use(restify.conditionalRequest());
+
     server.get('/hello/:name', function(req, res, next) {
       res.send('hello ' + req.params.name);
     });
@@ -749,9 +761,25 @@ and it contains the give mime type.
 Note this is almost compliant with express, but restify does not have
 all the `app.is()` callback business express does.
 
-### getLogger(category)
+### log
 
-Shorthand to grab a new log4js logger.
+Note that you can piggyback on the restify logging framework, by just using
+`req.log`.  I.e.,:
+
+    function myHandler(req, res, next) {
+      var log = req.log;
+
+      log.debug({params: req.params}, 'Hello there %s', 'foo');
+    }
+
+The advantage to doing this is that each restify `req` instance has a new bunyan
+`Logger` on it where the request id is automatically injected in, so you can
+easily correlate your high-throughput logs together.
+
+### getLogger(component)
+
+Shorthand to grab a new bunyan logger that is a child component of the
+one restify has:
 
     var log = req.getLogger('MyFoo');
 
@@ -761,6 +789,7 @@ Shorthand to grab a new log4js logger.
 ||contentLength||Number||short hand for the header content-length||
 ||contentType||String||short hand for the header content-type||
 ||href||String||url.parse(req.url) href||
+||log||Object||bunyan logger you can piggyback on||
 ||id||String||A unique request id (x-request-id)||
 ||path||String||cleaned up URL path||
 ||query||String||the query string only||
@@ -1110,7 +1139,7 @@ Options:
 ||version||String||semver string to set the accept-version||
 ||retry||Object||options to provide to node-retry; defaults to 3 retries||
 ||dtrace||Object||node-dtrace-provider handle||
-||log4js||Object||log4js handle||
+||log||Object||bunyan handle||
 
 ### get(path, callback)
 

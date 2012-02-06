@@ -1,8 +1,9 @@
 // Copyright 2011 Mark Cavage, Inc.  All rights reserved.
 
+var Logger = require('bunyan');
 var test = require('tap').test;
 
-var log4js = require('../lib/log4js_stub');
+
 var Route = require('../lib/route');
 
 
@@ -20,7 +21,7 @@ test('throws on missing options', function(t) {
 test('throws on missing log4js', function(t) {
   t.throws(function() {
     return new Route({});
-  }, new TypeError('options.log4js (Object) required'));
+  }, new TypeError('options.Logger (Object) required'));
   t.end();
 });
 
@@ -28,7 +29,7 @@ test('throws on missing log4js', function(t) {
 test('throws on missing url', function(t) {
   t.throws(function() {
     return new Route({
-      log4js: log4js
+      Logger: new Logger({ service: 'restify/test/route' })
     });
   }, new TypeError('url must be a String'));
   t.end();
@@ -38,7 +39,7 @@ test('throws on missing url', function(t) {
 test('throws on url wrong type', function(t) {
   t.throws(function() {
     return new Route({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test/route' }),
       url: 123
     });
   }, new TypeError('url must be a String'));
@@ -48,7 +49,7 @@ test('throws on url wrong type', function(t) {
 
 test('throws on setting url incorrectly', function(t) {
   var r = new Route({
-    log4js: log4js,
+    Logger: new Logger({ service: 'restify/test/route' }),
     url: '/foo'
   });
   t.throws(function() {
@@ -61,7 +62,7 @@ test('throws on setting url incorrectly', function(t) {
 test('throws on bad version', function(t) {
   t.throws(function() {
     return new Route({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test/route' }),
       url: '/foo/bar',
       version: 123
     });
@@ -73,7 +74,7 @@ test('throws on bad version', function(t) {
 test('throws on bad handlers (not array)', function(t) {
   t.throws(function() {
     return new Route({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test/route' }),
       url: '/foo/bar',
       handlers: 123
     });
@@ -85,7 +86,7 @@ test('throws on bad handlers (not array)', function(t) {
 test('throws on bad handlers (not function)', function(t) {
   t.throws(function() {
     return new Route({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test/route' }),
       url: '/foo/bar',
       handlers: [123]
     });
@@ -96,7 +97,7 @@ test('throws on bad handlers (not function)', function(t) {
 
 test('construct with default method and name', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({ service: 'restify/test/route' }),
     url: '/foo/:bar'
   });
   t.ok(route);
@@ -109,7 +110,7 @@ test('construct with default method and name', function(t) {
 
 test('construct with explicit method and version', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({ service: 'restify/test/route' }),
     url: '/foo/:bar',
     method: 'PUT',
     version: '1.2.3'
@@ -124,7 +125,7 @@ test('construct with explicit method and version', function(t) {
 
 test('construct with range versioning', function(t){
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({ service: 'restify/test/route' }),
     url: '/foo/:bar',
     version: '>=1.2',
     rangeVersioning: true
@@ -136,7 +137,7 @@ test('construct with range versioning', function(t){
 test('bad version. Sent range instead', function(t){
   t.throws(function(){
     return new Route({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test/route' }),
       url: '/foo/:bar',
       version: '>=1.2'
     });
@@ -146,7 +147,7 @@ test('bad version. Sent range instead', function(t){
 
 test('construct with regex url and chain', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({ service: 'restify/test/route' }),
     url: /foo\/(\w+)/,
     method: 'PUT',
     name: 'PutFoo',
@@ -163,7 +164,7 @@ test('construct with regex url and chain', function(t) {
 
 test('test matches no params', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/bar',
     method: 'GET'
   });
@@ -186,7 +187,7 @@ test('test matches no params', function(t) {
 
 test('test matches params', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET'
   });
@@ -209,7 +210,7 @@ test('test matches params', function(t) {
 
 test('test matches params url-encoded', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET'
   });
@@ -232,7 +233,7 @@ test('test matches params url-encoded', function(t) {
 
 test('test matches multiple params', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:one/bar/:two',
     method: 'GET'
   });
@@ -255,7 +256,7 @@ test('test matches multiple params', function(t) {
 
 test('test matches regex', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: /^\/foo\/(\w+)$/,
     method: 'GET'
   });
@@ -278,7 +279,7 @@ test('test matches regex', function(t) {
 
 test('test matches version', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET',
     version: '1.2.3'
@@ -299,7 +300,7 @@ test('test matches version', function(t) {
 
 test('run routes', function(t) {
   var route = new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET'
   });
@@ -330,20 +331,20 @@ test('run routes', function(t) {
 
 test('toString', function(t) {
   t.equal(new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET'
   }).toString(), 'GET /foo/:bar');
 
   t.equal(new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET',
     version: '1.2.3'
   }).toString(), 'GET /foo/:bar (version=1.2.3)');
 
   t.equal(new Route({
-    log4js: log4js,
+    Logger: new Logger({service: 'restify/test/route'}),
     url: '/foo/:bar',
     method: 'GET',
     version: '1.2.3',

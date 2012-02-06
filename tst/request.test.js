@@ -1,9 +1,10 @@
 // Copyright 2011 Mark Cavage, Inc.  All rights reserved.
 
 var EventEmitter = require('events').EventEmitter;
+
+var Logger = require('bunyan');
 var test = require('tap').test;
 
-var log4js = require('../lib/log4js_stub');
 var Request = require('../lib/request');
 
 var getRequest = require('./stubs').getRequest;
@@ -20,10 +21,10 @@ test('throws on missing options', function(t) {
 });
 
 
-test('throws on missing log4js', function(t) {
+test('throws on missing Logger', function(t) {
   t.throws(function() {
     return new Request({});
-  }, new TypeError('options.log4js (Object) required'));
+  }, new TypeError('options.Logger (Object) required'));
   t.end();
 });
 
@@ -31,7 +32,7 @@ test('throws on missing log4js', function(t) {
 test('throws on missing request', function(t) {
   t.throws(function() {
     return new Request({
-      log4js: {}
+      Logger: new Logger({service: 'restify/test/request'})
     });
   }, new TypeError('options.request (http.IncomingMessage) required'));
   t.end();

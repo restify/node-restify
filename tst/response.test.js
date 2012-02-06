@@ -1,11 +1,11 @@
 // Copyright 2011 Mark Cavage, Inc.  All rights reserved.
 
 var EventEmitter = require('events').EventEmitter;
+var Logger = require('bunyan');
 var test = require('tap').test;
 
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
-var log4js = require('../lib/log4js_stub');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
 
@@ -24,10 +24,10 @@ test('throws on missing options', function(t) {
 });
 
 
-test('throws on missing log4js', function(t) {
+test('throws on missing Logger', function(t) {
   t.throws(function() {
     return new Response({});
-  }, new TypeError('options.log4js (Object) required'));
+  }, new TypeError('options.Logger (Object) required'));
   t.end();
 });
 
@@ -35,7 +35,7 @@ test('throws on missing log4js', function(t) {
 test('throws on missing response', function(t) {
   t.throws(function() {
     return new Response({
-      log4js: {}
+      Logger: new Logger({service: 'restify/test/response'})
     });
   }, new TypeError('options.response (http.OutgoingMessage) required'));
   t.end();
@@ -45,7 +45,7 @@ test('throws on missing response', function(t) {
 test('throws on missing request', function(t) {
   t.throws(function() {
     return new Response({
-      log4js: {},
+      Logger: new Logger({service: 'restify/test/response'}),
       response: {}
     });
   }, new TypeError('options.request (Request) required'));
@@ -56,7 +56,7 @@ test('throws on missing request', function(t) {
 test('throws on bad version type', function(t) {
   t.throws(function() {
     return new Response({
-      log4js: {},
+      Logger: new Logger({service: 'restify/test/response'}),
       response: {},
       request: getRequest(),
       version: 123

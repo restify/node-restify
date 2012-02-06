@@ -1,9 +1,9 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
+var Logger = require('bunyan');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
-var log4js = require('../lib/log4js_stub');
 var restify = require('../lib');
 
 
@@ -36,11 +36,14 @@ function sendText(req, res, next) {
 
 ///--- Tests
 
-log4js.setGlobalLogLevel('TRACE');
+var log = new Logger({
+  service: 'client.test',
+  level: 'info'
+});
 
 test('setup', function(t) {
   server = restify.createServer({
-    log4js: log4js
+    Logger: log
   });
   t.ok(server);
 
@@ -69,7 +72,7 @@ test('setup', function(t) {
 
 test('create json client', function(t) {
   client = restify.createClient({
-    log4js: log4js,
+    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'json'
   });
@@ -139,7 +142,7 @@ test('PUT json', function(t) {
 
 test('create string client', function(t) {
   client = restify.createClient({
-    log4js: log4js,
+    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'string'
   });
@@ -232,7 +235,7 @@ test('DELETE text', function(t) {
 
 test('create raw client', function(t) {
   client = restify.createClient({
-    log4js: log4js,
+    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'http',
     accept: 'text/plain'

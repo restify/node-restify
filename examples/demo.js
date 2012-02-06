@@ -1,13 +1,29 @@
 var restify = require('../lib');
-var log4js = require('../lib/log4js_stub');
+var Logger = require('bunyan');
 
-log4js.setGlobalLogLevel('TRACE');
 
-var log = log4js.getLogger('main');
+
+///--- Globals
+
+var NAME = 'exampleapp';
+
+
+
+///--- Mainline
+
+var log = new Logger({
+  level: 'trace',
+  service: 'exampleapp',
+  serializers: {
+    err: Logger.stdSerializers.err,
+    req: Logger.stdSerializers.req,
+    res: restify.bunyan.serializers.response
+  }
+});
 
 var server = restify.createServer({
-  name: 'exampleapp',
-  log4js: log4js,
+  name: NAME,
+  Logger: log,
   formatters: {
     'application/foo': function(req, res, body) {
       if (body instanceof Error) {

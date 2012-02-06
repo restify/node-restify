@@ -2,6 +2,8 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- Switch from log4js to [bunyan](https://github.com/trentm/node-bunyan)
+- Official version of `ConditionalRequest` plugin (Falco Nogatz)
 - order formatters on response such that JSON/text are before custom ones
 - RestErrors can use format strings
 - date plugin has bad log check

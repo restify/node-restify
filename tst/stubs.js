@@ -1,8 +1,8 @@
 // Copyright 2011 Mark Cavage, Inc.  All rights reserved.
 
 var EventEmitter = require('events').EventEmitter;
+var Logger = require('bunyan');
 
-var log4js = require('../lib/log4js_stub');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
 
@@ -26,7 +26,7 @@ module.exports = {
     stub.url = '//foo/bar';
 
     var r = new Request({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test' }),
       request: stub
     });
     r.accept = [
@@ -80,7 +80,7 @@ module.exports = {
     stub.writeable = true;
 
     return new Response({
-      log4js: log4js,
+      Logger: new Logger({ service: 'restify/test' }),
       request: module.exports.getRequest(),
       response: stub
     });

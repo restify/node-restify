@@ -12,7 +12,7 @@
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.0.0-1-rc2",
+  "version": "1.0.0-1-rc3",
   "publishConfig": { "tag": "beta" },
   "repository": {
     "type": "git",
@@ -28,12 +28,12 @@
   },
   "dependencies": {
     "async": "0.1.15",
-    "dtrace-provider": "0.0.5",
-    "http-signature": "0.9.7",
+    "bunyan": "0.4.0",
+    "dtrace-provider": "git://github.com/chrisa/node-dtrace-provider.git#f8cc8dc545dff9d81b910a770758b04ce4085bdc",
+    "http-signature": "0.9.8",
     "mime": "1.2.4",
-    "node-uuid": "1.2.0",
+    "node-uuid": "1.3.3",
     "retry": "0.5.0",
-    "sprintf": "0.1.1",
     "semver": "1.0.12"
   },
   "devDependencies": {

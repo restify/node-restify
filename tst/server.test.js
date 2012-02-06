@@ -5,12 +5,12 @@ var http = require('http');
 
 var d = require('dtrace-provider');
 var filed = require('filed');
+var Logger = require('bunyan');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
 var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
-var log4js = require('../lib/log4js_stub');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
 var Server = require('../lib/server');
@@ -20,6 +20,7 @@ var Server = require('../lib/server');
 ///--- Globals
 
 var DTRACE = d.createDTraceProvider('restifyUnitTest');
+var LOGGER = new Logger({service: 'restify/test/server'});
 var PORT = process.env.UNIT_TEST_PORT || 12345;
 
 
@@ -42,16 +43,16 @@ test('throws on missing dtrace', function(t) {
 });
 
 
-test('throws on missing log4js', function(t) {
+test('throws on missing bunyan', function(t) {
   t.throws(function() {
     return new Server({ dtrace: {} });
-  }, new TypeError('options.log4js (Object) required'));
+  }, new TypeError('options.Logger (Object) required'));
   t.end();
 });
 
 
 test('ok', function(t) {
-  t.ok(new Server({ dtrace: DTRACE, log4js: log4js }));
+  t.ok(new Server({ dtrace: DTRACE, Logger: LOGGER }));
   t.end();
 });
 
@@ -61,7 +62,7 @@ test('ok (ssl)', function(t) {
   try {
     t.ok(new Server({
       dtrace: DTRACE,
-      log4js: log4js,
+      Logger: LOGGER,
       certificate: 'hello',
       key: 'world'
     }));
@@ -74,7 +75,7 @@ test('ok (ssl)', function(t) {
 
 
 test('listen and close (port only)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.listen(PORT, function() {
     server.close(function() {
       t.end();
@@ -84,7 +85,7 @@ test('listen and close (port only)', function(t) {
 
 
 test('listen and close (port and hostname)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.listen(PORT, '127.0.0.1', function() {
     server.close(function() {
       t.end();
@@ -94,7 +95,7 @@ test('listen and close (port and hostname)', function(t) {
 
 
 test('listen and close (socketPath)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.listen('/tmp/.' + uuid(), function() {
     server.close(function() {
       t.end();
@@ -104,7 +105,7 @@ test('listen and close (socketPath)', function(t) {
 
 
 test('get (path only)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.get('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
@@ -143,7 +144,7 @@ test('get (path only)', function(t) {
 
 
 test('get (path and version ok)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.get({
     url: '/foo/:id',
     version: '1.2.3'
@@ -188,7 +189,7 @@ test('get (path and version ok)', function(t) {
 
 
 test('get (path and version not ok)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   server.get({
     url: '/foo/:id',
     version: '1.2.3'
@@ -239,7 +240,7 @@ test('get (path and version not ok)', function(t) {
 
 
 test('use + get (path only)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   var handler = 0;
   server.use(function(req, res, next) {
     handler++;
@@ -272,7 +273,7 @@ test('use + get (path only)', function(t) {
 
 
 test('rm', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.get('/foo/:id', function(req, res, next) {
     return next();
@@ -309,7 +310,7 @@ test('rm', function(t) {
 
 
 test('405', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.post('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -337,7 +338,7 @@ test('405', function(t) {
 
 
 test('PUT ok', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.put('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -365,7 +366,7 @@ test('PUT ok', function(t) {
 
 
 test('HEAD ok', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.head('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -396,7 +397,7 @@ test('HEAD ok', function(t) {
 
 
 test('DELETE ok', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.del('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -427,7 +428,7 @@ test('DELETE ok', function(t) {
 
 
 test('OPTIONS', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.get('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -456,7 +457,7 @@ test('OPTIONS', function(t) {
 
 
 test('GH-56 streaming with filed (download)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.get('/foo.txt', function tester(req, res, next) {
     filed(__filename).pipe(res);
@@ -490,7 +491,7 @@ test('GH-56 streaming with filed (download)', function(t) {
 
 
 test('GH-59 Query params with / result in a 404', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.get('/', function tester(req, res, next) {
     res.send('hello');
@@ -528,7 +529,7 @@ test('GH-59 Query params with / result in a 404', function(t) {
 
 
 test('GH-63 res.send 204 is sending a body', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.del('/hello/:name', function tester(req, res, next) {
     res.send(204);
@@ -566,7 +567,7 @@ test('GH-63 res.send 204 is sending a body', function(t) {
 
 
 test('GH-64 prerouting chain', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.pre(function(req, res, next) {
     req.headers.accept = 'application/json';
@@ -609,7 +610,7 @@ test('GH-64 prerouting chain', function(t) {
 
 
 test('GH-64 prerouting chain with error', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.pre(function(req, res, next) {
     return next(new RestError(400, 'BadRequest', 'screw you client'));
@@ -651,7 +652,7 @@ test('GH-64 prerouting chain with error', function(t) {
 
 
 test('GH-67 extend access-control headers', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
 
   server.get('/hello/:name', function tester(req, res, next) {
     res.header('Access-Control-Allow-Headers',
@@ -696,7 +697,7 @@ test('GH-67 extend access-control headers', function(t) {
  * Disabled, as Heroku (travis) doesn't allow us to write to /tmp
  *
 test('GH-56 streaming with filed (upload)', function(t) {
-  var server = new Server({ dtrace: DTRACE, log4js: log4js });
+  var server = new Server({ dtrace: DTRACE, Logger: LOGGER });
   var file = '/tmp/.' + uuid();
   server.put('/foo', function tester(req, res, next) {
     req.pipe(filed(file)).pipe(res);
