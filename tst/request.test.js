@@ -24,7 +24,7 @@ test('throws on missing options', function(t) {
 test('throws on missing Logger', function(t) {
   t.throws(function() {
     return new Request({});
-  }, new TypeError('options.Logger (Object) required'));
+  }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
@@ -32,7 +32,7 @@ test('throws on missing Logger', function(t) {
 test('throws on missing request', function(t) {
   t.throws(function() {
     return new Request({
-      Logger: new Logger({service: 'restify/test/request'})
+      log: new Logger({service: 'restify/test/request'})
     });
   }, new TypeError('options.request (http.IncomingMessage) required'));
   t.end();

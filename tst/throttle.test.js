@@ -33,7 +33,7 @@ var password = uuid();
 test('setup', function(t) {
   server = new Server({
     dtrace: DTRACE,
-    Logger: new Logger({service: 'restify/test/throttle'})
+    log: new Logger({service: 'restify/test/throttle'})
   });
   t.ok(server);
 
@@ -68,7 +68,7 @@ test('setup', function(t) {
   server.listen(PORT, '127.0.0.1', function() {
     client = createClient({
       dtrace: DTRACE,
-      Logger: new Logger({service: 'restify/test/throttle'}),
+      log: new Logger({service: 'restify/test/throttle'}),
       name: 'throttleUnitTest',
       type: 'string',
       url: 'http://127.0.0.1:' + PORT

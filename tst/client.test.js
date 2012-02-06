@@ -1,6 +1,5 @@
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
-var Logger = require('bunyan');
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
@@ -36,15 +35,8 @@ function sendText(req, res, next) {
 
 ///--- Tests
 
-var log = new Logger({
-  service: 'client.test',
-  level: 'info'
-});
-
 test('setup', function(t) {
-  server = restify.createServer({
-    Logger: log
-  });
+  server = restify.createServer({});
   t.ok(server);
 
   server.use(restify.acceptParser(['json', 'text/plain']));
@@ -72,7 +64,6 @@ test('setup', function(t) {
 
 test('create json client', function(t) {
   client = restify.createClient({
-    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'json'
   });
@@ -142,7 +133,6 @@ test('PUT json', function(t) {
 
 test('create string client', function(t) {
   client = restify.createClient({
-    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'string'
   });
@@ -235,7 +225,6 @@ test('DELETE text', function(t) {
 
 test('create raw client', function(t) {
   client = restify.createClient({
-    Logger: log,
     url: 'http://127.0.0.1:' + PORT,
     type: 'http',
     accept: 'text/plain'

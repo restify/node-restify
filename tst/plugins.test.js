@@ -56,7 +56,7 @@ function request(path, headers, callback) {
 test('setup', function(t) {
   SERVER = new Server({
     dtrace: DTRACE,
-    Logger: new Logger({service: 'restify/test/plugins'})
+    log: new Logger({service: 'restify/test/plugins'})
   });
 
   SERVER.use(plugins.acceptParser(SERVER.acceptable));

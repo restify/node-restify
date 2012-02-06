@@ -146,7 +146,7 @@ below (and `listen()` takes the same arguments as node's
 ||certificate||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||key||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
-||Logger||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) handle; not required||
+||log||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required||
 ||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider; default is `restify` ||
 ||version||String||A default version to set for all routes||
 
@@ -494,7 +494,7 @@ A restify server has the following properties on it:
 ||**Name**||**Type**||**Description**||
 ||name||String||name of the server||
 ||version||String||default version to use in all routes||
-||log||Object||bunyan Logger||
+||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
 ||acceptable||Array(String)||list of content-types this server can respond with||
 ||url||String||Once listen() is called, this will be filled in with where the server is running||
 
@@ -774,14 +774,15 @@ Note that you can piggyback on the restify logging framework, by just using
       log.debug({params: req.params}, 'Hello there %s', 'foo');
     }
 
-The advantage to doing this is that each restify `req` instance has a new bunyan
-`Logger` on it where the request id is automatically injected in, so you can
-easily correlate your high-throughput logs together.
+The advantage to doing this is that each restify `req` instance has a new
+[bunyan](https://github.com/trentm/node-bunyan) instance `log` on it where
+the request id is automatically injected in, so you can easily correlate
+your high-throughput logs together.
 
 ### getLogger(component)
 
-Shorthand to grab a new bunyan logger that is a child component of the
-one restify has:
+Shorthand to grab a new  [bunyan](https://github.com/trentm/node-bunyan)
+instance that is a child component of the one restify has:
 
     var log = req.getLogger('MyFoo');
 
@@ -1141,7 +1142,7 @@ Options:
 ||version||String||semver string to set the accept-version||
 ||retry||Object||options to provide to node-retry; defaults to 3 retries||
 ||dtrace||Object||node-dtrace-provider handle||
-||log||Object||bunyan handle||
+||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
 
 ### get(path, callback)
 

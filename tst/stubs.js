@@ -26,7 +26,7 @@ module.exports = {
     stub.url = '//foo/bar';
 
     var r = new Request({
-      Logger: new Logger({ service: 'restify/test' }),
+      log: new Logger({service: 'restify/test'}),
       request: stub
     });
     r.accept = [
@@ -80,7 +80,7 @@ module.exports = {
     stub.writeable = true;
 
     return new Response({
-      Logger: new Logger({ service: 'restify/test' }),
+      log: new Logger({service: 'restify/test'}),
       request: module.exports.getRequest(),
       response: stub
     });

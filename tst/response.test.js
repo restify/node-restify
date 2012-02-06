@@ -27,7 +27,7 @@ test('throws on missing options', function(t) {
 test('throws on missing Logger', function(t) {
   t.throws(function() {
     return new Response({});
-  }, new TypeError('options.Logger (Object) required'));
+  }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
@@ -35,7 +35,7 @@ test('throws on missing Logger', function(t) {
 test('throws on missing response', function(t) {
   t.throws(function() {
     return new Response({
-      Logger: new Logger({service: 'restify/test/response'})
+      log: new Logger({service: 'restify/test/response'})
     });
   }, new TypeError('options.response (http.OutgoingMessage) required'));
   t.end();
@@ -45,7 +45,7 @@ test('throws on missing response', function(t) {
 test('throws on missing request', function(t) {
   t.throws(function() {
     return new Response({
-      Logger: new Logger({service: 'restify/test/response'}),
+      log: new Logger({service: 'restify/test/response'}),
       response: {}
     });
   }, new TypeError('options.request (Request) required'));
@@ -56,7 +56,7 @@ test('throws on missing request', function(t) {
 test('throws on bad version type', function(t) {
   t.throws(function() {
     return new Response({
-      Logger: new Logger({service: 'restify/test/response'}),
+      log: new Logger({service: 'restify/test/response'}),
       response: {},
       request: getRequest(),
       version: 123
