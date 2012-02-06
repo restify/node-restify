@@ -255,9 +255,11 @@ we asked for a version that doesn't exist and got an error (notably,
 we didn't send an `Accept` header, so we got a JSON response).  Which
 segues us nicely into content negotiation.
 
-Lastly, note that you can default the versions on routes by passing in
-a version field at server creation time.
+You can default the versions on routes by passing in a version field at
+server creation time.  Lastly, you can support multiple versions in the API
+by using an array:
 
+      server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
 
 ## Content Negotiation
 

@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- range versioning changed to be an array of explicit versions
 - Switch from log4js to [bunyan](https://github.com/trentm/node-bunyan)
 - Official version of `ConditionalRequest` plugin (Falco Nogatz)
 - order formatters on response such that JSON/text are before custom ones

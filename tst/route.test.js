@@ -59,18 +59,6 @@ test('throws on setting url incorrectly', function(t) {
 });
 
 
-test('throws on bad version', function(t) {
-  t.throws(function() {
-    return new Route({
-      Logger: new Logger({ service: 'restify/test/route' }),
-      url: '/foo/bar',
-      version: 123
-    });
-  }, new TypeError('options.version must be a String'));
-  t.end();
-});
-
-
 test('throws on bad handlers (not array)', function(t) {
   t.throws(function() {
     return new Route({
@@ -127,8 +115,7 @@ test('construct with range versioning', function(t){
   var route = new Route({
     Logger: new Logger({ service: 'restify/test/route' }),
     url: '/foo/:bar',
-    version: '>=1.2',
-    rangeVersioning: true
+    version: ['1.2.1', '1.3.1']
   });
   t.ok(route);
   t.end();
@@ -141,7 +128,7 @@ test('bad version. Sent range instead', function(t){
       url: '/foo/:bar',
       version: '>=1.2'
     });
-  }, new Error('only semver versions are allowed'));
+  }, new Error('>=1.2 is not a valid semantic version'));
   t.end();
 });
 
