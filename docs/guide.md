@@ -529,8 +529,7 @@ Allows you to add in handlers that run no matter what the route.
 
 ## Bundled Plugins
 
-restify ships with several handlers
-you can use, specifically:
+restify ships with several handlers you can use, specifically:
 
 * Accept header parsing
 * Authorization header parsing
@@ -539,6 +538,7 @@ you can use, specifically:
 * Body parsing (JSON/URL-encoded)
 * Throttling
 * Conditional request handling
+* Audit logger
 
 Here's some example code using all the shipped plugins:
 
@@ -700,6 +700,71 @@ Some example usage:
     server.get('/hello/:name', function(req, res, next) {
       res.send('hello ' + req.params.name);
     });
+
+### Audit Logging
+
+Audit logging is a special plugin, as you don't use it with `.use()`, but with
+the `after` event:
+
+    server.on('after', restify.auditLogger({
+      log: new Logger({
+        name: 'audit',
+        stream: process.stdout
+      })
+    }));
+
+You pass in the auditor a bunyan logger, and it will write out records at the
+`info` level.  Records will look like this:
+
+        {
+          "name": "audit",
+          "hostname": "your.host.name",
+          "audit": true,
+          "remoteAddress": "127.0.0.1",
+          "remotePort": 57692,
+          "req_id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
+          "req": {
+            "method": "GET",
+            "url": "/foo",
+            "headers": {
+              "authorization": "Basic YWRtaW46am95cGFzczEyMw==",
+              "user-agent": "curl/7.19.7 (universal-apple-darwin10.0) libcurl/7.19.7 OpenSSL/0.9.8r zlib/1.2.3",
+              "host": "localhost:8080",
+              "accept": "application/json"
+            },
+            "httpVersion": "1.1",
+            "trailers": {},
+            "version": "*"
+          },
+          "res": {
+            "statusCode": 200,
+            "headers": {
+              "access-control-allow-origin": "*",
+              "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+              "access-control-expose-headers": "X-Api-Version, X-Request-Id, X-Response-Time",
+              "server": "Joyent SmartDataCenter 7.0.0",
+              "x-request-id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
+              "access-control-allow-methods": "GET",
+              "x-api-version": "1.0.0",
+              "connection": "close",
+              "content-length": 158,
+              "content-md5": "zkiRn2/k3saflPhxXI7aXA==",
+              "content-type": "application/json",
+              "date": "Tue, 07 Feb 2012 20:30:31 GMT",
+              "x-response-time": 1639
+            },
+            "trailer": false
+          },
+          "route": {
+          "name": "GetFoo",
+          "version": ["1.0.0"]
+          },
+          "secure": false,
+          "level": 30,
+          "msg": GetFoo handled: 200",
+          "time": "2012-02-07T20:30:31.896Z",
+          "v": 0
+        }
 
 ## Request API
 
