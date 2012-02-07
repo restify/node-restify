@@ -206,7 +206,7 @@ test('test matches params url-encoded', function(t) {
     method: 'GET',
     path: '/foo/a%40b.com'
   }), { bar: 'a@b.com' });
-  t.equivalent(route.matches({
+  t.notOk(route.matches({
     method: 'GET',
     path: '/foo/a@b.com'
   }), { bar: 'a@b.com' });
