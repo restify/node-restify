@@ -5,7 +5,7 @@ var Logger = require('bunyan');
 
 var Request = require('../lib/request');
 var Response = require('../lib/response');
-
+var restify = require('../lib');
 
 
 ///--- API
@@ -26,7 +26,7 @@ module.exports = {
     stub.url = '//foo/bar';
 
     var r = new Request({
-      log: new Logger({service: 'restify/test'}),
+      log: new Logger({name: 'restify/test'}),
       request: stub
     });
     r.accept = [
@@ -80,7 +80,10 @@ module.exports = {
     stub.writeable = true;
 
     return new Response({
-      log: new Logger({service: 'restify/test'}),
+      log: new Logger({
+        name: 'restify/test/response/stub',
+        serializers: Logger.stdSerializers
+      }),
       request: module.exports.getRequest(),
       response: stub
     });

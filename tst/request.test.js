@@ -32,7 +32,7 @@ test('throws on missing Logger', function(t) {
 test('throws on missing request', function(t) {
   t.throws(function() {
     return new Request({
-      log: new Logger({service: 'restify/test/request'})
+      log: new Logger({name: 'restify/test/request'})
     });
   }, new TypeError('options.request (http.IncomingMessage) required'));
   t.end();

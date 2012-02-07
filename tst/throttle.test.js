@@ -12,7 +12,7 @@ var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
 var Request = require('../lib/request');
 var Response = require('../lib/response');
-var Server = require('../lib/server');
+var restify = require('../lib');
 var throttle = require('../lib/plugins/throttle');
 
 
@@ -31,9 +31,8 @@ var password = uuid();
 //--- Tests
 
 test('setup', function(t) {
-  server = new Server({
-    dtrace: DTRACE,
-    log: new Logger({service: 'restify/test/throttle'})
+  server = restify.createServer({
+    dtrace: DTRACE
   });
   t.ok(server);
 
@@ -68,7 +67,6 @@ test('setup', function(t) {
   server.listen(PORT, '127.0.0.1', function() {
     client = createClient({
       dtrace: DTRACE,
-      log: new Logger({service: 'restify/test/throttle'}),
       name: 'throttleUnitTest',
       type: 'string',
       url: 'http://127.0.0.1:' + PORT

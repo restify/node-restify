@@ -12,7 +12,7 @@ var RestError = require('../lib/errors').RestError;
 var plugins = require('../lib/plugins');
 var Request = require('../lib/request');
 var Response = require('../lib/response');
-var Server = require('../lib/server');
+var restify = require('../lib');
 
 
 
@@ -54,9 +54,9 @@ function request(path, headers, callback) {
 ///--- Tests
 
 test('setup', function(t) {
-  SERVER = new Server({
+  SERVER = restify.createServer({
     dtrace: DTRACE,
-    log: new Logger({service: 'restify/test/plugins'})
+    log: new Logger({name: 'restify/test/plugins'})
   });
 
   SERVER.use(plugins.acceptParser(SERVER.acceptable));
