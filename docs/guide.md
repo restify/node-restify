@@ -442,13 +442,15 @@ from the stack trace (you don't *have* to do that, but you probably
 want it).  In the example above, we also set the name property so
 `console.log(new MyError());` looks correct.
 
-## Events
+## Server API
+
+### Events
 
 Restify servers emit all the events from the node
 [http.Server](http://nodejs.org/docs/latest/api/http.html#http.Server)
 and has several other events you want to listen on.
 
-### Event: 'NotFound'
+##### Event: 'NotFound'
 
 `function (request, response) {}`
 
@@ -457,7 +459,7 @@ will emit this event. Note that restify checks for listeners on this
 event, and if there are none, responds with a default 404 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: 'MethodNotAllowed'
+#### Event: 'MethodNotAllowed'
 
 `function (request, response) {}`
 
@@ -467,7 +469,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 405 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: 'VersionNotAllowed'
+#### Event: 'VersionNotAllowed'
 
 `function (request, response) {}`
 
@@ -477,17 +479,19 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
-### Event: 'after'
+#### Event: 'after'
 
 `function (request, response, route) {}`
 
 Emitted after a route has finished all the handlers you registered.
 You can use this to write audit logs, etc.  The route parameter will be
-the `Route` object that ran.
+the `Route` object that ran.  Note that when you are using the default
+404/405/BadVersion handlers, this event will still be fired, but route will
+be `null`.
 
-## Properties and other methods
+### Properties and other methods
 
-### Properties
+#### Properties
 
 A restify server has the following properties on it:
 
@@ -498,21 +502,21 @@ A restify server has the following properties on it:
 ||acceptable||Array(String)||list of content-types this server can respond with||
 ||url||String||Once listen() is called, this will be filled in with where the server is running||
 
-### Methods
+#### Methods
 
-#### address()
+##### address()
 
 Wraps node's [address()](http://nodejs.org/docs/latest/api/net.html#server.address).
 
-#### listen(port, [host], [callback]) or listen(path, [callback])
+##### listen(port, [host], [callback]) or listen(path, [callback])
 
 Wrap's node's [listen()](http://nodejs.org/docs/latest/api/net.html#server.listen).
 
-#### close()
+##### close()
 
 Wrap's node's [close()](http://nodejs.org/docs/latest/api/net.html#server.close).
 
-### pre()
+##### pre()
 
 Allows you to add in handlers that run *before* routing occurs. This gives you
 a hook to change request headers and the like if you need to. Note that
@@ -523,7 +527,7 @@ a hook to change request headers and the like if you need to. Note that
       return next();
     });
 
-### use()
+##### use()
 
 Allows you to add in handlers that run no matter what the route.
 
