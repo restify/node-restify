@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- Allow pre handlers to update request url
 - try/catch around route running
 - Bundled audit logger (via bunyan)
 - strict adherence to RFC3986 for URL encoding
