@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- try/catch around route running
 - Bundled audit logger (via bunyan)
 - strict adherence to RFC3986 for URL encoding
 - range versioning changed to be an array of explicit versions
