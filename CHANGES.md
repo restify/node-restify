@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- RegExp mounts throw a TypeError
 - Allow pre handlers to update request url
 - try/catch around route running
 - Bundled audit logger (via bunyan)

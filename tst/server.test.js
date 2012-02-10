@@ -457,6 +457,32 @@ test('OPTIONS', function(t) {
 });
 
 
+test('RegExp ok', function(t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+
+  server.get(/\/foo/, function tester(req, res, next) {
+    res.send('hi there');
+    return next();
+  });
+
+  server.listen(PORT, function() {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/foo',
+      method: 'GET',
+      agent: false
+    };
+    http.request(opts, function(res) {
+      t.equal(res.statusCode, 200);
+      server.close(function() {
+        t.end();
+      });
+    }).end();
+  });
+});
+
+
 test('GH-56 streaming with filed (download)', function(t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
