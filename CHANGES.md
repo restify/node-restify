@@ -2,6 +2,7 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+- GH-72 Wrong server name in response header on 404/405/...
 - RegExp mounts throw a TypeError
 - Allow pre handlers to update request url
 - try/catch around route running
