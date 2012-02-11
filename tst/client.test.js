@@ -1,4 +1,4 @@
-// Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
+// Copyright 2012 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
 var test = require('tap').test;
 var uuid = require('node-uuid');
