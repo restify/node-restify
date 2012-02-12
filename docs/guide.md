@@ -537,7 +537,7 @@ restify ships with several handlers you can use, specifically:
 * Authorization header parsing
 * Date header parsing
 * Query string parsing
-* Body parsing (JSON/URL-encoded)
+* Body parsing (JSON/URL-encoded/multipart form)
 * Throttling
 * Conditional request handling
 * Audit logger
@@ -621,8 +621,9 @@ in the options object:
 ### BodyParser
 
 Blocks your chain on reading and parsing the HTTP request body.  Switches on
-`Content-Type` and does the appropriate logic.  `application/json` and
-`application/x-www-form-urlencoded` are currently supported.
+`Content-Type` and does the appropriate logic.  `application/json`,
+`application/x-www-form-urlencoded` and `multipart/form-data` are currently
+supported.
 
     server.use(restify.bodyParser({ mapParams: false }));
 
