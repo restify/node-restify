@@ -27,11 +27,11 @@ var SERVER;
 ///--- Helpers
 
 function request(path, headers, callback) {
-  if (typeof(path) === 'function') {
+  if (typeof (path) === 'function') {
     callback = path;
     path = headers = false;
   }
-  if (typeof(headers) === 'function') {
+  if (typeof (headers) === 'function') {
     callback = headers;
     headers = false;
   }
@@ -53,7 +53,7 @@ function request(path, headers, callback) {
 
 ///--- Tests
 
-test('setup', function(t) {
+test('setup', function (t) {
   SERVER = restify.createServer({
     dtrace: DTRACE,
     log: new Logger({name: 'restify/test/plugins'})
@@ -64,53 +64,53 @@ test('setup', function(t) {
   SERVER.use(plugins.dateParser());
   SERVER.use(plugins.queryParser());
 
-  SERVER.get('/foo/:id', function(req, res, next) {
+  SERVER.get('/foo/:id', function (req, res, next) {
     res.send();
     return next();
   });
 
-  SERVER.listen(PORT, '127.0.0.1', function() {
+  SERVER.listen(PORT, '127.0.0.1', function () {
     t.end();
   });
 });
 
 
-test('accept ok', function(t) {
-  request(function(res) {
+test('accept ok', function (t) {
+  request(function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   }).end();
 });
 
 
-test('406', function(t) {
-  request('/foo/bar', { accept: 'foo/bar' }, function(res) {
+test('406', function (t) {
+  request('/foo/bar', { accept: 'foo/bar' }, function (res) {
     t.equal(res.statusCode, 406);
     t.end();
   }).end();
 });
 
 
-test('authorization basic ok', function(t) {
+test('authorization basic ok', function (t) {
   var authz = 'Basic ' + new Buffer('user:secret').toString('base64');
-  request('/foo/bar', { authorization: authz }, function(res) {
+  request('/foo/bar', { authorization: authz }, function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   }).end();
 });
 
 
-test('authorization basic invalid', function(t) {
+test('authorization basic invalid', function (t) {
   var authz = 'Basic bogus';
-  request('/foo/bar', { authorization: authz }, function(res) {
+  request('/foo/bar', { authorization: authz }, function (res) {
     t.equal(res.statusCode, 400);
     t.end();
   }).end();
 });
 
 
-test('query ok', function(t) {
-  SERVER.get('/query/:id', function(req, res, next) {
+test('query ok', function (t) {
+  SERVER.get('/query/:id', function (req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
     t.equal(req.query.name, 'markc');
@@ -118,15 +118,15 @@ test('query ok', function(t) {
     return next();
   });
 
-  request('/query/foo?id=bar&name=markc', function(res) {
+  request('/query/foo?id=bar&name=markc', function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   }).end();
 });
 
 
-test('body url-encoded ok', function(t) {
-  SERVER.post('/bodyurl/:id', plugins.bodyParser(), function(req, res, next) {
+test('body url-encoded ok', function (t) {
+  SERVER.post('/bodyurl/:id', plugins.bodyParser(), function (req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
     t.equal(req.params.phone, '(206) 555-1212');
@@ -144,7 +144,7 @@ test('body url-encoded ok', function(t) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
-  var client = http.request(opts, function(res) {
+  var client = http.request(opts, function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   });
@@ -153,10 +153,10 @@ test('body url-encoded ok', function(t) {
 });
 
 
-test('body url-encoded ok (no params)', function(t) {
+test('body url-encoded ok (no params)', function (t) {
   SERVER.post('/bodyurl2/:id',
               plugins.bodyParser({ mapParams: false }),
-              function(req, res, next) {
+              function (req, res, next) {
                 t.equal(req.params.id, 'foo');
                 t.equal(req.params.name, 'markc');
                 t.notOk(req.params.phone);
@@ -175,7 +175,7 @@ test('body url-encoded ok (no params)', function(t) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   };
-  var client = http.request(opts, function(res) {
+  var client = http.request(opts, function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   });
@@ -184,10 +184,10 @@ test('body url-encoded ok (no params)', function(t) {
 });
 
 
-test('body json ok', function(t) {
+test('body json ok', function (t) {
   SERVER.post('/bodyjson/:id',
               plugins.bodyParser(),
-              function(req, res, next) {
+              function (req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
     t.equal(req.params.phone, '(206) 555-1212');
@@ -205,7 +205,7 @@ test('body json ok', function(t) {
       'Content-Type': 'application/json'
     }
   };
-  var client = http.request(opts, function(res) {
+  var client = http.request(opts, function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   });
@@ -217,10 +217,10 @@ test('body json ok', function(t) {
 });
 
 
-test('body json ok (no params)', function(t) {
+test('body json ok (no params)', function (t) {
   SERVER.post('/bodyjson2/:id',
               plugins.bodyParser({ mapParams: false }),
-              function(req, res, next) {
+              function (req, res, next) {
                 t.equal(req.params.id, 'foo');
                 t.equal(req.params.name, 'markc');
                 t.notOk(req.params.phone);
@@ -239,7 +239,7 @@ test('body json ok (no params)', function(t) {
       'Content-Type': 'application/json'
     }
   };
-  var client = http.request(opts, function(res) {
+  var client = http.request(opts, function (res) {
     t.equal(res.statusCode, 200);
     t.end();
   });
@@ -251,15 +251,16 @@ test('body json ok (no params)', function(t) {
 });
 
 
-test('date expired', function(t) {
-  request('/foo/bar', { date: 'Tue, 15 Nov 1994 08:12:31 GMT' }, function(res) {
+test('date expired', function (t) {
+  var _ = { date: 'Tue, 15 Nov 1994 08:12:31 GMT' };
+  request('/foo/bar', _, function (res) {
     t.equal(res.statusCode, 400);
     res.setEncoding('utf8');
     res.body = '';
-    res.on('data', function(chunk) {
+    res.on('data', function (chunk) {
       res.body += chunk;
     });
-    res.on('end', function() {
+    res.on('end', function () {
       t.equal(JSON.parse(res.body).message, 'Date header is too old');
       t.end();
     });
@@ -267,8 +268,8 @@ test('date expired', function(t) {
 });
 
 
-test('teardown', function(t) {
-  SERVER.close(function() {
+test('teardown', function (t) {
+  SERVER.close(function () {
     t.end();
   });
 });

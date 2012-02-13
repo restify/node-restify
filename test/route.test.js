@@ -10,24 +10,24 @@ var Route = require('../lib/route');
 
 ///--- Tests
 
-test('throws on missing options', function(t) {
-  t.throws(function() {
+test('throws on missing options', function (t) {
+  t.throws(function () {
     return new Route();
   }, new TypeError('options (Object) required'));
   t.end();
 });
 
 
-test('throws on missing log4js', function(t) {
-  t.throws(function() {
+test('throws on missing log4js', function (t) {
+  t.throws(function () {
     return new Route({});
   }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
 
-test('throws on missing url', function(t) {
-  t.throws(function() {
+test('throws on missing url', function (t) {
+  t.throws(function () {
     return new Route({
       log: new Logger({ name: 'restify/test/route' })
     });
@@ -36,8 +36,8 @@ test('throws on missing url', function(t) {
 });
 
 
-test('throws on url wrong type', function(t) {
-  t.throws(function() {
+test('throws on url wrong type', function (t) {
+  t.throws(function () {
     return new Route({
       log: new Logger({ name: 'restify/test/route' }),
       url: 123
@@ -47,20 +47,20 @@ test('throws on url wrong type', function(t) {
 });
 
 
-test('throws on setting url incorrectly', function(t) {
+test('throws on setting url incorrectly', function (t) {
   var r = new Route({
     log: new Logger({ name: 'restify/test/route' }),
     url: '/foo'
   });
-  t.throws(function() {
+  t.throws(function () {
     r.url = 123;
   }, new TypeError('url must be a String'));
   t.end();
 });
 
 
-test('throws on bad handlers (not array)', function(t) {
-  t.throws(function() {
+test('throws on bad handlers (not array)', function (t) {
+  t.throws(function () {
     return new Route({
       log: new Logger({ name: 'restify/test/route' }),
       url: '/foo/bar',
@@ -71,8 +71,8 @@ test('throws on bad handlers (not array)', function(t) {
 });
 
 
-test('throws on bad handlers (not function)', function(t) {
-  t.throws(function() {
+test('throws on bad handlers (not function)', function (t) {
+  t.throws(function () {
     return new Route({
       log: new Logger({ name: 'restify/test/route' }),
       url: '/foo/bar',
@@ -83,7 +83,7 @@ test('throws on bad handlers (not function)', function(t) {
 });
 
 
-test('construct with default method and name', function(t) {
+test('construct with default method and name', function (t) {
   var route = new Route({
     log: new Logger({ name: 'restify/test/route' }),
     url: '/foo/:bar'
@@ -96,7 +96,7 @@ test('construct with default method and name', function(t) {
 });
 
 
-test('construct with explicit method and version', function(t) {
+test('construct with explicit method and version', function (t) {
   var route = new Route({
     log: new Logger({ name: 'restify/test/route' }),
     url: '/foo/:bar',
@@ -111,7 +111,7 @@ test('construct with explicit method and version', function(t) {
   t.end();
 });
 
-test('construct with range versioning', function(t){
+test('construct with range versioning', function (t) {
   var route = new Route({
     log: new Logger({ name: 'restify/test/route' }),
     url: '/foo/:bar',
@@ -121,8 +121,8 @@ test('construct with range versioning', function(t){
   t.end();
 });
 
-test('bad version. Sent range instead', function(t){
-  t.throws(function(){
+test('bad version. Sent range instead', function (t) {
+  t.throws(function () {
     return new Route({
       log: new Logger({ name: 'restify/test/route' }),
       url: '/foo/:bar',
@@ -132,13 +132,13 @@ test('bad version. Sent range instead', function(t){
   t.end();
 });
 
-test('construct with regex url and chain', function(t) {
+test('construct with regex url and chain', function (t) {
   var route = new Route({
     log: new Logger({ name: 'restify/test/route' }),
     url: /foo\/(\w+)/,
     method: 'PUT',
     name: 'PutFoo',
-    handlers: [function(req, res, next) {}]
+    handlers: [function (req, res, next) {}]
   });
   t.ok(route);
   t.ok(route.pattern);
@@ -149,7 +149,7 @@ test('construct with regex url and chain', function(t) {
 });
 
 
-test('test matches no params', function(t) {
+test('test matches no params', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/bar',
@@ -172,7 +172,7 @@ test('test matches no params', function(t) {
 });
 
 
-test('test matches params', function(t) {
+test('test matches params', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:bar',
@@ -195,7 +195,7 @@ test('test matches params', function(t) {
 });
 
 
-test('test matches params url-encoded', function(t) {
+test('test matches params url-encoded', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:bar',
@@ -218,7 +218,7 @@ test('test matches params url-encoded', function(t) {
 });
 
 
-test('test matches multiple params', function(t) {
+test('test matches multiple params', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:one/bar/:two',
@@ -241,7 +241,7 @@ test('test matches multiple params', function(t) {
 });
 
 
-test('test matches regex', function(t) {
+test('test matches regex', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: /^\/foo\/(\w+)$/,
@@ -264,7 +264,7 @@ test('test matches regex', function(t) {
 });
 
 
-test('test matches version', function(t) {
+test('test matches version', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:bar',
@@ -285,7 +285,7 @@ test('test matches version', function(t) {
 });
 
 
-test('run routes', function(t) {
+test('run routes', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:bar',
@@ -294,29 +294,29 @@ test('run routes', function(t) {
   t.ok(route);
   var invoked = 0;
   route.use([
-    function(req, res, next) {
+    function (req, res, next) {
       invoked++;
       return next();
     },
-    function(req, res, next) {
+    function (req, res, next) {
       invoked++;
       return next();
     },
-    function(req, res, next) {
+    function (req, res, next) {
       return next(new Error('foo'));
     }
   ]);
-  route.once('done', function() {
+  route.once('done', function () {
     t.equal(invoked, 2);
     t.end();
   });
 
   // Stub this out
-  route.run({}, { send: function() {} });
+  route.run({}, { send: function () {} });
 });
 
 
-test('toString', function(t) {
+test('toString', function (t) {
   t.equal(new Route({
     log: new Logger({name: 'restify/test/route'}),
     url: '/foo/:bar',

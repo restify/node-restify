@@ -36,7 +36,7 @@ function sendText(req, res, next) {
 
 ///--- Tests
 
-test('setup', function(t) {
+test('setup', function (t) {
   server = restify.createServer({});
   t.ok(server);
 
@@ -57,13 +57,13 @@ test('setup', function(t) {
   server.put('/str/:name', sendText);
   server.post('/str/:name', sendText);
 
-  server.listen(PORT, '127.0.0.1', function() {
+  server.listen(PORT, '127.0.0.1', function () {
     t.end();
   });
 });
 
 
-test('create json client', function(t) {
+test('create json client', function (t) {
   client = restify.createClient({
     url: 'http://127.0.0.1:' + PORT,
     type: 'json'
@@ -74,8 +74,8 @@ test('create json client', function(t) {
 });
 
 
-test('GET json', function(t) {
-  client.get('/json/mcavage', function(err, req, res, obj) {
+test('GET json', function (t) {
+  client.get('/json/mcavage', function (err, req, res, obj) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -85,8 +85,8 @@ test('GET json', function(t) {
 });
 
 
-test('Check error (404)', function(t) {
-  client.get('/' + uuid(), function(err, req, res, obj) {
+test('Check error (404)', function (t) {
+  client.get('/' + uuid(), function (err, req, res, obj) {
     t.ok(err);
     t.ok(err.message);
     t.equal(err.statusCode, 404);
@@ -100,8 +100,8 @@ test('Check error (404)', function(t) {
 });
 
 
-test('HEAD json', function(t) {
-  client.head('/json/mcavage', function(err, req, res) {
+test('HEAD json', function (t) {
+  client.head('/json/mcavage', function (err, req, res) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -110,19 +110,8 @@ test('HEAD json', function(t) {
 });
 
 
-test('POST json', function(t) {
-  client.post('/json/mcavage', { hello: 'foo' }, function(err, req, res, obj) {
-    t.ifError(err);
-    t.ok(req);
-    t.ok(res);
-    t.equivalent(obj, {hello: 'foo'});
-    t.end();
-  });
-});
-
-
-test('PUT json', function(t) {
-  client.post('/json/mcavage', { hello: 'foo' }, function(err, req, res, obj) {
+test('POST json', function (t) {
+  client.post('/json/mcavage', { hello: 'foo' }, function (err, req, res, obj) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -132,7 +121,18 @@ test('PUT json', function(t) {
 });
 
 
-test('create string client', function(t) {
+test('PUT json', function (t) {
+  client.post('/json/mcavage', { hello: 'foo' }, function (err, req, res, obj) {
+    t.ifError(err);
+    t.ok(req);
+    t.ok(res);
+    t.equivalent(obj, {hello: 'foo'});
+    t.end();
+  });
+});
+
+
+test('create string client', function (t) {
   client = restify.createClient({
     url: 'http://127.0.0.1:' + PORT,
     type: 'string'
@@ -143,8 +143,8 @@ test('create string client', function(t) {
 });
 
 
-test('GET text', function(t) {
-  client.get('/str/mcavage', function(err, req, res, data) {
+test('GET text', function (t) {
+  client.get('/str/mcavage', function (err, req, res, data) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -155,8 +155,8 @@ test('GET text', function(t) {
 });
 
 
-test('HEAD text', function(t) {
-  client.head('/str/mcavage', function(err, req, res) {
+test('HEAD text', function (t) {
+  client.head('/str/mcavage', function (err, req, res) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -165,8 +165,8 @@ test('HEAD text', function(t) {
 });
 
 
-test('Check error (404)', function(t) {
-  client.get('/' + uuid(), function(err, req, res, message) {
+test('Check error (404)', function (t) {
+  client.get('/' + uuid(), function (err, req, res, message) {
     t.ok(err);
     t.ok(err.message);
     t.equal(err.statusCode, 404);
@@ -178,8 +178,8 @@ test('Check error (404)', function(t) {
 });
 
 
-test('POST text', function(t) {
-  client.post('/str/mcavage', 'hello=foo', function(err, req, res, data) {
+test('POST text', function (t) {
+  client.post('/str/mcavage', 'hello=foo', function (err, req, res, data) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -190,8 +190,8 @@ test('POST text', function(t) {
 });
 
 
-test('POST text (object)', function(t) {
-  client.post('/str/mcavage', {hello: 'foo'}, function(err, req, res, data) {
+test('POST text (object)', function (t) {
+  client.post('/str/mcavage', {hello: 'foo'}, function (err, req, res, data) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -202,8 +202,8 @@ test('POST text (object)', function(t) {
 });
 
 
-test('PUT text', function(t) {
-  client.put('/str/mcavage', 'hello=foo', function(err, req, res, data) {
+test('PUT text', function (t) {
+  client.put('/str/mcavage', 'hello=foo', function (err, req, res, data) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -214,8 +214,8 @@ test('PUT text', function(t) {
 });
 
 
-test('DELETE text', function(t) {
-  client.del('/str/mcavage', function(err, req, res) {
+test('DELETE text', function (t) {
+  client.del('/str/mcavage', function (err, req, res) {
     t.ifError(err);
     t.ok(req);
     t.ok(res);
@@ -224,7 +224,7 @@ test('DELETE text', function(t) {
 });
 
 
-test('create raw client', function(t) {
+test('create raw client', function (t) {
   client = restify.createClient({
     url: 'http://127.0.0.1:' + PORT,
     type: 'http',
@@ -236,20 +236,20 @@ test('create raw client', function(t) {
 });
 
 
-test('GET raw', function(t) {
-  client.get('/str/mcavage', function(connectErr, req) {
+test('GET raw', function (t) {
+  client.get('/str/mcavage', function (connectErr, req) {
     t.ifError(connectErr);
     t.ok(req);
 
-    req.on('result', function(err, res) {
+    req.on('result', function (err, res) {
       t.ifError(err);
       res.body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         res.body += chunk;
       });
 
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(res.body, 'hello mcavage');
         t.end();
       });
@@ -258,28 +258,28 @@ test('GET raw', function(t) {
 });
 
 
-test('POST raw', function(t) {
+test('POST raw', function (t) {
   var opts = {
     path: '/str/mcavage',
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
     }
   };
-  client.post(opts, function(connectErr, req) {
+  client.post(opts, function (connectErr, req) {
     t.ifError(connectErr);
 
     req.write('hello=snoopy');
     req.end();
 
-    req.on('result', function(err, res) {
+    req.on('result', function (err, res) {
       t.ifError(err);
       res.body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         res.body += chunk;
       });
 
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(res.body, 'hello snoopy');
         t.end();
       });
@@ -297,7 +297,7 @@ test('GH-20 connectTimeout', function (t) {
     retry: false
   });
 
-  client.get('/foo', function(err, req) {
+  client.get('/foo', function (err, req) {
     t.ok(err);
     t.notOk(req);
     t.end();
@@ -305,12 +305,8 @@ test('GH-20 connectTimeout', function (t) {
 });
 
 
-test('teardown', function(t) {
-  server.close(function() {
+test('teardown', function (t) {
+  server.close(function () {
     t.end();
   });
 });
-
-
-
-

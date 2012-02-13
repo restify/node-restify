@@ -28,37 +28,37 @@ var PORT = process.env.UNIT_TEST_PORT || 12345;
 
 ///--- Tests
 
-test('throws on missing options', function(t) {
-  t.throws(function() {
+test('throws on missing options', function (t) {
+  t.throws(function () {
     return new Server();
   }, new TypeError('options (Object) required'));
   t.end();
 });
 
 
-test('throws on missing dtrace', function(t) {
-  t.throws(function() {
+test('throws on missing dtrace', function (t) {
+  t.throws(function () {
     return new Server({});
   }, new TypeError('options.dtrace (Object) required'));
   t.end();
 });
 
 
-test('throws on missing bunyan', function(t) {
-  t.throws(function() {
+test('throws on missing bunyan', function (t) {
+  t.throws(function () {
     return new Server({ dtrace: {} });
   }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
 
-test('ok', function(t) {
+test('ok', function (t) {
   t.ok(new Server({ dtrace: DTRACE, log: LOGGER }));
   t.end();
 });
 
 
-test('ok (ssl)', function(t) {
+test('ok (ssl)', function (t) {
   // Lame, just make sure we go down the https path
   try {
     t.ok(new Server({
@@ -75,37 +75,37 @@ test('ok (ssl)', function(t) {
 });
 
 
-test('listen and close (port only)', function(t) {
+test('listen and close (port only)', function (t) {
   var server = new Server({ dtrace: DTRACE, log: LOGGER });
-  server.listen(PORT, function() {
-    server.close(function() {
+  server.listen(PORT, function () {
+    server.close(function () {
       t.end();
     });
   });
 });
 
 
-test('listen and close (port and hostname)', function(t) {
+test('listen and close (port and hostname)', function (t) {
   var server = new Server({ dtrace: DTRACE, log: LOGGER });
-  server.listen(PORT, '127.0.0.1', function() {
-    server.close(function() {
+  server.listen(PORT, '127.0.0.1', function () {
+    server.close(function () {
       t.end();
     });
   });
 });
 
 
-test('listen and close (socketPath)', function(t) {
+test('listen and close (socketPath)', function (t) {
   var server = new Server({ dtrace: DTRACE, log: LOGGER });
-  server.listen('/tmp/.' + uuid(), function() {
-    server.close(function() {
+  server.listen('/tmp/.' + uuid(), function () {
+    server.close(function () {
       t.end();
     });
   });
 });
 
 
-test('get (path only)', function(t) {
+test('get (path only)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
   server.get('/foo/:id', function tester(req, res, next) {
     t.ok(req.params);
@@ -115,28 +115,28 @@ test('get (path only)', function(t) {
   });
 
   var done = 0;
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
       path: '/foo/bar',
       agent: false
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 200);
       if (++done == 2) {
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       }
     });
   });
 
-  server.on('after', function(req, res) {
+  server.on('after', function (req, res) {
     t.ok(req);
     t.ok(res);
     if (++done == 2) {
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }
@@ -144,7 +144,7 @@ test('get (path only)', function(t) {
 });
 
 
-test('get (path and version ok)', function(t) {
+test('get (path and version ok)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
   server.get({
     url: '/foo/:id',
@@ -157,7 +157,7 @@ test('get (path and version ok)', function(t) {
   });
 
   var done = 0;
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -167,21 +167,21 @@ test('get (path and version ok)', function(t) {
         'accept-version': '~1.2'
       }
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 200);
       if (++done == 2) {
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       }
     });
   });
 
-  server.on('after', function(req, res) {
+  server.on('after', function (req, res) {
     t.ok(req);
     t.ok(res);
     if (++done == 2) {
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }
@@ -189,12 +189,12 @@ test('get (path and version ok)', function(t) {
 });
 
 
-test('get (path and version not ok)', function(t) {
+test('get (path and version not ok)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
   server.get({
     url: '/foo/:id',
     version: '1.2.3'
-  }, function(req, res, next) {
+  }, function (req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
     res.send();
@@ -204,14 +204,14 @@ test('get (path and version not ok)', function(t) {
   server.get({
     url: '/foo/:id',
     version: '1.2.4'
-  }, function(req, res, next) {
+  }, function (req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'bar');
     res.send();
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -222,16 +222,16 @@ test('get (path and version not ok)', function(t) {
         'accept-version': '~2.1'
       }
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 400);
       res.setEncoding('utf8');
       res.body = '';
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         res.body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(res.body, 'GET /foo/bar supports versions: 1.2.3, 1.2.4');
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -240,10 +240,10 @@ test('get (path and version not ok)', function(t) {
 });
 
 
-test('use + get (path only)', function(t) {
+test('use + get (path only)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
   var handler = 0;
-  server.use(function(req, res, next) {
+  server.use(function (req, res, next) {
     handler++;
     return next();
   });
@@ -255,17 +255,17 @@ test('use + get (path only)', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
       path: '/foo/bar',
       agent: false
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 200);
       t.equal(handler, 2);
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     });
@@ -273,14 +273,14 @@ test('use + get (path only)', function(t) {
 });
 
 
-test('rm', function(t) {
+test('rm', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
-  server.get('/foo/:id', function(req, res, next) {
+  server.get('/foo/:id', function (req, res, next) {
     return next();
   });
 
-  server.get('/bar/:id', function(req, res, next) {
+  server.get('/bar/:id', function (req, res, next) {
     t.ok(req.params);
     t.equal(req.params.id, 'foo');
     res.send();
@@ -289,19 +289,19 @@ test('rm', function(t) {
 
   t.ok(server.rm('GET /foo/:id'));
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
       path: '/foo/bar',
       agent: false
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 404);
       opts.path = '/bar/foo';
-      http.get(opts, function(res2) {
+      http.get(opts, function (res2) {
         t.equal(res2.statusCode, 200);
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -310,7 +310,7 @@ test('rm', function(t) {
 });
 
 
-test('405', function(t) {
+test('405', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.post('/foo/:id', function tester(req, res, next) {
@@ -320,17 +320,17 @@ test('405', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
       path: '/foo/bar',
       agent: false
     };
-    http.get(opts, function(res) {
+    http.get(opts, function (res) {
       t.equal(res.statusCode, 405);
       t.equal(res.headers.allow, 'POST');
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     });
@@ -338,7 +338,7 @@ test('405', function(t) {
 });
 
 
-test('PUT ok', function(t) {
+test('PUT ok', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.put('/foo/:id', function tester(req, res, next) {
@@ -348,7 +348,7 @@ test('PUT ok', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -356,9 +356,9 @@ test('PUT ok', function(t) {
       method: 'PUT',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }).end();
@@ -366,7 +366,7 @@ test('PUT ok', function(t) {
 });
 
 
-test('HEAD ok', function(t) {
+test('HEAD ok', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.head('/foo/:id', function tester(req, res, next) {
@@ -376,7 +376,7 @@ test('HEAD ok', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -384,12 +384,12 @@ test('HEAD ok', function(t) {
       method: 'HEAD',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         t.fail('Data was sent on HEAD');
       });
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }).end();
@@ -397,7 +397,7 @@ test('HEAD ok', function(t) {
 });
 
 
-test('DELETE ok', function(t) {
+test('DELETE ok', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.del('/foo/:id', function tester(req, res, next) {
@@ -407,7 +407,7 @@ test('DELETE ok', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -415,12 +415,12 @@ test('DELETE ok', function(t) {
       method: 'DELETE',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 204);
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         t.fail('Data was sent on 204');
       });
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }).end();
@@ -428,7 +428,7 @@ test('DELETE ok', function(t) {
 });
 
 
-test('OPTIONS', function(t) {
+test('OPTIONS', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.get('/foo/:id', function tester(req, res, next) {
@@ -438,7 +438,7 @@ test('OPTIONS', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -446,10 +446,10 @@ test('OPTIONS', function(t) {
       method: 'OPTIONS',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       t.ok(res.headers.allow);
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }).end();
@@ -457,7 +457,7 @@ test('OPTIONS', function(t) {
 });
 
 
-test('RegExp ok', function(t) {
+test('RegExp ok', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.get(/\/foo/, function tester(req, res, next) {
@@ -465,7 +465,7 @@ test('RegExp ok', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -473,9 +473,9 @@ test('RegExp ok', function(t) {
       method: 'GET',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
-      server.close(function() {
+      server.close(function () {
         t.end();
       });
     }).end();
@@ -483,14 +483,14 @@ test('RegExp ok', function(t) {
 });
 
 
-test('GH-56 streaming with filed (download)', function(t) {
+test('GH-56 streaming with filed (download)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.get('/foo.txt', function tester(req, res, next) {
     filed(__filename).pipe(res);
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -498,16 +498,16 @@ test('GH-56 streaming with filed (download)', function(t) {
       method: 'GET',
       agent: false
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.ok(body.length > 0);
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -517,7 +517,7 @@ test('GH-56 streaming with filed (download)', function(t) {
 });
 
 
-test('GH-59 Query params with / result in a 404', function(t) {
+test('GH-59 Query params with / result in a 404', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.get('/', function tester(req, res, next) {
@@ -525,7 +525,7 @@ test('GH-59 Query params with / result in a 404', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -536,16 +536,16 @@ test('GH-59 Query params with / result in a 404', function(t) {
         accept: 'text/plain'
       }
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(body, 'hello');
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -555,7 +555,7 @@ test('GH-59 Query params with / result in a 404', function(t) {
 });
 
 
-test('GH-63 res.send 204 is sending a body', function(t) {
+test('GH-63 res.send 204 is sending a body', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.del('/hello/:name', function tester(req, res, next) {
@@ -563,7 +563,7 @@ test('GH-63 res.send 204 is sending a body', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -574,16 +574,16 @@ test('GH-63 res.send 204 is sending a body', function(t) {
         accept: 'text/plain'
       }
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 204);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.notOk(body);
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -593,10 +593,10 @@ test('GH-63 res.send 204 is sending a body', function(t) {
 });
 
 
-test('GH-64 prerouting chain', function(t) {
+test('GH-64 prerouting chain', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
-  server.pre(function(req, res, next) {
+  server.pre(function (req, res, next) {
     req.headers.accept = 'application/json';
     return next();
   });
@@ -606,7 +606,7 @@ test('GH-64 prerouting chain', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -617,16 +617,16 @@ test('GH-64 prerouting chain', function(t) {
         accept: 'text/plain'
       }
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(body, '\"mark\"');
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -636,10 +636,10 @@ test('GH-64 prerouting chain', function(t) {
 });
 
 
-test('GH-64 prerouting chain with error', function(t) {
+test('GH-64 prerouting chain with error', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
-  server.pre(function(req, res, next) {
+  server.pre(function (req, res, next) {
     return next(new RestError(400, 'BadRequest', 'screw you client'));
   });
 
@@ -648,7 +648,7 @@ test('GH-64 prerouting chain with error', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -659,16 +659,16 @@ test('GH-64 prerouting chain with error', function(t) {
         accept: 'text/plain'
       }
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 400);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(body, 'screw you client');
-        server.close(function() {
+        server.close(function () {
           t.end();
         });
       });
@@ -678,7 +678,7 @@ test('GH-64 prerouting chain with error', function(t) {
 });
 
 
-test('GH-67 extend access-control headers', function(t) {
+test('GH-67 extend access-control headers', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.get('/hello/:name', function tester(req, res, next) {
@@ -690,7 +690,7 @@ test('GH-67 extend access-control headers', function(t) {
     return next();
   });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     var opts = {
       hostname: 'localhost',
       port: PORT,
@@ -701,16 +701,16 @@ test('GH-67 extend access-control headers', function(t) {
         accept: 'text/plain'
       }
     };
-    http.request(opts, function(res) {
+    http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(chunk) {
+      res.on('data', function (chunk) {
         body += chunk;
       });
-      res.on('end', function() {
+      res.on('end', function () {
         t.equal(body, 'mark');
-        server.close(function() {
+        server.close(function () {
           t.ok(res.headers['access-control-allow-headers'].indexOf('If-Match'));
           t.end();
         });
@@ -720,44 +720,43 @@ test('GH-67 extend access-control headers', function(t) {
 
 });
 
-/*
- * Disabled, as Heroku (travis) doesn't allow us to write to /tmp
- *
-test('GH-56 streaming with filed (upload)', function(t) {
-  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
-  var file = '/tmp/.' + uuid();
-  server.put('/foo', function tester(req, res, next) {
-    req.pipe(filed(file)).pipe(res);
-  });
+//
+// Disabled, as Heroku (travis) doesn't allow us to write to /tmp
+//
+// test('GH-56 streaming with filed (upload)', function (t) {
+//   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+//   var file = '/tmp/.' + uuid();
+//   server.put('/foo', function tester(req, res, next) {
+//     req.pipe(filed(file)).pipe(res);
+//   });
 
-  server.listen(PORT, function() {
-    var opts = {
-      hostname: 'localhost',
-      port: PORT,
-      path: '/foo',
-      method: 'PUT',
-      agent: false
-    };
+//   server.listen(PORT, function () {
+//     var opts = {
+//       hostname: 'localhost',
+//       port: PORT,
+//       path: '/foo',
+//       method: 'PUT',
+//       agent: false
+//     };
 
-    var req = http.request(opts, function(res) {
-      t.equal(res.statusCode, 201);
-      res.on('end', function() {
-        fs.readFile(file, 'utf8', function(err, data) {
-          t.ifError(err);
-          t.equal(data, 'hello world');
-          server.close(function() {
-            fs.unlink(file, function() {
-              t.end();
-            });
-          });
-        });
-      });
-    });
+//     var req = http.request(opts, function (res) {
+//       t.equal(res.statusCode, 201);
+//       res.on('end', function () {
+//         fs.readFile(file, 'utf8', function (err, data) {
+//           t.ifError(err);
+//           t.equal(data, 'hello world');
+//           server.close(function () {
+//             fs.unlink(file, function () {
+//               t.end();
+//             });
+//           });
+//         });
+//       });
+//     });
 
-    req.write('hello world');
-    req.end();
-  });
+//     req.write('hello world');
+//     req.end();
+//   });
 
-});
-*/
-
+// });
+//

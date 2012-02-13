@@ -30,13 +30,13 @@ var password = uuid();
 
 //--- Tests
 
-test('setup', function(t) {
+test('setup', function (t) {
   server = restify.createServer({
     dtrace: DTRACE
   });
   t.ok(server);
 
-  server.use(function(req, res, next) {
+  server.use(function (req, res, next) {
     if (req.params.name)
       req.username = req.params.name;
 
@@ -59,12 +59,12 @@ test('setup', function(t) {
     }
   }));
 
-  server.get('/test/:name', function(req, res, next) {
+  server.get('/test/:name', function (req, res, next) {
     res.send();
     return next();
   });
 
-  server.listen(PORT, '127.0.0.1', function() {
+  server.listen(PORT, '127.0.0.1', function () {
     client = createClient({
       dtrace: DTRACE,
       name: 'throttleUnitTest',
@@ -77,8 +77,8 @@ test('setup', function(t) {
 });
 
 
-test('ok', function(t) {
-  client.get('/test/throttleMe', function(err, req, res, body) {
+test('ok', function (t) {
+  client.get('/test/throttleMe', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -86,19 +86,19 @@ test('ok', function(t) {
 });
 
 
-test('throttled', function(t) {
-  client.get('/test/throttleMe', function(err, req, res, body) {
+test('throttled', function (t) {
+  client.get('/test/throttleMe', function (err, req, res, body) {
     t.ok(err);
     t.equal(err.statusCode, 429);
     t.ok(err.message);
     t.equal(res.statusCode, 429);
-    setTimeout(function() { t.end(); }, 2100);
+    setTimeout(function () { t.end(); }, 2100);
   });
 });
 
 
-test('ok after tokens', function(t) {
-  client.get('/test/throttleMe', function(err, req, res, body) {
+test('ok after tokens', function (t) {
+  client.get('/test/throttleMe', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -106,8 +106,8 @@ test('ok after tokens', function(t) {
 });
 
 
-test('override limited', function(t) {
-  client.get('/test/special', function(err, req, res, body) {
+test('override limited', function (t) {
+  client.get('/test/special', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -115,8 +115,8 @@ test('override limited', function(t) {
 });
 
 
-test('override limited (not throttled)', function(t) {
-  client.get('/test/special', function(err, req, res, body) {
+test('override limited (not throttled)', function (t) {
+  client.get('/test/special', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -124,8 +124,8 @@ test('override limited (not throttled)', function(t) {
 });
 
 
-test('override unlimited', function(t) {
-  client.get('/test/admin', function(err, req, res, body) {
+test('override unlimited', function (t) {
+  client.get('/test/admin', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -133,8 +133,8 @@ test('override unlimited', function(t) {
 });
 
 
-test('override unlimited (not throttled)', function(t) {
-  client.get('/test/admin', function(err, req, res, body) {
+test('override unlimited (not throttled)', function (t) {
+  client.get('/test/admin', function (err, req, res, body) {
     t.ifError(err);
     t.equal(res.statusCode, 200);
     t.end();
@@ -142,8 +142,8 @@ test('override unlimited (not throttled)', function(t) {
 });
 
 
-test('teardown', function(t) {
-  server.close(function() {
+test('teardown', function (t) {
+  server.close(function () {
     t.end();
   });
 });

@@ -13,24 +13,24 @@ var getRequest = require('./stubs').getRequest;
 
 ///--- Tests
 
-test('throws on missing options', function(t) {
-  t.throws(function() {
+test('throws on missing options', function (t) {
+  t.throws(function () {
     return new Request();
   }, new TypeError('options (Object) required'));
   t.end();
 });
 
 
-test('throws on missing Logger', function(t) {
-  t.throws(function() {
+test('throws on missing Logger', function (t) {
+  t.throws(function () {
     return new Request({});
   }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
 
-test('throws on missing request', function(t) {
-  t.throws(function() {
+test('throws on missing request', function (t) {
+  t.throws(function () {
     return new Request({
       log: new Logger({name: 'restify/test/request'})
     });
@@ -39,7 +39,7 @@ test('throws on missing request', function(t) {
 });
 
 
-test('properties', function(t) {
+test('properties', function (t) {
   var req = getRequest();
   t.ok(req.contentType);
   t.ok(req.connection);
@@ -55,9 +55,9 @@ test('properties', function(t) {
 });
 
 
-test('accepts', function(t) {
+test('accepts', function (t) {
   var req = getRequest();
-  t.throws(function() {
+  t.throws(function () {
     req.accepts(123);
   }, new TypeError('type (String) required'));
   t.ok(req.accepts('application/json'));
@@ -69,16 +69,16 @@ test('accepts', function(t) {
 });
 
 
-test('header', function(t) {
+test('header', function (t) {
   var req = getRequest();
-  t.throws(function() {
+  t.throws(function () {
     req.header(123);
   }, new TypeError('name (String) required'));
   t.equal(req.header('Content-Type'), 'application/xml; charset=en_us');
   t.end();
 });
 
-test('is', function(t) {
+test('is', function (t) {
   var req = getRequest();
   t.equal(req.contentType, 'application/xml');
   t.ok(req.is('application/xml'));

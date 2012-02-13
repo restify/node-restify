@@ -2,6 +2,7 @@
 
 ## 1.0.0 (not yet released)
 
+- Makefile restructure (use Joyent templates)
 - GH-20 HttpClient connectTimeout.
 - Allow parser plugins to allow "override" params
 - Proper handling of Expect: 100

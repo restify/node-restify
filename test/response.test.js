@@ -16,24 +16,24 @@ var getResponse = require('./stubs').getResponse;
 
 ///--- Tests
 
-test('throws on missing options', function(t) {
-  t.throws(function() {
+test('throws on missing options', function (t) {
+  t.throws(function () {
     return new Response();
   }, new TypeError('options (Object) required'));
   t.end();
 });
 
 
-test('throws on missing Logger', function(t) {
-  t.throws(function() {
+test('throws on missing Logger', function (t) {
+  t.throws(function () {
     return new Response({});
   }, new TypeError('options.log (Object) required'));
   t.end();
 });
 
 
-test('throws on missing response', function(t) {
-  t.throws(function() {
+test('throws on missing response', function (t) {
+  t.throws(function () {
     return new Response({
       log: new Logger({name: 'restify/test/response'})
     });
@@ -42,8 +42,8 @@ test('throws on missing response', function(t) {
 });
 
 
-test('throws on missing request', function(t) {
-  t.throws(function() {
+test('throws on missing request', function (t) {
+  t.throws(function () {
     return new Response({
       log: new Logger({name: 'restify/test/response'}),
       response: {}
@@ -53,8 +53,8 @@ test('throws on missing request', function(t) {
 });
 
 
-test('throws on bad version type', function(t) {
-  t.throws(function() {
+test('throws on bad version type', function (t) {
+  t.throws(function () {
     return new Response({
       log: new Logger({name: 'restify/test/response'}),
       response: {},
@@ -66,7 +66,7 @@ test('throws on bad version type', function(t) {
 });
 
 
-test('properties', function(t) {
+test('properties', function (t) {
   var res = getResponse();
   t.ok(res);
   t.ok(res.code);
@@ -77,15 +77,15 @@ test('properties', function(t) {
 });
 
 
-test('header throws on bad type', function(t) {
-  t.throws(function() {
+test('header throws on bad type', function (t) {
+  t.throws(function () {
     getResponse().header(123);
   }, new TypeError('name (String) required'));
   t.end();
 });
 
 
-test('header (get)', function(t) {
+test('header (get)', function (t) {
   var res = getResponse();
   res.setHeader('foo', 'bar');
   t.equal(res.header('foo'), 'bar');
@@ -94,7 +94,7 @@ test('header (get)', function(t) {
 });
 
 
-test('header (set)', function(t) {
+test('header (set)', function (t) {
   var res = getResponse();
   res.header('foo', 'bar');
   res.set({
@@ -107,9 +107,9 @@ test('header (set)', function(t) {
 });
 
 
-test('send plain string no code', function(t) {
+test('send plain string no code', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'text/plain; charset=UTF-8');
@@ -121,9 +121,9 @@ test('send plain string no code', function(t) {
 });
 
 
-test('send plain string with code', function(t) {
+test('send plain string with code', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 100);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'text/plain; charset=UTF-8');
@@ -135,9 +135,9 @@ test('send plain string with code', function(t) {
 });
 
 
-test('send(json)', function(t) {
+test('send(json)', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -149,9 +149,9 @@ test('send(json)', function(t) {
 });
 
 
-test('json', function(t) {
+test('json', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -162,9 +162,9 @@ test('json', function(t) {
 });
 
 
-test('json with code', function(t) {
+test('json with code', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 100);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -175,9 +175,9 @@ test('json with code', function(t) {
 });
 
 
-test('send(buffer)', function(t) {
+test('send(buffer)', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/octet-stream');
@@ -190,9 +190,9 @@ test('send(buffer)', function(t) {
 });
 
 
-test('send(Error)', function(t) {
+test('send(Error)', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 500);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -204,9 +204,9 @@ test('send(Error)', function(t) {
 });
 
 
-test('send(HttpError)', function(t) {
+test('send(HttpError)', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 409);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -218,9 +218,9 @@ test('send(HttpError)', function(t) {
 });
 
 
-test('send(RestError)', function(t) {
+test('send(RestError)', function (t) {
   var res = getResponse();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 409);
     t.ok(headers);
     t.equal(headers['Content-Type'], 'application/json');
@@ -233,11 +233,11 @@ test('send(RestError)', function(t) {
 });
 
 
-test('check headers', function(t) {
+test('check headers', function (t) {
   var res = getResponse();
   res.methods.push('GET');
   res.defaultHeaders();
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(code, 200);
     t.ok(headers);
     t.equal(headers['Access-Control-Allow-Origin'], '*');
@@ -259,10 +259,10 @@ test('check headers', function(t) {
 });
 
 
-test('GH-68 res.header() shoud take a Date object', function(t) {
+test('GH-68 res.header() shoud take a Date object', function (t) {
   var res = getResponse();
 
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.ok(headers.foo);
     t.ok(/\w{3}, \d{2} \w{3} \d{4} (\d{2}:){2}/.test(headers.foo));
     t.end();
@@ -273,10 +273,10 @@ test('GH-68 res.header() shoud take a Date object', function(t) {
 });
 
 
-test('GH-66 support res.charSet=...', function(t) {
+test('GH-66 support res.charSet=...', function (t) {
   var res = getResponse();
 
-  res.res.on('end', function(code, headers, data) {
+  res.res.on('end', function (code, headers, data) {
     t.equal(headers['Content-Type'], 'text/plain; charset=iso-8859-1');
     t.end();
   });

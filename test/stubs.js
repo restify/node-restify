@@ -51,27 +51,27 @@ module.exports = {
     var stub = new EventEmitter();
     stub.data = [];
     stub._headers = {};
-    stub.writeContinue = function() {};
-    stub.setHeader = function(k, v) {
+    stub.writeContinue = function () {};
+    stub.setHeader = function (k, v) {
       stub._headers[k] = v;
     };
-    stub.getHeader = function(k) {
+    stub.getHeader = function (k) {
       return stub._headers[k];
     };
-    stub.removeHeader = function(k) {
+    stub.removeHeader = function (k) {
       delete stub._headers[k];
     };
-    stub.writeHead = function(status, headers) {
+    stub.writeHead = function (status, headers) {
       if (status)
         stub.statusCode = status;
       if (headers)
         stub._headers = headers;
     };
-    stub.write = function(data) {
+    stub.write = function (data) {
       stub.data.push(data);
     };
-    stub.addTrailers = function() {};
-    stub.end = function(data) {
+    stub.addTrailers = function () {};
+    stub.end = function (data) {
       if (data)
         stub.data.push(data);
       stub.emit('end', stub.statusCode, stub._headers, stub.data);

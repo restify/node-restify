@@ -1,0 +1,55 @@
+#
+# Copyright (c) 2012, Joyent, Inc. All rights reserved.
+#
+# Makefile.deps: Makefile for including common tools as dependencies
+#
+
+#
+# javascriptlint
+#
+JSL_SCRIPT	= deps/javascriptlint/build/install/jsl
+JSL		= python2.6 $(JSL_SCRIPT)
+
+$(JSL_SCRIPT): | deps/javascriptlint/.git
+	cd deps/javascriptlint && make install
+
+deps/javascriptlint/.git:
+	git submodule update --init deps/javascriptlint
+
+#
+# jsstyle
+#
+JSSTYLE_SCRIPT  = deps/jsstyle/jsstyle
+JSSTYLE		= $(JSSTYLE_SCRIPT)
+
+deps/jsstyle/jsstyle:
+	git submodule update --init deps/jsstyle
+
+#
+# cutarelease
+#
+CUTARELEASE_SCRIPT  = deps/cutarelease/cutarelease
+CUTARELEASE		= $(CUTARELEASE_SCRIPT)
+
+deps/cutarelease/curarelease.py:
+	git submodule update --init deps/cutarelease
+
+#
+# restdown
+#
+RESTDOWN	= python2.6 deps/restdown/bin/restdown
+
+$(RESTDOWN): | deps/restdown/.git
+
+deps/restdown/.git:
+	git submodule update --init deps/restdown
+
+#
+# The restdown submodule should be updated before we build "docs".
+#
+docs: $(RESTDOWN)
+
+#
+# JSL and JSSTYLE must be around before we build "check".
+#
+check: $(JSL_SCRIPT) $(JSSTYLE)
