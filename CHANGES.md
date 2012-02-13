@@ -1,6 +1,6 @@
 # restify Changelog
 
-## 1.0.0 (not yet released)
+## 1.0.0
 
 - Makefile restructure (use Joyent templates)
 - GH-20 HttpClient connectTimeout.
