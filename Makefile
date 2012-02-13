@@ -38,5 +38,10 @@ setup: $(NPM)
 test: setup $(TAP)
 	$(TAP) test/*.test.js
 
+.PHONY: cutarelease
+cutarelease:
+	./deps/cutarelease/cutarelease.py -v --dry-run -p restify -f package.json
+
+
 include ./Makefile.deps
 include ./Makefile.targ
