@@ -553,9 +553,7 @@ the <code>Route</code> object that ran.  Note that when you are using the defaul
 404/405/BadVersion handlers, this event will still be fired, but route will
 be <code>null</code>.</p>
 
-<h3>Properties and other methods</h3>
-
-<h4>Properties</h4>
+<h3>Properties</h3>
 
 <p>A restify server has the following properties on it:</p>
 
@@ -570,21 +568,21 @@ be <code>null</code>.</p>
 </tbody>
 </table>
 
-<h4>Methods</h4>
+<h3>Other Methods</h3>
 
-<h5>address()</h5>
+<h4>address()</h4>
 
 <p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#server.address">address()</a>.</p>
 
-<h5>listen(port, [host], [callback]) or listen(path, [callback])</h5>
+<h4>listen(port, [host], [callback]) or listen(path, [callback])</h4>
 
 <p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.listen">listen()</a>.</p>
 
-<h5>close()</h5>
+<h4>close()</h4>
 
 <p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.close">close()</a>.</p>
 
-<h5>pre()</h5>
+<h4>pre()</h4>
 
 <p>Allows you to add in handlers that run <em>before</em> routing occurs. This gives you
 a hook to change request headers and the like if you need to. Note that
@@ -596,7 +594,7 @@ a hook to change request headers and the like if you need to. Note that
 });
 </code></pre>
 
-<h5>use()</h5>
+<h4>use()</h4>
 
 <p>Allows you to add in handlers that run no matter what the route.</p>
 
@@ -609,7 +607,7 @@ a hook to change request headers and the like if you need to. Note that
 <li>Authorization header parsing</li>
 <li>Date header parsing</li>
 <li>Query string parsing</li>
-<li>Body parsing (JSON/URL-encoded)</li>
+<li>Body parsing (JSON/URL-encoded/multipart form)</li>
 <li>Throttling</li>
 <li>Conditional request handling</li>
 <li>Audit logger</li>
@@ -702,8 +700,9 @@ in the options object:</p>
 <h3>BodyParser</h3>
 
 <p>Blocks your chain on reading and parsing the HTTP request body.  Switches on
-<code>Content-Type</code> and does the appropriate logic.  <code>application/json</code> and
-<code>application/x-www-form-urlencoded</code> are currently supported.</p>
+<code>Content-Type</code> and does the appropriate logic.  <code>application/json</code>,
+<code>application/x-www-form-urlencoded</code> and <code>multipart/form-data</code> are currently
+supported.</p>
 
 <pre><code>server.use(restify.bodyParser({ mapParams: false }));
 </code></pre>
@@ -1268,8 +1267,13 @@ friends buffer requests/responses.</p>
 
 <p>All clients support retry with exponential backoff for getting a TCP
 connection; they do not perform retries on 5xx error codes like
-previous versions of the restify client.  Here's an example of hitting
-the <a href="https://api.us-west-1.joyentcloud.com">Joyent CloudAPI</a>:</p>
+previous versions of the restify client.  You can set <code>retry</code> to <code>false</code> to
+disable this logic altogether.  Also, all clients support a <code>connectTimeout</code>
+field, which is use <em>on each retry</em>.  The default is not to set a
+<code>connectTimeout</code>, so you end up with the node.js socket defaults.</p>
+
+<p>Here's an example of hitting the
+<a href="https://api.us-west-1.joyentcloud.com">Joyent CloudAPI</a>:</p>
 
 <pre><code>var restify = require('restify');
 
@@ -1339,14 +1343,15 @@ it will be an <code>HttpError</code>.</p>
 <table>
 <tbody>
 <tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
-<tr><td>url</td><td>String</td><td>Fully-qualified URL to connect to</td></tr>
-<tr><td>headers</td><td>Object</td><td>HTTP headers to set in all requests</td></tr>
 <tr><td>accept</td><td>String</td><td>Accept header to send</td></tr>
+<tr><td>connectTimeout</td><td>Number</td><td>Amount of time to wait for a socket</td></tr>
+<tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
+<tr><td>headers</td><td>Object</td><td>HTTP headers to set in all requests</td></tr>
+<tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
+<tr><td>retry</td><td>Object</td><td>options to provide to node-retry; defaults to 3 retries</td></tr>
+<tr><td>url</td><td>String</td><td>Fully-qualified URL to connect to</td></tr>
 <tr><td>userAgent</td><td>String</td><td>user-agent string to use; restify inserts one, but you can override it</td></tr>
 <tr><td>version</td><td>String</td><td>semver string to set the accept-version</td></tr>
-<tr><td>retry</td><td>Object</td><td>options to provide to node-retry; defaults to 3 retries</td></tr>
-<tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
-<tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
 </tbody>
 </table>
 
