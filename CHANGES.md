@@ -2,6 +2,10 @@
 
 ## 1.0.0-rc3 (not yet released)
 
+
+- Allow parser plugins to allow "override" params
+- Proper handling of Expect: 100
+- multipart/form-data plugin
 - Added a 'header' event on res.writeHead
 - GH-72 Wrong server name in response header on 404/405/...
 - RegExp mounts throw a TypeError
