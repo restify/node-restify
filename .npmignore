@@ -1,0 +1,12 @@
+.dir-locals.el
+.git*
+.travis.yml
+build
+deps
+docs
+examples
+node_modules
+tools
+Makefile*
+*.tar.gz
+*.log

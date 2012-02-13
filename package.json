@@ -12,8 +12,7 @@
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.0.0-1-rc3",
-  "publishConfig": { "tag": "beta" },
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -42,6 +41,6 @@
     "tap": "0.2.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/tap ./tst/*.test.js"
+    "test": "./node_modules/.bin/tap ./test/*.test.js"
   }
 }
