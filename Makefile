@@ -40,7 +40,7 @@ test: setup $(TAP)
 
 .PHONY: cutarelease
 cutarelease:
-	./deps/cutarelease/cutarelease.py -v --dry-run -p restify -f package.json
+	./deps/cutarelease/cutarelease.py -v -p restify -f package.json
 
 
 include ./Makefile.deps
