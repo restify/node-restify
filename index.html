@@ -1,1 +1,1615 @@
-guide.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>API Guide | restify</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="media/css/restdown.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+</head>
+<body>
+<div id="header">
+    <h1>API Guide | restify Documentation</h1>
+</div>
+
+    <div id="sidebar">
+<ul>
+  <li><div><a href="#installation">Installation</a></div></li>
+  <li><div><a href="#server-api">Server API</a></div>
+  <ul>
+    <li><div><a href="#Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></a></div></li>
+    <li><div><a href="#Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></a></div></li>
+    <li><div><a href="#Routing"><span class="method name"><span class="name">Routing</span></span></a></div></li>
+    <li><div><a href="#Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></a></div></li>
+    <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
+    <li><div><a href="#Server-API"><span class="method name"><span class="name">Server API</span></span></a></div></li>
+    <li><div><a href="#Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></a></div></li>
+    <li><div><a href="#Request-API"><span class="method name"><span class="name">Request API</span></span></a></div></li>
+    <li><div><a href="#Response-API"><span class="method name"><span class="name">Response API</span></span></a></div></li>
+    <li><div><a href="#DTrace"><span class="method name"><span class="name">DTrace</span></span></a></div></li>
+  </ul></li>
+  <li><div><a href="#client-api">Client API</a></div>
+  <ul>
+    <li><div><a href="#JsonClient"><span class="method name"><span class="name">JsonClient</span></span></a></div></li>
+    <li><div><a href="#StringClient"><span class="method name"><span class="name">StringClient</span></span></a></div></li>
+    <li><div><a href="#HttpClient"><span class="method name"><span class="name">HttpClient</span></span></a></div></li>
+  </ul></li>
+</ul>
+
+    </div>
+    <div id="content">
+
+<h1>About restify</h1>
+<div class="intro">
+
+
+<p>restify is a node.js module built specifically to enable you to build correct
+REST web services.  It borrows heavily from <a href="http://expressjs.com/">express</a>
+(intentionally) as that is more or less the de facto API for writing
+web applications on top of node.js.</p>
+
+<h2>Why use restify and not express?</h2>
+
+<p>I get asked this more than anything else, so I'll just get it out of
+the way up front.</p>
+
+<p>Express' use case is targeted at browser applications, and contains a
+lot of functionality (i.e., templating/rendering) to support that.
+Restify does not.  Restify exists to let you build "strict" API
+services that are maintanable and observable; restify comes with automatic
+<a href="http://en.wikipedia.org/wiki/DTrace">DTrace</a> support for all your
+handlers, if you're running on a platform that supports DTrace.</p>
+
+<p>In short, I wrote restify as I needed a framework that
+gave me absolute control over interactions with HTTP and full
+observability into the latency and characteristics of my
+applications.  If you don't need that, or don't care about those
+aspect(s), then it's probably not for you.</p>
+
+<h2>About this guide</h2>
+
+<p>This guide provides comprehensive documentation on writing a REST api (server)
+with restify, writing clients that easily consume REST APIs, and on
+the DTrace integration present in restify.</p>
+
+<p>Note this documentation refers to the 1.0.X version(s) of restify;
+these versions are not backwards-compatible with the 0.5 versions.</p>
+
+<h2>Conventions</h2>
+
+<p>Any content formatted like this:</p>
+
+<pre class="shell"><code>curl localhost:8080
+</code></pre>
+
+<p>is a command-line example that you can run from a shell.  All other examples
+and information is formatted like this:</p>
+
+<pre><code>GET /foo HTTP/1.1
+</code></pre>
+
+
+</div>
+<h1 id="installation">Installation</h1>
+
+<pre class="shell"><code>npm install restify
+</code></pre>
+
+<h1 id="server-api">Server API</h1>
+
+<p>The most barebones echo server:</p>
+
+<pre><code>var restify = require('restify');
+
+function respond(req, res, next) {
+  res.send('hello ' + req.params.name);
+}
+
+var server = restify.createServer();
+server.get('/hello/:name', respond);
+server.head('/hello/:name', respond);
+
+server.listen(8080, function() {
+  console.log('%s listening at %s', server.name, server.url);
+});
+</code></pre>
+
+<p>Try hitting that with the following curl commands to get a feel for
+what restify is going to turn that into:</p>
+
+<pre class="shell"><code>curl -is http://localhost:8080/hello/mark -H 'accept: text/plain'
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
+Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Server: restify
+X-Request-Id: b0cec85c-cc17-4985-8f2f-7787ad6e3512
+Date: Fri, 30 Dec 2011 20:09:36 GMT
+X-Response-Time: 1
+Content-Type: text/plain
+Content-Length: 10
+Content-MD5: pvc6+Tyy1EBQgBWaN1v+eQ==
+Connection: close
+
+hello mark
+
+$ curl -is http://localhost:8080/hello/mark
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
+Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Server: restify
+X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
+Date: Fri, 30 Dec 2011 20:11:17 GMT
+X-Response-Time: 1
+Content-Type: application/json
+Content-Length: 12
+Content-MD5: UxC9l75x6aHfos8MhdrDLg==
+Connection: close
+
+"hello mark"
+
+$ curl -is http://localhost:8080 -X HEAD
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
+Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Server: restify
+X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
+Date: Fri, 30 Dec 2011 20:11:17 GMT
+X-Response-Time: 1
+Content-Type: application/json
+Content-Length: 12
+Content-MD5: UxC9l75x6aHfos8MhdrDLg==
+Connection: close
+</code></pre>
+
+<p>Note that all of those headers are set automatically IFF you don't set
+them explicitly (or register a <code>defaultResponseHeaders</code> function).</p>
+
+<h2 id="Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></h2>
+
+<p>Creating a server is straightforward, as you simply invoke the
+<code>createServer</code> API, which takes an options object with the options
+below (and <code>listen()</code> takes the same arguments as node's
+<a href="http://nodejs.org/docs/latest/api/http.html#server.listen">http.Server.listen</a>):</p>
+
+<pre><code>var restify = require('restify');
+
+var server = restify.createServer({
+  certificate: ...,
+  key: ...,
+  name: 'MyApp',
+});
+
+server.listen(8080);
+</code></pre>
+
+<table>
+<tbody>
+<tr><td><strong>Option</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>certificate</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
+<tr><td>key</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
+<tr><td>formatters</td><td>Object</td><td>Custom response formatters for <code>res.send()</code></td></tr>
+<tr><td>log</td><td>Object</td><td>You can optionally pass in a <a href="https://github.com/trentm/node-bunyan">bunyan</a> instance; not required</td></tr>
+<tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, and also will name the DTrace provider; default is <code>restify</code></td></tr>
+<tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
+</tbody>
+</table>
+
+<h2 id="Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></h2>
+
+<p>A restify server has a <code>use()</code> method on it, which takes handlers of
+the form <code>function (req, res, next)</code>.   Note that restify runs
+handlers in the order they are registered on a server, so if you want
+some common handlers to run before any of your routes, issue calls to
+<code>use()</code> before defining routes.</p>
+
+<p>Note that in all calls to <code>use()</code> and the routes below, you can pass
+in any combination of <code>function(res, res, next)</code> and
+<code>[function(req, res, next)]</code> (i.e., direct functions and arrays of functions).</p>
+
+<h2 id="Routing"><span class="method name"><span class="name">Routing</span></span></h2>
+
+<p>restify routing, in 'basic' mode, is pretty much identical to express/sinatra,
+in that HTTP verbs are used with a parameterized resource to determine
+what chain of handlers to run.  Values associated with named
+placeholders are available in <code>req.params</code>. Note that values will be
+URL-decoded before being passed to you.</p>
+
+<pre><code> function send(req, res, next) {
+   res.send(hello ' + req.params.name);
+   return next();
+ }
+
+ server.post('/hello', function create(req, res, next) {
+   res.send(201, Math.random().toString(36).substr(3, 8));
+   return next();
+ });
+ server.put('/hello', send);
+ server.get('/hello/:name', send);
+ server.head('/hello/:name', send);
+ server.del('hello/:name', function rm(req, res, next) {
+   res.send(204);
+   return next();
+ });
+</code></pre>
+
+<p>You can also pass in a <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/RegExp">RegExp</a>
+object and access the capture group with <code>req.params</code> (which will not
+be interpreted in any way):</p>
+
+<pre><code>server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {
+  console.log(req.params[0]);
+  console.log(req.params[1]);
+  res.send(200);
+  return next();
+});
+</code></pre>
+
+<p>Here any request like:</p>
+
+<pre class="shell"><code>curl localhost:8080/foo/my/cats/name/is/gandalf
+</code></pre>
+
+<p>Would result in <code>req.params[0]</code> being <code>foo</code> and <code>req.params[1]</code> being
+<code>my/cats/name/is/gandalf</code>.  Basically, you can do whatever you want.</p>
+
+<h3>Versioned Routes</h3>
+
+<p>Most REST APIs tend to need versioning, and restify ships with support
+for <a href="http://semver.org/">semver</a> versioning in an <code>Accept-Version</code>
+header, the same way you specify NPM version dependencies:</p>
+
+<pre><code>var restify = require('restify');
+
+var server = restify.createServer();
+
+function sendV1(req, res, next) {
+  res.send('hello: ' + req.params.name);
+  return next();
+}
+
+function sendV2(req, res, next) {
+  res.send({hello: req.params.name});
+  return next();
+}
+
+var PATH = '/hello/:name';
+server.get({path: PATH, version: '1.1.3'}, sendV1);
+server.get({path: PATH, version: '2.0.0'}, sendV2);
+
+server.listen(8080);
+</code></pre>
+
+<p>Try hitting with:</p>
+
+<pre class="shell"><code>curl -s localhost:8080/hello/mark
+"hello: mark"
+$ curl -s -H 'accept-version: ~1' localhost:8080/hello/mark
+"hello: mark"
+$ curl -s -H 'accept-version: ~2' localhost:8080/hello/mark
+{"hello":"mark"}
+$ curl -s -H 'accept-version: ~3' localhost:8080/hello/mark | json
+{
+  "code": "InvalidVersion",
+  "message": "GET /hello/mark supports versions: 1.1.3, 2.0.0"
+}
+</code></pre>
+
+<p>In the first case, we didn't specify an <code>Accept-Version</code> header
+at all, so restify treats that like sending a <code>*</code>. Much as not sending
+an <code>Accept</code> header means the client gets the server's choice. Restify
+will choose the first matching route, in the order specified in the
+code. In the second case, we explicitly asked for for V1, which got
+us the same response, but then we asked for V2 and got back JSON.  Finally,
+we asked for a version that doesn't exist and got an error (notably,
+we didn't send an <code>Accept</code> header, so we got a JSON response).  Which
+segues us nicely into content negotiation.</p>
+
+<p>You can default the versions on routes by passing in a version field at
+server creation time.  Lastly, you can support multiple versions in the API
+by using an array:</p>
+
+<pre><code>  server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
+</code></pre>
+
+<h2 id="Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></h2>
+
+<p>If you're using <code>res.send()</code> restify will automatically select the
+content-type to respond with, by finding the first registered
+<code>formatter</code> defined.  Note in the examples above we've not defined any
+formatters, so we've been leveraging the fact that restify ships with
+<code>application/json</code>,  <code>text/plain</code> and <code>application/octet-stream</code>
+formatters.  You can add additional formatters to restify by passing
+in a hash of content-type -> parser at server creation time:</p>
+
+<pre><code>var server = restify.createServer({
+  formatters: {
+    'application/foo': function formatFoo(req, res, body) {
+      if (body instanceof Error)
+        return body.stack;
+
+      if (Buffer.isBuffer(body))
+        return body.toString('base64');
+
+      return util.inspect(body);
+    }
+  }
+});
+</code></pre>
+
+<p>You can do whatever you want, but you probably want to check the type
+of <code>body</code> to figure out what type it is, notably for
+Error/Buffer/everything else.  You can always add more formatters
+later by just setting the formatter on <code>server.formatters</code>, but it's
+probably sane to just do it at construct time.   Also, note that if a
+content-type can't be negotiated, the default is
+<code>application/octet-stream</code>.  Of course, you can always explicitly set
+the content-type to return by setting it on <code>res.contentType</code>:</p>
+
+<pre><code>res.contentType = 'application/foo';
+res.send({hello: 'world'});
+</code></pre>
+
+<p>Lastly, you don't have to use any of this magic, as a restify response
+object has all the "raw" methods of a node
+<a href="http://nodejs.org/docs/latest/api/http.html#http.ServerResponse">ServerResponse</a>
+ on it as well.</p>
+
+<pre><code>var body = 'hello world';
+res.writeHead(200, {
+  'Content-Length': Buffer.byteLength(body),
+  'Content-Type': 'text/plain'
+});
+res.write(body);
+res.end();
+</code></pre>
+
+<h2 id="Error-handling"><span class="method name"><span class="name">Error handling</span></span></h2>
+
+<p>You can handle errors in restify a few different ways.  First, you can
+always just call <code>res.send(err)</code>.  You can also shorthand this in a
+route by doing:</p>
+
+<pre><code>server.get('/hello/:name', function(req, res, next) {
+  return database.get(req.params.name, function(err, user) {
+    if (err)
+      return next(err);
+
+    res.send(user);
+    return next();
+  });
+});
+</code></pre>
+
+<p>If you invoke <code>res.send()</code> with an error that has a <code>statusCode</code>
+attribute, that will be used, otherwise a default of 500 will be used
+(unless you're using <code>res.send(4xx, new Error('blah))</code>).</p>
+
+<h3>HttpError</h3>
+
+<p>Now the obvious question is what that exactly does (in either case).
+restify tries to be programmer-friendly with errors by exposing all
+HTTP status codes as a subclass of <code>HttpError</code>.  So, for example, you can
+do this:</p>
+
+<pre><code>server.get('/hello/:name', function(req, res, next) {
+  return next(new restify.ConflictError("I just don't like you"));
+});
+
+$ curl -is -H 'accept: text/*' localhost:8080/hello/mark
+HTTP/1.1 409 Conflict
+Content-Type: text/plain
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
+Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Connection: close
+Content-Length: 21
+Content-MD5: up6uNh2ejV/C6JUbLlvsiw==
+Date: Tue, 03 Jan 2012 00:24:48 GMT
+Server: restify
+X-Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
+X-Response-Time: 1
+
+I just don't like you
+</code></pre>
+
+<p>The core thing to note about an <code>HttpError</code> is that it has a numeric
+code (statusCode) and a <code>body</code>.  The statusCode will automatically
+set the HTTP response status code, and the body attribute by default
+will be the message.</p>
+
+<p>All status codes between 400 and 5xx are automatically converted into
+an HttpError with the name being 'PascalCase' and spaces removed.  For
+the complete list, take a look at the
+<a href="https://github.com/joyent/node/blob/v0.6/lib/http.js#L152-205">node source</a>.</p>
+
+<p>From that code above <code>418: I'm a teapot</code> would be <code>ImATeapotError</code>, as
+an example.</p>
+
+<h3>RestError</h3>
+
+<p>Now, a common problem with REST APIs and HTTP is that they often end
+up needing to overload 400 and 409 to mean a bunch of different
+things.  There's no real standard on what to do in these cases, but in
+general you want machines to be able to (safely) parse these things
+out, and so restify defines a convention of a <code>RestError</code>.  A
+<code>RestError</code> is a subclass of one of the particular <code>HttpError</code> types,
+and additionally sets the body attribute to be a JS object with the
+attributes <code>code</code> and <code>message</code>.  For example, here's a built-in RestError:</p>
+
+<pre><code>var server = restify.createServer();
+server.get('/hello/:name', function(req, res, next) {
+  return next(new restify.InvalidArgumentError("I just don't like you"));
+});
+
+$ curl -is localhost:8080/hello/mark | json
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
+Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Connection: close
+Content-Length: 60
+Content-MD5: MpEcO5EQFUZ2MNeUB2VaZg==
+Date: Tue, 03 Jan 2012 00:50:21 GMT
+Server: restify
+X-Request-Id: bda456dd-2fe4-478d-809c-7d159d58d579
+X-Response-Time: 3
+
+{
+  "code": "InvalidArgument",
+  "message": "I just don't like you"
+}
+</code></pre>
+
+<p>The built-in restify errors are:</p>
+
+<ul>
+<li>RestError</li>
+<li>BadDigestError</li>
+<li>BadMethodError</li>
+<li>InternalErrorError</li>
+<li>InvalidArgumentError</li>
+<li>InvalidContentError</li>
+<li>InvalidCredentialsError</li>
+<li>InvalidHeaderError</li>
+<li>InvalidVersionError</li>
+<li>MissingParameterError</li>
+<li>NotAuthorizedError</li>
+<li>RequestExpiredError</li>
+<li>RequestThrottledError</li>
+<li>ResourceNotFoundError</li>
+<li>WrongAcceptError</li>
+</ul>
+
+<p>You can always add your own by subclassing <code>restify.RestError</code> like:</p>
+
+<pre><code>var restify = require('restify');
+var util = require('util');
+
+function MyError(message) {
+  restify.RestError.call(this, 418, 'MyError', message, MyError);
+  this.name = 'MyError';
+};
+util.inherits(MyError, restify.RestError);
+</code></pre>
+
+<p>Basically, a <code>RestError</code> takes a statusCode, a restCode, a message,
+and a "constructorOpt" so that V8 correctly omits your code
+from the stack trace (you don't <em>have</em> to do that, but you probably
+want it).  In the example above, we also set the name property so
+<code>console.log(new MyError());</code> looks correct.</p>
+
+<h2 id="Server-API"><span class="method name"><span class="name">Server API</span></span></h2>
+
+<h3>Events</h3>
+
+<p>Restify servers emit all the events from the node
+<a href="http://nodejs.org/docs/latest/api/http.html#http.Server">http.Server</a>
+and has several other events you want to listen on.</p>
+
+<h5>Event: 'NotFound'</h5>
+
+<p><code>function (request, response) {}</code></p>
+
+<p>When a client request is sent for a URL that does not exist, restify
+will emit this event. Note that restify checks for listeners on this
+event, and if there are none, responds with a default 404 handler.  It
+is expected that if you listen for this event, you respond to the client.</p>
+
+<h4>Event: 'MethodNotAllowed'</h4>
+
+<p><code>function (request, response) {}</code></p>
+
+<p>When a client request is sent for a URL that does exist, but you have
+not registered a route for that HTTP verb, restify will emit this
+event. Note that restify checks for listeners on this event, and if
+there are none, responds with a default 405 handler.  It
+is expected that if you listen for this event, you respond to the client.</p>
+
+<h4>Event: 'VersionNotAllowed'</h4>
+
+<p><code>function (request, response) {}</code></p>
+
+<p>When a client request is sent for a route that exists, but does not
+match the version(s) on those routes, restify will emit this
+event. Note that restify checks for listeners on this event, and if
+there are none, responds with a default 400 handler.  It
+is expected that if you listen for this event, you respond to the client.</p>
+
+<h4>Event: 'after'</h4>
+
+<p><code>function (request, response, route) {}</code></p>
+
+<p>Emitted after a route has finished all the handlers you registered.
+You can use this to write audit logs, etc.  The route parameter will be
+the <code>Route</code> object that ran.  Note that when you are using the default
+404/405/BadVersion handlers, this event will still be fired, but route will
+be <code>null</code>.</p>
+
+<h3>Properties</h3>
+
+<p>A restify server has the following properties on it:</p>
+
+<table>
+<tbody>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>name</td><td>String</td><td>name of the server</td></tr>
+<tr><td>version</td><td>String</td><td>default version to use in all routes</td></tr>
+<tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
+<tr><td>acceptable</td><td>Array(String)</td><td>list of content-types this server can respond with</td></tr>
+<tr><td>url</td><td>String</td><td>Once listen() is called, this will be filled in with where the server is running</td></tr>
+</tbody>
+</table>
+
+<h3>Other Methods</h3>
+
+<h4>address()</h4>
+
+<p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#server.address">address()</a>.</p>
+
+<h4>listen(port, [host], [callback]) or listen(path, [callback])</h4>
+
+<p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.listen">listen()</a>.</p>
+
+<h4>close()</h4>
+
+<p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.close">close()</a>.</p>
+
+<h4>pre()</h4>
+
+<p>Allows you to add in handlers that run <em>before</em> routing occurs. This gives you
+a hook to change request headers and the like if you need to. Note that
+<code>req.params</code> will be undefined, as that's filled in _after_ routing.</p>
+
+<pre><code>server.pre(function(req, res, next) {
+  req.headers.accept = 'application/json';  // screw you client!
+  return next();
+});
+</code></pre>
+
+<h4>use()</h4>
+
+<p>Allows you to add in handlers that run no matter what the route.</p>
+
+<h2 id="Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></h2>
+
+<p>restify ships with several handlers you can use, specifically:</p>
+
+<ul>
+<li>Accept header parsing</li>
+<li>Authorization header parsing</li>
+<li>Date header parsing</li>
+<li>Query string parsing</li>
+<li>Body parsing (JSON/URL-encoded/multipart form)</li>
+<li>Throttling</li>
+<li>Conditional request handling</li>
+<li>Audit logger</li>
+</ul>
+
+<p>Here's some example code using all the shipped plugins:</p>
+
+<pre><code>var server = restify.createServer();
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.authorizationParser());
+server.use(restify.dateParser());
+server.use(restify.queryParser());
+server.use(restify.bodyParser());
+server.use(restify.throttle({
+  burst: 100,
+  rate: 50,
+  ip: true,
+  overrides: {
+    '192.168.1.1': {
+      rate: 0,        // unlimited
+      burst: 0
+    }
+  }
+}));
+server.use(restify.conditionalRequest());
+</code></pre>
+
+<h3>Accept Parser</h3>
+
+<p>Parses out the <code>Accept</code> header, and ensures that the server can respond to what
+the client asked for.  You almost always want to just pass in
+<code>server.acceptable</code> here, as that's an array of content types the server knows
+how to respond to (with the formatters you've registered).  If the request is
+for a non-handled type, this plugin will return an error of <code>406</code>.</p>
+
+<pre><code>server.use(restify.acceptParser(server.acceptable));
+</code></pre>
+
+<h3>Authorization Parser</h3>
+
+<pre><code>server.use(restify.authorizationParser());
+</code></pre>
+
+<p>Parses out the <code>Authorization</code> header as best restify can.  Currently only
+HTTP Basic Auth and
+<a href="https://github.com/joyent/node-http-signature">HTTP Signature</a>
+schemes are supported.   When this is used, <code>req.authorization</code> will be set
+to something like:</p>
+
+<pre><code>{
+  scheme: &lt;Basic|Signature|...&gt;,
+  credentials: &lt;Undecoded value of header&gt;,
+  basic: {
+    username: $user
+    password: $password
+  }
+}
+</code></pre>
+
+<p><code>req.username</code> will also be set, and defaults to 'anonymous'.  If the scheme
+is unrecognized, the only thing avaiable in <code>req.authorization</code> will be
+<code>scheme</code> and <code>credentials</code> - it will be up to you to parse out the rest.</p>
+
+<h3>Date Parser</h3>
+
+<pre><code>server.use(restify.dateParser());
+</code></pre>
+
+<p>Parses out the HTTP Date header (if present) and checks for clock skew (default
+allowed clock skew is 300s, like Kerberos).  You can pass in a number, which is
+interpreted in seconds, to allow for clock skew.</p>
+
+<pre><code>// Allows clock skew of 1m
+server.use(restify.dateParser(60));
+</code></pre>
+
+<h3>QueryParser</h3>
+
+<pre><code>server.use(restify.queryParser());
+</code></pre>
+
+<p>Parses the HTTP query string (i.e., <code>/foo?id=bar&amp;name=mark</code>).  If you use this,
+the parsed content will always be available in <code>req.query</code>, additionally params
+are merged into <code>req.params</code>.  You can disable by passing in <code>mapParams: false</code>
+in the options object:</p>
+
+<pre><code>server.use(restify.queryParser({ mapParams: false }));
+</code></pre>
+
+<h3>BodyParser</h3>
+
+<p>Blocks your chain on reading and parsing the HTTP request body.  Switches on
+<code>Content-Type</code> and does the appropriate logic.  <code>application/json</code>,
+<code>application/x-www-form-urlencoded</code> and <code>multipart/form-data</code> are currently
+supported.</p>
+
+<pre><code>server.use(restify.bodyParser({ mapParams: false }));
+</code></pre>
+
+<p>You can pass in an options object; currently the only parameter honored is
+<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from
+the request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with
+the parsed object.  The default is to map params into <code>req.params</code>.</p>
+
+<h3>Throttle</h3>
+
+<p>restify ships with a fairly comprehensive implementation of
+<a href="http://en.wikipedia.org/wiki/Token_bucket">Token bucket</a>, with the ability to
+throttle on IP (or x-forwarded-for) and username (from <code>req.username</code>).  You
+define "global" request rate and burst rate, and you can define overrides for
+specific keys.  Note that you can always place this on per-URL routes to enable
+different request rates to different resources (if for example, one route, like
+<code>/my/slow/database</code> is much easier to overwhlem than <code>/my/fast/memcache</code>).</p>
+
+<pre><code>server.use(restify.throttle({
+  burst: 100,
+  rate: 50,
+  ip: true,
+  overrides: {
+    '192.168.1.1': {
+      rate: 0,        // unlimited
+      burst: 0
+    }
+  }
+}));
+</code></pre>
+
+<p>If a client has consumed all of their available rate/burst, an HTTP response
+code of <code>429</code>
+<a href="http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4">Too Many Requests</a>
+is returned.</p>
+
+<p>Options:</p>
+
+<table>
+<tbody>
+<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>rate</td><td>Number</td><td>Steady state number of requests/second to allow</td></tr>
+<tr><td>burst</td><td>Number</td><td>If available, the amount of requests to burst to</td></tr>
+<tr><td>ip</td><td>Boolean</td><td>Do throttling on a /32 (source IP)</td></tr>
+<tr><td>xff</td><td>Boolean</td><td>Do throttling on a /32 (X-Forwarded-For)</td></tr>
+<tr><td>username</td><td>Boolean</td><td>Do throttling on <code>req.username</code></td></tr>
+<tr><td>overrides</td><td>Object</td><td>Per "key" overrides</td></tr>
+</tbody>
+</table>
+
+<p>Note that <code>ip</code>, <code>xff</code> and <code>username</code> are XOR'd.</p>
+
+<h3>Conditional Request Handler</h3>
+
+<pre><code>server.use(restify.conditionalRequest());
+</code></pre>
+
+<p>You can use this handler to let clients do nice HTTP semantics with the
+"match" headers.  Specifically, with this plugin in place, you would set
+<code>res.etag=$yourhashhere</code>, and then this plugin will do one of:</p>
+
+<ul>
+<li>return 304 (Not Modified) [and stop the handler chain]</li>
+<li>return 412 (Precondition Failed) [and stop the handler chain]</li>
+<li>Allow the request to go through the handler chain.</li>
+</ul>
+
+<p>The specific headers this plugin looks at are:</p>
+
+<ul>
+<li><code>Last-Modified</code></li>
+<li><code>If-Match</code></li>
+<li><code>If-None-Match</code></li>
+<li><code>If-Modified-Since</code></li>
+<li><code>If-Unmodified-Since</code></li>
+</ul>
+
+<p>Some example usage:</p>
+
+<pre><code>server.use(function setETag(req, res, next) {
+  res.header('ETag', 'myETag');
+  res.header('Last-Modified', new Date());
+});
+
+server.use(restify.conditionalRequest());
+
+server.get('/hello/:name', function(req, res, next) {
+  res.send('hello ' + req.params.name);
+});
+</code></pre>
+
+<h3>Audit Logging</h3>
+
+<p>Audit logging is a special plugin, as you don't use it with <code>.use()</code>, but with
+the <code>after</code> event:</p>
+
+<pre><code>server.on('after', restify.auditLogger({
+  log: new Logger({
+    name: 'audit',
+    stream: process.stdout
+  })
+}));
+</code></pre>
+
+<p>You pass in the auditor a bunyan logger, and it will write out records at the
+<code>info</code> level.  Records will look like this:</p>
+
+<pre><code>    {
+      "name": "audit",
+      "hostname": "your.host.name",
+      "audit": true,
+      "remoteAddress": "127.0.0.1",
+      "remotePort": 57692,
+      "req_id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
+      "req": {
+        "method": "GET",
+        "url": "/foo",
+        "headers": {
+          "authorization": "Basic YWRtaW46am95cGFzczEyMw==",
+          "user-agent": "curl/7.19.7 (universal-apple-darwin10.0) libcurl/7.19.7 OpenSSL/0.9.8r zlib/1.2.3",
+          "host": "localhost:8080",
+          "accept": "application/json"
+        },
+        "httpVersion": "1.1",
+        "trailers": {},
+        "version": "*"
+      },
+      "res": {
+        "statusCode": 200,
+        "headers": {
+          "access-control-allow-origin": "*",
+          "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+          "access-control-expose-headers": "X-Api-Version, X-Request-Id, X-Response-Time",
+          "server": "Joyent SmartDataCenter 7.0.0",
+          "x-request-id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
+          "access-control-allow-methods": "GET",
+          "x-api-version": "1.0.0",
+          "connection": "close",
+          "content-length": 158,
+          "content-md5": "zkiRn2/k3saflPhxXI7aXA==",
+          "content-type": "application/json",
+          "date": "Tue, 07 Feb 2012 20:30:31 GMT",
+          "x-response-time": 1639
+        },
+        "trailer": false
+      },
+      "route": {
+      "name": "GetFoo",
+      "version": ["1.0.0"]
+      },
+      "secure": false,
+      "level": 30,
+      "msg": GetFoo handled: 200",
+      "time": "2012-02-07T20:30:31.896Z",
+      "v": 0
+    }
+</code></pre>
+
+<h2 id="Request-API"><span class="method name"><span class="name">Request API</span></span></h2>
+
+<p>Wraps all of the node
+<a href="http://nodejs.org/docs/latest/api/http.html#http.ServerRequest">ServerRequest</a>
+APIs, events and properties, plus the following.</p>
+
+<h3>header(key, [defaultValue])</h3>
+
+<p>Get the case-insensitive request header key, and optionally provide a
+default value (express-compliant):</p>
+
+<pre><code>req.header('Host');
+req.header('HOST');
+req.header('Accept', '*/*');
+</code></pre>
+
+<h3>accepts(type)</h3>
+
+<p>(express-compliant)</p>
+
+<p>Check if the Accept header is present, and includes the given type.</p>
+
+<p>When the Accept header is not present true is returned. Otherwise the
+given type is matched by an exact match, and then subtypes. You may
+pass the subtype such as <code>html</code> which is then converted internally
+to <code>text/html</code> using the mime lookup table.</p>
+
+<pre><code>// Accept: text/html
+req.accepts('html');
+// =&gt; true
+
+// Accept: text/*; application/json
+req.accepts('html');
+req.accepts('text/html');
+req.accepts('text/plain');
+req.accepts('application/json');
+// =&gt; true
+
+req.accepts('image/png');
+req.accepts('png');
+// =&gt; false
+</code></pre>
+
+<h3>is(type)</h3>
+
+<p>Check if the incoming request contains the Content-Type header field,
+and it contains the give mime type.</p>
+
+<pre><code>// With Content-Type: text/html; charset=utf-8
+req.is('html');
+req.is('text/html');
+// =&gt; true
+
+// When Content-Type is application/json
+req.is('json');
+req.is('application/json');
+// =&gt; true
+
+req.is('html');
+// =&gt; false
+</code></pre>
+
+<p>Note this is almost compliant with express, but restify does not have
+all the <code>app.is()</code> callback business express does.</p>
+
+<h3>log</h3>
+
+<p>Note that you can piggyback on the restify logging framework, by just using
+<code>req.log</code>.  I.e.,:</p>
+
+<pre><code>function myHandler(req, res, next) {
+  var log = req.log;
+
+  log.debug({params: req.params}, 'Hello there %s', 'foo');
+}
+</code></pre>
+
+<p>The advantage to doing this is that each restify <code>req</code> instance has a new
+<a href="https://github.com/trentm/node-bunyan">bunyan</a> instance <code>log</code> on it where
+the request id is automatically injected in, so you can easily correlate
+your high-throughput logs together.</p>
+
+<h3>getLogger(component)</h3>
+
+<p>Shorthand to grab a new  <a href="https://github.com/trentm/node-bunyan">bunyan</a>
+instance that is a child component of the one restify has:</p>
+
+<pre><code>var log = req.getLogger('MyFoo');
+</code></pre>
+
+<h3>Properties</h3>
+
+<table>
+<tbody>
+<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
+<tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
+<tr><td>href</td><td>String</td><td>url.parse(req.url) href</td></tr>
+<tr><td>log</td><td>Object</td><td>bunyan logger you can piggyback on</td></tr>
+<tr><td>id</td><td>String</td><td>A unique request id (x-request-id)</td></tr>
+<tr><td>path</td><td>String</td><td>cleaned up URL path</td></tr>
+<tr><td>query</td><td>String</td><td>the query string only</td></tr>
+<tr><td>secure</td><td>Boolean</td><td>Whether this was an SSL request</td></tr>
+<tr><td>time</td><td>Number</td><td>the time when this request arrived (ms since epoch)</td></tr>
+</tbody>
+</table>
+
+<h2 id="Response-API"><span class="method name"><span class="name">Response API</span></span></h2>
+
+<p>Wraps all of the node
+<a href="http://nodejs.org/docs/latest/api/http.html#http.ServerResponse">ServerResponse</a>
+APIs, events and properties, plus the following.</p>
+
+<h3>header(key, value)</h3>
+
+<p>Get or set the response header key.</p>
+
+<pre><code>res.header('Content-Length');
+// =&gt; undefined
+
+res.header('Content-Length', 123);
+// =&gt; 123
+
+res.header('Content-Length');
+// =&gt; 123
+
+res.header('foo', new Date());
+// =&gt; Fri, 03 Feb 2012 20:09:58 GMT
+</code></pre>
+
+<h3>cache([type], [options])</h3>
+
+<p>Sets the cache-control header.  <code>type</code> defaults to _public_, and
+options currently only takes <code>maxAge</code>.</p>
+
+<pre><code>res.cache();
+</code></pre>
+
+<h3>status(code)</h3>
+
+<p>Sets the response statusCode.</p>
+
+<pre><code>res.status(201);
+</code></pre>
+
+<h3>send([status], body)</h3>
+
+<p>You can use <code>send()</code> to wrap up all the usual <code>writeHead()</code>,
+<code>write()</code>, <code>end()</code> calls on the HTTP API of node.  You can pass send
+either a code and body, or just a body.  <code>body</code> can be an Object, a
+Buffer, or an Error.  When you call <code>send()</code>, restify figures out how
+to format the response (see content-negotiation, above), and does
+that.</p>
+
+<pre><code>res.send({hello: 'world'});
+res.send(201, {hello: 'world'});
+res.send(new BadRequestError('meh'));
+</code></pre>
+
+<h3>json([status], body)</h3>
+
+<p>Short-hand for:</p>
+
+<pre><code>res.contentType = 'json';
+res.send({hello: 'world'});
+</code></pre>
+
+<h3>Properties</h3>
+
+<table>
+<tbody>
+<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>code</td><td>Number</td><td>HTTP status code</td></tr>
+<tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
+<tr><td>charSet</td><td>String</td><td>In conjunction with <code>contentType</code>, you can explicitly set the charSet to be written in the content-type header</td></tr>
+<tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
+<tr><td>headers</td><td>Object</td><td>response headers</td></tr>
+<tr><td>id</td><td>String</td><td>A unique request id (x-request-id)</td></tr>
+</tbody>
+</table>
+
+<h3>Setting the default headers</h3>
+
+<p>You can change what headers restify sends by default by setting the
+top-level property <code>defaultResponseHeaders</code>.  This should be a
+function that takes one argument <code>data</code>, which is the already
+serialized response body.  <code>data</code> can be either a String or Buffer (or
+null).  The <code>this</code> object will be the response itself.</p>
+
+<pre><code>var restify = require('restify');
+
+restify.defaultResponseHeaders = function(data) {
+  this.header('Server', 'helloworld');
+};
+
+restify.defaultResponseHeaders = false; // disable altogether
+</code></pre>
+
+<h2 id="DTrace"><span class="method name"><span class="name">DTrace</span></span></h2>
+
+<p>One of the coolest features of restify is that it automatically
+creates DTrace probes for you whenever you add a new route/handler.
+The easiest way to explain this is with an example:</p>
+
+<pre><code>var restify = require('restify');
+
+var server = restify.createServer({
+  name: 'helloworld'
+});
+
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.authorizationParser());
+server.use(restify.dateParser());
+server.use(restify.queryParser());
+server.use(restify.urlEncodedBodyParser());
+
+server.use(function slowHandler(req, res, next) {
+  setTimeout(function() {
+    return next();
+  }, 250);
+});
+
+server.get({path: '/hello/:name', name: 'GetFoo'}, function respond(req, res, next) {
+  res.send({
+    hello: req.params.name
+  });
+  return next();
+});
+
+server.listen(8080, function() {
+  console.log('listening: %s', server.url);
+});
+</code></pre>
+
+<p>So we've got our typical "hello world" server now, with a slight twist; we
+introduced an artificial 250ms lag.  Also, note that we named our server, our
+routes, and all of our handlers (functions); while that's optional, it
+does make DTrace much more usable.  So, if you started that server,
+then looked for DTrace probes, you'd see something like this:</p>
+
+<pre class="shell"><code>dtrace -l -P helloworld*
+   ID   PROVIDER            MODULE                          FUNCTION NAME
+23491 helloworld10254            module                              func getfoo-start
+23492 helloworld10254            module                              func getfoo-done
+23493 helloworld10254            module                              func getfoo-parseAccept-start
+23494 helloworld10254            module                              func getfoo-parseAccept-done
+23495 helloworld10254            module                              func getfoo-parseAuthorization-start
+23496 helloworld10254            module                              func getfoo-parseAuthorization-done
+23497 helloworld10254            module                              func getfoo-parseDate-start
+23498 helloworld10254            module                              func getfoo-parseDate-done
+23499 helloworld10254            module                              func getfoo-parseQueryString-start
+23500 helloworld10254            module                              func getfoo-parseQueryString-done
+23501 helloworld10254            module                              func getfoo-parseUrlEncodedBody-start
+23502 helloworld10254            module                              func getfoo-parseUrlEncodedBody-done
+23503 helloworld10254            module                              func getfoo-slowHandler-start
+23504 helloworld10254            module                              func getfoo-slowHandler-done
+23505 helloworld10254            module                              func getfoo-respond-start
+23506 helloworld10254            module                              func getfoo-respond-done
+</code></pre>
+
+<p>What restify does is autogenerate a probe for each route/handler on
+start and finish, and uses the names found to do so. If there's no
+names, it fills in based on the method, url and index in the chain.
+The probe signatures generated look like:</p>
+
+<h3>Start Probes</h3>
+
+<p><code>$route-start and $route-$handler-start</code></p>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
+<tr><td>url</td><td>char *</td><td>request url</td></tr>
+<tr><td>user-agent</td><td>char *</td><td>value of user-agent header</td></tr>
+<tr><td>user</td><td>char *</td><td>req.username (i.e., the authenticated party)</td></tr>
+<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
+<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+</tbody>
+</table>
+
+<h3>Done Probes</h3>
+
+<p><code>$route-done and $route-$handler-done</code></p>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
+<tr><td>statusCode</td><td>int</td><td>HTTP response code</td></tr>
+<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
+<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+</tbody>
+</table>
+
+<p>Now, if you wanted to say get a breakdown of latency by handler, you
+could do something like this:</p>
+
+<pre><code>#!/usr/sbin/dtrace -s
+#pragma D option quiet
+
+helloworld*:::getfoo-*-start
+{
+  tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = timestamp;
+}
+
+helloworld*:::getfoo-*-done
+/tracker[arg0, substr(probename, 0, rindex(probename, "-"))]/
+{
+  this-&gt;name = substr(probename, 0, rindex(probename, "-"));
+  @[this-&gt;name] = quantize(((timestamp - tracker[arg0, this-&gt;name]) / 1000000));
+  tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = 0;
+}
+</code></pre>
+
+<p>So running the server in one terminal:</p>
+
+<pre class="shell"><code>node helloworld.js
+</code></pre>
+
+<p>The D script in another:</p>
+
+<pre class="shell"><code>./helloworld.d
+</code></pre>
+
+<p>Hit the server a few times with curl:</p>
+
+<pre class="shell"><code>curl http://localhost:8080/hello/mcavage
+</code></pre>
+
+<p>Then Ctrl-C the D script, and you'll see the "slowHandler" at the
+bottom of the stack, bucketized that it's the vast majority of latency
+in this pipeline</p>
+
+<pre class="shell"><code>./guide.d
+^C
+
+getfoo-parseAuthorization
+       value  ------------- Distribution ------------- count
+          -1 |                                         0
+           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
+           1 |                                         0
+
+getfoo-parseDate
+       value  ------------- Distribution ------------- count
+          -1 |                                         0
+           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
+           1 |                                         0
+
+getfoo-parseQueryString
+       value  ------------- Distribution ------------- count
+          -1 |                                         0
+           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
+           1 |                                         0
+
+getfoo-parseUrlEncodedBody
+       value  ------------- Distribution ------------- count
+          -1 |                                         0
+           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
+           1 |                                         0
+
+getfoo-parseAccept
+       value  ------------- Distribution ------------- count
+          -1 |                                         0
+           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           3
+           1 |@@@@@@@@@@                               1
+           2 |                                         0
+
+getfoo-respond
+       value  ------------- Distribution ------------- count
+           0 |                                         0
+           1 |@@@@@@@@@@                               1
+           2 |@@@@@@@@@@@@@@@@@@@@                     2
+           4 |                                         0
+           8 |                                         0
+          16 |                                         0
+          32 |@@@@@@@@@@                               1
+          64 |                                         0
+
+getfoo-slowHandler
+       value  ------------- Distribution ------------- count
+          64 |                                         0
+         128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
+         256 |                                         0
+</code></pre>
+
+<h1 id="client-api">Client API</h1>
+
+<p>There are actually three separate clients shipped in restify:</p>
+
+<ul>
+<li><strong>JsonClient:</strong> sends and expects application/json</li>
+<li><strong>StringClient:</strong> sends url-encoded request and expects text/plain</li>
+<li><strong>HttpClient:</strong> thin wrapper over node's http/https libraries</li>
+</ul>
+
+<p>The idea being that if you want to support "typical" control-plane
+REST APIs, you probably want the <code>JsonClient</code>, or if you're using some
+other serialization (like XML) you'd write your own client that
+extends the <code>StringClient</code>. If you need streaming support, you'll need
+to do some work on top of the <code>HttpClient</code>, as <code>StringClient</code> and
+friends buffer requests/responses.</p>
+
+<p>All clients support retry with exponential backoff for getting a TCP
+connection; they do not perform retries on 5xx error codes like
+previous versions of the restify client.  You can set <code>retry</code> to <code>false</code> to
+disable this logic altogether.  Also, all clients support a <code>connectTimeout</code>
+field, which is use <em>on each retry</em>.  The default is not to set a
+<code>connectTimeout</code>, so you end up with the node.js socket defaults.</p>
+
+<p>Here's an example of hitting the
+<a href="https://api.us-west-1.joyentcloud.com">Joyent CloudAPI</a>:</p>
+
+<pre><code>var restify = require('restify');
+
+// Creates a JSON client
+var client = restify.createJsonClient({
+  url: 'https://us-west-1.api.joyentcloud.com'
+});
+
+
+client.basicAuth('$login', '$password');
+client.get('/my/machines', function(err, req, res, obj) {
+  assert.ifError(err);
+
+  console.log(JSON.stringify(obj, null, 2));
+});
+</code></pre>
+
+<p>Note that all further documentation refers to the "short-hand" form of
+methods like <code>get/put/del</code> which take a string path.  You can also
+pass in an object to any of those methods with extra params (notably
+headers):</p>
+
+<pre><code>var options = {
+  path: '/foo/bar',
+  headers: {
+    'x-foo': 'bar'
+  },
+  retry: {
+    'retries': 0
+  },
+  agent: false
+};
+
+client.get(options, function(err, req, res) { .. });
+</code></pre>
+
+<h2 id="JsonClient"><span class="method name"><span class="name">JsonClient</span></span></h2>
+
+<p>The JSON Client is the highest-level client bundled with restify; it
+exports a set of methods that map directly to HTTP verbs.  All
+callbacks look like <code>function(err, req, res, [obj])</code>, where <code>obj</code> is
+optional, depending on if content was returned. HTTP status codes are
+not interpreted, so if the server returned 4xx or something with a
+JSON payload, <code>obj</code> will be the JSON payload.  <code>err</code> however will be
+set if the server returned a status code &gt;= 400 (it will be one of the
+restify HTTP errors).  If <code>obj</code> looks like a <code>RestError</code>:</p>
+
+<pre><code>{
+  "code": "FooError",
+  "message": "some foo happened"
+}
+</code></pre>
+
+<p>then <code>err</code> gets "upconverted" into a <code>RestError</code> for you.  Otherwise
+it will be an <code>HttpError</code>.</p>
+
+<h3>createJsonClient(options)</h3>
+
+<pre><code>var client = restify.createJsonClient({
+  url: 'https://api.us-west-1.joyentcloud.com',
+  version: '*'
+});
+</code></pre>
+
+<p>Options:</p>
+
+<table>
+<tbody>
+<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>accept</td><td>String</td><td>Accept header to send</td></tr>
+<tr><td>connectTimeout</td><td>Number</td><td>Amount of time to wait for a socket</td></tr>
+<tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
+<tr><td>headers</td><td>Object</td><td>HTTP headers to set in all requests</td></tr>
+<tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
+<tr><td>retry</td><td>Object</td><td>options to provide to node-retry; defaults to 3 retries</td></tr>
+<tr><td>url</td><td>String</td><td>Fully-qualified URL to connect to</td></tr>
+<tr><td>userAgent</td><td>String</td><td>user-agent string to use; restify inserts one, but you can override it</td></tr>
+<tr><td>version</td><td>String</td><td>semver string to set the accept-version</td></tr>
+</tbody>
+</table>
+
+<h3>get(path, callback)</h3>
+
+<p>Performs an HTTP get; if no payload was returned, <code>obj</code> defaults to
+<code>{}</code> for you (so you don't get a bunch of null pointer errors).</p>
+
+<pre><code>client.get('/foo/bar', function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%j', obj);
+});
+</code></pre>
+
+<h3>head(path, callback)</h3>
+
+<p>Just like <code>get</code>, but without <code>obj</code>:</p>
+
+<pre><code>client.head('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+});
+</code></pre>
+
+<h3>post(path, object, callback)</h3>
+
+<p>Takes a complete object to serialize and send to the server.</p>
+
+<pre><code>client.post('/foo', { hello: 'world' }, function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+  console.log('%j', obj);
+});
+</code></pre>
+
+<h3>put(path, object, callback)</h3>
+
+<p>Just like <code>post</code>:</p>
+
+<pre><code>client.put('/foo', { hello: 'world' }, function(err, req, res, obj) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+  console.log('%j', obj);
+});
+</code></pre>
+
+<h3>del(path, callback)</h3>
+
+<p><code>del</code> doesn't take content, since you know, it should't:</p>
+
+<pre><code>client.del('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+});
+</code></pre>
+
+<h2 id="StringClient"><span class="method name"><span class="name">StringClient</span></span></h2>
+
+<p><code>StringClient</code> is what <code>JsonClient</code> is built on, and provides a base
+for you to write other buffering/parsing clients (like say an XML
+client). If you need to talk to some "raw" HTTP server, then
+<code>StringClient</code> is what you want, as it by default will provide you
+with content uploads in <code>application/x-www-form-url-encoded</code> and
+downloads as <code>text/plain</code>.  To extend a <code>StringClient</code>, take a look at
+the source for <code>JsonClient</code>. Effectively, you extend it, and set the
+appropriate options in the constructor and implement a <code>write</code> (for
+put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p>
+
+<h3>createStringClient(options)</h3>
+
+<pre><code>var client = restify.createStringClient({
+  url: 'https://example.com'
+})
+</code></pre>
+
+<h3>get(path, callback)</h3>
+
+<p>Performs an HTTP get; if no payload was returned, <code>data</code> defaults to
+<code>''</code> for you (so you don't get a bunch of null pointer errors).</p>
+
+<pre><code>client.get('/foo/bar', function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%s', data);
+});
+</code></pre>
+
+<h3>head(path, callback)</h3>
+
+<p>Just like <code>get</code>, but without <code>data</code>:</p>
+
+<pre><code>client.head('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+});
+</code></pre>
+
+<h3>post(path, object, callback)</h3>
+
+<p>Takes a complete object to serialize and send to the server.</p>
+
+<pre><code>client.post('/foo', { hello: 'world' }, function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+  console.log('%s', data);
+});
+</code></pre>
+
+<h3>put(path, object, callback)</h3>
+
+<p>Just like <code>post</code>:</p>
+
+<pre><code>client.put('/foo', { hello: 'world' }, function(err, req, res, data) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+  console.log('%s', data);
+});
+</code></pre>
+
+<h3>del(path, callback)</h3>
+
+<p><code>del</code> doesn't take content, since you know, it should't:</p>
+
+<pre><code>client.del('/foo/bar', function(err, req, res) {
+  assert.ifError(err);
+  console.log('%d -&gt; %j', res.statusCode, res.headers);
+});
+</code></pre>
+
+<h2 id="HttpClient"><span class="method name"><span class="name">HttpClient</span></span></h2>
+
+<p><code>HttpClient</code> is the lowest-level client shipped in restify, and is
+basically just some sugar over the top of node's http/https modules
+(with HTTP methods like the other clients).  It is useful if you want
+to stream with restify.  Note that the event below is unfortunately
+named <code>result</code> and not <code>response</code> (because
+<a href="http://nodejs.org/docs/latest/api/all.html#event_response_">Event 'response'</a>
+is already used).</p>
+
+<pre><code>client = restify.createClient({
+  url: 'http://127.0.0.1'
+});
+
+client.get('/str/mcavage', function(err, req) {
+  assert.ifError(err); // connection error
+
+  req.on('result', function(err, res) {
+    assert.ifError(err); // HTTP status code &gt;= 400
+
+    res.body = '';
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+      res.body += chunk;
+    });
+
+    res.on('end', function() {
+      console.log(body);
+    });
+  });
+});
+</code></pre>
+
+<p>Or a write:</p>
+
+<pre><code>client.post(opts, function(err, req) {
+  assert.ifError(connectErr);
+
+  req.on('result', function(err, res) {
+    assert.ifError(err);
+    res.body = '';
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+      res.body += chunk;
+    });
+
+    res.on('end', function() {
+      console.log(res.body);
+    });
+  });
+
+  req.write('hello world');
+  req.end();
+});
+</code></pre>
+
+<p>Note that get/head/del all call <code>req.end()</code> for you, so you can't
+write data over those. Otherwise, all the same methods exist as
+<code>JsonClient/StringClient</code>.</p>
+
+<p>One wishing to extend the <code>HttpClient</code> should look at the internals
+and note that <code>read</code> and <code>write</code> probably need to be overridden.</p>
+
+<h3>basicAuth(username, password)</h3>
+
+<p>Since it hasn't been mentioned yet, this convenience method (available
+on all clients), just sets the <code>Authorization</code> header for all HTTP requests:</p>
+
+<pre><code>client.basicAuth('mark', 'mysupersecretpassword');
+</code></pre>
+
+    </div>
+<script type="text/javascript" charset="utf-8">
+$(function() {
+    var headerHeight = $("#header").height();
+
+    var sections = $("#content h1[id], #content h2[id]");
+    var sectionOffsets = [];
+    var slack = 100;  // Give the section scroll some slack (in pixels).
+    sections.each(function(elem) {
+        sectionOffsets.push($(this).offset().top - headerHeight - slack);
+    });
+
+    var currSectionIdx = -1;
+    function getSectionIdx(scrollDistance) {
+        if (scrollDistance < sectionOffsets[0]) {
+            return -1;
+        } else {
+            for (var id = sectionOffsets.length; id > 0; id--) {
+                if (scrollDistance > sectionOffsets[id - 1]) {
+                    return id - 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    /** {{{ http://code.activestate.com/recipes/577787/ (r2) */
+    _slugify_strip_re = /[^\w\s-]/g;
+    _slugify_hyphenate_re = /[-\s]+/g;
+    function slugify(s) {
+      s = s.replace(_slugify_strip_re, '').trim().toLowerCase();
+      s = s.replace(_slugify_hyphenate_re, '-');
+      return s;
+    }
+    /** end of http://code.activestate.com/recipes/577787/ }}} */
+
+
+    $("#content").scroll(function() {
+        var scrollDistance = $("#content").attr('scrollTop');
+        var sectionIdx = getSectionIdx(scrollDistance);
+    
+        if (sectionIdx !== currSectionIdx) {
+            $("#sidebar li>div").removeClass("current");
+            currSectionIdx = sectionIdx;
+            if (currSectionIdx >= 0) {
+                var heading = $(sections[currSectionIdx]).text();
+                var possibleAnchors = [
+                    slugify(heading), // h1 or non-method h2
+                    heading.replace(/ /g, '-'), // h2 method, just name or just endpoint
+                    heading.slice(0, heading.lastIndexOf(' (')).trimRight().replace(/ /g, '-'), // h2 method, name and endpoint
+                ]
+                for (var i=0; i < possibleAnchors.length; i++) {
+                    $("#sidebar a[href|=#" + possibleAnchors[i] + "]").parent().addClass("current");
+                }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
