@@ -1,8 +1,8 @@
 # restify Changelog
 
-## 1.0.0-rc3 (not yet released)
+## 1.0.0 (not yet released)
 
-
+- GH-20 HttpClient connectTimeout.
 - Allow parser plugins to allow "override" params
 - Proper handling of Expect: 100
 - multipart/form-data plugin

@@ -1138,8 +1138,13 @@ friends buffer requests/responses.
 
 All clients support retry with exponential backoff for getting a TCP
 connection; they do not perform retries on 5xx error codes like
-previous versions of the restify client.  Here's an example of hitting
-the [Joyent CloudAPI](https://api.us-west-1.joyentcloud.com):
+previous versions of the restify client.  You can set `retry` to `false` to
+disable this logic altogether.  Also, all clients support a `connectTimeout`
+field, which is use *on each retry*.  The default is not to set a
+`connectTimeout`, so you end up with the node.js socket defaults.
+
+Here's an example of hitting the
+[Joyent CloudAPI](https://api.us-west-1.joyentcloud.com):
 
     var restify = require('restify');
 
@@ -1203,14 +1208,15 @@ it will be an `HttpError`.
 Options:
 
 ||*Name*||*Type*||*Description*||
-||url||String||Fully-qualified URL to connect to||
-||headers||Object||HTTP headers to set in all requests||
 ||accept||String||Accept header to send||
+||connectTimeout||Number||Amount of time to wait for a socket||
+||dtrace||Object||node-dtrace-provider handle||
+||headers||Object||HTTP headers to set in all requests||
+||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
+||retry||Object||options to provide to node-retry; defaults to 3 retries||
+||url||String||Fully-qualified URL to connect to||
 ||userAgent||String||user-agent string to use; restify inserts one, but you can override it||
 ||version||String||semver string to set the accept-version||
-||retry||Object||options to provide to node-retry; defaults to 3 retries||
-||dtrace||Object||node-dtrace-provider handle||
-||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
 
 ### get(path, callback)
 

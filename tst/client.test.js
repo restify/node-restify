@@ -3,6 +3,7 @@
 var test = require('tap').test;
 var uuid = require('node-uuid');
 
+var Logger = require('bunyan');
 var restify = require('../lib');
 
 
@@ -283,6 +284,23 @@ test('POST raw', function(t) {
         t.end();
       });
     });
+  });
+});
+
+
+test('GH-20 connectTimeout', function (t) {
+  client = restify.createClient({
+    url: 'http://169.254.1.10',
+    type: 'http',
+    accept: 'text/plain',
+    connectTimeout: 100,
+    retry: false
+  });
+
+  client.get('/foo', function(err, req) {
+    t.ok(err);
+    t.notOk(req);
+    t.end();
   });
 });
 
