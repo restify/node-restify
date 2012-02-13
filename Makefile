@@ -7,7 +7,6 @@
 #
 # Tools
 #
-CUTARELEASE	:= ./deps/cutarelease/cutarelease.py
 NPM		:= $(shell which npm)
 TAP		:= ./node_modules/.bin/tap
 

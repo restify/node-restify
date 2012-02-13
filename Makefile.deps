@@ -28,7 +28,7 @@ deps/jsstyle/jsstyle:
 #
 # cutarelease
 #
-CUTARELEASE_SCRIPT  = deps/cutarelease/cutarelease
+CUTARELEASE_SCRIPT	= deps/cutarelease/cutarelease.py
 CUTARELEASE		= $(CUTARELEASE_SCRIPT)
 
 deps/cutarelease/curarelease.py:
