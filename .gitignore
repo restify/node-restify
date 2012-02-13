@@ -4,4 +4,5 @@ docs/*.html
 docs/pkg
 *.log
 *.tar.gz
-
+build
+docs/*.json
