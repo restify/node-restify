@@ -1,5 +1,5 @@
 [restify](http://mcavage.github.com/node-restify) is a smallish framework,
-similar to [express](http://expressjs.org) for building REST APIs.  For full
+similar to [express](http://expressjs.com) for building REST APIs.  For full
 details, see http://mcavage.github.com/node-restify.
 
 # Usage
