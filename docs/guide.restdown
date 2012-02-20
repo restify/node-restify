@@ -412,7 +412,7 @@ The built-in restify errors are:
 * RestError
 * BadDigestError
 * BadMethodError
-* InternalErrorError
+* InternalError
 * InvalidArgumentError
 * InvalidContentError
 * InvalidCredentialsError

@@ -1,8 +1,12 @@
 # restify Changelog
 
-## 1.0.1 (not yet released)
+## 1.0.2
 
-(nothing yet)
+- GH-79 Docs typo(s).
+
+## 1.0.1
+
+- Version bump bunyan to 0.6.4.
 
 
 ## 1.0.0
