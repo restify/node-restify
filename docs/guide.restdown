@@ -489,6 +489,16 @@ the `Route` object that ran.  Note that when you are using the default
 404/405/BadVersion handlers, this event will still be fired, but route will
 be `null`.
 
+#### Event: 'uncaughtException'
+
+`function (request, response, route, error) {}`
+
+Emitted when some handler throws an uncaughtException somewhere in the chain.
+The default behavior is to just call `res.send(error)`, and let the built-ins
+in restify handle transforming, but you can override to whatever you want
+here.
+
+
 ### Properties
 
 A restify server has the following properties on it:

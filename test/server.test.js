@@ -720,6 +720,81 @@ test('GH-67 extend access-control headers', function (t) {
 
 });
 
+
+test('GH-77 uncaughtException (default behavior)', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+
+  server.get('/', function (req, res, next) {
+    throw new Error('Catch me!');
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 500);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        t.equal(body, 'Catch me!');
+        server.close(function () {
+          t.end();
+        });
+      });
+    }).end();
+  });
+});
+
+
+test('GH-77 uncaughtException (with custom handler)', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+  server.on('uncaughtException', function (req, res, route, err) {
+    res.send(204);
+  });
+  server.get('/', function (req, res, next) {
+    throw new Error('Catch me!');
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 204);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        t.equal(body, '');
+        server.close(function () {
+          t.end();
+        });
+      });
+    }).end();
+  });
+});
+
+
 //
 // Disabled, as Heroku (travis) doesn't allow us to write to /tmp
 //

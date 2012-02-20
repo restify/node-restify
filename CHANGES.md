@@ -1,7 +1,8 @@
 # restify Changelog
 
-## 1.0.2
+## 1.1.0 (not yet released)
 
+- GH-77 `server.on('uncaughtException', function (req, res, route, err) {});`
 - GH-79 Docs typo(s).
 
 ## 1.0.1
