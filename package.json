@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "async": "0.1.15",
-    "bunyan": "0.6.2",
+    "bunyan": "0.6.4",
     "formidable": "1.0.8",
     "dtrace-provider": "0.0.6",
     "http-signature": "0.9.8",
