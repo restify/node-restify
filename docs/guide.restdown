@@ -678,8 +678,23 @@ Options:
 ||xff||Boolean||Do throttling on a /32 (X-Forwarded-For)||
 ||username||Boolean||Do throttling on `req.username`||
 ||overrides||Object||Per "key" overrides||
+||tokensTable||Object||Storage engine; must support put/get||
+||maxKeys||Number||If using the built-in storage table, the maximum distinct throttling keys to allow at a time||
 
 Note that `ip`, `xff` and `username` are XOR'd.
+
+#### Using an external storage mechanism for key/bucket mappings.
+
+By default, the restify throttling plugin uses an in-memory LRU to store
+mappings between throttling keys (i.e., IP address) to the actual bucket that
+key is consuming.  If this suits you, you can tune the maximum number of keys
+to store in memory with `options.maxKeys`; the default is 10000.
+
+In some circumstances, you want to offload this into a shared system, such as
+Redis, if you have a fleet of API servers and you're not getting steady and/or
+uniform request distribution.  To enable this, you can pass in
+`options.tokensTable`, which is simply any Object that supports `put` and `get`
+with a `String` key, and an `Object` value.
 
 ### Conditional Request Handler
 
