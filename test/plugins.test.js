@@ -64,6 +64,7 @@ test('setup', function (t) {
   SERVER.use(plugins.dateParser());
   SERVER.use(plugins.queryParser());
 
+
   SERVER.get('/foo/:id', function (req, res, next) {
     res.send();
     return next();
@@ -89,7 +90,6 @@ test('406', function (t) {
     t.end();
   }).end();
 });
-
 
 test('authorization basic ok', function (t) {
   var authz = 'Basic ' + new Buffer('user:secret').toString('base64');
@@ -267,6 +267,234 @@ test('date expired', function (t) {
   }).end();
 });
 
+test('Conditional Request with correct Etag and headers', function (t) {
+    SERVER.get('/bodyurl3/:id',
+        function (req, res, next) {
+            res.etag = 'testETag';
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 304';
+            res.send();
+            return next();
+        }
+        );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl3/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Match': 'testETag',
+            'If-None-Match': 'testETag'
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 304);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with mismatched Etag and If-Match', function (t) {
+    SERVER.get('/bodyurl4/:id',
+        function (req, res, next) {
+            res.etag = 'testETag';
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 304';
+            res.send();
+            return next();
+        }
+    );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl4/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Match': 'testETag2'
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 412);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid If-Modified header and not modified content', function (t) {
+    var now = new Date();
+    SERVER.get('/bodyurl5/:id',
+        function (req, res, next) {
+            var yesterday = new Date(now.setDate(now.getDate()-1));
+            res.header('Last-Modified', yesterday);
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 304';
+            res.send();
+            return next();
+        }
+    );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl5/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Modified-Since': new Date()
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 304);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid If-Unmodified-Since header and modified content', function (t) {
+    var now = new Date();
+    var yesterday = new Date(now.setDate(now.getDate()-1));
+    SERVER.get('/bodyurl6/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl6/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Unmodified-Since': yesterday
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 412);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid headers from ahead Timezone and unmodified content should be OK', function (t) {
+    SERVER.get('/bodyurl7/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var now = new Date();
+    var ahead = new Date(now.setHours(now.getHours()+5));
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl7/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Modified-Since': ahead
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid headers from ahead Timezone and modified content should be OK', function (t) {
+    SERVER.get('/bodyurl8/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var now = new Date();
+    var ahead = new Date(now.setHours(now.getHours()+5));
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl8/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Unmodified-Since': ahead
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional PUT with matched Etag and headers', function (t) {
+    SERVER.put('/bodyurl9/:id',
+        function (req, res, next) {
+            res.etag = 'testETag';
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 304';
+            res.send();
+            return next();
+        }
+    );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl9/foo',
+        agent: false,
+        method: 'PUT',
+        headers: {
+            'If-Match': 'testETag',
+            'If-None-Match': 'testETag'
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 412);
+        t.end();
+    });
+    client.end();
+});
 
 test('teardown', function (t) {
   SERVER.close(function () {
