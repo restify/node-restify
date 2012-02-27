@@ -300,7 +300,7 @@ test('Conditional Request with correct Etag and headers', function (t) {
 });
 
 test('Conditional Request with mismatched Etag and If-Match', function (t) {
-    SERVER.get('/bodyurl3/:id',
+    SERVER.get('/bodyurl4/:id',
         function (req, res, next) {
             res.etag = 'testETag';
             next();
@@ -316,7 +316,7 @@ test('Conditional Request with mismatched Etag and If-Match', function (t) {
     var opts = {
         hostname: '127.0.0.1',
         port: PORT,
-        path: '/bodyurl3/foo',
+        path: '/bodyurl4/foo',
         agent: false,
         method: 'GET',
         headers: {
@@ -330,12 +330,12 @@ test('Conditional Request with mismatched Etag and If-Match', function (t) {
     client.end();
 });
 
-test('Conditional Request with valid Modified header', function (t) {
+test('Conditional Request with valid If-Modified header and not modified content', function (t) {
     var now = new Date();
-    SERVER.get('/bodyurl3/:id',
+    SERVER.get('/bodyurl5/:id',
         function (req, res, next) {
-            res.etag = 'ignoredETag';
-            res.header('Last-Modified', now);
+            var yesterday = new Date(now.setDate(now.getDate()-1));
+            res.header('Last-Modified', yesterday);
             next();
         },
         plugins.conditionalRequest(),
@@ -349,11 +349,11 @@ test('Conditional Request with valid Modified header', function (t) {
     var opts = {
         hostname: '127.0.0.1',
         port: PORT,
-        path: '/bodyurl3/foo',
+        path: '/bodyurl5/foo',
         agent: false,
         method: 'GET',
         headers: {
-            'If-Modified-Since': now.setDate(now.getDate()+5)
+            'If-Modified-Since': new Date()
         }
     };
     var client = http.request(opts, function (res) {
@@ -363,8 +363,109 @@ test('Conditional Request with valid Modified header', function (t) {
     client.end();
 });
 
+test('Conditional Request with valid If-Unmodified-Since header and modified content', function (t) {
+    var now = new Date();
+    var yesterday = new Date(now.setDate(now.getDate()-1));
+    SERVER.get('/bodyurl6/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl6/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Unmodified-Since': yesterday
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 412);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid headers from ahead Timezone and unmodified content should be OK', function (t) {
+    SERVER.get('/bodyurl7/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var now = new Date();
+    var ahead = new Date(now.setHours(now.getHours()+5));
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl7/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Modified-Since': ahead
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+    client.end();
+});
+
+test('Conditional Request with valid headers from ahead Timezone and modified content should be OK', function (t) {
+    SERVER.get('/bodyurl8/:id',
+        function (req, res, next) {
+            res.header('Last-Modified', new Date());
+            next();
+        },
+        plugins.conditionalRequest(),
+        function (req, res, next) {
+            res.body = 'testing 412';
+            res.send();
+            return next();
+        }
+    );
+
+    var now = new Date();
+    var ahead = new Date(now.setHours(now.getHours()+5));
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/bodyurl8/foo',
+        agent: false,
+        method: 'GET',
+        headers: {
+            'If-Unmodified-Since': ahead
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+    client.end();
+});
+
 test('Conditional PUT with matched Etag and headers', function (t) {
-    SERVER.put('/bodyurl3/:id',
+    SERVER.put('/bodyurl9/:id',
         function (req, res, next) {
             res.etag = 'testETag';
             next();
@@ -380,7 +481,7 @@ test('Conditional PUT with matched Etag and headers', function (t) {
     var opts = {
         hostname: '127.0.0.1',
         port: PORT,
-        path: '/bodyurl3/foo',
+        path: '/bodyurl9/foo',
         agent: false,
         method: 'PUT',
         headers: {
