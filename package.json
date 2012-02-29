@@ -8,6 +8,7 @@
     "Isaac Schlueter",
     "Matt Smillie",
     "Diego Torres"
+    "Mike Williams",
   ],
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
@@ -26,8 +27,8 @@
     "node": ">=0.6"
   },
   "dependencies": {
-    "async": "0.1.15",
-    "bunyan": "0.6.4",
+    "async": "0.1.16",
+    "bunyan": "0.6.8",
     "formidable": "1.0.8",
     "dtrace-provider": "0.0.6",
     "http-signature": "0.9.8",
@@ -39,7 +40,7 @@
   },
   "devDependencies": {
     "filed": "0.0.5",
-    "tap": "0.2.0"
+    "tap": "0.2.2"
   },
   "scripts": {
     "test": "./node_modules/.bin/tap ./test/*.test.js"
