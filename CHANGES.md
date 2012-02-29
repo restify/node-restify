@@ -2,6 +2,8 @@
 
 ## 1.1.0 (not yet released)
 
+- GH-86 Bunyan version bump.
+- Conditional Request plugin tests and fixes for some errors (Mike Williams).
 - GH-83 pluggable storage engine for throttling, and LRU for default engine.
 - GH-77 `server.on('uncaughtException', function (req, res, route, err) {});`
 - GH-79 Docs typo(s).
