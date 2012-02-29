@@ -24,8 +24,6 @@ var DTRACE = d.createDTraceProvider('restifyUnitTest');
 var LOGGER = new Logger({name: 'restify/test/server'});
 var PORT = process.env.UNIT_TEST_PORT || 12345;
 
-
-
 ///--- Tests
 
 test('throws on missing options', function (t) {
@@ -78,6 +76,16 @@ test('ok (ssl)', function (t) {
 test('listen and close (port only)', function (t) {
   var server = new Server({ dtrace: DTRACE, log: LOGGER });
   server.listen(PORT, function () {
+    server.close(function () {
+      t.end();
+    });
+  });
+});
+
+
+test('listen and close (port only) w/ port number as string', function (t) {
+  var server = new Server({ dtrace: DTRACE, log: LOGGER });
+  server.listen(String(PORT), function () {
     server.close(function () {
       t.end();
     });
