@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 1.1.0 (not yet released)
+## 1.1.1 (not yet released)
+
+## 1.1.0
 
 - GH-86 Bunyan version bump.
 - Conditional Request plugin tests and fixes for some errors (Mike Williams).
