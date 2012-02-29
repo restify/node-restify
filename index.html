@@ -474,7 +474,7 @@ X-Response-Time: 3
 <li>RestError</li>
 <li>BadDigestError</li>
 <li>BadMethodError</li>
-<li>InternalErrorError</li>
+<li>InternalError</li>
 <li>InvalidArgumentError</li>
 <li>InvalidContentError</li>
 <li>InvalidCredentialsError</li>
@@ -552,6 +552,15 @@ You can use this to write audit logs, etc.  The route parameter will be
 the <code>Route</code> object that ran.  Note that when you are using the default
 404/405/BadVersion handlers, this event will still be fired, but route will
 be <code>null</code>.</p>
+
+<h4>Event: 'uncaughtException'</h4>
+
+<p><code>function (request, response, route, error) {}</code></p>
+
+<p>Emitted when some handler throws an uncaughtException somewhere in the chain.
+The default behavior is to just call <code>res.send(error)</code>, and let the built-ins
+in restify handle transforming, but you can override to whatever you want
+here.</p>
 
 <h3>Properties</h3>
 
@@ -751,10 +760,25 @@ is returned.</p>
 <tr><td>xff</td><td>Boolean</td><td>Do throttling on a /32 (X-Forwarded-For)</td></tr>
 <tr><td>username</td><td>Boolean</td><td>Do throttling on <code>req.username</code></td></tr>
 <tr><td>overrides</td><td>Object</td><td>Per "key" overrides</td></tr>
+<tr><td>tokensTable</td><td>Object</td><td>Storage engine; must support put/get</td></tr>
+<tr><td>maxKeys</td><td>Number</td><td>If using the built-in storage table, the maximum distinct throttling keys to allow at a time</td></tr>
 </tbody>
 </table>
 
 <p>Note that <code>ip</code>, <code>xff</code> and <code>username</code> are XOR'd.</p>
+
+<h4>Using an external storage mechanism for key/bucket mappings.</h4>
+
+<p>By default, the restify throttling plugin uses an in-memory LRU to store
+mappings between throttling keys (i.e., IP address) to the actual bucket that
+key is consuming.  If this suits you, you can tune the maximum number of keys
+to store in memory with <code>options.maxKeys</code>; the default is 10000.</p>
+
+<p>In some circumstances, you want to offload this into a shared system, such as
+Redis, if you have a fleet of API servers and you're not getting steady and/or
+uniform request distribution.  To enable this, you can pass in
+<code>options.tokensTable</code>, which is simply any Object that supports <code>put</code> and <code>get</code>
+with a <code>String</code> key, and an <code>Object</code> value.</p>
 
 <h3>Conditional Request Handler</h3>
 
