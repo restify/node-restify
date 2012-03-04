@@ -149,6 +149,8 @@ below (and `listen()` takes the same arguments as node's
 ||log||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required||
 ||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider; default is `restify` ||
 ||version||String||A default version to set for all routes||
+||responseTimeHeader||String||By default, this will be `X-Response-Time`||
+||responseTimeFormatter||function||Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. [example](https://gist.github.com/1970083)||
 
 ## Common handlers: server.use()
 
