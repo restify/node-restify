@@ -1,6 +1,13 @@
 # restify Changelog
 
-## 1.1.1 (not yet released)
+## 1.1.1
+
+- dependency version bumps
+- res.header accepts sprintf-style arguments
+- GH-95 Make restify compatible with node-logging (Andrew Robinson)
+- GH-93 Minimal port of express pre-conditions (Dominic Barnes)
+- GH-92 Make X-Response-Time configurable (Shaun Berryman)
+- GH-87 server.listen on port as string (Andrew Sliwinski)
 
 ## 1.1.0
 

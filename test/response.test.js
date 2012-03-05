@@ -107,6 +107,19 @@ test('header (set)', function (t) {
 });
 
 
+test('header (set sprintf)', function (t) {
+  var res = getResponse();
+  res.header('foo', '%s', 'bar');
+  res.set({
+    'bar': ['baz', 'bebop']
+  });
+
+  t.equal(res.header('foo'), 'bar');
+  t.equivalent(res.get('bar'), ['baz', 'bebop']);
+  t.end();
+});
+
+
 test('send plain string no code', function (t) {
   var res = getResponse();
   res.res.on('end', function (code, headers, data) {
