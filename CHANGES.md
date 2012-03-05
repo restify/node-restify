@@ -1,5 +1,9 @@
 # restify Changelog
 
+## 1.2.0 (not yet released)
+
+- GH-94 leverage `qs` module for object notation in query string.
+
 ## 1.1.1
 
 - dependency version bumps

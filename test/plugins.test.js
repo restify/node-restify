@@ -125,6 +125,23 @@ test('query ok', function (t) {
 });
 
 
+test('query object', function (t) {
+  SERVER.get('/query/:id', function (req, res, next) {
+    t.equal(req.params.id, 'foo');
+    t.ok(req.params.name);
+    t.equal(req.params.name.first, 'mark');
+    t.equal(req.query.name.last, 'cavage');
+    res.send();
+    return next();
+  });
+
+  request('/query/foo?name[first]=mark&name[last]=cavage', function (res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  }).end();
+});
+
+
 test('body url-encoded ok', function (t) {
   SERVER.post('/bodyurl/:id', plugins.bodyParser(), function (req, res, next) {
     t.equal(req.params.id, 'foo');
