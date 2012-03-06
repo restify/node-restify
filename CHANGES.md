@@ -2,6 +2,7 @@
 
 ## 1.2.0 (not yet released)
 
+- GH-97 Malformed URI results in server crash
 - GH-94 leverage `qs` module for object notation in query string.
 
 ## 1.1.1

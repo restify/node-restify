@@ -803,6 +803,79 @@ test('GH-77 uncaughtException (with custom handler)', function (t) {
 });
 
 
+test('GH-77 uncaughtException (with custom handler)', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+  server.on('uncaughtException', function (req, res, route, err) {
+    res.send(204);
+  });
+  server.get('/', function (req, res, next) {
+    throw new Error('Catch me!');
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 204);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        t.equal(body, '');
+        server.close(function () {
+          t.end();
+        });
+      });
+    }).end();
+  });
+});
+
+
+test('GH-97 malformed URI breaks server', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+  server.get('/echo/:name', function (req, res, next) {
+    res.send(200);
+    return next();
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/echo/mark%',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 400);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        t.ok(body);
+        server.close(function () {
+          t.end();
+        });
+      });
+    }).end();
+  });
+});
+
 //
 // Disabled, as Heroku (travis) doesn't allow us to write to /tmp
 //
