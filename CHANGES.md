@@ -2,6 +2,7 @@
 
 ## 1.2.0 (not yet released)
 
+- Add `res.link` API (wrap up sending a Link: response header).
 - GH-98 req.secure needs to return a boolean, not an object
 - GH-97 Malformed URI results in server crash
 - GH-94 leverage `qs` module for object notation in query string.
