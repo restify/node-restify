@@ -2,6 +2,7 @@
 
 ## 1.2.0 (not yet released)
 
+- Don't rely on instanceof checks for Errors in response.
 - Change route.run log level from trace to debug on next(err).
 - Add `res.link` API (wrap up sending a Link: response header).
 - GH-98 req.secure needs to return a boolean, not an object
