@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 1.2.0 (not yet released)
+## 1.2.1 (not yet released)
+
+## 1.2.0
 
 - Don't rely on instanceof checks for Errors in response.
 - Change route.run log level from trace to debug on next(err).

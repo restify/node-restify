@@ -17,7 +17,7 @@
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
