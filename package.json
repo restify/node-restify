@@ -47,6 +47,9 @@
     "filed": "0.0.6",
     "tap": "0.2.3"
   },
+  "optionalDependencies": {
+    "dtrace-provider": "0.0.6"
+  },
   "scripts": {
     "test": "./node_modules/.bin/tap ./test/*.test.js"
   }
