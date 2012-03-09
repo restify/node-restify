@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 1.2.1 (not yet released)
+## 1.3.0 (not yet released)
+
+- GH-100 Make DTrace an optional dependency, and stub it out if not found.
 
 ## 1.2.0
 
