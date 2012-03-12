@@ -1,8 +1,15 @@
 # restify Changelog
 
-## 1.3.0 (not yet released)
+## 1.3.1 (not yet released)
+
+## 1.3.0
 
 - GH-100 Make DTrace an optional dependency, and stub it out if not found.
+- res.link API not allowing sprintf style sets.
+- Support for `socketPath` in client API (alternative to url).
+- OPTIONS api not returning access-control-allow-methods header (Steve Mason).
+- Allow null passwords in HTTP basic auth (Andrew Robinson).
+- set `req.files` on multipart file uploads (Andrew Robinson).
 
 ## 1.2.0
 

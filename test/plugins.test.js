@@ -101,7 +101,7 @@ test('authorization basic ok', function (t) {
 
 
 test('authorization basic invalid', function (t) {
-  var authz = 'Basic bogus';
+  var authz = 'Basic ';
   request('/foo/bar', { authorization: authz }, function (res) {
     t.equal(res.statusCode, 400);
     t.end();

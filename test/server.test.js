@@ -439,7 +439,7 @@ test('DELETE ok', function (t) {
 test('OPTIONS', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
-  ['get', 'post', 'put', 'del'].forEach(function(method){
+  ['get', 'post', 'put', 'del'].forEach(function (method) {
     server[method]('/foo/:id', function tester(req, res, next) {
       t.ok(req.params);
       t.equal(req.params.id, 'bar');
@@ -459,7 +459,8 @@ test('OPTIONS', function (t) {
     http.request(opts, function (res) {
       t.equal(res.statusCode, 200);
       t.ok(res.headers.allow);
-      t.equal(res.headers['access-control-allow-methods'], 'GET, POST, PUT, DELETE');
+      t.equal(res.headers['access-control-allow-methods'],
+              'GET, POST, PUT, DELETE');
       server.close(function () {
         t.end();
       });
