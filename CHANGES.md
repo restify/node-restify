@@ -2,6 +2,8 @@
 
 ## 1.3.1 (not yet released)
 
+- Require http-signature@0.9.9/ctype@0.5.0 (node 0.7 compatible)
+
 ## 1.3.0
 
 - GH-100 Make DTrace an optional dependency, and stub it out if not found.
