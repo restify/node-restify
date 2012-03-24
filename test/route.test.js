@@ -241,16 +241,16 @@ test('test matches multiple params', function (t) {
 });
 
 
-test('test matches regex', function (t) {
+test('test matches regex (w/flags)', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
-    url: /^\/foo\/(\w+)$/,
+    url: /^\/foo\/(\w+)$/i,
     method: 'GET'
   });
   t.ok(route);
   t.equivalent(route.matches({
     method: 'GET',
-    path: '/foo/car'
+    path: '/Foo/car'
   }), {0: 'car'});
   t.notOk(route.matches({
     method: 'GET',

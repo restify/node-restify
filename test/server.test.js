@@ -883,6 +883,43 @@ test('GH-97 malformed URI breaks server', function (t) {
   });
 });
 
+
+test('GH-109 RegExp flags not honored', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+  server.get(/\/echo\/(\w+)/i, function (req, res, next) {
+    res.send(200, req.params[0]);
+    return next();
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/ECHO/mark',
+      method: 'GET',
+      agent: false,
+      headers: {
+        accept: 'text/plain'
+      }
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 200);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        t.equal(body, 'mark');
+        server.close(function () {
+          t.end();
+        });
+      });
+    }).end();
+  });
+});
+
+
 //
 // Disabled, as Heroku (travis) doesn't allow us to write to /tmp
 //
