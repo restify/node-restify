@@ -75,11 +75,14 @@ test('ok (ssl)', function (t) {
 
 test('listen and close (port only)', function (t) {
   var server = new Server({ dtrace: DTRACE, log: LOGGER });
-  server.listen(PORT, function () {
+
+  server.on('listening', function () {
     server.close(function () {
       t.end();
     });
   });
+
+  server.listen(PORT);
 });
 
 
