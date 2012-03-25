@@ -113,7 +113,7 @@ test('query ok', function (t) {
   SERVER.get('/query/:id', function (req, res, next) {
     t.equal(req.params.id, 'foo');
     t.equal(req.params.name, 'markc');
-    t.equal(req.query.name, 'markc');
+    t.equal(req.params.name, 'markc');
     res.send();
     return next();
   });
@@ -507,6 +507,7 @@ test('Conditional PUT with matched Etag and headers', function (t) {
   });
   client.end();
 });
+
 
 test('teardown', function (t) {
   SERVER.close(function () {
