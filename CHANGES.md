@@ -2,6 +2,7 @@
 
 ## 1.4.0 (not yet released)
 
+- GH-110 emit expectContinue (Paul Bouzakis)
 - Fix "undefined" log message in string_client.js
 - GH-107
   - Go back to hacking up http.prototype for performance reasons
