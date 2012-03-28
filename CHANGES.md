@@ -1,7 +1,12 @@
 # restify Changelog
 
-## 1.3.1 (not yet released)
+## 1.4.0 (not yet released)
 
+- Fix "undefined" log message in string_client.js
+- GH-107
+  - Go back to hacking up http.prototype for performance reasons
+  - Default to keep-alive on for HTTP/1.1 requests
+  - Misc fixes after refactoring.
 - GH-109 routes not honoring regex flags.
 - GH-108 server missing `listening` event.
 - Audit logger optionally logs request/response bodies
