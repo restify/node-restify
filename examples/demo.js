@@ -12,6 +12,7 @@ var NAME = 'exampleapp';
 ///--- Mainline
 
 var log = new Logger({
+  name: NAME,
   level: 'trace',
   service: 'exampleapp',
   serializers: {
