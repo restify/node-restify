@@ -10,6 +10,13 @@ var restify = require('../lib');
 
 ///--- Globals
 
+var LOG = new Logger({
+  level: (process.env.LOG_LEVEL || 'info'),
+  name: process.argv[1],
+  stream: process.stderr,
+  src: true,
+  serializers: Logger.stdSerializers
+});
 var PORT = process.env.UNIT_TEST_PORT || 12345;
 var client;
 var server;
@@ -37,8 +44,14 @@ function sendText(req, res, next) {
 ///--- Tests
 
 test('setup', function (t) {
-  server = restify.createServer({});
+  server = restify.createServer({
+    log: LOG
+  });
   t.ok(server);
+
+  server.on('clientError', function (err) {
+
+  });
 
   server.use(restify.acceptParser(['json', 'text/plain']));
   server.use(restify.dateParser());
@@ -66,7 +79,9 @@ test('setup', function (t) {
 test('create json client', function (t) {
   client = restify.createClient({
     url: 'http://127.0.0.1:' + PORT,
-    type: 'json'
+    type: 'json',
+    log: LOG,
+    retry: false
   });
   t.ok(client);
   t.ok(client instanceof restify.JsonClient);
@@ -80,6 +95,15 @@ test('GET json', function (t) {
     t.ok(req);
     t.ok(res);
     t.equivalent(obj, {hello: 'mcavage'});
+    t.end();
+  });
+});
+
+
+test('GH-115 GET path with spaces', function (t) {
+  client.get('/json/foo bar', function (err, req, res, obj) {
+    t.ok(err);
+    console.log(err);
     t.end();
   });
 });
