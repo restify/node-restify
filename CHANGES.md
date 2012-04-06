@@ -2,6 +2,8 @@
 
 ## 1.4.0 (not yet released)
 
+- GH-116 More friendly error objects (Domenic Denicola)
+- GH-115 Client hangs on server "hard kills" (i.e., RST)
 - GH-110 emit expectContinue (Paul Bouzakis)
 - Fix "undefined" log message in string_client.js
 - GH-107
