@@ -268,6 +268,37 @@ test('body json ok (no params)', function (t) {
 });
 
 
+
+test('GH-111 JSON Parser not right for arrays', function (t) {
+  SERVER.post('/gh111',
+              plugins.bodyParser(),
+              function (req, res, next) {
+                t.ok(Array.isArray(req.params));
+                t.equal(req.params[0], 'foo');
+                t.equal(req.params[1], 'bar');
+                res.send();
+                return next();
+              });
+
+  var opts = {
+    hostname: '127.0.0.1',
+    port: PORT,
+    path: '/gh111',
+    agent: false,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  var client = http.request(opts, function (res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+  client.write(JSON.stringify(['foo', 'bar']));
+  client.end();
+});
+
+
 test('date expired', function (t) {
   var _ = { date: 'Tue, 15 Nov 1994 08:12:31 GMT' };
   request('/foo/bar', _, function (res) {
