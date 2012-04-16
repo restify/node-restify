@@ -1,6 +1,11 @@
 # restify Changelog
 
-## 1.4.0 (not yet released)
+## 1.4.1 (not yet released)
+
+- GH-119 defaultResponseHeaders not settable
+
+
+## 1.4.0
 
 - GH-116 More friendly error objects (Domenic Denicola)
 - GH-115 Client hangs on server "hard kills" (i.e., RST)
