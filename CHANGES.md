@@ -3,6 +3,7 @@
 ## 1.4.1 (not yet released)
 
 - GH-119 defaultResponseHeaders not settable
+- GH-120 Allow server.patch (Paul Bouzakis)
 
 
 ## 1.4.0
