@@ -377,6 +377,35 @@ test('PUT ok', function (t) {
 });
 
 
+test('PATCH ok', function (t) {
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+
+  server.patch('/foo/:id', function tester(req, res, next) {
+    t.ok(req.params);
+    t.equal(req.params.id, 'bar');
+    res.send();
+    return next();
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/foo/bar',
+      method: 'PATCH',
+      agent: false
+    };
+    http.request(opts, function (res) {
+      t.equal(res.statusCode, 200);
+      server.close(function () {
+        t.end();
+      });
+    }).end();
+  });
+});
+
+
+
 test('HEAD ok', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
