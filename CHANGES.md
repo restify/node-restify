@@ -3,6 +3,7 @@
 ## 1.4.1 (not yet released)
 
 - GH-124 `req.query` is `undefined` if no query string was sent
+- GH-123 Generated DTrace probe names should be valid
 - GH-122 Response._writeHead can cause infinite loop (Trent Mick)
 - GH-120 Allow server.patch (Paul Bouzakis)
 - GH-119 defaultResponseHeaders not settable
