@@ -7,6 +7,7 @@
 - GH-122 Response._writeHead can cause infinite loop (Trent Mick)
 - GH-120 Allow server.patch (Paul Bouzakis)
 - GH-119 defaultResponseHeaders not settable
+- GH-113 document `return next(false)`
 
 
 ## 1.4.0
