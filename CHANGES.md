@@ -2,8 +2,9 @@
 
 ## 1.4.1 (not yet released)
 
-- GH-119 defaultResponseHeaders not settable
+- GH-122 Response._writeHead can cause infinite loop (Trent Mick)
 - GH-120 Allow server.patch (Paul Bouzakis)
+- GH-119 defaultResponseHeaders not settable
 
 
 ## 1.4.0
