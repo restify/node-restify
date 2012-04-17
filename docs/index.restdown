@@ -207,6 +207,14 @@ Here any request like:
 Would result in `req.params[0]` being `foo` and `req.params[1]` being
 `my/cats/name/is/gandalf`.  Basically, you can do whatever you want.
 
+Note the use of calling `next()`.  You are responsible for calling this in
+order to run the next handler in the chain.  As below, you can pass an
+Error object in to have restify automatically return responses to the client;
+additionally, you can pass in a `false` to not error, but to stop the handler
+chain.  This is useful if you had a `res.send` in an early filter, which is
+not an error, and you possibly have one later you want to short-circuit.
+
+
 ### Versioned Routes
 
 Most REST APIs tend to need versioning, and restify ships with support
