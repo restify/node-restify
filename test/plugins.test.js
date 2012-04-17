@@ -125,6 +125,21 @@ test('query ok', function (t) {
 });
 
 
+test('GH-124 query ok no query string', function (t) {
+  SERVER.get('/query/:id', function (req, res, next) {
+    t.ok(req.query);
+    t.equal(typeof (req.query), 'object');
+    res.send();
+    return next();
+  });
+
+  request('/query/foo', function (res) {
+    t.equal(res.statusCode, 200);
+    t.end();
+  }).end();
+});
+
+
 test('query object', function (t) {
   SERVER.get('/query/:id', function (req, res, next) {
     t.equal(req.params.id, 'foo');
