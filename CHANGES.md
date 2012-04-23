@@ -1,7 +1,10 @@
 # restify Changelog
 
-## 1.4.1 (not yet released)
+## 1.4.2 (not yet released)
 
+## 1.4.1
+
+- GH-130 Allow restify and express to coexist.
 - GH-129 format HttpErrors as well as RestErrors (Domenic Denicola)
 - GH-127 add absolute uri to request (Paul Bouzakis)
 - GH-124 `req.query` is `undefined` if no query string was sent
