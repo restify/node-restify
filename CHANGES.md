@@ -2,6 +2,9 @@
 
 ## 1.4.2 (not yet released)
 
+- logging typo (Pedro Candel)
+- response `beforeSend` event (Paul Bouzakis)
+
 ## 1.4.1
 
 - GH-130 Allow restify and express to coexist.
