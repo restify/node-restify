@@ -7,6 +7,3 @@
 [submodule "deps/jsstyle"]
 	path = deps/jsstyle
 	url = git://github.com/davepacheco/jsstyle.git
-[submodule "deps/cutarelease"]
-	path = deps/cutarelease
-	url = git://github.com/trentm/cutarelease.git

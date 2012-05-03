@@ -1,60 +1,60 @@
 {
-  "author": "Mark Cavage <mcavage@gmail.com>",
-  "contributors": [
-    "Dominic Barnes",
-    "Domenic Denicola",
-    "Paul Bouzakis",
-    "Shaun Berryman",
-    "Ben Howes",
-    "Steve Mason",
-    "Trent Mick",
-    "Falco Nogatz",
-    "Pedro Palazón",
-    "Andrew Robinson",
-    "Isaac Schlueter",
-    "Andrew Sliwinski",
-    "Matt Smillie",
-    "Diego Torres",
-    "Mike Williams"
-  ],
-  "name": "restify",
-  "homepage": "http://mcavage.github.com/node-restify",
-  "description": "REST framework",
-  "version": "1.4.1",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mcavage/node-restify.git"
-  },
-  "main": "lib/index.js",
-  "directories": {
-    "bin": "./bin",
-    "lib": "./lib"
-  },
-  "engines": {
-    "node": ">=0.6"
-  },
-  "dependencies": {
-    "async": "0.1.18",
-    "bunyan": "0.6.8",
-    "byline": "2.0.2",
-    "formidable": "1.0.9",
-    "dtrace-provider": "0.0.6",
-    "http-signature": "0.9.9",
-    "lru-cache": "1.0.5",
-    "mime": "1.2.5",
-    "node-uuid": "1.3.3",
-    "qs": "0.4.2",
-    "retry": "0.6.0",
-    "semver": "1.0.13"
-  },
-  "devDependencies": {
-    "filed": "0.0.6",
-    "tap": "0.2.4"
-  },
-  "optionalDependencies": {
-    "dtrace-provider": "0.0.6"
-  },
-  "scripts": {
-    "test": "./node_modules/.bin/tap ./test/*.test.js"
-  }
+        "author": "Mark Cavage <mcavage@gmail.com>",
+        "contributors": [
+                "Dominic Barnes",
+                "Domenic Denicola",
+                "Paul Bouzakis",
+                "Shaun Berryman",
+                "Ben Howes",
+                "Steve Mason",
+                "Trent Mick",
+                "Falco Nogatz",
+                "Pedro Palazón",
+                "Andrew Robinson",
+                "Isaac Schlueter",
+                "Andrew Sliwinski",
+                "Matt Smillie",
+                "Diego Torres",
+                "Mike Williams"
+        ],
+        "name": "restify",
+        "homepage": "http://mcavage.github.com/node-restify",
+        "description": "REST framework",
+        "version": "1.4.1",
+        "repository": {
+                "type": "git",
+                "url": "git://github.com/mcavage/node-restify.git"
+        },
+        "main": "lib/index.js",
+        "directories": {
+                "bin": "./bin",
+                "lib": "./lib"
+        },
+        "engines": {
+                "node": ">=0.6"
+        },
+        "dependencies": {
+                "bunyan": "~0.7",
+                "clone": "~0.1",
+                "byline": "~2.0",
+                "formidable": "~1.0",
+                "dtrace-provider": "~0.0",
+                "http-signature": "~0.9",
+                "lru-cache": "~1.0",
+                "mime": "~1.2",
+                "node-uuid": "~1.3",
+                "qs": "~0.4",
+                "retry": "~0.6",
+                "semver": "~1.0"
+        },
+        "devDependencies": {
+                "filed": "~0.0",
+                "tap": "0.2.4"
+        },
+        "optionalDependencies": {
+                "dtrace-provider": "~0.0"
+        },
+        "scripts": {
+                "test": "./node_modules/.bin/tap ./test/*.test.js"
+        }
 }
