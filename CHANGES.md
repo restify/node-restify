@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 1.4.2 (not yet released)
+## 1.4.3 (not yet released)
+
+## 1.4.2
 
 - Add Route.realize( Domenic Denicola)
 - defaultResponseHeaders setter was setting the wrong method (Harry Marr)
