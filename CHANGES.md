@@ -2,6 +2,9 @@
 
 ## 1.4.2 (not yet released)
 
+- Add Route.realize( Domenic Denicola)
+- defaultResponseHeaders setter was setting the wrong method (Harry Marr)
+- Workaround joyent/node#3257 (Dave Pacheco)
 - logging typo (Pedro Candel)
 - response `beforeSend` event (Paul Bouzakis)
 

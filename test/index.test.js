@@ -2,9 +2,13 @@
 
 var test = require('tap').test;
 
-
 var restify = require('../lib/index');
 
+
+
+///--- Globals
+
+var realizeUrl = restify.realizeUrl;
 
 
 ///--- Tests
@@ -12,12 +16,13 @@ var restify = require('../lib/index');
 test('realize', function (t) {
   var pattern = '/foo/:bar/:baz';
 
-  t.equal(restify.realizeUrl(pattern, {}), '/foo/:bar/:baz');
-  t.equal(restify.realizeUrl(pattern, {bar: 'BAR'}), '/foo/BAR/:baz');
-  t.equal(restify.realizeUrl(pattern, {bar: 'BAR', baz: 'BAZ'}), '/foo/BAR/BAZ');
-  t.equal(restify.realizeUrl(pattern, {bar: 'BAR', baz: 'BAZ', quux: 'QUUX'}), '/foo/BAR/BAZ');
+  t.equal(realizeUrl(pattern, {}), '/foo/:bar/:baz');
+  t.equal(realizeUrl(pattern, {bar: 'BAR'}), '/foo/BAR/:baz');
+  t.equal(realizeUrl(pattern, {bar: 'BAR', baz: 'BAZ'}), '/foo/BAR/BAZ');
+  t.equal(realizeUrl(pattern, {bar: 'BAR', baz: 'BAZ', quux: 'QUUX'}),
+          '/foo/BAR/BAZ');
 
-  t.equal(restify.realizeUrl('/foo////bar///:baz', {baz: 'BAZ'}), '/foo/bar/BAZ');
+  t.equal(realizeUrl('/foo////bar///:baz', {baz: 'BAZ'}), '/foo/bar/BAZ');
 
   t.end();
 });
