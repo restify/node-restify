@@ -2,11 +2,6 @@
 
 var http = require('http');
 
-var uuid = require('node-uuid');
-
-var HttpError = require('../lib/errors').HttpError;
-var RestError = require('../lib/errors').RestError;
-var plugins = require('../lib/plugins');
 var restify = require('../lib');
 
 if (require.cache[__dirname + '/helper.js'])
@@ -36,10 +31,10 @@ before(function (callback) {
                         log: helper.getLog('server')
                 });
 
-                SERVER.use(plugins.acceptParser(SERVER.acceptable));
-                SERVER.use(plugins.authorizationParser());
-                SERVER.use(plugins.dateParser());
-                SERVER.use(plugins.queryParser());
+                SERVER.use(restify.acceptParser(SERVER.acceptable));
+                SERVER.use(restify.authorizationParser());
+                SERVER.use(restify.dateParser());
+                SERVER.use(restify.queryParser());
 
                 SERVER.get('/foo/:id', function respond(req, res, next) {
                         res.send();
@@ -178,7 +173,7 @@ test('query object', function (t) {
 
 test('body url-encoded ok', function (t) {
         SERVER.post('/bodyurl/:id',
-                    plugins.bodyParser(),
+                    restify.bodyParser(),
                     function (req, res, next) {
                             t.equal(req.params.id, 'foo');
                             t.equal(req.params.name, 'markc');
@@ -209,7 +204,7 @@ test('body url-encoded ok', function (t) {
 
 test('body url-encoded ok (no params)', function (t) {
         SERVER.post('/bodyurl2/:id',
-                    plugins.bodyParser({ mapParams: false }),
+                    restify.bodyParser({ mapParams: false }),
                     function (req, res, next) {
                             t.equal(req.params.id, 'foo');
                             t.equal(req.params.name, 'markc');
@@ -240,7 +235,7 @@ test('body url-encoded ok (no params)', function (t) {
 
 test('body json ok', function (t) {
         SERVER.post('/body/:id',
-                    plugins.bodyParser(),
+                    restify.bodyParser(),
                     function (req, res, next) {
                             t.equal(req.params.id, 'foo');
                             t.equal(req.params.name, 'markc');
@@ -263,7 +258,7 @@ test('body json ok', function (t) {
 
 test('body json ok (no params)', function (t) {
         SERVER.post('/body/:id',
-                    plugins.bodyParser({ mapParams: false }),
+                    restify.bodyParser({ mapParams: false }),
                     function (req, res, next) {
                             t.equal(req.params.id, 'foo');
                             t.equal(req.params.name, 'markc');
@@ -288,7 +283,7 @@ test('body json ok (no params)', function (t) {
 
 test('GH-111 JSON Parser not right for arrays', function (t) {
         SERVER.post('/gh111',
-                    plugins.bodyParser(),
+                    restify.bodyParser(),
                     function (req, res, next) {
                             t.ok(Array.isArray(req.params));
                             t.equal(req.params[0], 'foo');
@@ -328,7 +323,7 @@ test('Conditional Request with correct Etag and headers', function (t) {
                            res.etag = 'testETag';
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.body = 'testing 304';
                            res.send();
@@ -355,7 +350,7 @@ test('Conditional Request with mismatched Etag and If-Match', function (t) {
                            res.etag = 'testEtag';
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function respond(req, res, next) {
                            res.send();
                            next();
@@ -383,7 +378,7 @@ test('cdntl req If-Modified header & !modified content', function (t) {
                            res.header('Last-Modified', yesterday);
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.send('testing 304');
                            next();
@@ -410,7 +405,7 @@ test('cdtl req  If-Unmodified-Since header,modified content', function (t) {
                            res.header('Last-Modified', new Date());
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.send('testing 412');
                            next();
@@ -437,7 +432,7 @@ test('cdtl req valid headers, ahead time, unmodified OK', function (t) {
                            res.header('Last-Modified', now);
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.send();
                            next();
@@ -465,7 +460,7 @@ test('cdtl req valid headers, ahead Timezone, modified content', function (t) {
                            res.header('Last-Modified', now);
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.send();
                            next();
@@ -490,7 +485,7 @@ test('Conditional PUT with matched Etag and headers', function (t) {
                            res.etag = 'testETag';
                            next();
                    },
-                   plugins.conditionalRequest(),
+                   restify.conditionalRequest(),
                    function (req, res, next) {
                            res.send();
                            next();
