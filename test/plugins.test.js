@@ -356,11 +356,10 @@ test('Conditional Request with mismatched Etag and If-Match', function (t) {
                            next();
                    });
 
-        // console.log(require('util').inspect(SERVER.routes['GET_/etag/:id_[]']))
         var opts = {
                 path: '/etag/foo',
                 headers: {
-                        'If-Match': 'testETag2',
+                        'If-Match': 'testETag2'
                 }
         };
         CLIENT.get(opts, function (err, _, res) {
@@ -503,4 +502,3 @@ test('Conditional PUT with matched Etag and headers', function (t) {
                 t.end();
         });
 });
-

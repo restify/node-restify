@@ -68,21 +68,6 @@ test('ok', function (t) {
 });
 
 
-test('ok (ssl)', function (t) {
-        // Lame, just make sure we go down the https path
-        try {
-                // t.ok(restify.createServer({
-                //         certificate: 'hello',
-                //         key: 'world'
-                // }));
-
-        } catch (e) {
-                t.fail('HTTPS server not created: ' + e.message);
-        }
-        t.end();
-});
-
-
 test('listen and close (port only)', function (t) {
         var server = restify.createServer();
         server.listen(PORT, function () {
@@ -118,7 +103,7 @@ test('get (path only)', function (t) {
                 t.ok(req.params);
                 t.equal(req.params.id, 'bar');
                 res.send();
-                return next();
+                next();
         });
 
         var count = 0;
@@ -140,15 +125,12 @@ test('get (path only)', function (t) {
 
 
 test('use + get (path only)', function (t) {
-        var handler = 0;
         SERVER.use(function (req, res, next) {
-                handler++;
                 next();
         });
         SERVER.get('/foo/:id', function tester(req, res, next) {
                 t.ok(req.params);
                 t.equal(req.params.id, 'bar');
-                handler++;
                 res.send();
                 next();
         });
@@ -225,7 +207,7 @@ test('PATCH ok', function (t) {
                 t.ok(req.params);
                 t.equal(req.params.id, 'bar');
                 res.send();
-                return next();
+                next();
         });
 
         var opts = {
@@ -380,7 +362,6 @@ test('get (path and version not ok)', function (t) {
         };
         CLIENT.get(opts, function (err, _, res) {
                 t.ok(err);
-                console.log(err)
                 t.equal(err.message, '~2.1');
                 t.equal(res.statusCode, 400);
                 t.end();
@@ -505,7 +486,7 @@ test('GH-64 prerouting chain with error', function (t) {
 
         SERVER.get('/hello/:name', function tester(req, res, next) {
                 res.send(req.params.name);
-                return next();
+                next();
         });
 
         CLIENT.get('/hello/mark', function (err, _, res) {
@@ -523,7 +504,7 @@ test('GH-67 extend access-control headers', function (t) {
                             ', If-Match, If-None-Match'));
 
                 res.send(req.params.name);
-                return next();
+                next();
         });
 
         CLIENT.get('/hello/mark', function (err, _, res) {
@@ -597,23 +578,23 @@ test('GH-109 RegExp flags not honored', function (t) {
 //
 // Disabled, as Heroku (travis) doesn't allow us to write to /tmp
 //
-/*
-test('GH-56 streaming with filed (upload)', function (t) {
-        var file = '/tmp/.' + uuid();
-        SERVER.put('/foo', function tester(req, res, next) {
-                req.pipe(filed(file)).pipe(res);
-        });
+//
+// test('GH-56 streaming with filed (upload)', function (t) {
+//         var file = '/tmp/.' + uuid();
+//         SERVER.put('/foo', function tester(req, res, next) {
+//                 req.pipe(filed(file)).pipe(res);
+//         });
 
-        CLIENT.put('/foo', 'hello world', function (err, _, res) {
-                t.ifError(err);
-                t.equal(res.statusCode, 201);
-                fs.readFile(file, 'utf8', function (err, data) {
-                        t.ifError(err);
-                        t.equal(JSON.parse(data), 'hello world');
-                        fs.unlink(file, function () {
-                                t.end();
-                        });
-                });
-        });
-});
-*/
+//         CLIENT.put('/foo', 'hello world', function (err, _, res) {
+//                 t.ifError(err);
+//                 t.equal(res.statusCode, 201);
+//                 fs.readFile(file, 'utf8', function (err, data) {
+//                         t.ifError(err);
+//                         t.equal(JSON.parse(data), 'hello world');
+//                         fs.unlink(file, function () {
+//                                 t.end();
+//                         });
+//                 });
+//         });
+// });
+//

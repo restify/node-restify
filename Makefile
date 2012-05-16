@@ -53,7 +53,7 @@ $(NODECOVER): | $(NPM_EXEC)
 .PHONY: cover
 cover: $(NODECOVER)
 	@rm -fr ./.coverage_data
-	LOG_LEVEL=trace $(NODECOVER) run $(NODEUNIT) test/*.test.js | $(BUNYAN)
+	$(NODECOVER) run $(NODEUNIT) test/*.test.js | $(BUNYAN)
 	$(NODECOVER) report html
 
 CLEAN_FILES += $(TAP) ./node_modules/nodeunit
