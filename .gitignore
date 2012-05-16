@@ -1,4 +1,5 @@
-coverage
+.coverage_data
+cover_html
 node_modules
 docs/*.html
 docs/pkg

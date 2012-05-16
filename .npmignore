@@ -2,6 +2,8 @@
 .git*
 .travis.yml
 build
+.coverage_data
+cover_html
 deps
 docs
 examples
