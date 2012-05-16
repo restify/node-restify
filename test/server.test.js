@@ -380,8 +380,8 @@ test('get (path and version not ok)', function (t) {
         };
         CLIENT.get(opts, function (err, _, res) {
                 t.ok(err);
-                // t.equal(err.message,
-                //         'GET /foo/bar supports versions: 1.2.3, 1.2.4');
+                console.log(err)
+                t.equal(err.message, '~2.1');
                 t.equal(res.statusCode, 400);
                 t.end();
         });
