@@ -396,7 +396,7 @@ test('GH-56 streaming with filed (download)', function (t) {
         var opts = {
                 hostname: 'localhost',
                 port: PORT,
-                path: '/foo',
+                path: '/',
                 method: 'GET',
                 agent: false
         };
