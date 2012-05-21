@@ -575,6 +575,42 @@ test('GH-109 RegExp flags not honored', function (t) {
 });
 
 
+test('upload routing based on content-type ok', function (t) {
+        var opts = {
+                path: '/',
+                contentType: '*/json'
+        };
+        SERVER.put(opts, function (req, res, next) {
+                res.send(204);
+                next();
+        });
+
+        CLIENT.put('/', 'foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 204);
+                t.end();
+        });
+});
+
+
+test('upload routing based on content-type ok', function (t) {
+        var opts = {
+                path: '/',
+                contentType: 'text/*'
+        };
+        SERVER.put(opts, function (req, res, next) {
+                res.send(204);
+                next();
+        });
+
+        CLIENT.put('/', 'foo', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 415);
+                t.end();
+        });
+});
+
+
 //
 // Disabled, as Heroku (travis) doesn't allow us to write to /tmp
 //
