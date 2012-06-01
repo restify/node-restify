@@ -1038,7 +1038,7 @@ test('GH-141 return next(err) not working', function (t) {
 //
 
 
-test('GH-149 limit request body size', function (t) {
+test('GH-149 limit request body size (form)', function (t) {
   var server = restify.createServer();
   server.use(restify.bodyParser({maxBodySize: 1024}));
 
@@ -1068,14 +1068,53 @@ test('GH-149 limit request body size', function (t) {
         body += chunk;
       });
       res.on('end', function () {
-        //throw new Error(body);
-        //t.equal(body, 'invalid credentials');
         server.close(function () {
           t.end();
         });
       });
     });
-    req.write(new Array(1028).join('x'));
+    req.write(new Array(1026).join('x'));
+    req.end();
+  });
+});
+
+
+test('GH-149 limit request body size (json)', function (t) {
+  var server = restify.createServer();
+  server.use(restify.bodyParser({maxBodySize: 1024}));
+
+  server.post('/', function (req, res, next) {
+    res.send(200, {length: req.body.length});
+    return next();
+  });
+
+  server.listen(PORT, function () {
+    var opts = {
+      hostname: 'localhost',
+      port: PORT,
+      path: '/',
+      method: 'POST',
+      agent: false,
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'transfer-encoding': 'chunked'
+      }
+    };
+    var req = http.request(opts, function (res) {
+      t.equal(res.statusCode, 413);
+      var body = '';
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        body += chunk;
+      });
+      res.on('end', function () {
+        server.close(function () {
+          t.end();
+        });
+      });
+    });
+    req.write('{"a":[' + new Array(512).join('1,') + '0]}');
     req.end();
   });
 });
