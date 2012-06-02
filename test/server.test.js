@@ -1062,11 +1062,6 @@ test('GH-149 limit request body size (form)', function (t) {
     };
     var req = http.request(opts, function (res) {
       t.equal(res.statusCode, 413);
-      var body = '';
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        body += chunk;
-      });
       res.on('end', function () {
         server.close(function () {
           t.end();
@@ -1103,11 +1098,6 @@ test('GH-149 limit request body size (json)', function (t) {
     };
     var req = http.request(opts, function (res) {
       t.equal(res.statusCode, 413);
-      var body = '';
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        body += chunk;
-      });
       res.on('end', function () {
         server.close(function () {
           t.end();
