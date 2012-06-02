@@ -2,6 +2,12 @@
 
 ## 1.4.3 (not yet released)
 
+- GH-149 allow setting of max body size (and return 413) (Simon Sturmer)
+- GH-146 allow setting of route regex flags when path is not a RegExp
+- Support SSL CAs (Paul Bouzakis)
+- body parser should return 415 when content-type not known (Simon Sturmer)
+
+
 ## 1.4.2
 
 - Add Route.realize( Domenic Denicola)
