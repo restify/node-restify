@@ -80,7 +80,9 @@ before(function (callback) {
                                 dtrace: helper.dtrace,
                                 retry: false,
                                 type: 'json',
-                                pooling: {}
+                                pooling: {
+                                        max: 2
+                                }
                         });
                         STR_CLIENT = restify.createClient({
                                 url: 'http://127.0.0.1:' + PORT,
@@ -88,7 +90,7 @@ before(function (callback) {
                                 retry: false,
                                 type: 'string',
                                 pooling: {
-                                        maxClients: 5,
+                                        max: 5,
                                         maxIdleTime: 120000
                                 }
                         });
@@ -98,7 +100,7 @@ before(function (callback) {
                                 retry: false,
                                 type: 'http',
                                 pooling: {
-                                        maxClients: 5,
+                                        max: 5,
                                         maxIdleTime: 120000
                                 }
                         });
@@ -134,6 +136,30 @@ test('GET json', function (t) {
                 t.deepEqual(obj, {hello: 'mcavage'});
                 t.end();
         });
+});
+
+
+test('pool acquire and release', function (t) {
+        var clients = [];
+        for (var i = 0; i < JSON_CLIENT.pool.max; i++) {
+                JSON_CLIENT.pool.acquire(function (err, client) {
+                        t.ifError(err, 'error acquiring pool client');
+                        clients.push(client);
+                });
+        }
+        // Given the queue is full, this will be called once we release
+        // later:
+        JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {
+                t.equal(JSON_CLIENT.pool.queue.length, 0);
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {hello: 'mcavage'});
+                t.end();
+        });
+        t.equal(JSON_CLIENT.pool.queue.length, 1);
+        t.equal(JSON_CLIENT.pool.resources.length, JSON_CLIENT.pool.max);
+        JSON_CLIENT.pool.release(clients.shift());
 });
 
 
