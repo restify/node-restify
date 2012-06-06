@@ -3,8 +3,8 @@
 // Pretty much same setup than client.test.js, with the main difference that
 // all the clients here will use node-pooling instead of http Agent.
 
-var uuid = require('node-uuid'),
-    util = require('util');
+var uuid = require('node-uuid');
+var util = require('util');
 
 var restify = require('../lib');
 
@@ -111,7 +111,7 @@ before(function (callback) {
 });
 
 
-after(function (callback) { 
+after(function (callback) {
         try {
                 SERVER.close(function () {
                         JSON_CLIENT.pool.shutdown();
