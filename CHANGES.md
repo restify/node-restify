@@ -1,7 +1,14 @@
 # restify Changelog
 
-## 1.4.3 (not yet released)
+## 1.4.4 (not yet released)
 
+## 1.4.3
+
+- update dependencies to latest (notably dtrace-provider)
+- GH-158 res.charSet broken (Tamas Daniel)
+- GH-154 bodyParser work with PATCH (Domenic Denicola)
+- GH-153 bodyParser can reject or allow unknown content-types (Domenic Denicola)
+- GH-152 Send JSON on HttpError (Domenic Denicola)
 - GH-149 allow setting of max body size (and return 413) (Simon Sturmer)
 - GH-146 allow setting of route regex flags when path is not a RegExp
 - Support SSL CAs (Paul Bouzakis)
