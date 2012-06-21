@@ -34,7 +34,7 @@
                 "node": ">=0.6"
         },
         "dependencies": {
-                "bunyan": "0.7.0",
+                "bunyan": "0.8.0",
                 "clone": "0.1.0",
                 "byline": "2.0.2",
                 "formidable": "1.0.9",
