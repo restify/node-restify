@@ -18,7 +18,7 @@
 # javascriptlint
 #
 JSL_EXEC	?= deps/javascriptlint/build/install/jsl
-JSL		?= python2.6 $(JSL_EXEC)
+JSL		?= python $(JSL_EXEC)
 
 $(JSL_EXEC): | deps/javascriptlint/.git
 	cd deps/javascriptlint && make install
