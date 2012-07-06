@@ -99,6 +99,9 @@ before(function (callback) {
                                 dtrace: helper.dtrace,
                                 retry: false,
                                 type: 'http',
+                                headers: {
+                                        accept: 'text/plain'
+                                },
                                 pooling: {
                                         max: 5,
                                         maxIdleTime: 120000

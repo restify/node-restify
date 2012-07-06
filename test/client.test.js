@@ -84,7 +84,10 @@ before(function (callback) {
                         RAW_CLIENT = restify.createClient({
                                 url: 'http://127.0.0.1:' + PORT,
                                 dtrace: helper.dtrace,
-                                retry: false
+                                retry: false,
+                                headers: {
+                                        accept: 'text/plain'
+                                }
                         });
                         process.nextTick(callback);
                 });
