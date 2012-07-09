@@ -54,7 +54,7 @@ before(function (callback) {
 
                 SERVER.on('clientError', function (err) {
                         console.error(err.stack);
-                        process.exit(1);
+                        // process.exit(1);
                 });
 
                 SERVER.use(restify.acceptParser(['json', 'text/plain']));

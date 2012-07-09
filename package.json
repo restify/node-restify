@@ -46,7 +46,8 @@
                 "qs": "0.5.0",
                 "retry": "0.6.0",
                 "semver": "1.0.14",
-                "pooling": "0.2.1"
+                "pooling": "0.2.1",
+                "verror": "git://github.com/davepacheco/node-verror.git"
         },
         "devDependencies": {
                 "cover": "0.2.8",

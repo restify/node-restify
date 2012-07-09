@@ -481,7 +481,10 @@ test('GH-64 prerouting chain', function (t) {
 
 test('GH-64 prerouting chain with error', function (t) {
         SERVER.pre(function (req, res, next) {
-                next(new RestError(400, 'BadRequest', 'screw you client'));
+                next(new RestError({
+                        statusCode: 400,
+                        restCode: 'BadRequest'
+                }, 'screw you client'));
         });
 
         SERVER.get('/hello/:name', function tester(req, res, next) {
