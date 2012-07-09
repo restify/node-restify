@@ -3,6 +3,7 @@
 ## 1.4.4 (not yet released)
 
 - GH-160 don't rely on npm's directories: "bin".
+- set `req.params.files` on multipart file uploads
 
 ## 1.4.3
 
