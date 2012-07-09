@@ -647,10 +647,11 @@ supported.
 
     server.use(restify.bodyParser({ mapParams: false }));
 
-You can pass in an options object; currently the only parameter honored is
-`mapParams`, which you can set to `false` to disable copying k/v pairs from
+You can pass in an options object; currently the only two parameters honored are
+`mapParams` and `keepExtensions`. You can set `mapParams` to `false` to disable copying k/v pairs from
 the request body into `req.params`; instead, `req.body` will be overwritten with
-the parsed object.  The default is to map params into `req.params`.
+the parsed object.  The default is to map params into `req.params`. The `keepExtensions` option is
+useful if you want the uploaded files to include the extensions of the original files. Default is `false`.
 
 ### Throttle
 
