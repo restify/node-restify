@@ -2,7 +2,15 @@
 
 ## 1.4.4 (not yet released)
 
+- GH-177 move to dtrace-provider 0.0.9
+- GH-172 option `keepExtensions` in body parser (Luri Aranda)
+- GH-173 set req.files on multipart (Jonathan Wiepert)
+- GH-169 json body parser failing content-md5, sometimes
+- GH-166 plugins assume content-length is integer (Petter Rasmussen)
+- GH-164 Get rid of ETag quotes and W/ prefix for ETag header (Dominic Denicola)
+- GH-163 Don't default content-length to 0
 - GH-160 don't rely on npm's directories: "bin".
+- GH-159 req.charset not working (Tamas Daniel)
 - set `req.params.files` on multipart file uploads
 
 ## 1.4.3
