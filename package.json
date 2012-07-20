@@ -1,6 +1,7 @@
 {
   "author": "Mark Cavage <mcavage@gmail.com>",
   "contributors": [
+    "Luri Aranda",
     "Dominic Barnes",
     "Tamas Daniel",
     "Domenic Denicola",
@@ -11,18 +12,20 @@
     "Trent Mick",
     "Falco Nogatz",
     "Pedro Palazón",
+    "Petter Rasmussen",
     "Andrew Robinson",
     "Isaac Schlueter",
     "Andrew Sliwinski",
     "Matt Smillie",
     "Simon Sturmer",
     "Diego Torres",
+    "Jonathan Wiepert",
     "Mike Williams"
   ],
   "name": "restify",
   "homepage": "http://mcavage.github.com/node-restify",
   "description": "REST framework",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
@@ -36,10 +39,10 @@
   },
   "dependencies": {
     "async": "0.1.22",
-    "bunyan": "0.8.0",
+    "bunyan": "0.10.0",
     "byline": "2.0.2",
     "formidable": "1.0.11",
-    "dtrace-provider": "0.0.8",
+    "dtrace-provider": "0.0.9",
     "http-signature": "0.9.9",
     "lru-cache": "1.1.0",
     "mime": "1.2.5",
@@ -53,7 +56,7 @@
     "tap": "0.2.5"
   },
   "optionalDependencies": {
-    "dtrace-provider": "0.0.6"
+    "dtrace-provider": "0.0.9"
   },
   "scripts": {
     "test": "./node_modules/.bin/tap ./test/*.test.js"
