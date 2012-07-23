@@ -348,7 +348,7 @@ HTTP status codes as a subclass of `HttpError`.  So, for example, you can
 do this:
 
     server.get('/hello/:name', function(req, res, next) {
-      return next(new restify.ConflictError("I just don't like you"));
+      return next(new restify.InvalidArgumentError("I just don't like you"));
     });
 
     $ curl -is -H 'accept: text/*' localhost:8080/hello/mark
