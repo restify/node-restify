@@ -250,6 +250,31 @@ test('get (path and version not ok)', function (t) {
   });
 });
 
+test('use - throws TypeError on non function as argument', function (t) {
+
+  var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
+
+  var err = new TypeError('handlers must be Functions');
+
+  t.throws(function () {
+    server.use('/nonfn');
+  }, err);
+
+  t.throws(function () {
+    server.use({an:'object'});
+  }, err);
+
+  t.throws(function () {
+    server.use(
+      function good() { return next() },
+      '/bad',
+      {really:'bad'}
+    );
+  }, err);
+
+
+  t.end();
+});
 
 test('use + get (path only)', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
