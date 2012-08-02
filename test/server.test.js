@@ -642,7 +642,10 @@ test('upload routing based on content-type ok', function (t) {
 
 test('full response', function (t) {
         SERVER.use(restify.fullResponse());
-
+        SERVER.del('/bar/:id', function tester(req, res, next) {
+                res.send();
+                next();
+        });
         SERVER.get('/bar/:id', function tester(req, res, next) {
                 t.ok(req.params);
                 t.equal(req.params.id, 'bar');
@@ -658,6 +661,7 @@ test('full response', function (t) {
                 t.ok(headers['access-control-allow-origin']);
                 t.ok(headers['access-control-allow-headers']);
                 t.ok(headers['access-control-expose-headers']);
+                t.ok(headers['access-control-allow-methods']);
                 t.ok(headers.date);
                 t.ok(headers['x-request-id']);
                 t.ok(headers['x-response-time'] >= 0);
