@@ -34,7 +34,8 @@ before(function (callback) {
         try {
                 SERVER = restify.createServer({
                         dtrace: helper.dtrace,
-                        log: helper.getLog('server')
+                        log: helper.getLog('server'),
+                        version: ['2.0.0', '0.5.4', '1.4.3']
                 });
                 SERVER.listen(PORT, '127.0.0.1', function () {
                         CLIENT = restify.createJsonClient({
@@ -637,3 +638,32 @@ test('upload routing based on content-type ok', function (t) {
 //         });
 // });
 //
+
+
+test('full response', function (t) {
+        SERVER.use(restify.fullResponse());
+
+        SERVER.get('/bar/:id', function tester(req, res, next) {
+                t.ok(req.params);
+                t.equal(req.params.id, 'bar');
+                res.send();
+                next();
+        });
+
+        CLIENT.get('/bar/bar', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                var headers = res.headers;
+                t.ok(headers, 'headers ok');
+                t.ok(headers['access-control-allow-origin']);
+                t.ok(headers['access-control-allow-headers']);
+                t.ok(headers['access-control-expose-headers']);
+                t.ok(headers.date);
+                t.ok(headers['x-request-id']);
+                t.ok(headers['x-response-time'] >= 0);
+                t.equal(headers.server, 'restify');
+                t.equal(headers.connection, 'Keep-Alive');
+                t.equal(headers['x-api-version'], '2.0.0');
+                t.end();
+        });
+});
