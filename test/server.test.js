@@ -646,7 +646,7 @@ test('full response', function (t) {
                 res.send();
                 next();
         });
-        SERVER.get('/bar/:id', function tester(req, res, next) {
+        SERVER.get('/bar/:id', function tester2(req, res, next) {
                 t.ok(req.params);
                 t.equal(req.params.id, 'bar');
                 res.send();
