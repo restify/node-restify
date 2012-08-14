@@ -201,6 +201,7 @@ server.listen(8080);
 <tr><td>formatters</td><td>Object</td><td>Custom response formatters for <code>res.send()</code></td></tr>
 <tr><td>log</td><td>Object</td><td>You can optionally pass in a <a href="https://github.com/trentm/node-bunyan">bunyan</a> instance; not required</td></tr>
 <tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, and also will name the DTrace provider; default is <code>restify</code></td></tr>
+<tr><td>urlParamPattern</td><td>String</td><td>Overrides the RegExp used to replace <code>:name</code> parameters. By default, uses <code>[a-zA-Z0-9-_~\\.%]+</code> (RFC3986 compliant).</td></tr>
 <tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
 <tr><td>responseTimeHeader</td><td>String</td><td>By default, this will be <code>X-Response-Time</code></td></tr>
 <tr><td>responseTimeFormatter</td><td>function</td><td>Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. <a href="https://gist.github.com/1970083">example</a></td></tr>
