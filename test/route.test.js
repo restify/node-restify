@@ -218,6 +218,34 @@ test('test matches params url-encoded', function (t) {
 });
 
 
+test('test matches params with custom regex', function (t) {
+  var route = new Route({
+    log: new Logger({name: 'restify/test/route'}),
+    url: '/foo/:bar',
+    method: 'GET',
+    urlParamPattern: '[a-zA-Z0-9-_~%!;@=+\\$\\*\\.]+'
+  });
+  t.ok(route);
+  t.equivalent(route.matches({
+    method: 'GET',
+    path: '/foo/a%40b.com'
+  }), { bar: 'a@b.com' });
+  t.ok(route.matches({
+    method: 'GET',
+    path: '/foo/a@b.com'
+  }), { bar: 'a@b.com' });
+  t.ok(route.matches({
+    method: 'GET',
+    path: '/foo/a*b.com'
+  }), { bar: 'a*b.com' });
+  t.notOk(route.matches({
+    method: 'GET',
+    path: '/foo/a%40b.com/bar'
+  }));
+  t.end();
+});
+
+
 test('test matches multiple params', function (t) {
   var route = new Route({
     log: new Logger({name: 'restify/test/route'}),
