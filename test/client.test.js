@@ -125,7 +125,7 @@ test('GH-203 GET json, body is whitespace', function (t) {
 });
 
 test('GH-203 GET json, body is tabs', function (t) {
-    client.get('/whitespace/spaces', function (err, req, res, obj) {
+    client.get('/whitespace/tabs', function (err, req, res, obj) {
         t.ifError(err);
         t.ok(req);
         t.ok(res);
