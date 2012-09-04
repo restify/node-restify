@@ -39,7 +39,20 @@ function sendText(req, res, next) {
   return next();
 }
 
+function sendWhitespace(req, res, next) {
+    var body = ' ';
+    if (req.params.flavor === 'spaces') {
+        body = '   ';
+    } else if (req.params.flavor === 'tabs') {
+        body = ' \t\t  ';
+    }
 
+    // override contentType as otherwise the string is json-ified to include quotes. Don't want that for this test.
+    res.contentType = 'text/plain';
+    res.send(body);
+
+    return next();
+}
 
 ///--- Tests
 
@@ -70,6 +83,8 @@ test('setup', function (t) {
   server.put('/str/:name', sendText);
   server.post('/str/:name', sendText);
 
+  server.get('/whitespace/:flavor', sendWhitespace);
+
   server.listen(PORT, '127.0.0.1', function () {
     t.end();
   });
@@ -99,6 +114,25 @@ test('GET json', function (t) {
   });
 });
 
+test('GH-203 GET json, body is whitespace', function (t) {
+    client.get('/whitespace/spaces', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equivalent(obj, {});
+        t.end();
+    });
+});
+
+test('GH-203 GET json, body is tabs', function (t) {
+    client.get('/whitespace/spaces', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equivalent(obj, {});
+        t.end();
+    });
+});
 
 test('GH-115 GET path with spaces', function (t) {
   client.get('/json/foo bar', function (err, req, res, obj) {
