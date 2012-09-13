@@ -692,6 +692,7 @@ test('GH-64 prerouting chain', function (t) {
   var server = restify.createServer({ dtrace: DTRACE, log: LOGGER });
 
   server.pre(function (req, res, next) {
+    req.log.info('prerouting chain');
     req.headers.accept = 'application/json';
     return next();
   });
