@@ -178,6 +178,13 @@ test('POST json', function (t) {
   });
 });
 
+test('POST nothing', function (t) {
+    t.throws(function () {
+      client.post('/json/mcavage', function(){});
+    }, new TypeError('body (Object) required'));
+    t.end();
+});
+
 
 test('PUT json', function (t) {
   client.post('/json/mcavage', { hello: 'foo' }, function (err, req, res, obj) {
