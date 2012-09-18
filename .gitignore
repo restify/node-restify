@@ -6,3 +6,4 @@ docs/pkg
 *.tar.gz
 build
 docs/*.json
+/nbproject/private/
