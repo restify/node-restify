@@ -2,6 +2,7 @@
 
 var test = require('tap').test;
 var uuid = require('node-uuid');
+var http = require('http');
 
 var Logger = require('bunyan');
 var restify = require('../lib');
@@ -39,6 +40,15 @@ function sendText(req, res, next) {
   return next();
 }
 
+function sendSignature(req, res, next) {
+  res.contentType = 'text/plain';
+  var hdr = req.header('X-Awesome-Signature');
+  if (!hdr)
+    res.send('request NOT signed');
+  else
+    res.send('ok: ' + hdr);
+}
+
 function sendWhitespace(req, res, next) {
     var body = ' ';
     if (req.params.flavor === 'spaces') {
@@ -53,6 +63,7 @@ function sendWhitespace(req, res, next) {
 
     return next();
 }
+
 
 ///--- Tests
 
@@ -82,6 +93,8 @@ test('setup', function (t) {
   server.head('/str/:name', sendText);
   server.put('/str/:name', sendText);
   server.post('/str/:name', sendText);
+
+  server.get('/signed', sendSignature);
 
   server.get('/whitespace/:flavor', sendWhitespace);
 
@@ -452,6 +465,50 @@ test('GH-20 connectTimeout', function (t) {
   client.get('/foo', function (err, req) {
     t.ok(err);
     t.notOk(req);
+    t.end();
+  });
+});
+
+
+test('don\'t sign a request', function (t) {
+  client = restify.createClient({
+    url: 'http://127.0.0.1:' + PORT,
+    type: 'string',
+    accept: 'text/plain',
+    headers: { 'X-Gusty-Winds': 'May Exist' }
+  });
+  client.get('/signed', function (err, req, res, data) {
+    t.ifError(err);
+    t.ok(data);
+    t.equal(data, 'request NOT signed');
+    t.end();
+  });
+});
+
+
+test('sign a request', function (t) {
+  var called = 0;
+  var signer = function signRequest(request) {
+    called++;
+    if (!request || !(request instanceof http.ClientRequest))
+      throw new Error('request must be an instance of http.ClientRequest');
+    var gw = request.getHeader('X-Gusty-Winds');
+    if (!gw)
+      throw new Error('X-Gusty-Winds header was not present in request');
+    request.setHeader('X-Awesome-Signature', 'Gusty Winds ' + gw);
+  };
+  client = restify.createClient({
+    url: 'http://127.0.0.1:' + PORT,
+    type: 'string',
+    accept: 'text/plain',
+    signRequest: signer,
+    headers: { 'X-Gusty-Winds': 'May Exist' }
+  });
+  client.get('/signed', function (err, req, res, data) {
+    t.ifError(err);
+    t.ok(data);
+    t.equal(called, 1);
+    t.equal(data, 'ok: Gusty Winds May Exist');
     t.end();
   });
 });
