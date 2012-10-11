@@ -35,7 +35,7 @@
         },
         "dependencies": {
                 "assert-plus": "0.1.0",
-                "bunyan": "0.13.5",
+                "bunyan": "0.14.5",
                 "clone": "0.1.0",
                 "byline": "2.0.2",
                 "formidable": "1.0.11",

@@ -491,7 +491,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'after'
 
-`function (request, response, route) {}`
+`function (request, response, route, error) {}`
 
 Emitted after a route has finished all the handlers you registered.
 You can use this to write audit logs, etc.  The route parameter will be
@@ -745,7 +745,7 @@ Audit logging is a special plugin, as you don't use it with `.use()`, but with
 the `after` event:
 
     server.on('after', restify.auditLogger({
-      log: new Logger({
+      log: bunyan.createLogger({
         name: 'audit',
         stream: process.stdout
       })
