@@ -635,7 +635,7 @@ test('upload routing based on content-type ok', function (t) {
                 next();
         });
 
-        CLIENT.put('/', 'foo', function (err, _, res) {
+        CLIENT.put('/', {foo: 'foo'}, function (err, _, res) {
                 t.ok(err);
                 t.equal(res.statusCode, 415);
                 t.end();

@@ -462,3 +462,11 @@ test('GH-203 GET json, body is tabs', function (t) {
                 t.end();
         });
 });
+
+
+test('POST nothing', function (t) {
+        t.throws(function () {
+                JSON_CLIENT.post('/json/mcavage', function () {});
+        }, require('assert').AssertionError);
+        t.end();
+});
