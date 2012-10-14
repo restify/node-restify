@@ -27,8 +27,10 @@
         },
         "main": "lib/index.js",
         "directories": {
-                "bin": "./bin",
                 "lib": "./lib"
+        },
+        "bin": {
+                "report-latency": "./bin/report-latency"
         },
         "engines": {
                 "node": ">=0.8"
