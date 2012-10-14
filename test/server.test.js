@@ -473,6 +473,7 @@ test('GH-63 res.send 204 is sending a body', function (t) {
 
 test('GH-64 prerouting chain', function (t) {
         SERVER.pre(function (req, res, next) {
+                req.log.debug('testing log is set');
                 req.headers.accept = 'application/json';
                 next();
         });
