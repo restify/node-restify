@@ -1,5 +1,6 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+var assert = require('assert-plus');
 var fs = require('fs');
 var http = require('http');
 
@@ -167,6 +168,29 @@ test('rm', function (t) {
                         t.end();
                 });
         });
+});
+
+
+test('use - throws TypeError on non function as argument', function (t) {
+        var err = assert.AssertionError('handler (function) is required');
+
+        t.throws(function () {
+                SERVER.use('/nonfn');
+        }, err);
+
+        t.throws(function () {
+                SERVER.use({an:'object'});
+        }, err);
+
+        t.throws(function () {
+                SERVER.use(
+                        function good() { return next() },
+                        '/bad',
+                        {really:'bad'}
+                );
+        }, err);
+
+        t.end();
 });
 
 
