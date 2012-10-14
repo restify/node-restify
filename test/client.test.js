@@ -38,6 +38,22 @@ function sendText(req, res, next) {
 }
 
 
+function sendWhitespace(req, res, next) {
+        var body = ' ';
+        if (req.params.flavor === 'spaces') {
+                body = '   ';
+        } else if (req.params.flavor === 'tabs') {
+                body = ' \t\t  ';
+        }
+
+        // override contentType as otherwise the string is json-ified to
+        // include quotes. Don't want that for this test.
+        res.header('content-type', 'text/plain');
+        res.send(body);
+        next();
+}
+
+
 
 ///--- Tests
 
@@ -59,6 +75,8 @@ before(function (callback) {
                 SERVER.use(restify.authorizationParser());
                 SERVER.use(restify.queryParser());
                 SERVER.use(restify.bodyParser());
+
+                SERVER.get('/whitespace/:flavor', sendWhitespace);
 
                 SERVER.get('/json/:name', sendJson);
                 SERVER.head('/json/:name', sendJson);
@@ -419,6 +437,28 @@ test('GH-169 PUT json Content-MD5', function (t) {
                 t.ifError(err);
                 t.ok(req);
                 t.ok(res);
+                t.end();
+        });
+});
+
+
+test('GH-203 GET json, body is whitespace', function (t) {
+        JSON_CLIENT.get('/whitespace/spaces', function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {});
+                t.end();
+        });
+});
+
+
+test('GH-203 GET json, body is tabs', function (t) {
+        JSON_CLIENT.get('/whitespace/tabs', function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {});
                 t.end();
         });
 });

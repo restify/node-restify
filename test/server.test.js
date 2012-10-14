@@ -774,7 +774,6 @@ test('path+flags ok', function (t) {
 
 
 test('test matches params with custom regex', function (t) {
-        var req;
         var Router = require('../lib/router');
         var router = new Router({
                 log: helper.getLog()
