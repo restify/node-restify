@@ -1,5 +1,7 @@
 // Copyright 2012 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
+var http = require('http');
+
 var uuid = require('node-uuid');
 
 var restify = require('../lib');
@@ -35,6 +37,16 @@ function sendJson(req, res, next) {
 function sendText(req, res, next) {
         res.send('hello ' + (req.params.hello || req.params.name || ''));
         next();
+}
+
+function sendSignature(req, res, next) {
+        res.header('content-type', 'text/plain');
+        var hdr = req.header('X-Awesome-Signature');
+        if (!hdr) {
+                res.send('request NOT signed');
+        } else {
+                res.send('ok: ' + hdr);
+        }
 }
 
 
@@ -76,6 +88,7 @@ before(function (callback) {
                 SERVER.use(restify.queryParser());
                 SERVER.use(restify.bodyParser());
 
+                SERVER.get('/signed', sendSignature);
                 SERVER.get('/whitespace/:flavor', sendWhitespace);
 
                 SERVER.get('/json/:name', sendJson);
@@ -469,4 +482,50 @@ test('POST nothing', function (t) {
                 JSON_CLIENT.post('/json/mcavage', function () {});
         }, require('assert').AssertionError);
         t.end();
+});
+
+
+test('don\'t sign a request', function (t) {
+        var client = restify.createClient({
+                url: 'http://127.0.0.1:' + PORT,
+                type: 'string',
+                accept: 'text/plain',
+                headers: { 'X-Gusty-Winds': 'May Exist' }
+        });
+        client.get('/signed', function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(data);
+                t.equal(data, 'request NOT signed');
+                t.end();
+        });
+});
+
+
+test('sign a request', function (t) {
+        var called = 0;
+        var signer = function sign(request) {
+                called++;
+                if (!request || !(request instanceof http.ClientRequest))
+                        throw new Error('request must be an instance of ' +
+                                        'http.ClientRequest');
+                var gw = request.getHeader('X-Gusty-Winds');
+                if (!gw)
+                        throw new Error('X-Gusty-Winds header was not ' +
+                                        'present in request');
+                request.setHeader('X-Awesome-Signature', 'Gusty Winds ' + gw);
+        };
+        var client = restify.createClient({
+                url: 'http://127.0.0.1:' + PORT,
+                type: 'string',
+                accept: 'text/plain',
+                signRequest: signer,
+                headers: { 'X-Gusty-Winds': 'May Exist' }
+        });
+        client.get('/signed', function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(data);
+                t.equal(called, 1);
+                t.equal(data, 'ok: Gusty Winds May Exist');
+                t.end();
+        });
 });

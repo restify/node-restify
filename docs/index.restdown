@@ -1216,6 +1216,14 @@ headers):
 
     client.get(options, function(err, req, res) { .. });
 
+If you need to interpose additional headers in the request before it is sent on
+to the server, you can provide a synchronous callback function as the
+`signRequest` option when creating a client.  This is particularly useful with
+[node-http-signature](https://github.com/joyent/node-http-signature), which
+needs to attach a cryptographic signature of selected outgoing headers.  If
+provided, this callback will be invoked with a single parameter: the outgoing
+`http.ClientRequest` object.
+
 ## JsonClient
 
 The JSON Client is the highest-level client bundled with restify; it
@@ -1251,6 +1259,7 @@ Options:
 ||headers||Object||HTTP headers to set in all requests||
 ||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
 ||retry||Object||options to provide to node-retry; defaults to 3 retries||
+||signRequest||Function||synchronous callback for interposing headers before request is sent||
 ||url||String||Fully-qualified URL to connect to||
 ||userAgent||String||user-agent string to use; restify inserts one, but you can override it||
 ||version||String||semver string to set the accept-version||
