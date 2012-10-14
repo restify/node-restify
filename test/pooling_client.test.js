@@ -61,9 +61,7 @@ before(function (callback) {
                 SERVER.use(restify.dateParser());
                 SERVER.use(restify.authorizationParser());
                 SERVER.use(restify.queryParser());
-                SERVER.use(restify.bodyParser({
-                        allowAnyContentType: true
-                }));
+                SERVER.use(restify.bodyParser());
 
                 SERVER.get('/json/:name', sendJson);
                 SERVER.head('/json/:name', sendJson);
