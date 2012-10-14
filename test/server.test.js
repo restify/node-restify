@@ -671,3 +671,32 @@ test('full response', function (t) {
                 t.end();
         });
 });
+
+
+test('GH-149 limit request body size', function (t) {
+        SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+
+        SERVER.post('/', function (req, res, next) {
+                res.send(200, {length: req.body.length});
+                next();
+        });
+
+        var opts = {
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/',
+                method: 'POST',
+                agent: false,
+                headers: {
+                        'accept': 'application/json',
+                        'content-type': 'application/x-www-form-urlencoded',
+                        'transfer-encoding': 'chunked'
+                }
+        };
+        var client = http.request(opts, function (res) {
+                t.equal(res.statusCode, 413);
+                res.once('end', t.end.bind(t));
+        });
+        client.write(new Array(1028).join('x'));
+        client.end();
+});
