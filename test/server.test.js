@@ -184,10 +184,13 @@ test('use - throws TypeError on non function as argument', function (t) {
 
         t.throws(function () {
                 SERVER.use(
-                        function good() { return next() },
+                        function good(req, res, next) {
+                                next();
+                        },
                         '/bad',
-                        {really:'bad'}
-                );
+                        {
+                                really:'bad'
+                        });
         }, err);
 
         t.end();
@@ -767,4 +770,54 @@ test('path+flags ok', function (t) {
                 t.equal(obj, 'hi');
                 t.end();
         });
+});
+
+
+test('test matches params with custom regex', function (t) {
+        var req;
+        var Router = require('../lib/router');
+        var router = new Router({
+                log: helper.getLog()
+        });
+        t.ok(router);
+        router.mount({
+                method: 'GET',
+                url: '/foo/:bar',
+                urlParamPattern: '[a-zA-Z0-9-_~%!;@=+\\$\\*\\.]+'
+        });
+
+        var count = 0;
+        var done = 0;
+        function find(p, exp) {
+                count++;
+                var obj = {
+                        method: 'GET',
+                        path: function () {
+                                return (p);
+                        },
+                        version: function () {},
+                        url: p
+                };
+
+                process.nextTick(function () {
+                        router.find(obj, {}, function (err, r, ctx) {
+                                if (exp) {
+                                        t.ifError(err);
+                                        t.ok(r);
+                                        t.ok(ctx);
+                                        t.deepEqual(ctx, {bar: exp});
+                                } else {
+                                        t.ok(err);
+                                }
+                                if (++done === count)
+                                        t.end();
+                        });
+                });
+
+        }
+
+        find('/foo/a%40b.com', 'a@b.com');
+        find('/foo/a@b.com', 'a@b.com');
+        find('/foo/a*b.com', 'a*b.com');
+        find('/foo/a%40b.com/bar', false);
 });
