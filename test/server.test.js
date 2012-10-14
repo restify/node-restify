@@ -729,3 +729,18 @@ test('GH-149 limit request body size (json)', function (t) {
         client.write('{"a":[' + new Array(512).join('1,') + '0]}');
         client.end();
 });
+
+
+test('path+flags ok', function (t) {
+        SERVER.get({path: '/foo', flags: 'i'}, function (req, res, next) {
+                res.send('hi');
+                next();
+        });
+
+        CLIENT.get('/FoO', function (err, _, res, obj) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(obj, 'hi');
+                t.end();
+        });
+});
