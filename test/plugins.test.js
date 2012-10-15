@@ -16,7 +16,7 @@ var after = helper.after;
 var before = helper.before;
 var test = helper.test;
 
-var PORT = process.env.UNIT_TEST_PORT || 12345;
+var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
@@ -42,6 +42,7 @@ before(function (callback) {
                 });
 
                 SERVER.listen(PORT, '127.0.0.1', function () {
+                        PORT = SERVER.address().port;
                         CLIENT = restify.createJsonClient({
                                 url: 'http://127.0.0.1:' + PORT,
                                 dtrace: helper.dtrace,

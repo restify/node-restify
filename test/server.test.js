@@ -23,7 +23,7 @@ var after = helper.after;
 var before = helper.before;
 var test = helper.test;
 
-var PORT = process.env.UNIT_TEST_PORT || 12345;
+var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
@@ -39,6 +39,7 @@ before(function (callback) {
                         version: ['2.0.0', '0.5.4', '1.4.3']
                 });
                 SERVER.listen(PORT, '127.0.0.1', function () {
+                        PORT = SERVER.address().port;
                         CLIENT = restify.createJsonClient({
                                 url: 'http://127.0.0.1:' + PORT,
                                 dtrace: helper.dtrace,
@@ -72,7 +73,7 @@ test('ok', function (t) {
 
 test('listen and close (port only)', function (t) {
         var server = restify.createServer();
-        server.listen(PORT, function () {
+        server.listen(0, function () {
                 server.close(function () {
                         t.end();
                 });
@@ -82,7 +83,7 @@ test('listen and close (port only)', function (t) {
 
 test('listen and close (port only) w/ port number as string', function (t) {
         var server = restify.createServer();
-        server.listen(String(PORT), function () {
+        server.listen(String(0), function () {
                 server.close(function () {
                         t.end();
                 });
