@@ -38,7 +38,7 @@ var PASSWORD = uuid();
 test('setup', function (t) {
         SERVER = restify.createServer({
                 dtrace: helper.dtrace,
-                log: helper.getLog('server')
+                log: helper.getLog('server', process.stdout, 'trace')
         });
 
         SERVER.use(function ghettoAuthenticate(req, res, next) {

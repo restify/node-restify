@@ -39,9 +39,9 @@ module.exports = {
                 };
         },
 
-        getLog: function (name, stream) {
+        getLog: function (name, stream, level) {
                 return (bunyan.createLogger({
-                        level: (process.env.LOG_LEVEL || 'info'),
+                        level: (process.env.LOG_LEVEL || level || 'info'),
                         name: name || process.argv[1],
                         stream: stream || process.stdout,
                         src: true,
