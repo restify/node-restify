@@ -1,4 +1,4 @@
-﻿// Copyright 2012 Mark Cavage, Inc.  All rights reserved.
+// Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
 var restify = require('../lib/index');
 
