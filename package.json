@@ -37,7 +37,7 @@
         },
         "dependencies": {
                 "assert-plus": "0.1.2",
-                "bunyan": "0.16.0",
+                "bunyan": "0.16.3",
                 "clone": "0.1.1",
                 "byline": "2.0.3",
                 "formidable": "1.0.11",
@@ -56,7 +56,7 @@
                 "nodeunit": "0.7.4"
         },
         "optionalDependencies": {
-                "dtrace-provider": "0.2.3"
+                "dtrace-provider": "0.2.4"
         },
         "scripts": {
                 "test": "./node_modules/.bin/nodeunit ./test/*.test.js"
