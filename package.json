@@ -39,10 +39,11 @@
                 "assert-plus": "0.1.2",
                 "bunyan": "0.16.4",
                 "clone": "0.1.1",
+                "dtrace-provider": "0.2.4",
                 "byline": "2.0.3",
                 "formidable": "1.0.11",
                 "http-signature": "0.9.9",
-                "lru-cache": "2.0.4",
+                "lru-cache": "2.1.0",
                 "mime": "1.2.7",
                 "node-uuid": "1.4.0",
                 "qs": "0.5.1",
@@ -54,9 +55,6 @@
                 "cover": "0.2.8",
                 "filed": "0.0.7",
                 "nodeunit": "0.7.4"
-        },
-        "optionalDependencies": {
-                "dtrace-provider": "0.2.4"
         },
         "scripts": {
                 "test": "./node_modules/.bin/nodeunit ./test/*.test.js"
