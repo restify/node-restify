@@ -321,14 +321,12 @@ test('OPTIONS', function (t) {
         var opts = {
                 hostname: 'localhost',
                 port: PORT,
-                path: '/foo/bar',
+                path: '*',
                 method: 'OPTIONS',
                 agent: false
         };
         http.request(opts, function (res) {
                 t.equal(res.statusCode, 200);
-                t.ok(res.headers.allow);
-                t.equal(res.headers.allow, 'GET, POST, PUT, DELETE');
                 t.end();
         }).end();
 });
