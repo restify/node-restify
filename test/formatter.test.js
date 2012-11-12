@@ -29,17 +29,17 @@ before(function (callback) {
         try {
                 SERVER = restify.createServer({
                         formatters: {
-                            "text/plain": function(req, res, body, cb){
-                                if(isFirstRequest){
-                                    setTimeout(function(){
-                                        isFirstRequest = false;
-                                        cb( null, "async formatting");
-                                    },3000);
-                                    return this;
-                                }
+                                'text/plain': function (req, res, body, cb) {
+                                        if (isFirstRequest) {
+                                                process.nextTick(function () {
+                                                        isFirstRequest = false;
+                                                        cb(null, 'async fmt');
+                                                });
+                                                return (this);
+                                        }
 
-                                return "sync formatting";
-                            }
+                                        return ('sync fmt');
+                                }
                         },
                         dtrace: helper.dtrace,
                         log: helper.getLog('server'),
@@ -52,8 +52,8 @@ before(function (callback) {
                                 dtrace: helper.dtrace,
                                 retry: false
                         });
-                        SERVER.get("/tmp",function(req,res){
-                            res.send("dummy response");
+                        SERVER.get('/tmp', function (req, res) {
+                                res.send('dummy response');
                         });
                         process.nextTick(callback);
                 });
@@ -75,21 +75,21 @@ after(function (callback) {
 
 
 test('async formatter', function (t) {
-        CLIENT.get("/tmp", function(err, req, res, data){
-            t.ifError(err);
-            t.ok(req);
-            t.ok(res);
-            t.equal(data, 'async formatting');
-            t.end();
+        CLIENT.get('/tmp', function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(data, 'async fmt');
+                t.end();
         });
 });
 
 test('sync formatter', function (t) {
-        CLIENT.get("/tmp", function(err, req, res, data){
-             t.ifError(err);
-            t.ok(req);
-            t.ok(res);
-            t.equal(data, 'sync formatting');
-            t.end();
+        CLIENT.get('/tmp', function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(data, 'sync fmt');
+                t.end();
         });
 });
