@@ -30,3 +30,10 @@ test('realize', function (t) {
 
         t.end();
 });
+
+test('httpDate', function (t) {
+        var d = restify.httpDate();
+        var regex = /\w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT/;
+        t.ok(regex.test(d));
+        t.end();
+});
