@@ -147,7 +147,7 @@ below (and `listen()` takes the same arguments as node's
 ||key||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
 ||log||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required||
-||name||String||By default, this will be set in the `Server` response header, and also will name the DTrace provider; default is `restify` ||
+||name||String||By default, this will be set in the `Server` response header, default is `restify` ||
 ||version||String||A default version to set for all routes||
 ||responseTimeHeader||String||By default, this will be `X-Response-Time`||
 ||responseTimeFormatter||function||Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. [example](https://gist.github.com/1970083)||
@@ -1042,70 +1042,80 @@ routes, and all of our handlers (functions); while that's optional, it
 does make DTrace much more usable.  So, if you started that server,
 then looked for DTrace probes, you'd see something like this:
 
-    $ dtrace -l -P helloworld*
-       ID   PROVIDER            MODULE                          FUNCTION NAME
-    23491 helloworld10254            module                              func getfoo-start
-    23492 helloworld10254            module                              func getfoo-done
-    23493 helloworld10254            module                              func getfoo-parseAccept-start
-    23494 helloworld10254            module                              func getfoo-parseAccept-done
-    23495 helloworld10254            module                              func getfoo-parseAuthorization-start
-    23496 helloworld10254            module                              func getfoo-parseAuthorization-done
-    23497 helloworld10254            module                              func getfoo-parseDate-start
-    23498 helloworld10254            module                              func getfoo-parseDate-done
-    23499 helloworld10254            module                              func getfoo-parseQueryString-start
-    23500 helloworld10254            module                              func getfoo-parseQueryString-done
-    23501 helloworld10254            module                              func getfoo-parseUrlEncodedBody-start
-    23502 helloworld10254            module                              func getfoo-parseUrlEncodedBody-done
-    23503 helloworld10254            module                              func getfoo-slowHandler-start
-    23504 helloworld10254            module                              func getfoo-slowHandler-done
-    23505 helloworld10254            module                              func getfoo-respond-start
-    23506 helloworld10254            module                              func getfoo-respond-done
+    $ dtrace -l -P restify*
+    ID   PROVIDER            MODULE                          FUNCTION NAME
+    24 restify38789       mod-88f3f88                       route-start route-start
+    25 restify38789       mod-88f3f88                     handler-start handler-start
+    26 restify38789       mod-88f3f88                      handler-done handler-done
+    27 restify38789       mod-88f3f88                        route-done route-done
 
-What restify does is autogenerate a probe for each route/handler on
-start and finish, and uses the names found to do so. If there's no
-names, it fills in based on the method, url and index in the chain.
-The probe signatures generated look like:
-
-### Start Probes
-
-`$route-start and $route-$handler-start`
+### route-start
 
 ||*Field*||*Type*||*Description*||
-||id||int||cookie you can use to correlate request/response||
-||url||char *||request url||
-||user-agent||char *||value of user-agent header||
-||user||char *||req.username (i.e., the authenticated party)||
-||content-type||char *||value of content-type header||
-||content-length||int||value of content-length header||
+||server name||char *||name of the restify server that fired||
+||route name||char *||name of the route that fired||
+||id||int||unique id for this request||
+||method||char *||HTTP request method||
+||url||char *||(full) HTTP URL||
+||headers||char *||JSON encoded map of all request headers||
 
-### Done Probes
-
-`$route-done and $route-$handler-done`
+### handler-start
 
 ||*Field*||*Type*||*Description*||
-||id||int||cookie you can use to correlate request/response||
+||server name||char *||name of the restify server that fired||
+||route name||char *||name of the route that fired||
+||handler name||char *||name of the function that just entered||
+||id||int||unique id for this request||
+
+### route-done
+
+||*Field*||*Type*||*Description*||
+||server name||char *||name of the restify server that fired||
+||route name||char *||name of the route that fired||
+||id||int||unique id for this request||
 ||statusCode||int||HTTP response code||
-||content-type||char *||value of content-type header||
-||content-length||int||value of content-length header||
+||headers||char *||JSON encoded map of response headers||
+
+### handler-done
+
+||*Field*||*Type*||*Description*||
+||server name||char *||name of the restify server that fired||
+||route name||char *||name of the route that fired||
+||handler name||char *||name of the function that just entered||
+||id||int||unique id for this request||
+
+### Example D Script
 
 Now, if you wanted to say get a breakdown of latency by handler, you
 could do something like this:
 
-    #!/usr/sbin/dtrace -s
-    #pragma D option quiet
+     #!/usr/sbin/dtrace -s
+     #pragma D option quiet
 
-    helloworld*:::getfoo-*-start
-    {
-      tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = timestamp;
-    }
+     restify*:::route-start
+     {
+        track[arg2] = timestamp;
+     }
 
-    helloworld*:::getfoo-*-done
-    /tracker[arg0, substr(probename, 0, rindex(probename, "-"))]/
-    {
-      this->name = substr(probename, 0, rindex(probename, "-"));
-      @[this->name] = quantize(((timestamp - tracker[arg0, this->name]) / 1000000));
-      tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = 0;
-    }
+     restify*:::handler-start
+     /track[arg3]/
+     {
+        h[arg3, copyinstr(arg2)] = timestamp;
+     }
+
+     restify*:::handler-done
+     /track[arg3] && h[arg3, copyinstr(arg2)]/
+     {
+        @[copyinstr(arg2)] = quantize((timestamp - h[arg3, copyinstr(arg2)]) / 1000000);
+        h[arg3, copyinstr(arg2)] = 0;
+     }
+
+     restify*:::route-done
+     /track[arg2]/
+     {
+        @[copyinstr(arg1)] = quantize((timestamp - track[arg2]) / 1000000);
+        track[arg2] = 0;
+     }
 
 So running the server in one terminal:
 
@@ -1117,62 +1127,69 @@ The D script in another:
 
 Hit the server a few times with curl:
 
-    $ curl http://localhost:8080/hello/mcavage
+    $ for i in {1..10} ; do curl -is http://127.0.0.1:8080/hello/mark ; done
 
 Then Ctrl-C the D script, and you'll see the "slowHandler" at the
 bottom of the stack, bucketized that it's the vast majority of latency
 in this pipeline
 
-    $ ./guide.d
-    ^C
+    handler-6
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-parseAuthorization
-           value  ------------- Distribution ------------- count
-              -1 |                                         0
-               0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-               1 |                                         0
+    parseAccept
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-parseDate
-           value  ------------- Distribution ------------- count
-              -1 |                                         0
-               0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-               1 |                                         0
+    parseAuthorization
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-parseQueryString
-           value  ------------- Distribution ------------- count
-              -1 |                                         0
-               0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-               1 |                                         0
+    parseDate
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-parseUrlEncodedBody
-           value  ------------- Distribution ------------- count
-              -1 |                                         0
-               0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-               1 |                                         0
+    parseQueryString
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-parseAccept
-           value  ------------- Distribution ------------- count
-              -1 |                                         0
-               0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           3
-               1 |@@@@@@@@@@                               1
-               2 |                                         0
+    parseUrlEncodedBody
+    value  ------------- Distribution ------------- count
+    -1 |                                         0
+    0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+    1 |                                         0
 
-    getfoo-respond
-           value  ------------- Distribution ------------- count
-               0 |                                         0
-               1 |@@@@@@@@@@                               1
-               2 |@@@@@@@@@@@@@@@@@@@@                     2
-               4 |                                         0
-               8 |                                         0
-              16 |                                         0
-              32 |@@@@@@@@@@                               1
-              64 |                                         0
+    respond
+    value  ------------- Distribution ------------- count
+    1 |                                         0
+    2 |@@@@                                     1
+    4 |                                         0
+    8 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+    16 |                                         0
 
-    getfoo-slowHandler
-           value  ------------- Distribution ------------- count
-              64 |                                         0
-             128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-             256 |                                         0
+    slowHandler
+    value  ------------- Distribution ------------- count
+    64 |                                         0
+    128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+    256 |@@@@                                     1
+    512 |                                         0
+
+    getfoo
+    value  ------------- Distribution ------------- count
+    64 |                                         0
+    128 |@@@@                                     1
+    256 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+    512 |
 
 # Client API
 
