@@ -781,6 +781,7 @@ test('test matches params with custom regex', function (t) {
         t.ok(router);
         router.mount({
                 method: 'GET',
+                name: 'test',
                 url: '/foo/:bar',
                 urlParamPattern: '[a-zA-Z0-9-_~%!;@=+\\$\\*\\.]+'
         });
