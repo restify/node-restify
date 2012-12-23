@@ -4,9 +4,9 @@ var http = require('http');
 
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/helper.js'])
-        delete require.cache[__dirname + '/helper.js'];
-var helper = require('./helper.js');
+if (require.cache[__dirname + '/lib/helper.js'])
+        delete require.cache[__dirname + '/lib/helper.js'];
+var helper = require('./lib/helper.js');
 
 
 

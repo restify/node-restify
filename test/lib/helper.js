@@ -7,7 +7,7 @@
 var d = require('dtrace-provider');
 var bunyan = require('bunyan');
 
-var restify = require('../lib');
+var restify = require('../../lib');
 
 
 
