@@ -691,6 +691,22 @@ parsed object.  The default is to map params into `req.params`.  The
 `keepExtensions` option is useful if you want the uploaded files to include the
 extensions of the original files (multipart uploads only). Default is `false`.
 
+### RequestLogger
+
+Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with the
+current request id filled in, along with any other parameters you define.
+
+    server.use(restify.requestLogger({
+        properties: {
+            foo: 'bar'
+        },
+        serializers: {...}
+    }));
+
+You can pass in no options to this, in which case only the request id will be
+appended, and no serializers appended (this is also the most performant); the
+logger created at server creation time will be used as the parent logger.
+
 ### GzipResponse
 
     server.use(restify.gzipResponse());
