@@ -589,6 +589,7 @@ restify ships with several handlers you can use, specifically:
 * Accept header parsing
 * Authorization header parsing
 * Date header parsing
+* Gzip Response
 * Query string parsing
 * Body parsing (JSON/URL-encoded/multipart form)
 * Static file serving
@@ -603,6 +604,7 @@ Here's some example code using all the shipped plugins:
     server.use(restify.authorizationParser());
     server.use(restify.dateParser());
     server.use(restify.queryParser());
+    server.use(restify.gzipResponse());
     server.use(restify.bodyParser());
     server.use(restify.throttle({
       burst: 100,
@@ -687,6 +689,19 @@ request body into `req.params`; instead, `req.body` will be overwritten with the
 parsed object.  The default is to map params into `req.params`.  The
 `keepExtensions` option is useful if you want the uploaded files to include the
 extensions of the original files (multipart uploads only). Default is `false`.
+
+### GzipResponse
+
+    server.use(restify.gzipResponse());
+
+If the client sends an `accept-encoding: gzip` header (or one with an
+appropriate q-val), then the server will automatically gzip all response data.
+Note that only `gzip` is supported, as this is most widely supported by clients
+in the wild.  This plugin will overwrite some of the internal streams, so any
+calls to `res.send`, `res.write`, etc., will be compressed.  A side effect is
+that the `content-length` header cannot be known, and so
+`transfer-encoding: chunked` will *always* be set when this is in effect.  This
+plugin has no impact if the client does not send `accept-encoding: gzip`.
 
 ### Serve Static
 
@@ -1322,6 +1337,7 @@ Options:
 ||accept||String||Accept header to send||
 ||connectTimeout||Number||Amount of time to wait for a socket||
 ||dtrace||Object||node-dtrace-provider handle||
+||gzip||Object||Will compress data when sent using `content-encoding: gzip`||
 ||headers||Object||HTTP headers to set in all requests||
 ||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
 ||retry||Object||options to provide to node-retry; defaults to 3 retries||

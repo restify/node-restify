@@ -296,8 +296,8 @@ test('GH-111 JSON Parser not right for arrays', function (t) {
         var obj = ['foo', 'bar'];
         CLIENT.post('/gh111', obj, function (err, _, res) {
                 t.ifError(err);
-                t.equal(res.statusCode, 200);
                 t.end();
+                t.equal(res.statusCode, 200);
         });
 });
 
@@ -500,6 +500,56 @@ test('Conditional PUT with matched Etag and headers', function (t) {
         };
         CLIENT.put(opts, {}, function (err, _, res) {
                 t.equal(res.statusCode, 412);
+                t.end();
+        });
+});
+
+
+test('gzip response', function (t) {
+        SERVER.get('/gzip/:id',
+                   restify.gzipResponse(),
+                   function (req, res, next) {
+                           res.send({
+                                   hello: 'world'
+                           });
+                           next();
+                   });
+
+        var opts = {
+                path: '/gzip/foo',
+                headers: {
+                        'Accept-Encoding': 'gzip'
+                }
+        };
+        CLIENT.get(opts, function (err, _, res, obj) {
+                t.ifError(err);
+                t.deepEqual({hello: 'world'}, obj);
+                t.end();
+        });
+});
+
+
+test('gzip body json ok', function (t) {
+        SERVER.post('/body/:id',
+                    restify.bodyParser(),
+                    function (req, res, next) {
+                            t.equal(req.params.id, 'foo');
+                            t.equal(req.params.name, 'markc');
+                            t.equal(req.params.phone, '(206) 555-1212');
+                            res.send();
+                            next();
+                    });
+
+        var obj = {
+                phone: '(206) 555-1212',
+                name: 'somethingelse'
+        };
+        CLIENT.gzip = {};
+        CLIENT.post('/body/foo?name=markc', obj, function (err, _, res) {
+                t.ifError(err);
+                t.ok(res);
+                if (res)
+                        t.equal(res.statusCode, 200);
                 t.end();
         });
 });

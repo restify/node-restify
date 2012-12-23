@@ -37,9 +37,9 @@
         },
         "dependencies": {
                 "assert-plus": "0.1.2",
-                "bunyan": "0.16.7",
+                "bunyan": "0.16.8",
                 "clone": "git://github.com/pvorb/node-clone.git#341dd3f",
-                "dtrace-provider": "0.2.4",
+                "dtrace-provider": "0.2.5",
                 "byline": "2.0.3",
                 "formidable": "1.0.11",
                 "http-signature": "0.9.9",
