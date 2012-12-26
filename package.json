@@ -59,6 +59,6 @@
                 "nodeunit": "0.7.4"
         },
         "scripts": {
-                "test": "./node_modules/.bin/nodeunit ./test"
+                "test": "nodeunit ./test"
         }
 }
