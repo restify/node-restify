@@ -690,11 +690,11 @@ test('full response', function (t) {
                 t.ok(headers['access-control-expose-headers']);
                 t.ok(headers['access-control-allow-methods']);
                 t.ok(headers.date);
-                t.ok(headers['x-request-id']);
-                t.ok(headers['x-response-time'] >= 0);
+                t.ok(headers['request-id']);
+                t.ok(headers['response-time'] >= 0);
                 t.equal(headers.server, 'restify');
                 t.equal(headers.connection, 'Keep-Alive');
-                t.equal(headers['x-api-version'], '2.0.0');
+                t.equal(headers['api-version'], '2.0.0');
                 t.end();
         });
 });
@@ -823,7 +823,7 @@ test('test matches params with custom regex', function (t) {
 });
 
 
-test('GH-180 can parse DELETE body', function(t){
+test('GH-180 can parse DELETE body', function (t) {
         SERVER.use(restify.bodyParser({mapParams: false}));
 
         SERVER.del('/', function (req, res, next) {
@@ -843,7 +843,7 @@ test('GH-180 can parse DELETE body', function(t){
                         'transfer-encoding': 'chunked'
                 }
         };
-        var req = http.request(opts, function (res) {
+        http.request(opts, function (res) {
                 t.equal(res.statusCode, 200);
                 res.setEncoding('utf8');
                 res.body = '';
@@ -854,6 +854,5 @@ test('GH-180 can parse DELETE body', function(t){
                         t.equal(res.body, '{"param1":1234}');
                         t.end();
                 });
-        });
-        req.end('{"param1": 1234}');
+        }).end('{"param1": 1234}');
 });
