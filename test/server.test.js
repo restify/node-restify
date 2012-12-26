@@ -821,3 +821,39 @@ test('test matches params with custom regex', function (t) {
         find('/foo/a*b.com', 'a*b.com');
         find('/foo/a%40b.com/bar', false);
 });
+
+
+test('GH-180 can parse DELETE body', function(t){
+        SERVER.use(restify.bodyParser({mapParams: false}));
+
+        SERVER.del('/', function (req, res, next) {
+                res.send(200, req.body);
+                next();
+        });
+
+        var opts = {
+                hostname: 'localhost',
+                port: PORT,
+                path: '/',
+                method: 'DELETE',
+                agent: false,
+                headers: {
+                        'accept': 'application/json',
+                        'content-type': 'application/json',
+                        'transfer-encoding': 'chunked'
+                }
+        };
+        var req = http.request(opts, function (res) {
+                t.equal(res.statusCode, 200);
+                res.setEncoding('utf8');
+                res.body = '';
+                res.on('data', function (chunk) {
+                        res.body += chunk;
+                });
+                res.on('end', function () {
+                        t.equal(res.body, '{"param1":1234}');
+                        t.end();
+                });
+        });
+        req.end('{"param1": 1234}');
+});
