@@ -442,7 +442,12 @@ You can always add your own by subclassing `restify.RestError` like:
     var util = require('util');
 
     function MyError(message) {
-      restify.RestError.call(this, 418, 'MyError', message, MyError);
+      restify.RestError.call(this, {
+        restCode: 'MyError'
+        statusCode: 418,
+        message: message,
+        constructorOpt: MyError
+      });
       this.name = 'MyError';
     };
     util.inherits(MyError, restify.RestError);
