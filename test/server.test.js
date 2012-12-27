@@ -791,7 +791,9 @@ test('test matches params with custom regex', function (t) {
         function find(p, exp) {
                 count++;
                 var obj = {
+                        headers: {},
                         method: 'GET',
+                        contentType: function () {},
                         path: function () {
                                 return (p);
                         },
