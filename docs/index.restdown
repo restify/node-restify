@@ -616,6 +616,7 @@ restify ships with several handlers you can use, specifically:
 * Accept header parsing
 * Authorization header parsing
 * Date header parsing
+* JSONP support
 * Gzip Response
 * Query string parsing
 * Body parsing (JSON/URL-encoded/multipart form)
@@ -631,6 +632,7 @@ Here's some example code using all the shipped plugins:
     server.use(restify.authorizationParser());
     server.use(restify.dateParser());
     server.use(restify.queryParser());
+    server.use(restify.jsonp());
     server.use(restify.gzipResponse());
     server.use(restify.bodyParser());
     server.use(restify.throttle({
@@ -700,6 +702,15 @@ are merged into `req.params`.  You can disable by passing in `mapParams: false`
 in the options object:
 
     server.use(restify.queryParser({ mapParams: false }));
+
+### JSONP
+
+Supports checking the query string for `callback` or `jsonp` and ensuring that
+the content-type is appropriately set if JSONP params are in place.  There is
+also a default `application/javascript` formatter to handle this.
+
+You _should_ set the `queryParser` plugin to run before this, but if you don't
+this plugin will still parse the query string properly.
 
 ### BodyParser
 
