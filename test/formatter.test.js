@@ -39,6 +39,9 @@ before(function (callback) {
                                         }
 
                                         return ('sync fmt');
+                                },
+                                'application/foo; q=0.9': function () {
+                                        return ('foo!');
                                 }
                         },
                         dtrace: helper.dtrace,
@@ -90,6 +93,23 @@ test('sync formatter', function (t) {
                 t.ok(req);
                 t.ok(res);
                 t.equal(data, 'sync fmt');
+                t.end();
+        });
+});
+
+
+test('q-val priority', function (t) {
+        var opts = {
+                path: '/tmp',
+                headers: {
+                        accept: 'application/*'
+                }
+        };
+        CLIENT.get(opts, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(data, 'foo!');
                 t.end();
         });
 });

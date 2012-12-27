@@ -296,6 +296,7 @@ in a hash of content-type -> parser at server creation time:
       }
     });
 
+
 You can do whatever you want, but you probably want to check the type
 of `body` to figure out what type it is, notably for
 Error/Buffer/everything else.  You can always add more formatters
@@ -303,10 +304,30 @@ later by just setting the formatter on `server.formatters`, but it's
 probably sane to just do it at construct time.   Also, note that if a
 content-type can't be negotiated, the default is
 `application/octet-stream`.  Of course, you can always explicitly set
-the content-type to return by setting it on `res.contentType`:
+the content-type:
 
-    res.contentType = 'application/foo';
+    res.setHeader('content-type', 'application/foo');
     res.send({hello: 'world'});
+
+Note that there are typically at least three content-types supported by
+restify: json, text and binary.  When you override or append to this, the
+"priority" might change; to ensure that the priority is set to what you
+want, you should set a `q-value` on your formatter definitions, which will
+ensure sorting happens the way you want:
+
+    restify.createServer({
+      formatters: {
+        'application/foo; q=0.9': function formatFoo(req, res, body) {
+          if (body instanceof Error)
+            return body.stack;
+
+          if (Buffer.isBuffer(body))
+            return body.toString('base64');
+
+          return util.inspect(body);
+        }
+      }
+    });
 
 Lastly, you don't have to use any of this magic, as a restify response
 object has all the "raw" methods of a node
