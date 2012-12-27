@@ -856,3 +856,44 @@ test('GH-180 can parse DELETE body', function (t) {
                 });
         }).end('{"param1": 1234}');
 });
+
+
+test('returning error from a handler (with domains)', function (t) {
+        SERVER.get('/', function (req, res, next) {
+                next(new Error('bah!'));
+        });
+
+        CLIENT.get('/', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.end();
+        });
+});
+
+
+test('emitting error from a handler (with domains)', function (t) {
+        SERVER.get('/', function (req, res, next) {
+                req.emit('error', new Error('bah!'));
+        });
+
+        CLIENT.get('/', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.end();
+        });
+});
+
+
+test('throwing error from a handler (with domains)', function (t) {
+        SERVER.get('/', function (req, res, next) {
+                process.nextTick(function () {
+                        throw new Error('bah!');
+                });
+        });
+
+        CLIENT.get('/', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.end();
+        });
+});
