@@ -1,0 +1,21 @@
+{
+        "name": "restify-example",
+        "version": "0.0.0",
+        "description": "Kitchen Sink App of restify",
+        "main": "main.js",
+        "dependencies": {
+                "assert-plus": "0.1.2",
+                "bunyan": "0.16.8",
+                "posix-getopt": "1.0.0",
+                "restify": "git://github.com/mcavage/node-restify.git#master"
+        },
+        "devDependencies": {
+                "nodeunit": "0.7.4"
+        },
+        "scripts": {
+                "start": "node server.js 2>&1 | bunyan",
+                "test": "nodeunit test"
+        },
+        "author": "Mark Cavage",
+        "license": "MIT"
+}
