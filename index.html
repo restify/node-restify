@@ -4,18 +4,12 @@
     <title>API Guide | restify</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="media/css/restdown.css">
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 </head>
 <body>
-  <a href="http://github.com/mcavage/node-restify">
-    <img style="position: absolute; top: 0; right: 0; border: 0; z-index: 3;"
-         src="https://a248.e.akamai.net/assets.github.com/img/7afbc8b248c68eb468279e8c17986ad46549fb71/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
-         alt="Fork me on GitHub"/ >
-  </a>
-  <div id="header">
+<div id="header">
     <h1>API Guide | restify Documentation</h1>
-  </div>
-
+</div>
 
     <div id="sidebar">
 <ul>
@@ -27,6 +21,7 @@
     <li><div><a href="#Routing"><span class="method name"><span class="name">Routing</span></span></a></div></li>
     <li><div><a href="#Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></a></div></li>
     <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
+    <li><div><a href="#Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></a></div></li>
     <li><div><a href="#Server-API"><span class="method name"><span class="name">Server API</span></span></a></div></li>
     <li><div><a href="#Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></a></div></li>
     <li><div><a href="#Request-API"><span class="method name"><span class="name">Request API</span></span></a></div></li>
@@ -200,8 +195,8 @@ server.listen(8080);
 <tr><td>key</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
 <tr><td>formatters</td><td>Object</td><td>Custom response formatters for <code>res.send()</code></td></tr>
 <tr><td>log</td><td>Object</td><td>You can optionally pass in a <a href="https://github.com/trentm/node-bunyan">bunyan</a> instance; not required</td></tr>
-<tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, and also will name the DTrace provider; default is <code>restify</code></td></tr>
-<tr><td>urlParamPattern</td><td>String</td><td>Overrides the RegExp used to replace <code>:name</code> parameters. By default, uses <code>[a-zA-Z0-9-_~\\.%]+</code> (RFC3986 compliant).</td></tr>
+<tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, default is <code>restify</code></td></tr>
+<tr><td>spdy</td><td>Object</td><td>Any options accepted by <a href="https://github.com/indutny/node-spdy">node-spdy</a></td></tr>
 <tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
 <tr><td>responseTimeHeader</td><td>String</td><td>By default, this will be <code>X-Response-Time</code></td></tr>
 <tr><td>responseTimeFormatter</td><td>function</td><td>Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. <a href="https://gist.github.com/1970083">example</a></td></tr>
@@ -265,6 +260,13 @@ be interpreted in any way):</p>
 
 <p>Would result in <code>req.params[0]</code> being <code>foo</code> and <code>req.params[1]</code> being
 <code>my/cats/name/is/gandalf</code>.  Basically, you can do whatever you want.</p>
+
+<p>Note the use of calling <code>next()</code>.  You are responsible for calling this in
+order to run the next handler in the chain.  As below, you can pass an
+Error object in to have restify automatically return responses to the client;
+additionally, you can pass in a <code>false</code> to not error, but to stop the handler
+chain.  This is useful if you had a <code>res.send</code> in an early filter, which is
+not an error, and you possibly have one later you want to short-circuit.</p>
 
 <h3>Versioned Routes</h3>
 
@@ -357,10 +359,31 @@ later by just setting the formatter on <code>server.formatters</code>, but it's
 probably sane to just do it at construct time.   Also, note that if a
 content-type can't be negotiated, the default is
 <code>application/octet-stream</code>.  Of course, you can always explicitly set
-the content-type to return by setting it on <code>res.contentType</code>:</p>
+the content-type:</p>
 
-<pre><code>res.contentType = 'application/foo';
+<pre><code>res.setHeader('content-type', 'application/foo');
 res.send({hello: 'world'});
+</code></pre>
+
+<p>Note that there are typically at least three content-types supported by
+restify: json, text and binary.  When you override or append to this, the
+"priority" might change; to ensure that the priority is set to what you
+want, you should set a <code>q-value</code> on your formatter definitions, which will
+ensure sorting happens the way you want:</p>
+
+<pre><code>restify.createServer({
+  formatters: {
+    'application/foo; q=0.9': function formatFoo(req, res, body) {
+      if (body instanceof Error)
+        return body.stack;
+
+      if (Buffer.isBuffer(body))
+        return body.toString('base64');
+
+      return util.inspect(body);
+    }
+  }
+});
 </code></pre>
 
 <p>Lastly, you don't have to use any of this magic, as a restify response
@@ -503,7 +526,12 @@ X-Response-Time: 3
 var util = require('util');
 
 function MyError(message) {
-  restify.RestError.call(this, 418, 'MyError', message, MyError);
+  restify.RestError.call(this, {
+    restCode: 'MyError'
+    statusCode: 418,
+    message: message,
+    constructorOpt: MyError
+  });
   this.name = 'MyError';
 };
 util.inherits(MyError, restify.RestError);
@@ -514,6 +542,40 @@ and a "constructorOpt" so that V8 correctly omits your code
 from the stack trace (you don't <em>have</em> to do that, but you probably
 want it).  In the example above, we also set the name property so
 <code>console.log(new MyError());</code> looks correct.</p>
+
+<h2 id="Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></h2>
+
+<p>To use <a href="http://socket.io/">socket.io</a> with restify, just treat your restify
+server as if it were a "raw" node server:</p>
+
+<pre><code>var server = restify.createServer();
+var io = socketio.listen(server);
+
+server.get('/', function indexHTML(req, res, next) {
+    fs.readFile(__dirname + '/index.html', function (err, data) {
+        if (err) {
+            next(err);
+            return;
+        }
+
+        res.setHeader('Content-Type', 'text/html');
+        res.writeHead(200);
+        res.end(data);
+        next();
+});
+
+
+io.sockets.on('connection', function (socket) {
+    socket.emit('news', { hello: 'world' });
+    socket.on('my other event', function (data) {
+            console.log(data);
+    });
+});
+
+server.listen(8080, function () {
+    console.log('socket.io server listening at %s', server.url);
+});
+</code></pre>
 
 <h2 id="Server-API"><span class="method name"><span class="name">Server API</span></span></h2>
 
@@ -554,7 +616,7 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4>Event: 'after'</h4>
 
-<p><code>function (request, response, route) {}</code></p>
+<p><code>function (request, response, route, error) {}</code></p>
 
 <p>Emitted after a route has finished all the handlers you registered.
 You can use this to write audit logs, etc.  The route parameter will be
@@ -624,8 +686,11 @@ a hook to change request headers and the like if you need to. Note that
 <li>Accept header parsing</li>
 <li>Authorization header parsing</li>
 <li>Date header parsing</li>
+<li>JSONP support</li>
+<li>Gzip Response</li>
 <li>Query string parsing</li>
 <li>Body parsing (JSON/URL-encoded/multipart form)</li>
+<li>Static file serving</li>
 <li>Throttling</li>
 <li>Conditional request handling</li>
 <li>Audit logger</li>
@@ -638,6 +703,8 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.authorizationParser());
 server.use(restify.dateParser());
 server.use(restify.queryParser());
+server.use(restify.jsonp());
+server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
 server.use(restify.throttle({
   burst: 100,
@@ -715,6 +782,15 @@ in the options object:</p>
 <pre><code>server.use(restify.queryParser({ mapParams: false }));
 </code></pre>
 
+<h3>JSONP</h3>
+
+<p>Supports checking the query string for <code>callback</code> or <code>jsonp</code> and ensuring that
+the content-type is appropriately set if JSONP params are in place.  There is
+also a default <code>application/javascript</code> formatter to handle this.</p>
+
+<p>You _should_ set the <code>queryParser</code> plugin to run before this, but if you don't
+this plugin will still parse the query string properly.</p>
+
 <h3>BodyParser</h3>
 
 <p>Blocks your chain on reading and parsing the HTTP request body.  Switches on
@@ -726,9 +802,58 @@ supported.</p>
 </code></pre>
 
 <p>You can pass in an options object; currently the only parameter honored is
-<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from
-the request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with
-the parsed object.  The default is to map params into <code>req.params</code>.</p>
+<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from the
+request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with the
+parsed object.  The default is to map params into <code>req.params</code>.  The
+<code>keepExtensions</code> option is useful if you want the uploaded files to include the
+extensions of the original files (multipart uploads only). Default is <code>false</code>.</p>
+
+<h3>RequestLogger</h3>
+
+<p>Sets up a child <a href="https://github.com/trentm/node-bunyan">bunyan</a> logger with the
+current request id filled in, along with any other parameters you define.</p>
+
+<pre><code>server.use(restify.requestLogger({
+    properties: {
+        foo: 'bar'
+    },
+    serializers: {...}
+}));
+</code></pre>
+
+<p>You can pass in no options to this, in which case only the request id will be
+appended, and no serializers appended (this is also the most performant); the
+logger created at server creation time will be used as the parent logger.</p>
+
+<h3>GzipResponse</h3>
+
+<pre><code>server.use(restify.gzipResponse());
+</code></pre>
+
+<p>If the client sends an <code>accept-encoding: gzip</code> header (or one with an
+appropriate q-val), then the server will automatically gzip all response data.
+Note that only <code>gzip</code> is supported, as this is most widely supported by clients
+in the wild.  This plugin will overwrite some of the internal streams, so any
+calls to <code>res.send</code>, <code>res.write</code>, etc., will be compressed.  A side effect is
+that the <code>content-length</code> header cannot be known, and so
+<code>transfer-encoding: chunked</code> will <em>always</em> be set when this is in effect.  This
+plugin has no impact if the client does not send <code>accept-encoding: gzip</code>.</p>
+
+<h3>Serve Static</h3>
+
+<p>The serveStatic module is different than most of the other plugins, in that it
+is expected that you are going to map it to a route, as below:</p>
+
+<pre><code>server.get(/\/docs\/public\/?.*/, restify.serveStatic({
+  directory: './public'
+}));
+</code></pre>
+
+<p>The plugin will enforce that only files under <code>directory</code> can be served; you can
+specify additional restrictions by passing in a <code>match</code> parameter, which is just
+a <code>RegExp</code> to check against the requested file name.  Lastly, you can pass in a
+<code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header. Default is <code>3600</code>
+(1 hour).</p>
 
 <h3>Throttle</h3>
 
@@ -834,7 +959,7 @@ server.get('/hello/:name', function(req, res, next) {
 the <code>after</code> event:</p>
 
 <pre><code>server.on('after', restify.auditLogger({
-  log: new Logger({
+  log: bunyan.createLogger({
     name: 'audit',
     stream: process.stdout
   })
@@ -1135,79 +1260,97 @@ routes, and all of our handlers (functions); while that's optional, it
 does make DTrace much more usable.  So, if you started that server,
 then looked for DTrace probes, you'd see something like this:</p>
 
-<pre class="shell"><code>dtrace -l -P helloworld*
-   ID   PROVIDER            MODULE                          FUNCTION NAME
-23491 helloworld10254            module                              func getfoo-start
-23492 helloworld10254            module                              func getfoo-done
-23493 helloworld10254            module                              func getfoo-parseAccept-start
-23494 helloworld10254            module                              func getfoo-parseAccept-done
-23495 helloworld10254            module                              func getfoo-parseAuthorization-start
-23496 helloworld10254            module                              func getfoo-parseAuthorization-done
-23497 helloworld10254            module                              func getfoo-parseDate-start
-23498 helloworld10254            module                              func getfoo-parseDate-done
-23499 helloworld10254            module                              func getfoo-parseQueryString-start
-23500 helloworld10254            module                              func getfoo-parseQueryString-done
-23501 helloworld10254            module                              func getfoo-parseUrlEncodedBody-start
-23502 helloworld10254            module                              func getfoo-parseUrlEncodedBody-done
-23503 helloworld10254            module                              func getfoo-slowHandler-start
-23504 helloworld10254            module                              func getfoo-slowHandler-done
-23505 helloworld10254            module                              func getfoo-respond-start
-23506 helloworld10254            module                              func getfoo-respond-done
+<pre class="shell"><code>dtrace -l -P restify*
+ID   PROVIDER            MODULE                          FUNCTION NAME
+24 restify38789       mod-88f3f88                       route-start route-start
+25 restify38789       mod-88f3f88                     handler-start handler-start
+26 restify38789       mod-88f3f88                      handler-done handler-done
+27 restify38789       mod-88f3f88                        route-done route-done
 </code></pre>
 
-<p>What restify does is autogenerate a probe for each route/handler on
-start and finish, and uses the names found to do so. If there's no
-names, it fills in based on the method, url and index in the chain.
-The probe signatures generated look like:</p>
-
-<h3>Start Probes</h3>
-
-<p><code>$route-start and $route-$handler-start</code></p>
+<h3>route-start</h3>
 
 <table>
 <tbody>
 <tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
-<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
-<tr><td>url</td><td>char *</td><td>request url</td></tr>
-<tr><td>user-agent</td><td>char *</td><td>value of user-agent header</td></tr>
-<tr><td>user</td><td>char *</td><td>req.username (i.e., the authenticated party)</td></tr>
-<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
-<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+<tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
+<tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
+<tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
+<tr><td>method</td><td>char *</td><td>HTTP request method</td></tr>
+<tr><td>url</td><td>char *</td><td>(full) HTTP URL</td></tr>
+<tr><td>headers</td><td>char *</td><td>JSON encoded map of all request headers</td></tr>
 </tbody>
 </table>
 
-<h3>Done Probes</h3>
-
-<p><code>$route-done and $route-$handler-done</code></p>
+<h3>handler-start</h3>
 
 <table>
 <tbody>
 <tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
-<tr><td>id</td><td>int</td><td>cookie you can use to correlate request/response</td></tr>
+<tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
+<tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
+<tr><td>handler name</td><td>char *</td><td>name of the function that just entered</td></tr>
+<tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
+</tbody>
+</table>
+
+<h3>route-done</h3>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
+<tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
+<tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
 <tr><td>statusCode</td><td>int</td><td>HTTP response code</td></tr>
-<tr><td>content-type</td><td>char *</td><td>value of content-type header</td></tr>
-<tr><td>content-length</td><td>int</td><td>value of content-length header</td></tr>
+<tr><td>headers</td><td>char *</td><td>JSON encoded map of response headers</td></tr>
 </tbody>
 </table>
+
+<h3>handler-done</h3>
+
+<table>
+<tbody>
+<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
+<tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
+<tr><td>handler name</td><td>char *</td><td>name of the function that just entered</td></tr>
+<tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
+</tbody>
+</table>
+
+<h3>Example D Script</h3>
 
 <p>Now, if you wanted to say get a breakdown of latency by handler, you
 could do something like this:</p>
 
-<pre><code>#!/usr/sbin/dtrace -s
-#pragma D option quiet
+<pre><code> #!/usr/sbin/dtrace -s
+ #pragma D option quiet
 
-helloworld*:::getfoo-*-start
-{
-  tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = timestamp;
-}
+ restify*:::route-start
+ {
+    track[arg2] = timestamp;
+ }
 
-helloworld*:::getfoo-*-done
-/tracker[arg0, substr(probename, 0, rindex(probename, "-"))]/
-{
-  this-&gt;name = substr(probename, 0, rindex(probename, "-"));
-  @[this-&gt;name] = quantize(((timestamp - tracker[arg0, this-&gt;name]) / 1000000));
-  tracker[arg0, substr(probename, 0, rindex(probename, "-"))] = 0;
-}
+ restify*:::handler-start
+ /track[arg3]/
+ {
+    h[arg3, copyinstr(arg2)] = timestamp;
+ }
+
+ restify*:::handler-done
+ /track[arg3] &amp;&amp; h[arg3, copyinstr(arg2)]/
+ {
+    @[copyinstr(arg2)] = quantize((timestamp - h[arg3, copyinstr(arg2)]) / 1000000);
+    h[arg3, copyinstr(arg2)] = 0;
+ }
+
+ restify*:::route-done
+ /track[arg2]/
+ {
+    @[copyinstr(arg1)] = quantize((timestamp - track[arg2]) / 1000000);
+    track[arg2] = 0;
+ }
 </code></pre>
 
 <p>So running the server in one terminal:</p>
@@ -1222,63 +1365,70 @@ helloworld*:::getfoo-*-done
 
 <p>Hit the server a few times with curl:</p>
 
-<pre class="shell"><code>curl http://localhost:8080/hello/mcavage
+<pre class="shell"><code>for i in {1..10} ; do curl -is http://127.0.0.1:8080/hello/mark ; done
 </code></pre>
 
 <p>Then Ctrl-C the D script, and you'll see the "slowHandler" at the
 bottom of the stack, bucketized that it's the vast majority of latency
 in this pipeline</p>
 
-<pre class="shell"><code>./guide.d
-^C
+<pre><code>handler-6
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-parseAuthorization
-       value  ------------- Distribution ------------- count
-          -1 |                                         0
-           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-           1 |                                         0
+parseAccept
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-parseDate
-       value  ------------- Distribution ------------- count
-          -1 |                                         0
-           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-           1 |                                         0
+parseAuthorization
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-parseQueryString
-       value  ------------- Distribution ------------- count
-          -1 |                                         0
-           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-           1 |                                         0
+parseDate
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-parseUrlEncodedBody
-       value  ------------- Distribution ------------- count
-          -1 |                                         0
-           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-           1 |                                         0
+parseQueryString
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-parseAccept
-       value  ------------- Distribution ------------- count
-          -1 |                                         0
-           0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           3
-           1 |@@@@@@@@@@                               1
-           2 |                                         0
+parseUrlEncodedBody
+value  ------------- Distribution ------------- count
+-1 |                                         0
+0 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 10
+1 |                                         0
 
-getfoo-respond
-       value  ------------- Distribution ------------- count
-           0 |                                         0
-           1 |@@@@@@@@@@                               1
-           2 |@@@@@@@@@@@@@@@@@@@@                     2
-           4 |                                         0
-           8 |                                         0
-          16 |                                         0
-          32 |@@@@@@@@@@                               1
-          64 |                                         0
+respond
+value  ------------- Distribution ------------- count
+1 |                                         0
+2 |@@@@                                     1
+4 |                                         0
+8 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+16 |                                         0
 
-getfoo-slowHandler
-       value  ------------- Distribution ------------- count
-          64 |                                         0
-         128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 4
-         256 |                                         0
+slowHandler
+value  ------------- Distribution ------------- count
+64 |                                         0
+128 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+256 |@@@@                                     1
+512 |                                         0
+
+getfoo
+value  ------------- Distribution ------------- count
+64 |                                         0
+128 |@@@@                                     1
+256 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     9
+512 |
 </code></pre>
 
 <h1 id="client-api">Client API</h1>
@@ -1343,6 +1493,14 @@ headers):</p>
 client.get(options, function(err, req, res) { .. });
 </code></pre>
 
+<p>If you need to interpose additional headers in the request before it is sent on
+to the server, you can provide a synchronous callback function as the
+<code>signRequest</code> option when creating a client.  This is particularly useful with
+<a href="https://github.com/joyent/node-http-signature">node-http-signature</a>, which
+needs to attach a cryptographic signature of selected outgoing headers.  If
+provided, this callback will be invoked with a single parameter: the outgoing
+<code>http.ClientRequest</code> object.</p>
+
 <h2 id="JsonClient"><span class="method name"><span class="name">JsonClient</span></span></h2>
 
 <p>The JSON Client is the highest-level client bundled with restify; it
@@ -1379,9 +1537,11 @@ it will be an <code>HttpError</code>.</p>
 <tr><td>accept</td><td>String</td><td>Accept header to send</td></tr>
 <tr><td>connectTimeout</td><td>Number</td><td>Amount of time to wait for a socket</td></tr>
 <tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
+<tr><td>gzip</td><td>Object</td><td>Will compress data when sent using <code>content-encoding: gzip</code></td></tr>
 <tr><td>headers</td><td>Object</td><td>HTTP headers to set in all requests</td></tr>
 <tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
 <tr><td>retry</td><td>Object</td><td>options to provide to node-retry; defaults to 3 retries</td></tr>
+<tr><td>signRequest</td><td>Function</td><td>synchronous callback for interposing headers before request is sent</td></tr>
 <tr><td>url</td><td>String</td><td>Fully-qualified URL to connect to</td></tr>
 <tr><td>userAgent</td><td>String</td><td>user-agent string to use; restify inserts one, but you can override it</td></tr>
 <tr><td>version</td><td>String</td><td>semver string to set the accept-version</td></tr>
@@ -1620,11 +1780,15 @@ $(function() {
     }
     /** end of http://code.activestate.com/recipes/577787/ }}} */
 
+    /* See <https://github.com/trentm/restdown/issues/11>. */
+    function safechars(s) {
+      return s.replace(_slugify_strip_re, '');
+    }
 
     $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
+        var scrollDistance = $("#content").scrollTop();
         var sectionIdx = getSectionIdx(scrollDistance);
-    
+
         if (sectionIdx !== currSectionIdx) {
             $("#sidebar li>div").removeClass("current");
             currSectionIdx = sectionIdx;
@@ -1634,9 +1798,15 @@ $(function() {
                     slugify(heading), // h1 or non-method h2
                     heading.replace(/ /g, '-'), // h2 method, just name or just endpoint
                     heading.slice(0, heading.lastIndexOf(' (')).trimRight().replace(/ /g, '-'), // h2 method, name and endpoint
-                ]
+                ];
                 for (var i=0; i < possibleAnchors.length; i++) {
-                    $("#sidebar a[href|=#" + possibleAnchors[i] + "]").parent().addClass("current");
+                    var anchor = safechars(possibleAnchors[i]);
+                    try {
+                        $("#sidebar a[href=#" + anchor + "]").parent().addClass("current");
+                    } catch (e) {
+                        /* Ignore error if no such element. */
+                        console.log(e)
+                    }
                 }
             }
         }
