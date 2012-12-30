@@ -1,6 +1,12 @@
 # restify Changelog
 
-## 1.4.2 (not yet released)
+## 2.0.1 (not yet released)
+
+- GH-269 plugin to make curl happy
+
+# Legacy Releases
+
+## 1.4.2
 
 - logging typo (Pedro Candel)
 - response `beforeSend` event (Paul Bouzakis)

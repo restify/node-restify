@@ -363,6 +363,9 @@ function createServer(options) {
         // Clean up sloppy paths like //todo//////1//
         server.pre(restify.pre.sanitizePath());
 
+        // Handles annoying user agents (curl)
+        server.pre(restify.pre.userAgentConnection());
+
         // Set a per request bunyan logger (with requestid filled in)
         server.use(restify.requestLogger());
 
