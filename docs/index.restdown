@@ -6,8 +6,9 @@ markdown2extras: wiki-tables, code-friendly
 # About restify
 
 restify is a node.js module built specifically to enable you to build correct
-REST web services.  It borrows heavily from [express](http://expressjs.com/)
-(intentionally) as that is more or less the de facto API for writing
+REST web services.  It intentionally borrows heavily
+from [express](http://expressjs.com/)
+as that is more or less the de facto API for writing
 web applications on top of node.js.
 
 ## Why use restify and not express?
@@ -15,10 +16,12 @@ web applications on top of node.js.
 I get asked this more than anything else, so I'll just get it out of
 the way up front.
 
-Express' use case is targeted at browser applications, and contains a
-lot of functionality (i.e., templating/rendering) to support that.
-Restify does not.  Restify exists to let you build "strict" API
-services that are maintanable and observable; restify comes with automatic
+Express' use case is targeted at browser applications and contains a
+lot of functionality, such as templating and rendering, to support that.
+Restify does not.
+
+Restify exists to let you build "strict" API
+services that are maintanable and observable. Restify comes with automatic
 [DTrace](http://en.wikipedia.org/wiki/DTrace) support for all your
 handlers, if you're running on a platform that supports DTrace.
 
@@ -34,8 +37,11 @@ This guide provides comprehensive documentation on writing a REST api (server)
 with restify, writing clients that easily consume REST APIs, and on
 the DTrace integration present in restify.
 
-Note this documentation refers to the 1.0.X version(s) of restify;
-these versions are not backwards-compatible with the 0.5 versions.
+Note this documentation refers to the 2.x version(s) of restify;
+these versions are not backwards-compatible with the 0.x and 1.x versions.
+
+If you're migrating from an earlier version of restify, see
+[1.4 to 2.0 Migration Tips](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips)
 
 ## Conventions
 
@@ -75,62 +81,48 @@ what restify is going to turn that into:
 
     $ curl -is http://localhost:8080/hello/mark -H 'accept: text/plain'
     HTTP/1.1 200 OK
-    Access-Control-Allow-Origin: *
-    Access-Control-Allow-Methods: GET
-    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-    Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-    Server: restify
-    X-Request-Id: b0cec85c-cc17-4985-8f2f-7787ad6e3512
-    Date: Fri, 30 Dec 2011 20:09:36 GMT
-    X-Response-Time: 1
     Content-Type: text/plain
     Content-Length: 10
-    Content-MD5: pvc6+Tyy1EBQgBWaN1v+eQ==
-    Connection: close
+    Date: Mon, 31 Dec 2012 01:32:44 GMT
+    Connection: keep-alive
 
     hello mark
 
+
     $ curl -is http://localhost:8080/hello/mark
     HTTP/1.1 200 OK
-    Access-Control-Allow-Origin: *
-    Access-Control-Allow-Methods: GET
-    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-    Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-    Server: restify
-    X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
-    Date: Fri, 30 Dec 2011 20:11:17 GMT
-    X-Response-Time: 1
     Content-Type: application/json
     Content-Length: 12
-    Content-MD5: UxC9l75x6aHfos8MhdrDLg==
-    Connection: close
+    Date: Mon, 31 Dec 2012 01:33:33 GMT
+    Connection: keep-alive
 
     "hello mark"
 
-    $ curl -is http://localhost:8080 -X HEAD
+
+    $ curl -is http://localhost:8080/hello/mark -X HEAD -H 'connection: close'
     HTTP/1.1 200 OK
-    Access-Control-Allow-Origin: *
-    Access-Control-Allow-Methods: GET
-    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-    Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-    Server: restify
-    X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
-    Date: Fri, 30 Dec 2011 20:11:17 GMT
-    X-Response-Time: 1
     Content-Type: application/json
     Content-Length: 12
-    Content-MD5: UxC9l75x6aHfos8MhdrDLg==
+    Date: Mon, 31 Dec 2012 01:42:07 GMT
     Connection: close
+    
+Note that by default, curl uses `Connection: keep-alive`. In order to make the HEAD
+method return right away, you'll need to pass `Connection: close`.
 
-Note that all of those headers are set automatically IFF you don't set
-them explicitly (or register a `defaultResponseHeaders` function).
+Since curl is often used with REST APIs, restify provides a plugin to work around
+this idiosyncrasy in curl. The plugin checks whether the user agent is curl. If it
+is, it sets the Connection header to "close" and removes the "Content-Length" header.
+
+    server.pre(restify.pre.userAgentConnection());
+
+See the [pre](#pre) method for more information.
 
 ## Creating a Server
 
 Creating a server is straightforward, as you simply invoke the
-`createServer` API, which takes an options object with the options
+`createServer` API, which takes an options object with the options listed
 below (and `listen()` takes the same arguments as node's
-[http.Server.listen](http://nodejs.org/docs/latest/api/http.html#server.listen)):
+[http.Server.listen](http://nodejs.org/docs/latest/api/http.html#http_server_listen_port_hostname_backlog_callback)):
 
     var restify = require('restify');
 
@@ -155,15 +147,15 @@ below (and `listen()` takes the same arguments as node's
 
 ## Common handlers: server.use()
 
-A restify server has a `use()` method on it, which takes handlers of
+A restify server has a `use()` method that takes handlers of
 the form `function (req, res, next)`.   Note that restify runs
 handlers in the order they are registered on a server, so if you want
 some common handlers to run before any of your routes, issue calls to
 `use()` before defining routes.
 
 Note that in all calls to `use()` and the routes below, you can pass
-in any combination of `function(res, res, next)` and
-`[function(req, res, next)]` (i.e., direct functions and arrays of functions).
+in any combination of direct functions (`function(res, res, next)`) and
+arrays of functions (`[function(req, res, next)]`).
 
 ## Routing
 
@@ -174,7 +166,7 @@ placeholders are available in `req.params`. Note that values will be
 URL-decoded before being passed to you.
 
      function send(req, res, next) {
-       res.send(hello ' + req.params.name);
+       res.send('hello ' + req.params.name);
        return next();
      }
 
@@ -208,10 +200,11 @@ Here any request like:
 Would result in `req.params[0]` being `foo` and `req.params[1]` being
 `my/cats/name/is/gandalf`.  Basically, you can do whatever you want.
 
-Note the use of calling `next()`.  You are responsible for calling this in
+Note the use of `next()`.  You are responsible for calling `next()` in
 order to run the next handler in the chain.  As below, you can pass an
-Error object in to have restify automatically return responses to the client;
-additionally, you can pass in a `false` to not error, but to stop the handler
+Error object in to have restify automatically return responses to the client.
+
+You can pass in  `false` to not error, but to stop the handler
 chain.  This is useful if you had a `res.send` in an early filter, which is
 not an error, and you possibly have one later you want to short-circuit.
 
@@ -517,7 +510,7 @@ server as if it were a "raw" node server:
 ### Events
 
 Restify servers emit all the events from the node
-[http.Server](http://nodejs.org/docs/latest/api/http.html#http.Server)
+[http.Server](http://nodejs.org/docs/latest/api/http.html#http_class_http_server)
 and has several other events you want to listen on.
 
 ##### Event: 'NotFound'
@@ -584,21 +577,21 @@ A restify server has the following properties on it:
 
 #### address()
 
-Wraps node's [address()](http://nodejs.org/docs/latest/api/net.html#server.address).
+Wraps node's [address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
 
 #### listen(port, [host], [callback]) or listen(path, [callback])
 
-Wrap's node's [listen()](http://nodejs.org/docs/latest/api/net.html#server.listen).
+Wraps node's [listen()](http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback).
 
 #### close()
 
-Wrap's node's [close()](http://nodejs.org/docs/latest/api/net.html#server.close).
+Wraps node's [close()](http://nodejs.org/docs/latest/api/net.html#net_event_close).
 
 #### pre()
 
 Allows you to add in handlers that run *before* routing occurs. This gives you
 a hook to change request headers and the like if you need to. Note that
-`req.params` will be undefined, as that's filled in _after_ routing.
+`req.params` will be undefined, as that's filled in *after* routing.
 
     server.pre(function(req, res, next) {
       req.headers.accept = 'application/json';  // screw you client!
@@ -709,7 +702,7 @@ Supports checking the query string for `callback` or `jsonp` and ensuring that
 the content-type is appropriately set if JSONP params are in place.  There is
 also a default `application/javascript` formatter to handle this.
 
-You _should_ set the `queryParser` plugin to run before this, but if you don't
+You *should* set the `queryParser` plugin to run before this, but if you don't
 this plugin will still parse the query string properly.
 
 ### BodyParser
@@ -801,7 +794,7 @@ is returned.
 
 Options:
 
-||*Name*||*Type*||*Description*||
+||**Nam**||**Type**||**Description**||
 ||rate||Number||Steady state number of requests/second to allow||
 ||burst||Number||If available, the amount of requests to burst to||
 ||ip||Boolean||Do throttling on a /32 (source IP)||
@@ -1011,7 +1004,7 @@ instance that is a child component of the one restify has:
 
 ### Properties
 
-||*Name*||*Type*||*Description*||
+||**Nam**||**Type**||**Description**||
 ||contentLength||Number||short hand for the header content-length||
 ||contentType||String||short hand for the header content-type||
 ||href||String||url.parse(req.url) href||
@@ -1079,7 +1072,7 @@ Short-hand for:
 
 ### Properties
 
-||*Name*||*Type*||*Description*||
+||**Nam**||**Type**||**Description**||
 ||code||Number||HTTP status code||
 ||contentLength||Number||short hand for the header content-length||
 ||charSet||String||In conjunction with `contentType`, you can explicitly set the charSet to be written in the content-type header||
@@ -1153,7 +1146,7 @@ then looked for DTrace probes, you'd see something like this:
 
 ### route-start
 
-||*Field*||*Type*||*Description*||
+||**Field**||**Type**||**Description**||
 ||server name||char *||name of the restify server that fired||
 ||route name||char *||name of the route that fired||
 ||id||int||unique id for this request||
@@ -1163,7 +1156,7 @@ then looked for DTrace probes, you'd see something like this:
 
 ### handler-start
 
-||*Field*||*Type*||*Description*||
+||**Field**||**Type**||**Description**||
 ||server name||char *||name of the restify server that fired||
 ||route name||char *||name of the route that fired||
 ||handler name||char *||name of the function that just entered||
@@ -1171,7 +1164,7 @@ then looked for DTrace probes, you'd see something like this:
 
 ### route-done
 
-||*Field*||*Type*||*Description*||
+||**Field**||**Type**||**Description**||
 ||server name||char *||name of the restify server that fired||
 ||route name||char *||name of the route that fired||
 ||id||int||unique id for this request||
@@ -1180,7 +1173,7 @@ then looked for DTrace probes, you'd see something like this:
 
 ### handler-done
 
-||*Field*||*Type*||*Description*||
+||**Field**||**Type**||**Description**||
 ||server name||char *||name of the restify server that fired||
 ||route name||char *||name of the route that fired||
 ||handler name||char *||name of the function that just entered||
@@ -1387,7 +1380,7 @@ it will be an `HttpError`.
 
 Options:
 
-||*Name*||*Type*||*Description*||
+||**Nam**||**Type**||**Description**||
 ||accept||String||Accept header to send||
 ||connectTimeout||Number||Amount of time to wait for a socket||
 ||dtrace||Object||node-dtrace-provider handle||
