@@ -794,7 +794,7 @@ is returned.
 
 Options:
 
-||**Nam**||**Type**||**Description**||
+||**Name**||**Type**||**Description**||
 ||rate||Number||Steady state number of requests/second to allow||
 ||burst||Number||If available, the amount of requests to burst to||
 ||ip||Boolean||Do throttling on a /32 (source IP)||
@@ -1004,7 +1004,7 @@ instance that is a child component of the one restify has:
 
 ### Properties
 
-||**Nam**||**Type**||**Description**||
+||**Name**||**Type**||**Description**||
 ||contentLength||Number||short hand for the header content-length||
 ||contentType||String||short hand for the header content-type||
 ||href||String||url.parse(req.url) href||
@@ -1072,7 +1072,7 @@ Short-hand for:
 
 ### Properties
 
-||**Nam**||**Type**||**Description**||
+||**Name**||**Type**||**Description**||
 ||code||Number||HTTP status code||
 ||contentLength||Number||short hand for the header content-length||
 ||charSet||String||In conjunction with `contentType`, you can explicitly set the charSet to be written in the content-type header||
@@ -1380,7 +1380,7 @@ it will be an `HttpError`.
 
 Options:
 
-||**Nam**||**Type**||**Description**||
+||**Name**||**Type**||**Description**||
 ||accept||String||Accept header to send||
 ||connectTimeout||Number||Amount of time to wait for a socket||
 ||dtrace||Object||node-dtrace-provider handle||
