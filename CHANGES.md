@@ -3,6 +3,7 @@
 ## 2.0.1 (not yet released)
 
 - GH-269 plugin to make curl happy
+- RestError not honoring `constructorOpt` from `cause`
 
 # Legacy Releases
 
