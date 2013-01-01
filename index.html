@@ -44,8 +44,9 @@
 
 
 <p>restify is a node.js module built specifically to enable you to build correct
-REST web services.  It borrows heavily from <a href="http://expressjs.com/">express</a>
-(intentionally) as that is more or less the de facto API for writing
+REST web services.  It intentionally borrows heavily
+from <a href="http://expressjs.com/">express</a>
+as that is more or less the de facto API for writing
 web applications on top of node.js.</p>
 
 <h2>Why use restify and not express?</h2>
@@ -53,10 +54,12 @@ web applications on top of node.js.</p>
 <p>I get asked this more than anything else, so I'll just get it out of
 the way up front.</p>
 
-<p>Express' use case is targeted at browser applications, and contains a
-lot of functionality (i.e., templating/rendering) to support that.
-Restify does not.  Restify exists to let you build "strict" API
-services that are maintanable and observable; restify comes with automatic
+<p>Express' use case is targeted at browser applications and contains a
+lot of functionality, such as templating and rendering, to support that.
+Restify does not.</p>
+
+<p>Restify exists to let you build "strict" API
+services that are maintanable and observable. Restify comes with automatic
 <a href="http://en.wikipedia.org/wiki/DTrace">DTrace</a> support for all your
 handlers, if you're running on a platform that supports DTrace.</p>
 
@@ -72,8 +75,11 @@ aspect(s), then it's probably not for you.</p>
 with restify, writing clients that easily consume REST APIs, and on
 the DTrace integration present in restify.</p>
 
-<p>Note this documentation refers to the 1.0.X version(s) of restify;
-these versions are not backwards-compatible with the 0.5 versions.</p>
+<p>Note this documentation refers to the 2.x version(s) of restify;
+these versions are not backwards-compatible with the 0.x and 1.x versions.</p>
+
+<p>If you're migrating from an earlier version of restify, see
+<a href="https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips">1.4 to 2.0 Migration Tips</a></p>
 
 <h2>Conventions</h2>
 
@@ -119,63 +125,50 @@ what restify is going to turn that into:</p>
 
 <pre class="shell"><code>curl -is http://localhost:8080/hello/mark -H 'accept: text/plain'
 HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-Server: restify
-X-Request-Id: b0cec85c-cc17-4985-8f2f-7787ad6e3512
-Date: Fri, 30 Dec 2011 20:09:36 GMT
-X-Response-Time: 1
 Content-Type: text/plain
 Content-Length: 10
-Content-MD5: pvc6+Tyy1EBQgBWaN1v+eQ==
-Connection: close
+Date: Mon, 31 Dec 2012 01:32:44 GMT
+Connection: keep-alive
 
 hello mark
 
+
 $ curl -is http://localhost:8080/hello/mark
 HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-Server: restify
-X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
-Date: Fri, 30 Dec 2011 20:11:17 GMT
-X-Response-Time: 1
 Content-Type: application/json
 Content-Length: 12
-Content-MD5: UxC9l75x6aHfos8MhdrDLg==
-Connection: close
+Date: Mon, 31 Dec 2012 01:33:33 GMT
+Connection: keep-alive
 
 "hello mark"
 
-$ curl -is http://localhost:8080 -X HEAD
+
+$ curl -is http://localhost:8080/hello/mark -X HEAD -H 'connection: close'
 HTTP/1.1 200 OK
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
-Server: restify
-X-Request-Id: 07c4b4b5-5866-4b08-ace8-63ef7c70b48f
-Date: Fri, 30 Dec 2011 20:11:17 GMT
-X-Response-Time: 1
 Content-Type: application/json
 Content-Length: 12
-Content-MD5: UxC9l75x6aHfos8MhdrDLg==
+Date: Mon, 31 Dec 2012 01:42:07 GMT
 Connection: close
 </code></pre>
 
-<p>Note that all of those headers are set automatically IFF you don't set
-them explicitly (or register a <code>defaultResponseHeaders</code> function).</p>
+<p>Note that by default, curl uses <code>Connection: keep-alive</code>. In order to make the HEAD
+method return right away, you'll need to pass <code>Connection: close</code>.</p>
+
+<p>Since curl is often used with REST APIs, restify provides a plugin to work around
+this idiosyncrasy in curl. The plugin checks whether the user agent is curl. If it
+is, it sets the Connection header to "close" and removes the "Content-Length" header.</p>
+
+<pre><code>server.pre(restify.pre.userAgentConnection());
+</code></pre>
+
+<p>See the <a href="#pre">pre</a> method for more information.</p>
 
 <h2 id="Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></h2>
 
 <p>Creating a server is straightforward, as you simply invoke the
-<code>createServer</code> API, which takes an options object with the options
+<code>createServer</code> API, which takes an options object with the options listed
 below (and <code>listen()</code> takes the same arguments as node's
-<a href="http://nodejs.org/docs/latest/api/http.html#server.listen">http.Server.listen</a>):</p>
+<a href="http://nodejs.org/docs/latest/api/http.html#http_server_listen_port_hostname_backlog_callback">http.Server.listen</a>):</p>
 
 <pre><code>var restify = require('restify');
 
@@ -205,15 +198,15 @@ server.listen(8080);
 
 <h2 id="Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></h2>
 
-<p>A restify server has a <code>use()</code> method on it, which takes handlers of
+<p>A restify server has a <code>use()</code> method that takes handlers of
 the form <code>function (req, res, next)</code>.   Note that restify runs
 handlers in the order they are registered on a server, so if you want
 some common handlers to run before any of your routes, issue calls to
 <code>use()</code> before defining routes.</p>
 
 <p>Note that in all calls to <code>use()</code> and the routes below, you can pass
-in any combination of <code>function(res, res, next)</code> and
-<code>[function(req, res, next)]</code> (i.e., direct functions and arrays of functions).</p>
+in any combination of direct functions (<code>function(res, res, next)</code>) and
+arrays of functions (<code>[function(req, res, next)]</code>).</p>
 
 <h2 id="Routing"><span class="method name"><span class="name">Routing</span></span></h2>
 
@@ -224,7 +217,7 @@ placeholders are available in <code>req.params</code>. Note that values will be
 URL-decoded before being passed to you.</p>
 
 <pre><code> function send(req, res, next) {
-   res.send(hello ' + req.params.name);
+   res.send('hello ' + req.params.name);
    return next();
  }
 
@@ -261,10 +254,11 @@ be interpreted in any way):</p>
 <p>Would result in <code>req.params[0]</code> being <code>foo</code> and <code>req.params[1]</code> being
 <code>my/cats/name/is/gandalf</code>.  Basically, you can do whatever you want.</p>
 
-<p>Note the use of calling <code>next()</code>.  You are responsible for calling this in
+<p>Note the use of <code>next()</code>.  You are responsible for calling <code>next()</code> in
 order to run the next handler in the chain.  As below, you can pass an
-Error object in to have restify automatically return responses to the client;
-additionally, you can pass in a <code>false</code> to not error, but to stop the handler
+Error object in to have restify automatically return responses to the client.</p>
+
+<p>You can pass in  <code>false</code> to not error, but to stop the handler
 chain.  This is useful if you had a <code>res.send</code> in an early filter, which is
 not an error, and you possibly have one later you want to short-circuit.</p>
 
@@ -582,7 +576,7 @@ server.listen(8080, function () {
 <h3>Events</h3>
 
 <p>Restify servers emit all the events from the node
-<a href="http://nodejs.org/docs/latest/api/http.html#http.Server">http.Server</a>
+<a href="http://nodejs.org/docs/latest/api/http.html#http_class_http_server">http.Server</a>
 and has several other events you want to listen on.</p>
 
 <h5>Event: 'NotFound'</h5>
@@ -652,21 +646,21 @@ here.</p>
 
 <h4>address()</h4>
 
-<p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#server.address">address()</a>.</p>
+<p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_server_address">address()</a>.</p>
 
 <h4>listen(port, [host], [callback]) or listen(path, [callback])</h4>
 
-<p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.listen">listen()</a>.</p>
+<p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback">listen()</a>.</p>
 
 <h4>close()</h4>
 
-<p>Wrap's node's <a href="http://nodejs.org/docs/latest/api/net.html#server.close">close()</a>.</p>
+<p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_event_close">close()</a>.</p>
 
 <h4>pre()</h4>
 
 <p>Allows you to add in handlers that run <em>before</em> routing occurs. This gives you
 a hook to change request headers and the like if you need to. Note that
-<code>req.params</code> will be undefined, as that's filled in _after_ routing.</p>
+<code>req.params</code> will be undefined, as that's filled in <em>after</em> routing.</p>
 
 <pre><code>server.pre(function(req, res, next) {
   req.headers.accept = 'application/json';  // screw you client!
@@ -788,7 +782,7 @@ in the options object:</p>
 the content-type is appropriately set if JSONP params are in place.  There is
 also a default <code>application/javascript</code> formatter to handle this.</p>
 
-<p>You _should_ set the <code>queryParser</code> plugin to run before this, but if you don't
+<p>You <em>should</em> set the <code>queryParser</code> plugin to run before this, but if you don't
 this plugin will still parse the query string properly.</p>
 
 <h3>BodyParser</h3>
@@ -887,7 +881,7 @@ is returned.</p>
 
 <table>
 <tbody>
-<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>rate</td><td>Number</td><td>Steady state number of requests/second to allow</td></tr>
 <tr><td>burst</td><td>Number</td><td>If available, the amount of requests to burst to</td></tr>
 <tr><td>ip</td><td>Boolean</td><td>Do throttling on a /32 (source IP)</td></tr>
@@ -1114,7 +1108,7 @@ instance that is a child component of the one restify has:</p>
 
 <table>
 <tbody>
-<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
 <tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
 <tr><td>href</td><td>String</td><td>url.parse(req.url) href</td></tr>
@@ -1191,7 +1185,7 @@ res.send({hello: 'world'});
 
 <table>
 <tbody>
-<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>code</td><td>Number</td><td>HTTP status code</td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
 <tr><td>charSet</td><td>String</td><td>In conjunction with <code>contentType</code>, you can explicitly set the charSet to be written in the content-type header</td></tr>
@@ -1272,7 +1266,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 
 <table>
 <tbody>
-<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Field</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
 <tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
 <tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
@@ -1286,7 +1280,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 
 <table>
 <tbody>
-<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Field</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
 <tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
 <tr><td>handler name</td><td>char *</td><td>name of the function that just entered</td></tr>
@@ -1298,7 +1292,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 
 <table>
 <tbody>
-<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Field</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
 <tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
 <tr><td>id</td><td>int</td><td>unique id for this request</td></tr>
@@ -1311,7 +1305,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 
 <table>
 <tbody>
-<tr><td><em>Field</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Field</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>server name</td><td>char *</td><td>name of the restify server that fired</td></tr>
 <tr><td>route name</td><td>char *</td><td>name of the route that fired</td></tr>
 <tr><td>handler name</td><td>char *</td><td>name of the function that just entered</td></tr>
@@ -1533,7 +1527,7 @@ it will be an <code>HttpError</code>.</p>
 
 <table>
 <tbody>
-<tr><td><em>Name</em></td><td><em>Type</em></td><td><em>Description</em></td></tr>
+<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>accept</td><td>String</td><td>Accept header to send</td></tr>
 <tr><td>connectTimeout</td><td>Number</td><td>Amount of time to wait for a socket</td></tr>
 <tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
