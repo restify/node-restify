@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.0.1 (not yet released)
+## 2.0.2 (not yet released)
+
+## 2.0.1
 
 - GH-269 plugin to make curl happy
 - RestError not honoring `constructorOpt` from `cause`
