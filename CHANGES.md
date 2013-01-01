@@ -4,6 +4,7 @@
 
 - GH-269 plugin to make curl happy
 - RestError not honoring `constructorOpt` from `cause`
+- GH-271 bump to dtrace 0.2.6 (fix build on Mountain Lion)
 
 # Legacy Releases
 
