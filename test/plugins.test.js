@@ -302,6 +302,33 @@ test('GH-111 JSON Parser not right for arrays', function (t) {
 });
 
 
+test('GH-279 more JSON Arrays', function (t) {
+        function respond(req, res, next) {
+                t.ok(Array.isArray(req.params));
+                t.equal(req.params[0].id, '123654');
+                t.ok(req.params[0].name, 'mimi');
+                t.ok(req.params[1].id, '987654');
+                t.ok(req.params[1].name, 'pijama');
+                res.send(200);
+                next();
+        }
+
+        SERVER.post('/gh279', restify.jsonBodyParser(), respond);
+
+        var obj = [ {
+                'id': '123654',
+                'name': 'mimi'
+        }, {
+                id: '987654',
+                name: 'pijama'
+        }];
+        CLIENT.post('/gh279', obj, function (err, _, res) {
+                t.ifError(err);
+                t.end();
+                t.equal(res.statusCode, 200);
+        });
+});
+
 test('date expired', function (t) {
         var opts = {
                 path: '/foo/bar',
