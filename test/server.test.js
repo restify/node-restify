@@ -899,3 +899,87 @@ test('throwing error from a handler (with domains)', function (t) {
                 t.end();
         });
 });
+
+
+test('gh-278 missing router error events (404)', function (t) {
+        SERVER.once('NotFound', function (req, res) {
+                res.send(404, 'foo');
+        });
+
+        CLIENT.get('/' + uuid.v4(), function (err, _, res) {
+                t.ok(err);
+                t.equal(err.message, '"foo"');
+                t.equal(res.statusCode, 404);
+                t.end();
+        });
+});
+
+
+test('gh-278 missing router error events (405)', function (t) {
+        var p = '/' + uuid.v4();
+        SERVER.post(p, function (req, res, next) {
+                res.send(201);
+                next();
+        });
+        SERVER.once('MethodNotAllowed', function (req, res) {
+                res.send(405, 'foo');
+        });
+
+        CLIENT.get(p, function (err, _, res) {
+                t.ok(err);
+                t.equal(err.message, '"foo"');
+                t.equal(res.statusCode, 405);
+                t.end();
+        });
+});
+
+
+test('gh-278 missing router error events invalid version', function (t) {
+        var p = '/' + uuid.v4();
+        SERVER.get({
+                path: p,
+                version: '1.2.3'
+        }, function (req, res, next) {
+                res.send(200);
+                next();
+        });
+        SERVER.once('VersionNotAllowed', function (req, res) {
+                res.send(449, 'foo');
+        });
+
+        var opts = {
+                path: p,
+                headers: {
+                        'accept-version': '3.2.1'
+                }
+        };
+        CLIENT.get(opts, function (err, _, res) {
+                t.ok(err);
+                t.equal(err.message, '"foo"');
+                t.equal(res.statusCode, 449);
+                t.end();
+        });
+});
+
+
+test('gh-278 missing router error events (415)', function (t) {
+        var p = '/' + uuid.v4();
+        SERVER.post({
+                path: p,
+                contentType: 'text/xml'
+        }, function (req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        SERVER.once('UnsupportedMediaType', function (req, res) {
+                res.send(415, 'foo');
+        });
+
+        CLIENT.post(p, {}, function (err, _, res) {
+                t.ok(err);
+                t.equal(err.message, '"foo"');
+                t.equal(res.statusCode, 415);
+                t.end();
+        });
+});

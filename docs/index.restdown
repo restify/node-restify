@@ -515,7 +515,7 @@ and has several other events you want to listen on.
 
 ##### Event: 'NotFound'
 
-`function (request, response) {}`
+`function (request, response, cb) {}`
 
 When a client request is sent for a URL that does not exist, restify
 will emit this event. Note that restify checks for listeners on this
@@ -524,7 +524,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'MethodNotAllowed'
 
-`function (request, response) {}`
+`function (request, response, cb) {}`
 
 When a client request is sent for a URL that does exist, but you have
 not registered a route for that HTTP verb, restify will emit this
@@ -534,12 +534,21 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'VersionNotAllowed'
 
-`function (request, response) {}`
+`function (request, response, cb) {}`
 
 When a client request is sent for a route that exists, but does not
 match the version(s) on those routes, restify will emit this
 event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
+is expected that if you listen for this event, you respond to the client.
+
+#### Event: UnsupportedMediaType'
+
+`function (request, response, cb) {}`
+
+When a client request is sent for a route that exist, but has a `content-type`
+mismatch, restify will emit this event. Note that restify checks for listeners
+on this event, and if there are none, responds with a default 415 handler.  It
 is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'after'
@@ -550,7 +559,9 @@ Emitted after a route has finished all the handlers you registered.
 You can use this to write audit logs, etc.  The route parameter will be
 the `Route` object that ran.  Note that when you are using the default
 404/405/BadVersion handlers, this event will still be fired, but route will
-be `null`.
+be `null`. If you have registered your own listeners for those, this event
+will not be fired unless you invoke the `cb` argument that is provided with
+them.
 
 #### Event: 'uncaughtException'
 

@@ -2,6 +2,8 @@
 
 ## 2.0.2 (not yet released)
 
+- GH-278 missing events on route errors
+
 ## 2.0.1
 
 - GH-269 plugin to make curl happy
