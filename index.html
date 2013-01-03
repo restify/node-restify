@@ -581,7 +581,7 @@ and has several other events you want to listen on.</p>
 
 <h5>Event: 'NotFound'</h5>
 
-<p><code>function (request, response) {}</code></p>
+<p><code>function (request, response, cb) {}</code></p>
 
 <p>When a client request is sent for a URL that does not exist, restify
 will emit this event. Note that restify checks for listeners on this
@@ -590,7 +590,7 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4>Event: 'MethodNotAllowed'</h4>
 
-<p><code>function (request, response) {}</code></p>
+<p><code>function (request, response, cb) {}</code></p>
 
 <p>When a client request is sent for a URL that does exist, but you have
 not registered a route for that HTTP verb, restify will emit this
@@ -600,12 +600,21 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4>Event: 'VersionNotAllowed'</h4>
 
-<p><code>function (request, response) {}</code></p>
+<p><code>function (request, response, cb) {}</code></p>
 
 <p>When a client request is sent for a route that exists, but does not
 match the version(s) on those routes, restify will emit this
 event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
+is expected that if you listen for this event, you respond to the client.</p>
+
+<h4>Event: UnsupportedMediaType'</h4>
+
+<p><code>function (request, response, cb) {}</code></p>
+
+<p>When a client request is sent for a route that exist, but has a <code>content-type</code>
+mismatch, restify will emit this event. Note that restify checks for listeners
+on this event, and if there are none, responds with a default 415 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
 <h4>Event: 'after'</h4>
@@ -616,7 +625,9 @@ is expected that if you listen for this event, you respond to the client.</p>
 You can use this to write audit logs, etc.  The route parameter will be
 the <code>Route</code> object that ran.  Note that when you are using the default
 404/405/BadVersion handlers, this event will still be fired, but route will
-be <code>null</code>.</p>
+be <code>null</code>. If you have registered your own listeners for those, this event
+will not be fired unless you invoke the <code>cb</code> argument that is provided with
+them.</p>
 
 <h4>Event: 'uncaughtException'</h4>
 
@@ -881,7 +892,7 @@ is returned.</p>
 
 <table>
 <tbody>
-<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>rate</td><td>Number</td><td>Steady state number of requests/second to allow</td></tr>
 <tr><td>burst</td><td>Number</td><td>If available, the amount of requests to burst to</td></tr>
 <tr><td>ip</td><td>Boolean</td><td>Do throttling on a /32 (source IP)</td></tr>
@@ -1108,7 +1119,7 @@ instance that is a child component of the one restify has:</p>
 
 <table>
 <tbody>
-<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
 <tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
 <tr><td>href</td><td>String</td><td>url.parse(req.url) href</td></tr>
@@ -1185,7 +1196,7 @@ res.send({hello: 'world'});
 
 <table>
 <tbody>
-<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>code</td><td>Number</td><td>HTTP status code</td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
 <tr><td>charSet</td><td>String</td><td>In conjunction with <code>contentType</code>, you can explicitly set the charSet to be written in the content-type header</td></tr>
@@ -1527,7 +1538,7 @@ it will be an <code>HttpError</code>.</p>
 
 <table>
 <tbody>
-<tr><td><strong>Nam</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
+<tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>accept</td><td>String</td><td>Accept header to send</td></tr>
 <tr><td>connectTimeout</td><td>Number</td><td>Amount of time to wait for a socket</td></tr>
 <tr><td>dtrace</td><td>Object</td><td>node-dtrace-provider handle</td></tr>
