@@ -1,8 +1,8 @@
 # restify Changelog
 
-## 2.0.3 (not yet released)
+## 2.0.4 (not yet released)
 
-## 2.0.2
+## 2.0.2/2.0.3
 
 - GH-278 missing events on route errors
 - Undo `RestError` `constructorOpt` from 2.0.1
