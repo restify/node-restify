@@ -2,6 +2,8 @@
 
 ## 2.0.4 (not yet released)
 
+- Default uncaughtException handler should check if headers have been sent
+
 ## 2.0.2/2.0.3
 
 - GH-278 missing events on route errors
