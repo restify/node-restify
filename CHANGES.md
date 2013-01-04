@@ -1,7 +1,10 @@
 # restify Changelog
 
-## 2.0.4 (not yet released)
+## 2.0.5 (not yet released)
 
+## 2.0.4
+
+- GH-280 req.params cached by router
 - RequestCaptureStream should support outputting to multiple streams
 - Default uncaughtException handler should check if headers have been sent
 
