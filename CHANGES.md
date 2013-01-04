@@ -2,6 +2,7 @@
 
 ## 2.0.4 (not yet released)
 
+- RequestCaptureStream should support outputting to multiple streams
 - Default uncaughtException handler should check if headers have been sent
 
 ## 2.0.2/2.0.3
