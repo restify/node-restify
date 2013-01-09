@@ -4,9 +4,9 @@
 var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
+var readline = require('readline');
 var sprintf = require('util').format;
 
-var byline = require('byline');
 var nopt = require('nopt');
 
 
@@ -145,15 +145,17 @@ var buckets = {};
 
 var done = 0;
 parsed.argv.remain.forEach(function (f) {
-        var stream = byline(fs.createReadStream(f));
-        stream.on('data', function (l) {
+        var stream = readline.createInterface({
+                input: fs.createReadStream(f),
+                output: null
+        })
+        stream.on('line', function (l) {
                 var record;
                 var t = -1;
 
                 try {
                         record = JSON.parse(l);
                 } catch (e) {}
-                // console.error('%s: line was: "%s"', e, l);
 
                 if (!record)
                         return;

@@ -2,7 +2,9 @@
 
 ## 2.0.5 (not yet released)
 
-- Support keep-alive by default in client
+- GH-291 fix overwriting `options.type` in createJSONClient (Trent Mick)
+- Move to `node-backoff` and rework retry logic in HttpClient
+- Support keep-alive by default in HttpClient
 
 ## 2.0.4
 

@@ -76,12 +76,6 @@ before(function (callback) {
                         log: helper.getLog('server')
                 });
 
-                SERVER.on('clientError', function (err) {
-                        console.error('CLIENT ERROR');
-                        console.error(err.stack);
-                        // process.exit(1);
-                });
-
                 SERVER.use(restify.acceptParser(['json', 'text/plain']));
                 SERVER.use(restify.dateParser());
                 SERVER.use(restify.authorizationParser());
@@ -159,7 +153,7 @@ test('GET json', function (t) {
 test('GH-115 GET path with spaces', function (t) {
         JSON_CLIENT.get('/json/foo bar', function (err, req, res, obj) {
                 t.ok(err);
-                console.log(err);
+                t.equal(err.code, 'ECONNRESET');
                 t.end();
         });
 });
@@ -362,7 +356,6 @@ test('GH-20 connectTimeout', function (t) {
 
         client.get('/foo', function (err, req) {
                 t.ok(err);
-                t.notOk(req);
                 t.end();
         });
 });
