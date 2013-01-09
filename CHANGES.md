@@ -2,6 +2,8 @@
 
 ## 2.0.5 (not yet released)
 
+- Support keep-alive by default in client
+
 ## 2.0.4
 
 - GH-280 req.params cached by router

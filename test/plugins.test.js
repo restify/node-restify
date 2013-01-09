@@ -46,7 +46,8 @@ before(function (callback) {
                         CLIENT = restify.createJsonClient({
                                 url: 'http://127.0.0.1:' + PORT,
                                 dtrace: helper.dtrace,
-                                retry: false
+                                retry: false,
+                                agent: false
                         });
 
                         process.nextTick(callback);

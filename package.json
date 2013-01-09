@@ -43,6 +43,7 @@
                 "byline": "2.0.3",
                 "formidable": "1.0.11",
                 "http-signature": "0.9.9",
+                "keep-alive-agent": "0.0.1",
                 "lru-cache": "2.2.1",
                 "mime": "1.2.7",
                 "node-uuid": "1.4.0",
@@ -51,7 +52,7 @@
                 "retry": "0.6.0",
                 "semver": "1.1.1",
                 "spdy": "1.3.9",
-                "verror": "git://github.com/davepacheco/node-verror.git#35e55e8"
+                "verror": "1.3.5"
         },
         "devDependencies": {
                 "cover": "0.2.8",

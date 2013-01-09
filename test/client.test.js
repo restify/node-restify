@@ -134,6 +134,9 @@ before(function (callback) {
 
 after(function (callback) {
         try {
+                JSON_CLIENT.close();
+                STR_CLIENT.close();
+                RAW_CLIENT.close();
                 SERVER.close(callback);
         } catch (e) {
                 console.error(e.stack);
@@ -353,7 +356,8 @@ test('GH-20 connectTimeout', function (t) {
                 type: 'http',
                 accept: 'text/plain',
                 connectTimeout: 100,
-                retry: false
+                retry: false,
+                agent: false
         });
 
         client.get('/foo', function (err, req) {
@@ -484,7 +488,8 @@ test('don\'t sign a request', function (t) {
                 url: 'http://127.0.0.1:' + PORT,
                 type: 'string',
                 accept: 'text/plain',
-                headers: { 'X-Gusty-Winds': 'May Exist' }
+                headers: { 'X-Gusty-Winds': 'May Exist' },
+                agent: false
         });
         client.get('/signed', function (err, req, res, data) {
                 t.ifError(err);
@@ -513,7 +518,8 @@ test('sign a request', function (t) {
                 type: 'string',
                 accept: 'text/plain',
                 signRequest: signer,
-                headers: { 'X-Gusty-Winds': 'May Exist' }
+                headers: { 'X-Gusty-Winds': 'May Exist' },
+                agent: false
         });
         client.get('/signed', function (err, req, res, data) {
                 t.ifError(err);

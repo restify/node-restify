@@ -57,6 +57,7 @@ before(function (callback) {
 
 after(function (callback) {
         try {
+                CLIENT.close();
                 SERVER.close(callback);
         } catch (e) {
                 console.error(e.stack);

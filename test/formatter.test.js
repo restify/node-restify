@@ -53,7 +53,8 @@ before(function (callback) {
                         CLIENT = restify.createStringClient({
                                 url: 'http://127.0.0.1:' + PORT,
                                 dtrace: helper.dtrace,
-                                retry: false
+                                retry: false,
+                                agent: false
                         });
                         SERVER.get('/tmp', function (req, res) {
                                 res.send('dummy response');

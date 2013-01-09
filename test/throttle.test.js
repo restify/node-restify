@@ -74,7 +74,8 @@ test('setup', function (t) {
                 CLIENT = restify.createJsonClient({
                         url: 'http://127.0.0.1:' + PORT,
                         dtrace: helper.dtrace,
-                        retry: false
+                        retry: false,
+                        agent: false
                 });
 
                 t.end();
