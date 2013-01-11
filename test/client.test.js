@@ -41,7 +41,7 @@ function sendText(req, res, next) {
 
 function sendSignature(req, res, next) {
         res.header('content-type', 'text/plain');
-        var hdr = req.header('X-Awesome-Signature');
+        var hdr = req.header('Awesome-Signature');
         if (!hdr) {
                 res.send('request NOT signed');
         } else {
@@ -481,7 +481,7 @@ test('don\'t sign a request', function (t) {
                 url: 'http://127.0.0.1:' + PORT,
                 type: 'string',
                 accept: 'text/plain',
-                headers: { 'X-Gusty-Winds': 'May Exist' },
+                headers: { 'Gusty-Winds': 'May Exist' },
                 agent: false
         });
         client.get('/signed', function (err, req, res, data) {
@@ -500,18 +500,18 @@ test('sign a request', function (t) {
                 if (!request || !(request instanceof http.ClientRequest))
                         throw new Error('request must be an instance of ' +
                                         'http.ClientRequest');
-                var gw = request.getHeader('X-Gusty-Winds');
+                var gw = request.getHeader('Gusty-Winds');
                 if (!gw)
-                        throw new Error('X-Gusty-Winds header was not ' +
+                        throw new Error('Gusty-Winds header was not ' +
                                         'present in request');
-                request.setHeader('X-Awesome-Signature', 'Gusty Winds ' + gw);
+                request.setHeader('Awesome-Signature', 'Gusty Winds ' + gw);
         };
         var client = restify.createClient({
                 url: 'http://127.0.0.1:' + PORT,
                 type: 'string',
                 accept: 'text/plain',
                 signRequest: signer,
-                headers: { 'X-Gusty-Winds': 'May Exist' },
+                headers: { 'Gusty-Winds': 'May Exist' },
                 agent: false
         });
         client.get('/signed', function (err, req, res, data) {

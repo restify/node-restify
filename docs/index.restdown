@@ -105,7 +105,7 @@ what restify is going to turn that into:
     Content-Length: 12
     Date: Mon, 31 Dec 2012 01:42:07 GMT
     Connection: close
-    
+
 Note that by default, curl uses `Connection: keep-alive`. In order to make the HEAD
 method return right away, you'll need to pass `Connection: close`.
 
@@ -142,7 +142,7 @@ below (and `listen()` takes the same arguments as node's
 ||name||String||By default, this will be set in the `Server` response header, default is `restify` ||
 ||spdy||Object||Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)||
 ||version||String||A default version to set for all routes||
-||responseTimeHeader||String||By default, this will be `X-Response-Time`||
+||responseTimeHeader||String||By default, this will be `Response-Time`||
 ||responseTimeFormatter||function||Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. [example](https://gist.github.com/1970083)||
 
 ## Common handlers: server.use()
@@ -371,15 +371,15 @@ do this:
     Content-Type: text/plain
     Access-Control-Allow-Origin: *
     Access-Control-Allow-Methods: GET
-    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-    Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version
+    Access-Control-Expose-Headers: Api-Version, Request-Id, Response-Time
     Connection: close
     Content-Length: 21
     Content-MD5: up6uNh2ejV/C6JUbLlvsiw==
     Date: Tue, 03 Jan 2012 00:24:48 GMT
     Server: restify
-    X-Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
-    X-Response-Time: 1
+    Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
+    Response-Time: 1
 
     I just don't like you
 
@@ -417,15 +417,15 @@ attributes `code` and `message`.  For example, here's a built-in RestError:
     Content-Type: application/json
     Access-Control-Allow-Origin: *
     Access-Control-Allow-Methods: GET
-    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-    Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+    Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version
+    Access-Control-Expose-Headers: Api-Version, Request-Id, Response-Time
     Connection: close
     Content-Length: 60
     Content-MD5: MpEcO5EQFUZ2MNeUB2VaZg==
     Date: Tue, 03 Jan 2012 00:50:21 GMT
     Server: restify
-    X-Request-Id: bda456dd-2fe4-478d-809c-7d159d58d579
-    X-Response-Time: 3
+    Request-Id: bda456dd-2fe4-478d-809c-7d159d58d579
+    Response-Time: 3
 
     {
       "code": "InvalidArgument",
@@ -902,8 +902,8 @@ You pass in the auditor a bunyan logger, and it will write out records at the
             "statusCode": 200,
             "headers": {
               "access-control-allow-origin": "*",
-              "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-              "access-control-expose-headers": "X-Api-Version, X-Request-Id, X-Response-Time",
+              "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version",
+              "access-control-expose-headers": "Api-Version, Request-Id, Response-Time",
               "server": "Joyent SmartDataCenter 7.0.0",
               "x-request-id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
               "access-control-allow-methods": "GET",
