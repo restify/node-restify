@@ -4,6 +4,9 @@ var http = require('http');
 
 var restify = require('../lib');
 
+var path = require('path');
+var fs = require('fs');
+
 if (require.cache[__dirname + '/lib/helper.js'])
         delete require.cache[__dirname + '/lib/helper.js'];
 var helper = require('./lib/helper.js');
@@ -20,7 +23,8 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-
+var FILES_TO_DELETE = [];
+var DIRS_TO_DELETE = [];
 
 ///--- Tests
 
@@ -61,6 +65,14 @@ before(function (callback) {
 
 after(function (callback) {
         try {
+                for (var i = 0; i < FILES_TO_DELETE.length; ++i) {
+                        try { fs.unlinkSync(FILES_TO_DELETE[i]); }
+                        catch (err) { /* normal */ }
+                }
+                for (var i = 0; i < DIRS_TO_DELETE.length; ++i) {
+                        try { fs.rmdirSync(DIRS_TO_DELETE[i]); }
+                        catch (err) { /* normal */ }
+                }
                 SERVER.close(callback);
         } catch (e) {
                 console.error(e.stack);
@@ -580,4 +592,51 @@ test('gzip body json ok', function (t) {
                         t.equal(res.statusCode, 200);
                 t.end();
         });
+});
+
+function serveStaticTest(t, testDefault) {
+        var staticContent = "{\"content\": \"abcdefg\"}";
+        var staticObj = JSON.parse(staticContent);
+        var testDir = 'public';
+        var testFileName = 'index.json';
+        var routeName = 'GET wildcard';
+        var tmpPath = path.join(process.cwd(), '.tmp');
+        fs.mkdir(tmpPath, function(err) {
+                DIRS_TO_DELETE.push(tmpPath);
+                var folderPath = path.join(tmpPath, testDir);
+
+                fs.mkdir(folderPath, function(err) {
+                        DIRS_TO_DELETE.push(folderPath);
+                        var file = path.join(folderPath, testFileName);
+
+                        fs.writeFile(file, staticContent, function(err) {
+                                FILES_TO_DELETE.push(file);
+                                var opts = { directory: tmpPath };
+                                if (testDefault) {
+                                        opts.defaultFile = testFileName;
+                                        routeName += ' with default';
+                                }
+                                SERVER.get({ path: new RegExp('/' + testDir + '/?.*'), name: routeName},
+                                        restify.serveStatic(opts));
+
+                                // Check for index file
+                                var req = '/' + testDir;
+                                if (!testDefault)
+                                        req += '/' + testFileName;
+
+                                CLIENT.get('/' + testDir + '/' + testFileName, function(err, req, res, obj) {
+                                        t.deepEqual(obj, staticObj);
+                                        t.end();
+                                });
+                        });
+                });
+        });
+}
+
+test('static serves static files', function(t) {
+    serveStaticTest(t, false);
+});
+
+test('static serves default file', function(t) {
+    serveStaticTest(t, true);
 });
