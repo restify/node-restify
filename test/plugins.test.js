@@ -4,7 +4,6 @@ var http = require('http');
 
 var restify = require('../lib');
 
-var temp = require('temp');
 var path = require('path');
 var fs = require('fs');
 
@@ -601,9 +600,9 @@ function serveStaticTest(t, testDefault) {
         var testDir = 'public';
         var testFileName = 'index.json';
         var routeName = 'GET wildcard';
-
-        temp.mkdir(testDir, function(err, tmpPath) {
-
+        var tmpPath = path.join(process.cwd(), '.tmp');
+        fs.mkdir(tmpPath, function(err) {
+                DIRS_TO_DELETE.push(tmpPath);
                 var folderPath = path.join(tmpPath, testDir);
 
                 fs.mkdir(folderPath, function(err) {
