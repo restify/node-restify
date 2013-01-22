@@ -64,12 +64,13 @@ before(function (callback) {
 
 
 after(function (callback) {
+        var i;
         try {
-                for (var i = 0; i < FILES_TO_DELETE.length; ++i) {
+                for (i = 0; i < FILES_TO_DELETE.length; ++i) {
                         try { fs.unlinkSync(FILES_TO_DELETE[i]); }
                         catch (err) { /* normal */ }
                 }
-                for (var i = 0; i < DIRS_TO_DELETE.length; ++i) {
+                for (i = 0; i < DIRS_TO_DELETE.length; ++i) {
                         try { fs.rmdirSync(DIRS_TO_DELETE[i]); }
                         catch (err) { /* normal */ }
                 }
@@ -176,8 +177,8 @@ test('query object', function (t) {
                 next();
         });
 
-        var path = '/query/foo?name[first]=mark&name[last]=cavage';
-        CLIENT.get(path, function (err, _, res) {
+        var p = '/query/foo?name[first]=mark&name[last]=cavage';
+        CLIENT.get(p, function (err, _, res) {
                 t.ifError(err);
                 t.equal(res.statusCode, 200);
                 t.end();
@@ -595,36 +596,39 @@ test('gzip body json ok', function (t) {
 });
 
 function serveStaticTest(t, testDefault) {
-        var staticContent = "{\"content\": \"abcdefg\"}";
+        var staticContent = '{"content": "abcdefg"}';
         var staticObj = JSON.parse(staticContent);
         var testDir = 'public';
         var testFileName = 'index.json';
         var routeName = 'GET wildcard';
         var tmpPath = path.join(process.cwd(), '.tmp');
-        fs.mkdir(tmpPath, function(err) {
+        fs.mkdir(tmpPath, function (err) {
                 DIRS_TO_DELETE.push(tmpPath);
                 var folderPath = path.join(tmpPath, testDir);
 
-                fs.mkdir(folderPath, function(err) {
+                fs.mkdir(folderPath, function (err2) {
+                        t.ifError(err2);
+
                         DIRS_TO_DELETE.push(folderPath);
                         var file = path.join(folderPath, testFileName);
 
-                        fs.writeFile(file, staticContent, function(err) {
+                        fs.writeFile(file, staticContent, function (err3) {
+                                t.ifError(err3);
                                 FILES_TO_DELETE.push(file);
                                 var opts = { directory: tmpPath };
                                 if (testDefault) {
                                         opts.defaultFile = testFileName;
                                         routeName += ' with default';
                                 }
-                                SERVER.get({ path: new RegExp('/' + testDir + '/?.*'), name: routeName},
-                                        restify.serveStatic(opts));
+                                var re = new RegExp('/' + testDir + '/?.*');
+                                SERVER.get({
+                                        path: re,
+                                        name: routeName
+                                }, restify.serveStatic(opts));
 
-                                // Check for index file
-                                var req = '/' + testDir;
-                                if (!testDefault)
-                                        req += '/' + testFileName;
-
-                                CLIENT.get('/' + testDir + '/' + testFileName, function(err, req, res, obj) {
+                                var p = '/' + testDir + '/' + testFileName;
+                                CLIENT.get(p, function (err4, req, res, obj) {
+                                        t.ifError(err4);
                                         t.deepEqual(obj, staticObj);
                                         t.end();
                                 });
@@ -633,10 +637,10 @@ function serveStaticTest(t, testDefault) {
         });
 }
 
-test('static serves static files', function(t) {
-    serveStaticTest(t, false);
+test('static serves static files', function (t) {
+        serveStaticTest(t, false);
 });
 
-test('static serves default file', function(t) {
-    serveStaticTest(t, true);
+test('static serves default file', function (t) {
+        serveStaticTest(t, true);
 });
