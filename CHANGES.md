@@ -1,8 +1,10 @@
-# restify Changelog
+B0;95;c# restify Changelog
 
 ## 2.0.5 (not yet released)
 
 - GH-291 fix overwriting `options.type` in createJSONClient (Trent Mick)
+- GH-299 gzip plugin doesn't play nice with content-length (Ben Hale)
+- GH-301 support private keys w/passphrase (Erik Kristensen)
 - Move to `node-backoff` and rework retry logic in HttpClient
 - Support keep-alive by default in HttpClient
 
