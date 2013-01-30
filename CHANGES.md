@@ -1,12 +1,14 @@
 # restify Changelog
 
-## 2.0.5 (not yet released)
+## 2.1.0
 
+- GH-284 built-in CORS
 - GH-290 next.ifError
 - GH-291 fix overwriting `options.type` in createJSONClient (Trent Mick)
 - GH-297 default document serving in static plugin (Adam Argo)
 - GH-299 gzip plugin doesn't play nice with content-length (Ben Hale)
 - GH-301 support private keys w/passphrase (Erik Kristensen)
+- GH-302 responseTime cleanup
 - Move to `node-backoff` and rework retry logic in HttpClient
 - Support keep-alive by default in HttpClient
 
