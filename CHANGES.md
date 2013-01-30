@@ -1,6 +1,10 @@
 # restify Changelog
 
-## 2.1.1 (not yet released)
+## 2.2.2 (not yet released)
+
+## 2.1.1
+
+- revert to backoff@1.2.0
 
 ## 2.1.0
 

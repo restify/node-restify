@@ -40,7 +40,7 @@
         },
         "dependencies": {
                 "assert-plus": "0.1.2",
-                "backoff": "2.0.0",
+                "backoff": "1.2.0",
                 "bunyan": "0.18.2",
                 "clone": "0.1.5",
                 "dtrace-provider": "0.2.7",
