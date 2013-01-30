@@ -984,3 +984,30 @@ test('gh-278 missing router error events (415)', function (t) {
                 t.end();
         });
 });
+
+
+test('next.ifError', function (t) {
+        SERVER.use(function (req, res, next) {
+                next.ifError(null);
+                next();
+        });
+
+        SERVER.get('/foo/:id', function tester(req, res, next) {
+                process.nextTick(function () {
+                        var e = new RestError({
+                                statusCode: 400,
+                                restCode: 'Foo'
+                        }, 'screw you client');
+                        next.ifError(e);
+                        res.send();
+                        next();
+                });
+        });
+
+        CLIENT.get('/foo/bar', function (err) {
+                t.ok(err);
+                t.equal(err.statusCode, 400);
+                t.equal(err.message, 'screw you client');
+                t.end();
+        });
+});

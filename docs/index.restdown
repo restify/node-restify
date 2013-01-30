@@ -353,6 +353,17 @@ If you invoke `res.send()` with an error that has a `statusCode`
 attribute, that will be used, otherwise a default of 500 will be used
 (unless you're using `res.send(4xx, new Error('blah))`).
 
+Alternatively, restify 2.1 supports a `next.ifError` API:
+
+    server.get('/hello/:name', function(req, res, next) {
+      return database.get(req.params.name, function(err, user) {
+        next.ifError(err);
+        res.send(user);
+        next();
+      });
+    });
+
+
 ### HttpError
 
 Now the obvious question is what that exactly does (in either case).

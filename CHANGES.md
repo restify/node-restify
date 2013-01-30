@@ -2,6 +2,7 @@
 
 ## 2.0.5 (not yet released)
 
+- GH-290 next.ifError
 - GH-291 fix overwriting `options.type` in createJSONClient (Trent Mick)
 - GH-297 default document serving in static plugin (Adam Argo)
 - GH-299 gzip plugin doesn't play nice with content-length (Ben Hale)
