@@ -1,5 +1,7 @@
 # restify Changelog
 
+## 2.1.1 (not yet released)
+
 ## 2.1.0
 
 - GH-284 built-in CORS
