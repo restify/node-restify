@@ -999,7 +999,8 @@ test('next.ifError', function (t) {
                                 restCode: 'Foo'
                         }, 'screw you client');
                         next.ifError(e);
-                        res.send();
+                        t.notOk(true);
+                        res.send(200);
                         next();
                 });
         });
