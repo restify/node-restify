@@ -2,6 +2,8 @@
 
 ## 2.2.2 (not yet released)
 
+- backoff@2.0.0 and necessary changes
+
 ## 2.1.1
 
 - revert to backoff@1.2.0

@@ -356,6 +356,7 @@ test('GH-20 connectTimeout', function (t) {
 
         client.get('/foo', function (err, req) {
                 t.ok(err);
+                t.equal(err.name, 'ConnectTimeoutError');
                 t.end();
         });
 });

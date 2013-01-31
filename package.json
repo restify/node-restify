@@ -23,7 +23,7 @@
         "name": "restify",
         "homepage": "http://mcavage.github.com/node-restify",
         "description": "REST framework",
-        "version": "2.1.1",
+        "version": "2.1.2",
         "repository": {
                 "type": "git",
                 "url": "git://github.com/mcavage/node-restify.git"
@@ -40,7 +40,7 @@
         },
         "dependencies": {
                 "assert-plus": "0.1.2",
-                "backoff": "1.2.0",
+                "backoff": "2.0.0",
                 "bunyan": "0.18.2",
                 "clone": "0.1.5",
                 "dtrace-provider": "0.2.7",
