@@ -390,7 +390,7 @@ test('get (path and version not ok)', function (t) {
         };
         CLIENT.get(opts, function (err, _, res) {
                 t.ok(err);
-                t.equal(err.message, '~2.1');
+                t.equal(err.message, '~2.1 is not supported by GET /foo/bar');
                 t.equal(res.statusCode, 400);
                 t.end();
         });
@@ -643,31 +643,6 @@ test('upload routing based on content-type ok', function (t) {
 });
 
 
-//
-// Disabled, as Heroku (travis) doesn't allow us to write to /tmp
-//
-//
-// test('GH-56 streaming with filed (upload)', function (t) {
-//         var file = '/tmp/.' + uuid();
-//         SERVER.put('/foo', function tester(req, res, next) {
-//                 req.pipe(filed(file)).pipe(res);
-//         });
-
-//         CLIENT.put('/foo', 'hello world', function (err, _, res) {
-//                 t.ifError(err);
-//                 t.equal(res.statusCode, 201);
-//                 fs.readFile(file, 'utf8', function (err, data) {
-//                         t.ifError(err);
-//                         t.equal(JSON.parse(data), 'hello world');
-//                         fs.unlink(file, function () {
-//                                 t.end();
-//                         });
-//                 });
-//         });
-// });
-//
-
-
 test('full response', function (t) {
         SERVER.use(restify.fullResponse());
         SERVER.del('/bar/:id', function tester(req, res, next) {
@@ -798,7 +773,9 @@ test('test matches params with custom regex', function (t) {
                         path: function () {
                                 return (p);
                         },
-                        version: function () {},
+                        version: function () {
+                                return ('*');
+                        },
                         url: p
                 };
 
@@ -1009,6 +986,38 @@ test('next.ifError', function (t) {
                 t.ok(err);
                 t.equal(err.statusCode, 400);
                 t.equal(err.message, 'screw you client');
+                t.end();
+        });
+});
+
+
+test('gh-283 maximum available versioned route matching', function (t) {
+        var p = '/' + uuid.v4();
+        var versions = ['1.0.0', '1.1.0'];
+        var i;
+
+        function mnt(v) {
+                SERVER.get({
+                        path: p,
+                        version: v
+                }, function (req, res, next) {
+                        res.json(200, {version: v});
+                        next();
+                });
+        }
+
+        for (i = 0; i < versions.length; i++)
+                mnt(versions[i]);
+
+        var opts = {
+                path: p,
+                headers: {
+                        'accept-version': '~1'
+                }
+        };
+
+        CLIENT.get(opts, function (err, _, res, obj) {
+                t.equal(obj.version, '1.1.0');
                 t.end();
         });
 });

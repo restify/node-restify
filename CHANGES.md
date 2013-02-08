@@ -1,7 +1,11 @@
 # restify Changelog
 
-## 2.2.2 (not yet released)
+## 2.2.0 (not yet released)
 
+- GH-316 drop `clone`, and just shallow copy (Trent Mick)
+- GH-284 preflight requests not working without access-control-request-headers
+- GH-283 versioned routes should use maximum match, not first (Colin O'Brien)
+- node-dtrace-provider@0.2.8
 - backoff@2.0.0 and necessary changes
 
 ## 2.1.1
