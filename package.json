@@ -24,7 +24,7 @@
         "name": "restify",
         "homepage": "http://mcavage.github.com/node-restify",
         "description": "REST framework",
-        "version": "2.1.2",
+        "version": "2.2.1",
         "repository": {
                 "type": "git",
                 "url": "git://github.com/mcavage/node-restify.git"
@@ -45,7 +45,7 @@
                 "bunyan": "0.18.2",
                 "dtrace-provider": "0.2.8",
                 "formidable": "1.0.11",
-                "http-signature": "0.9.10",
+                "http-signature": "0.9.11",
                 "keep-alive-agent": "0.0.1",
                 "lru-cache": "2.2.2",
                 "mime": "1.2.9",
