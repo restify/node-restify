@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.2.0 (not yet released)
+## 2.2.1 (not yet released)
+
+## 2.2.0
 
 - GH-316 drop `clone`, and just shallow copy (Trent Mick)
 - GH-284 preflight requests not working without access-control-request-headers
