@@ -856,7 +856,7 @@ is expected that you are going to map it to a route, as below:</p>
 
 <p>The plugin will enforce that only files under <code>directory</code> can be served; you can
 specify additional restrictions by passing in a <code>match</code> parameter, which is just
-a <code>RegExp</code> to check against the requested file name.  Lastly, you can pass in a
+a <code>RegExp</code> to check against the requested file name.  You may pass in a <code>default</code> parameter, which is just a <code>string</code> to specify a default file to serve up, for example <code>'index.html'</code>. Lastly, you can pass in a
 <code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header. Default is <code>3600</code>
 (1 hour).</p>
 
