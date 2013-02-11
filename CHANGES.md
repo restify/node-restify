@@ -1,7 +1,10 @@
 # restify Changelog
 
-## 2.2.1 (not yet released)
+## 2.2.2 (not yet released)
 
+## 2.2.1
+
+- GH-283 broke versioned, typed routes. Fix.
 - node-http-signature@0.9.11
 
 ## 2.2.0
