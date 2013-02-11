@@ -2,6 +2,8 @@
 
 ## 2.2.1 (not yet released)
 
+- node-http-signature@0.9.11
+
 ## 2.2.0
 
 - GH-316 drop `clone`, and just shallow copy (Trent Mick)
