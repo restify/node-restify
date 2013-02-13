@@ -1,6 +1,7 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
 var http = require('http');
+var net = require('net');
 
 var restify = require('../lib');
 
@@ -294,7 +295,48 @@ test('body json ok (no params)', function (t) {
         });
 });
 
+test('GH-318 get request with body (default)', function (t) {
+  SERVER.get('/getWithoutBody',
+    restify.bodyParser({ mapParams: true }),
+    function (req, res, next) {
+      t.notEqual(req.params.foo, 'bar');
+      res.send();
+      next();
+    });
 
+  var request = 'GET /getWithoutBody HTTP/1.1\nContent-Type: application/json\nContent-Length: 13\n\n{"foo":"bar"}\n';
+
+  var client = net.connect({host: 'localhost', port: PORT}, function() {
+    client.write(request);
+  });
+  client.on('data', function(data) {
+    client.end();
+  });
+  client.on('end', function() {
+    t.done();
+  });
+});
+
+test('GH-318 get request with body (requestBodyOnGet=true)', function (t) {
+  SERVER.get('/getWithBody',
+    restify.bodyParser({ mapParams: true, requestBodyOnGet: true}),
+    function (req, res, next) {
+      t.equal(req.params.foo, 'bar');
+      res.send();
+      next();
+    });
+
+  var request = 'GET /getWithBody HTTP/1.1\nContent-Type: application/json\nContent-Length: 13\n\n{"foo":"bar"}\n';
+  var client = net.connect({host: 'localhost', port: PORT}, function() {
+    client.write(request);
+  });
+  client.on('data', function(data) {
+    client.end();
+  });
+  client.on('end', function() {
+    t.done();
+  });
+});
 
 test('GH-111 JSON Parser not right for arrays', function (t) {
         SERVER.post('/gh111',
