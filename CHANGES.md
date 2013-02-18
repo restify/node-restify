@@ -3,6 +3,8 @@
 ## 2.2.2 (not yet released)
 
 - GH-329 Wrong values in res.methods on some cases
+- GH-326 non-default origins not working, Chrome requires allow/origin and
+         allow users to append to CORS array (John Fieber/Damon Oehlman)
 - GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
 
 ## 2.2.1
