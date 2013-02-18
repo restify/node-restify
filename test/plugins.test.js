@@ -295,47 +295,60 @@ test('body json ok (no params)', function (t) {
         });
 });
 
+
 test('GH-318 get request with body (default)', function (t) {
-  SERVER.get('/getWithoutBody',
-    restify.bodyParser({ mapParams: true }),
-    function (req, res, next) {
-      t.notEqual(req.params.foo, 'bar');
-      res.send();
-      next();
-    });
+        SERVER.get('/getWithoutBody',
+                   restify.bodyParser({ mapParams: true }),
+                   function (req, res, next) {
+                           t.notEqual(req.params.foo, 'bar');
+                           res.send();
+                           next();
+                   });
 
-  var request = 'GET /getWithoutBody HTTP/1.1\nContent-Type: application/json\nContent-Length: 13\n\n{"foo":"bar"}\n';
+        var request = 'GET /getWithoutBody HTTP/1.1\r\n' +
+                'Content-Type: application/json\r\n' +
+                'Content-Length: 13\r\n' +
+                '\r\n' +
+                '{"foo":"bar"}';
 
-  var client = net.connect({host: 'localhost', port: PORT}, function() {
-    client.write(request);
-  });
-  client.on('data', function(data) {
-    client.end();
-  });
-  client.on('end', function() {
-    t.done();
-  });
+        var client = net.connect({host: '127.0.0.1', port: PORT}, function () {
+                client.write(request);
+        });
+        client.once('data', function (data) {
+                client.end();
+        });
+        client.once('end', function () {
+                t.end();
+        });
 });
 
 test('GH-318 get request with body (requestBodyOnGet=true)', function (t) {
-  SERVER.get('/getWithBody',
-    restify.bodyParser({ mapParams: true, requestBodyOnGet: true}),
-    function (req, res, next) {
-      t.equal(req.params.foo, 'bar');
-      res.send();
-      next();
-    });
+        SERVER.get('/getWithBody',
+                   restify.bodyParser({
+                           mapParams: true,
+                           requestBodyOnGet: true
+                   }), function (req, res, next) {
+                           t.equal(req.params.foo, 'bar');
+                           res.send();
+                           next();
+                   });
 
-  var request = 'GET /getWithBody HTTP/1.1\nContent-Type: application/json\nContent-Length: 13\n\n{"foo":"bar"}\n';
-  var client = net.connect({host: 'localhost', port: PORT}, function() {
-    client.write(request);
-  });
-  client.on('data', function(data) {
-    client.end();
-  });
-  client.on('end', function() {
-    t.done();
-  });
+        var request = 'GET /getWithBody HTTP/1.1\r\n' +
+                'Content-Type: application/json\r\n' +
+                'Content-Length: 13\r\n' +
+                '\r\n' +
+                '{"foo":"bar"}';
+        var client = net.connect({host: '127.0.0.1', port: PORT}, function () {
+                client.write(request);
+        });
+
+        client.once('data', function (data) {
+                client.end();
+        });
+
+        client.once('end', function () {
+                t.end();
+        });
 });
 
 test('GH-111 JSON Parser not right for arrays', function (t) {

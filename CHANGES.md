@@ -2,6 +2,8 @@
 
 ## 2.2.2 (not yet released)
 
+- GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
+
 ## 2.2.1
 
 - GH-283 broke versioned, typed routes. Fix.
