@@ -2,6 +2,7 @@
 
 ## 2.2.2 (not yet released)
 
+- GH-329 Wrong values in res.methods on some cases
 - GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
 
 ## 2.2.1

@@ -1021,3 +1021,28 @@ test('gh-283 maximum available versioned route matching', function (t) {
                 t.end();
         });
 });
+
+
+test('gh-329 wrong values in res.methods', function (t) {
+        function route(req, res, next) {
+                res.send(200);
+                next();
+        }
+
+        SERVER.get('/stuff', route);
+        SERVER.post('/stuff', route);
+        SERVER.get('/stuff/:id', route);
+        SERVER.put('/stuff/:id', route);
+        SERVER.del('/stuff/:id', route);
+
+        SERVER.once('MethodNotAllowed', function (req, res, cb) {
+                t.ok(res.methods);
+                t.deepEqual(res.methods, ['GET', 'PUT', 'DELETE']);
+                res.send(405);
+        });
+
+        CLIENT.post('/stuff/foo', {}, function (err, _, res) {
+                t.ok(err);
+                t.end();
+        });
+});
