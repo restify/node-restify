@@ -6,6 +6,7 @@
 - GH-326 non-default origins not working, Chrome requires allow/origin and
          allow users to append to CORS array (John Fieber/Damon Oehlman)
 - GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
+- GH-323 <path>/?<querystring> broken
 
 ## 2.2.1
 

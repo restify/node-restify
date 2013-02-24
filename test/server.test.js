@@ -1046,3 +1046,20 @@ test('gh-329 wrong values in res.methods', function (t) {
                 t.end();
         });
 });
+
+
+test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
+        SERVER.pre(restify.pre.sanitizePath());
+        SERVER.use(restify.queryParser());
+        SERVER.get('/hello/:name', function (req, res, next) {
+                res.send(req.params);
+        });
+
+        SERVER.listen(8080, function () {
+                CLIENT.get('/hello/foo/?bar=baz', function (err, _, __, obj) {
+                        t.ifError(err);
+                        t.deepEqual(obj, {name: 'foo', bar: 'baz'});
+                        t.end();
+                });
+        });
+});
