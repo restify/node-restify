@@ -8,6 +8,8 @@
 - GH-326 non-default origins not working, Chrome requires allow/origin and
          allow users to append to CORS array (John Fieber/Damon Oehlman)
 - GH-323 <path>/?<querystring> broken
+- GH-322 add `req.route`, which contains the original params for the
+         route (Tim Kuijsten)
 - GH-312 bodyParser() should return buffers when data is binary (Tim Kuijsten)
 - GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
 
