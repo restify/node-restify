@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.3.0 (not yet released)
+## 2.3.1 (not yet released)
+
+## 2.3.0
 
 - GH-335 Content-Type'd routes not correct when only Accept-Extension varies
 - GH-332 Cache-Control max-age should show minutes (Ben Hutchison)
