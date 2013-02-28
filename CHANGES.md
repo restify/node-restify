@@ -3,11 +3,13 @@
 ## 2.3.0 (not yet released)
 
 - GH-335 Content-Type'd routes not correct when only Accept-Extension varies
+- GH-332 Cache-Control max-age should show minutes (Ben Hutchison)
 - GH-329 Wrong values in res.methods on some cases
 - GH-326 non-default origins not working, Chrome requires allow/origin and
          allow users to append to CORS array (John Fieber/Damon Oehlman)
-- GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
 - GH-323 <path>/?<querystring> broken
+- GH-312 bodyParser() should return buffers when data is binary (Tim Kuijsten)
+- GH-318 Allow use of 'requestBodyOnGet' option in bodyParser (@geebee)
 
 ## 2.2.1
 

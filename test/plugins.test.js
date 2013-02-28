@@ -650,6 +650,7 @@ test('gzip body json ok', function (t) {
         });
 });
 
+
 function serveStaticTest(t, testDefault) {
         var staticContent = '{"content": "abcdefg"}';
         var staticObj = JSON.parse(staticContent);
@@ -684,7 +685,8 @@ function serveStaticTest(t, testDefault) {
                                 var p = '/' + testDir + '/' + testFileName;
                                 CLIENT.get(p, function (err4, req, res, obj) {
                                         t.ifError(err4);
-                                        t.equal(res.headers['cache-control'], 'public, max-age=3600');
+                                        t.equal(res.headers['cache-control'],
+                                                'public, max-age=3600');
                                         t.deepEqual(obj, staticObj);
                                         t.end();
                                 });
