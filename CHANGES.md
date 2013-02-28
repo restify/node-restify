@@ -5,6 +5,7 @@
 - GH-335 Content-Type'd routes not correct when only Accept-Extension varies
 - GH-332 Cache-Control max-age should show minutes (Ben Hutchison)
 - GH-329 Wrong values in res.methods on some cases
+- GH-327 server.versionedUse('1.2.3', function (req, res, next) {}) (Tim Kuijsten)
 - GH-326 non-default origins not working, Chrome requires allow/origin and
          allow users to append to CORS array (John Fieber/Damon Oehlman)
 - GH-323 <path>/?<querystring> broken
