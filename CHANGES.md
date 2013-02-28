@@ -1,6 +1,11 @@
 # restify Changelog
 
-## 2.3.1 (not yet released)
+## 2.3.2 (not yet released)
+
+## 2.3.1
+
+- GH-335 Content-Type'd routes not correct when only Accept-Extension varies,
+         part deux (switch to `negotiator`, drop `mimeparse`).
 
 ## 2.3.0
 
