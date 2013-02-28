@@ -1063,3 +1063,109 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
                 });
         });
 });
+
+
+test('content-type routing vendor', function (t) {
+        SERVER.post({
+                name: 'foo',
+                path: '/',
+                contentType: 'application/vnd.joyent.com.foo+json'
+        }, function (req, res, next) {
+                res.send(201);
+        });
+
+        SERVER.post({
+                name: 'bar',
+                path: '/',
+                contentType: 'application/vnd.joyent.com.bar+json'
+        }, function (req, res, next) {
+                res.send(202);
+        });
+
+        SERVER.listen(8080, function () {
+                var _done = 0;
+                function done() {
+                        if (++_done === 2)
+                                t.end();
+                }
+
+                var opts = {
+                        path: '/',
+                        headers: {
+                                'content-type':
+                                'application/vnd.joyent.com.foo+json'
+                        }
+                };
+                CLIENT.post(opts, {}, function (err, _, res) {
+                        t.ifError(err);
+                        t.equal(res.statusCode, 201);
+                        done();
+                });
+
+                var opts2 = {
+                        path: '/',
+                        headers: {
+                                'content-type':
+                                'application/vnd.joyent.com.bar+json'
+                        }
+                };
+                CLIENT.post(opts2, {}, function (err, _, res) {
+                        t.ifError(err);
+                        t.equal(res.statusCode, 202);
+                        done();
+                });
+        });
+});
+
+
+test('content-type routing params only', function (t) {
+        SERVER.post({
+                name: 'foo',
+                path: '/',
+                contentType: 'application/json; type=foo'
+        }, function (req, res, next) {
+                res.send(201);
+        });
+
+        SERVER.post({
+                name: 'bar',
+                path: '/',
+                contentType: 'application/json; type=bar'
+        }, function (req, res, next) {
+                res.send(202);
+        });
+
+        SERVER.listen(8080, function () {
+                var _done = 0;
+                function done() {
+                        if (++_done === 2)
+                                t.end();
+                }
+
+                var opts = {
+                        path: '/',
+                        headers: {
+                                'content-type':
+                                'application/json; type=foo'
+                        }
+                };
+                CLIENT.post(opts, {}, function (err, _, res) {
+                        t.ifError(err);
+                        t.equal(res.statusCode, 201);
+                        done();
+                });
+
+                var opts2 = {
+                        path: '/',
+                        headers: {
+                                'content-type':
+                                'application/json; type=bar'
+                        }
+                };
+                CLIENT.post(opts2, {}, function (err, _, res) {
+                        t.ifError(err);
+                        t.equal(res.statusCode, 202);
+                        done();
+                });
+        });
+});
