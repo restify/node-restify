@@ -1,7 +1,10 @@
 # restify Changelog
 
-## 2.3.2 (not yet released)
+## 2.3.3 (not yet released)
 
+## 2.3.2
+
+- pick up bunyan 0.18.3
 - server.address() returning null causes server.url to deref null
 
 ## 2.3.1
