@@ -2,6 +2,8 @@
 
 ## 2.3.2 (not yet released)
 
+- server.address() returning null causes server.url to deref null
+
 ## 2.3.1
 
 - GH-335 Content-Type'd routes not correct when only Accept-Extension varies,
