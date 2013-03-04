@@ -4,7 +4,6 @@
 // a common logger for all tests.
 //
 
-var d = require('dtrace-provider');
 var bunyan = require('bunyan');
 
 var restify = require('../../lib');
@@ -49,5 +48,15 @@ module.exports = {
                 }));
         },
 
-        dtrace: d.createDTraceProvider('restifyUnitTest')
+
+        get dtrace() {
+                var dtp;
+                try {
+                        dtp = d.createDTraceProvider('restifyUnitTest')
+                } catch (e) {
+                        dtp = null;
+                }
+
+                return (dtp);
+        }
 };

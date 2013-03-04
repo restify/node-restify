@@ -45,7 +45,6 @@
                 "backoff": "2.0.0",
                 "bunyan": "0.18.3",
                 "deep-equal": "0.0.0",
-                "dtrace-provider": "0.2.8",
                 "formidable": "1.0.11",
                 "http-signature": "0.9.11",
                 "keep-alive-agent": "0.0.1",
@@ -58,6 +57,9 @@
                 "semver": "1.1.2",
                 "spdy": "1.4.3",
                 "verror": "1.3.5"
+        },
+        "optionalDependencies": {
+                "dtrace-provider": "0.2.8"
         },
         "devDependencies": {
                 "cover": "0.2.8",
