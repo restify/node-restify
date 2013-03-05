@@ -1,7 +1,10 @@
 # restify Changelog
 
-## 2.3.3 (not yet released)
+## 2.3.4 (not yet released)
 
+## 2.3.3
+
+- Stop logging client_req in bunyan output
 - GH-319 make DTrace optional
 - GH-335 Content-Type'd routes not accepting array (Pedro Palazón)
 
