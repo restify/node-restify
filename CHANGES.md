@@ -2,6 +2,9 @@
 
 ## 2.3.3 (not yet released)
 
+- GH-319 make DTrace optional
+- GH-335 Content-Type'd routes not accepting array (Pedro Palazón)
+
 ## 2.3.2
 
 - pick up bunyan 0.18.3
