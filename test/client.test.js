@@ -89,12 +89,14 @@ before(function (callback) {
                 SERVER.head('/json/:name', sendJson);
                 SERVER.put('/json/:name', sendJson);
                 SERVER.post('/json/:name', sendJson);
+                SERVER.patch('/json/:name', sendJson);
 
                 SERVER.del('/str/:name', sendText);
                 SERVER.get('/str/:name', sendText);
                 SERVER.head('/str/:name', sendText);
                 SERVER.put('/str/:name', sendText);
                 SERVER.post('/str/:name', sendText);
+                SERVER.patch('/str/:name', sendText);
 
                 SERVER.listen(PORT, '127.0.0.1', function () {
                         PORT = SERVER.address().port;
@@ -208,6 +210,18 @@ test('PUT json', function (t) {
 });
 
 
+test('PATCH json', function (t) {
+        var data = { hello: 'foo' };
+        JSON_CLIENT.patch('/json/mcavage', data, function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {hello: 'foo'});
+                t.end();
+        });
+});
+
+
 test('GET text', function (t) {
         STR_CLIENT.get('/str/mcavage', function (err, req, res, data) {
                 t.ifError(err);
@@ -246,6 +260,19 @@ test('Check error (404)', function (t) {
 test('POST text', function (t) {
         var body = 'hello=foo';
         STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.body, data);
+                t.equal(data, 'hello foo');
+                t.end();
+        });
+});
+
+
+test('PATCH text', function (t) {
+        var body = 'hello=foo';
+        STR_CLIENT.patch('/str/mcavage', body, function (err, req, res, data) {
                 t.ifError(err);
                 t.ok(req);
                 t.ok(res);
