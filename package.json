@@ -42,7 +42,6 @@
     "bunyan": "0.10.0",
     "byline": "2.0.2",
     "formidable": "1.0.11",
-    "dtrace-provider": "0.0.9",
     "http-signature": "0.9.9",
     "lru-cache": "1.1.0",
     "mime": "1.2.5",
