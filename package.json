@@ -42,6 +42,7 @@
     "bunyan": "0.10.0",
     "byline": "2.0.2",
     "formidable": "1.0.11",
+    "dtrace-provider": "0.2.8",
     "http-signature": "0.9.9",
     "lru-cache": "1.1.0",
     "mime": "1.2.5",
@@ -55,7 +56,7 @@
     "tap": "0.2.5"
   },
   "optionalDependencies": {
-    "dtrace-provider": "0.0.9"
+    "dtrace-provider": "0.2.8"
   },
   "scripts": {
     "test": "./node_modules/.bin/tap ./test/*.test.js"
