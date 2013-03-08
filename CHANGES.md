@@ -1,6 +1,12 @@
 # restify Changelog
 
-## 2.3.4 (not yet released)
+## 2.3.5 (not yet released)
+
+## 2.3.4
+
+- GH-343 default to 'identity' for accept-encoding
+- GH-342 client support for PATCH
+- Pick up spdy@1.4.6 (doesn't ship all the example garbage)
 
 ## 2.3.3
 

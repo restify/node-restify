@@ -25,7 +25,7 @@
         "name": "restify",
         "homepage": "http://mcavage.github.com/node-restify",
         "description": "REST framework",
-        "version": "2.3.3",
+        "version": "2.3.4",
         "repository": {
                 "type": "git",
                 "url": "git://github.com/mcavage/node-restify.git"
@@ -55,7 +55,7 @@
                 "once": "1.1.1",
                 "qs": "0.5.3",
                 "semver": "1.1.2",
-                "spdy": "1.4.3",
+                "spdy": "1.4.6",
                 "verror": "1.3.5"
         },
         "optionalDependencies": {
