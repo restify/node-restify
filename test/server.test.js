@@ -31,7 +31,7 @@ var SERVER;
 
 ///--- Tests
 
-before(function (callback) {
+before(function (cb) {
         try {
                 SERVER = restify.createServer({
                         dtrace: helper.dtrace,
@@ -46,7 +46,7 @@ before(function (callback) {
                                 retry: false
                         });
 
-                        process.nextTick(callback);
+                        cb();
                 });
         } catch (e) {
                 console.error(e.stack);
@@ -55,20 +55,18 @@ before(function (callback) {
 });
 
 
-after(function (callback) {
+after(function (cb) {
         try {
                 CLIENT.close();
-                SERVER.close(callback);
+                SERVER.close(function () {
+                        CLIENT = null;
+                        SERVER = null;
+                        cb();
+                });
         } catch (e) {
                 console.error(e.stack);
                 process.exit(1);
         }
-});
-
-
-test('ok', function (t) {
-        t.ok(SERVER);
-        t.end();
 });
 
 
@@ -111,7 +109,7 @@ test('get (path only)', function (t) {
         });
 
         var count = 0;
-        SERVER.on('after', function (req, res, route) {
+        SERVER.once('after', function (req, res, route) {
                 t.ok(req);
                 t.ok(res);
                 t.equal(r, route);
@@ -1135,37 +1133,257 @@ test('content-type routing params only', function (t) {
                 res.send(202);
         });
 
-        SERVER.listen(8080, function () {
-                var _done = 0;
-                function done() {
-                        if (++_done === 2)
-                                t.end();
+        var _done = 0;
+        function done() {
+                if (++_done === 2)
+                        t.end();
+        }
+
+        var opts = {
+                path: '/',
+                headers: {
+                        'content-type':
+                        'application/json; type=foo'
                 }
+        };
+        CLIENT.post(opts, {}, function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 201);
+                done();
+        });
 
-                var opts = {
-                        path: '/',
-                        headers: {
-                                'content-type':
-                                'application/json; type=foo'
-                        }
-                };
-                CLIENT.post(opts, {}, function (err, _, res) {
-                        t.ifError(err);
-                        t.equal(res.statusCode, 201);
-                        done();
-                });
+        var opts2 = {
+                path: '/',
+                headers: {
+                        'content-type':
+                        'application/json; type=bar'
+                }
+        };
+        CLIENT.post(opts2, {}, function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 202);
+                done();
+        });
+});
 
-                var opts2 = {
-                        path: '/',
-                        headers: {
-                                'content-type':
-                                'application/json; type=bar'
-                        }
-                };
-                CLIENT.post(opts2, {}, function (err, _, res) {
-                        t.ifError(err);
-                        t.equal(res.statusCode, 202);
-                        done();
-                });
+
+test('gh-193 basic', function (t) {
+        SERVER.get({
+                name: 'foo',
+                path: '/foo'
+        }, function (req, res, next) {
+                next('bar');
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar'
+        }, function (req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.end();
+        });
+});
+
+
+
+test('gh-193 route ENOEXIST', function (t) {
+        SERVER.get({
+                name: 'foo',
+                path: '/foo'
+        }, function (req, res, next) {
+                next('baz');
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar'
+        }, function (req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.end();
+        });
+});
+
+
+test('gh-193 route only run use once', function (t) {
+        var count = 0;
+
+        SERVER.use(function (req, res, next) {
+                count++;
+                next();
+        });
+
+        SERVER.get({
+                name: 'foo',
+                path: '/foo'
+        }, function (req, res, next) {
+                next('bar');
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar'
+        }, function (req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(count, 1);
+                t.end();
+        });
+});
+
+
+test('gh-193 route chained', function (t) {
+        var count = 0;
+
+        SERVER.use(function addCounter(req, res, next) {
+                count++;
+                next();
+        });
+
+        SERVER.get({
+                name: 'foo',
+                path: '/foo'
+        }, function getFoo(req, res, next) {
+                next('bar');
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar'
+        }, function getBar(req, res, next) {
+                next('baz');
+        });
+
+        SERVER.get({
+                name: 'baz',
+                path: '/baz'
+        }, function getBaz(req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.equal(count, 1);
+                t.end();
+        });
+});
+
+
+test('gh-193 route params basic', function (t) {
+        var count = 0;
+
+        SERVER.use(function (req, res, next) {
+                count++;
+                next();
+        });
+
+        SERVER.get({
+                name: 'foo',
+                path: '/foo/:id'
+        }, function (req, res, next) {
+                t.equal(req.params.id, 'blah');
+                next('bar');
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar/:baz'
+        }, function (req, res, next) {
+                t.notOk(req.params.baz);
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo/blah', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(count, 1);
+                t.end();
+        });
+});
+
+
+test('gh-193 same url w/params', function (t) {
+        var count = 0;
+
+        SERVER.use(function (req, res, next) {
+                count++;
+                next();
+        });
+
+        SERVER.get({
+                name: 'foo',
+                path: '/foo/:id'
+        }, function (req, res, next) {
+                t.equal(req.params.id, 'blah');
+                next('foo2');
+        });
+
+        SERVER.get({
+                name: 'foo2',
+                path: '/foo/:baz'
+        }, function (req, res, next) {
+                t.equal(req.params.baz, 'blah');
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo/blah', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(count, 1);
+                t.end();
+        });
+});
+
+
+
+test('gh-193 next("route") from a use plugin', function (t) {
+        var count = 0;
+
+        SERVER.use(function plugin(req, res, next) {
+                count++;
+                next('bar');
+        });
+
+        SERVER.get({
+                name: 'foo',
+                path: '/foo'
+        }, function getFoo(req, res, next) {
+                res.send(500);
+                next();
+        });
+
+        SERVER.get({
+                name: 'bar',
+                path: '/bar'
+        }, function getBar(req, res, next) {
+                res.send(200);
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(count, 1);
+                t.end();
         });
 });

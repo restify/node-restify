@@ -1,4 +1,4 @@
-var server = require('restify').createServer();
+var server = require('../../lib').createServer();
 //var server = require('express')();
 
 server.get('/echo/:name', function (req, res, next) {

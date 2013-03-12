@@ -1,6 +1,9 @@
 # restify Changelog
 
-## 2.3.5 (not yet released)
+## 2.4.0 (not yet released)
+
+- GH-193 support `next('name_of_route')`
+
 
 ## 2.3.4
 

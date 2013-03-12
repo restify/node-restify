@@ -206,6 +206,37 @@ You can pass in  `false` to not error, but to stop the handler
 chain.  This is useful if you had a `res.send` in an early filter, which is
 not an error, and you possibly have one later you want to short-circuit.
 
+Lastly, you can pass in a string `name` to `next()`, and restify will lookup
+that route, and assuming it exists will run the chain *from where you left
+off*.  So for example:
+
+    var count = 0;
+
+    server.use(function foo(req, res, next) {
+        count++;
+        next();
+    });
+
+    server.get('/foo/:id', function (req, res, next) {
+       next('foo2');
+    });
+
+    server.get({
+        name: 'foo2',
+        path: '/foo/:id'
+    }, function (req, res, next) {
+       assert.equal(count, 1);
+       res.send(200);
+       next();
+    });
+
+Note that `foo` only gets run once in that example.  A few caveats:
+
+- If you provide a name that doesn't exist, restify will 500 that request.
+- Don't be silly and call this in cycles.  restify won't check that.
+- Lastly, you cannot "chain" `next('route')` calls; you can only delegate the
+  routing chain once (this is a limitation of the way routes are stored
+  internally, and may be revisited someday).
 
 ### Versioned Routes
 
