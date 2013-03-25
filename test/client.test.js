@@ -160,6 +160,25 @@ test('GH-115 GET path with spaces', function (t) {
         });
 });
 
+test('GH-353 GET path with trailing /', function (t) {
+        JSON_CLIENT.get('/json/mcavage/', function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {hello: 'mcavage'});
+                t.end();
+        });
+});
+
+test('GH-353 GET path with trailing ?', function (t) {
+        JSON_CLIENT.get('/json/mcavage/?', function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {hello: 'mcavage'});
+                t.end();
+        });
+});
 
 test('Check error (404)', function (t) {
         JSON_CLIENT.get('/' + uuid(), function (err, req, res, obj) {
