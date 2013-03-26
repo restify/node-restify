@@ -1,8 +1,10 @@
 # restify Changelog
 
-## 2.4.0 (not yet released)
+## Not Yet Released
 
-- bunyan@0.19.0
+## 2.3.5
+
+- bunyan@0.20.0
 - GH-346 `server.toString()` crashes (Alex Whitman)
 - GH-193 support `next('name_of_route')`
 
