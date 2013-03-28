@@ -625,6 +625,61 @@ test('gzip response', function (t) {
 });
 
 
+test('gzip large response', function (t) {
+        var testResponseSize = 65536*3;
+        var TestStream = function(){
+                this.readable = true;
+                this.sentSize = 0;
+                this.totalSize = testResponseSize;
+                this.interval = null;
+        };
+        require('util').inherits(TestStream, require('stream'));
+        TestStream.prototype.resume = function(){
+                var self = this;
+                this.interval || (this.interval = setInterval(function(){
+                        var chunkSize = Math.min(self.totalSize - self.sentSize, 65536);
+                        if(chunkSize > 0) {
+                                var chunk = new Array(chunkSize+1).join('a');
+                                self.emit('data', chunk);
+                                self.sentSize += chunkSize;
+                        } else {
+                                console.log('end');
+                                self.emit('data', '"}');
+                                self.emit('end');
+                                self.pause();
+                        }
+                }, 1));
+        };
+        TestStream.prototype.pause = function(){
+                clearInterval(this.interval);
+                this.interval = null;
+        };
+        var bodyStream = new TestStream();
+
+        SERVER.get('/gzip/:id',
+                   restify.gzipResponse(),
+                   function (req, res, next) {
+                           bodyStream.resume();
+                           res.write('{"foo":"');
+                           bodyStream.pipe(res);
+                           next();
+                   });
+
+        var opts = {
+                path: '/gzip/foo',
+                headers: {
+                        'Accept-Encoding': 'gzip'
+                }
+        };
+        CLIENT.get(opts, function (err, _, res, obj) {
+                t.ifError(err);
+                var expectedResponse = {foo: new Array(testResponseSize+1).join('a')};
+                t.deepEqual(expectedResponse, obj);
+                t.end();
+        });
+});
+
+
 test('gzip body json ok', function (t) {
         SERVER.post('/body/:id',
                     restify.bodyParser(),
