@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- client should log request/response pairs
+
 ## 2.3.5
 
 - bunyan@0.20.0
