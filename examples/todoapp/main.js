@@ -43,52 +43,6 @@ var LOG = bunyan.createLogger({
 
 
 
-///--- Errors
-
-function MissingTaskError() {
-        restify.RestError.call(this, {
-                statusCode: 409,
-                restCode: 'MissingTask',
-                message: '"task" is a required parameter',
-                constructorOpt: MissingTaskError
-        });
-
-        this.name = 'MissingTaskError';
-}
-util.inherits(MissingTaskError, restify.RestError);
-
-
-function TodoExistsError(name) {
-        assert.string(name, 'name');
-
-        restify.RestError.call(this, {
-                statusCode: 409,
-                restCode: 'TodoExists',
-                message: name + ' already exists',
-                constructorOpt: TodoExistsError
-        });
-
-        this.name = 'TodoExistsError';
-}
-util.inherits(TodoExistsError, restify.RestError);
-
-
-function TodoNotFoundError(name) {
-        assert.string(name, 'name');
-
-        restify.RestError.call(this, {
-                statusCode: 404,
-                restCode: 'TodoNotFound',
-                message: name + ' was not found',
-                constructorOpt: TodoNotFoundError
-        });
-
-        this.name = 'TodoNotFoundError';
-}
-util.inherits(TodoNotFoundError, restify.RestError);
-
-
-
 ///--- Helpers
 
 /**

@@ -5,15 +5,15 @@
         "main": "main.js",
         "dependencies": {
                 "assert-plus": "0.1.2",
-                "bunyan": "0.16.8",
+                "bunyan": "0.21.1",
                 "posix-getopt": "1.0.0",
                 "restify": "git://github.com/mcavage/node-restify.git#master"
         },
         "devDependencies": {
-                "nodeunit": "0.7.4"
+                "nodeunit": "0.8.0"
         },
         "scripts": {
-                "start": "node server.js 2>&1 | bunyan",
+                "start": "node main.js 2>&1 | bunyan",
                 "test": "nodeunit test"
         },
         "author": "Mark Cavage",
