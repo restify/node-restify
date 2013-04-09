@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- GH-338 turn `req.body` into an `Object` when content-type is
+         JSON (Daan Kuijsten)
 - GH-362 Empty body throws TypeError in StringClient (Bryan Donovan)
 - dependency version bumps
 - 0.10.X support in tests (add necessary `resume()` calls)
