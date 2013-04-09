@@ -140,7 +140,6 @@ after(function (callback) {
         }
 });
 
-
 test('GET json', function (t) {
         JSON_CLIENT.get('/json/mcavage', function (err, req, res, obj) {
                 t.ifError(err);
@@ -193,6 +192,18 @@ test('POST json', function (t) {
                 t.ok(req);
                 t.ok(res);
                 t.deepEqual(obj, {hello: 'foo'});
+                t.end();
+        });
+});
+
+
+test('POST json empty body object', function (t) {
+        var data = {};
+        JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {hello: 'mcavage'});
                 t.end();
         });
 });
@@ -296,6 +307,45 @@ test('POST text (object)', function (t) {
 });
 
 
+test('POST text empty body string', function (t) {
+        var body = '';
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.body, data);
+                t.equal(data, 'hello mcavage');
+                t.end();
+        });
+});
+
+
+test('POST text null body', function (t) {
+        var body = null;
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.body, data);
+                t.equal(data, 'hello mcavage');
+                t.end();
+        });
+});
+
+
+test('POST text empty body object', function (t) {
+        var body = {};
+        STR_CLIENT.post('/str/mcavage', body, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.body, data);
+                t.equal(data, 'hello mcavage');
+                t.end();
+        });
+});
+
+
 test('PUT text', function (t) {
         var body = 'hello=foo';
         STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
@@ -308,6 +358,17 @@ test('PUT text', function (t) {
         });
 });
 
+test('PUT text empty body string', function (t) {
+        var body = '';
+        STR_CLIENT.put('/str/mcavage', body, function (err, req, res, data) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.body, data);
+                t.equal(data, 'hello mcavage');
+                t.end();
+        });
+});
 
 test('DELETE text', function (t) {
         STR_CLIENT.del('/str/mcavage', function (err, req, res) {
