@@ -2,6 +2,7 @@
 
 ## Not Yet Released
 
+- GH-362 Empty body throws TypeError in StringClient (Bryan Donovan)
 - dependency version bumps
 - 0.10.X support in tests (add necessary `resume()` calls)
 - client should log request/response pairs
