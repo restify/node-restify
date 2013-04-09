@@ -250,6 +250,7 @@ test('PATCH ok', function (t) {
                 res.on('end', function () {
                         t.end();
                 });
+                res.resume();
         }).end();
 });
 
@@ -697,6 +698,7 @@ test('GH-149 limit request body size', function (t) {
         var client = http.request(opts, function (res) {
                 t.equal(res.statusCode, 413);
                 res.once('end', t.end.bind(t));
+                res.resume();
         });
         client.write(new Array(1028).join('x'));
         client.end();
@@ -726,6 +728,7 @@ test('GH-149 limit request body size (json)', function (t) {
         var client = http.request(opts, function (res) {
                 t.equal(res.statusCode, 413);
                 res.once('end', t.end.bind(t));
+                res.resume();
         });
         client.write('{"a":[' + new Array(512).join('1,') + '0]}');
         client.end();

@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- dependency version bumps
+- 0.10.X support in tests (add necessary `resume()` calls)
 - client should log request/response pairs
 
 ## 2.3.5
