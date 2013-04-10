@@ -3,9 +3,10 @@
 ## Not Yet Released
 
 - GH-366 `req.accepts()` not working with short-hand mime types
+- GH-362 Empty body throws TypeError in StringClient (Bryan Donovan)
 - GH-338 turn `req.body` into an `Object` when content-type is
          JSON (Daan Kuijsten)
-- GH-362 Empty body throws TypeError in StringClient (Bryan Donovan)
+- GH-336 `res.charSet()` back in
 - dependency version bumps
 - 0.10.X support in tests (add necessary `resume()` calls)
 - client should log request/response pairs

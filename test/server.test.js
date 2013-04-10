@@ -1375,7 +1375,6 @@ test('gh-193 same url w/params', function (t) {
 });
 
 
-
 test('gh-193 next("route") from a use plugin', function (t) {
         var count = 0;
 
@@ -1404,6 +1403,43 @@ test('gh-193 next("route") from a use plugin', function (t) {
                 t.ifError(err);
                 t.equal(res.statusCode, 200);
                 t.equal(count, 1);
+                t.end();
+        });
+});
+
+
+
+test('res.charSet', function (t) {
+        SERVER.get('/foo', function getFoo(req, res, next) {
+                res.charSet('ISO-8859-1');
+                res.set('Content-Type', 'text/plain');
+                res.send(200, {foo: 'bar'});
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(res.headers['content-type'],
+                        'text/plain; charset=ISO-8859-1');
+                t.end();
+        });
+});
+
+
+test('res.charSet override', function (t) {
+        SERVER.get('/foo', function getFoo(req, res, next) {
+                res.charSet('ISO-8859-1');
+                res.set('Content-Type', 'text/plain;charset=utf-8');
+                res.send(200, {foo: 'bar'});
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.equal(res.headers['content-type'],
+                        'text/plain; charset=ISO-8859-1');
                 t.end();
         });
 });
