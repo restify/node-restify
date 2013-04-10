@@ -1066,6 +1066,23 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
 });
 
 
+test('<url>/?<queryString> broken', function (t) {
+        SERVER.pre(restify.pre.sanitizePath());
+        SERVER.use(restify.queryParser());
+        SERVER.get(/\/.*/, function (req, res, next) {
+                res.send(req.params);
+        });
+
+        SERVER.listen(8080, function () {
+                CLIENT.get('/?bar=baz', function (err, _, __, obj) {
+                        t.ifError(err);
+                        t.deepEqual(obj, {bar: 'baz'});
+                        t.end();
+                });
+        });
+});
+
+
 test('content-type routing vendor', function (t) {
         SERVER.post({
                 name: 'foo',
