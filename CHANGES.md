@@ -2,6 +2,10 @@
 
 ## Not Yet Released
 
+## 2.4.1
+
+- Support node 0.10.X TLS options in client(s)
+
 ## 2.4.0
 
 - GH-368 Route /\/.*/ does not match request /? (Ben Hutchison)
