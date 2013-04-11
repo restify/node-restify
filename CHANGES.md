@@ -4,7 +4,7 @@
 
 ## 2.4.0
 
-- GH-368 Route /\/.*/ does not match request /? (Ben Hutchinson)
+- GH-368 Route /\/.*/ does not match request /? (Ben Hutchison)
 - GH-366 `req.accepts()` not working with short-hand mime types
 - GH-362 Empty body throws TypeError in StringClient (Bryan Donovan)
 - GH-355 Serve gzip encoded files from static if they are available
