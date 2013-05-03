@@ -3,6 +3,9 @@
 ## Not Yet Released
 
 - GH-388 JSON client blows up on bad content
+- GH-379 Static plugin: NotAuthorizedError for file path with
+         parentheses (Ricardo Stuven)
+- GH-370 Add charSet option for static file plugin (Jonathan Dahan)
 
 ## 2.4.1
 
