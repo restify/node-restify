@@ -1444,3 +1444,19 @@ test('res.charSet override', function (t) {
                 t.end();
         });
 });
+
+
+test('GH-384 res.json(200, {}) broken', function (t) {
+        SERVER.get('/foo', function (req, res, next) {
+                res.json(200, {foo: 'bar'});
+                next();
+        });
+
+        CLIENT.get('/foo', function (err, _, res, obj) {
+                t.ifError(err);
+                t.equal(res.statusCode, 200);
+                t.ok(obj);
+                t.equal((obj || {}).foo, 'bar');
+                t.end();
+        });
+});
