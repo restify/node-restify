@@ -47,6 +47,7 @@
                 "backoff": "2.1.0",
                 "bunyan": "0.21.1",
                 "deep-equal": "0.0.0",
+                "escape-regexp-component": "1.0.2",
                 "formidable": "1.0.13",
                 "http-signature": "0.9.11",
                 "keep-alive-agent": "0.0.1",

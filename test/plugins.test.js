@@ -713,13 +713,13 @@ test('gzip body json ok', function (t) {
 });
 
 
-function serveStaticTest(t, testDefault) {
+function serveStaticTest(t, testDefault, tmpDir) {
         var staticContent = '{"content": "abcdefg"}';
         var staticObj = JSON.parse(staticContent);
         var testDir = 'public';
         var testFileName = 'index.json';
         var routeName = 'GET wildcard';
-        var tmpPath = path.join(process.cwd(), '.tmp');
+        var tmpPath = path.join(process.cwd(), tmpDir);
         fs.mkdir(tmpPath, function (err) {
                 DIRS_TO_DELETE.push(tmpPath);
                 var folderPath = path.join(tmpPath, testDir);
@@ -758,9 +758,13 @@ function serveStaticTest(t, testDefault) {
 }
 
 test('static serves static files', function (t) {
-        serveStaticTest(t, false);
+        serveStaticTest(t, false, '.tmp');
 });
 
 test('static serves default file', function (t) {
-        serveStaticTest(t, true);
+        serveStaticTest(t, true, '.tmp');
+});
+
+test('GH-379 static serves file with parentheses in path', function (t) {
+        serveStaticTest(t, false, '.(tmp)');
 });
