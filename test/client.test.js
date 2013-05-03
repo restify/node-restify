@@ -85,6 +85,12 @@ before(function (callback) {
                 SERVER.get('/signed', sendSignature);
                 SERVER.get('/whitespace/:flavor', sendWhitespace);
 
+                SERVER.get('/json/boom', function (req, res, next) {
+                        res.set('content-type', 'text/html');
+                        res.send(200, '<html><head/><body/></html>');
+                        next();
+                });
+
                 SERVER.get('/json/:name', sendJson);
                 SERVER.head('/json/:name', sendJson);
                 SERVER.put('/json/:name', sendJson);
@@ -146,6 +152,17 @@ test('GET json', function (t) {
                 t.ok(req);
                 t.ok(res);
                 t.deepEqual(obj, {hello: 'mcavage'});
+                t.end();
+        });
+});
+
+
+test('GH-388 GET json, but really HTML', function (t) {
+        JSON_CLIENT.get('/json/boom', function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, {});
                 t.end();
         });
 });

@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- GH-388 JSON client blows up on bad content
+
 ## 2.4.1
 
 - Support node 0.10.X TLS options in client(s)
