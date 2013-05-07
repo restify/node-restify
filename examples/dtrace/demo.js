@@ -67,7 +67,7 @@
 //              512 |                                         0
 
 
-var restify = require('../lib');
+var restify = require('../../lib');
 var Logger = require('bunyan');
 
 
