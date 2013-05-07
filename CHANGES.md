@@ -2,6 +2,10 @@
 
 ## Not Yet Released
 
+## 2.5.0
+
+- Pick up http-signature@0.10.0 (breaking change, to those using it); see
+  https://github.com/joyent/node-http-signature/issues/10
 - GH-388 JSON client blows up on bad content
 - GH-379 Static plugin: NotAuthorizedError for file path with
          parentheses (Ricardo Stuven)

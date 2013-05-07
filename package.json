@@ -29,7 +29,7 @@
         "name": "restify",
         "homepage": "http://mcavage.github.com/node-restify",
         "description": "REST framework",
-        "version": "2.4.1",
+        "version": "2.5.0",
         "repository": {
                 "type": "git",
                 "url": "git://github.com/mcavage/node-restify.git"
@@ -51,14 +51,14 @@
                 "deep-equal": "0.0.0",
                 "escape-regexp-component": "1.0.2",
                 "formidable": "1.0.14",
-                "http-signature": "0.9.11",
+                "http-signature": "0.10.0",
                 "keep-alive-agent": "0.0.1",
                 "lru-cache": "2.3.0",
                 "mime": "1.2.9",
                 "negotiator": "0.2.5",
                 "node-uuid": "1.4.0",
                 "once": "1.1.1",
-                "qs": "0.6.2",
+                "qs": "0.6.4",
                 "semver": "1.1.4",
                 "spdy": "1.8.2",
                 "verror": "1.3.6"
