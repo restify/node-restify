@@ -2,6 +2,9 @@
 
 ## Not Yet Released
 
+- GH-389 StringClient should handle garbage servers that send neither
+         `Content-Length` nor `Transfer-Encoding: chunked` headers.
+
 ## 2.5.0
 
 - Pick up http-signature@0.10.0 (breaking change, to those using it); see
