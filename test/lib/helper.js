@@ -52,7 +52,7 @@ module.exports = {
         get dtrace() {
                 var dtp;
                 try {
-                        var d = require('dtrace-prodiver');
+                        var d = require('dtrace-provider');
                         dtp = d.createDTraceProvider('restifyUnitTest');
                 } catch (e) {
                         dtp = null;
