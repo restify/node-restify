@@ -806,12 +806,15 @@ supported.</p>
 <pre><code>server.use(restify.bodyParser({ mapParams: false }));
 </code></pre>
 
-<p>You can pass in an options object; currently the only parameter honored is
-<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from the
+<p>You can pass in an options object: currently there are some parameters being honored.</p>
+<p><code>mapParams</code>: this you can set to <code>false</code> to disable copying k/v pairs from the
 request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with the
-parsed object.  The default is to map params into <code>req.params</code>.  The
-<code>keepExtensions</code> option is useful if you want the uploaded files to include the
+parsed object.  The default is to map params into <code>req.params</code>.</p>
+<p> The <code>keepExtensions</code> option is useful if you want the uploaded files to include the
 extensions of the original files (multipart uploads only). Default is <code>false</code>.</p>
+<p><code>rejectUnknown</code>: this you can set to <code>true</code> to end the request with a
+<code>UnsupportedMediaTypeError</code> when nonone of the supported content types was given.
+Defaults to <code>false</code></p>
 
 <h3>RequestLogger</h3>
 
