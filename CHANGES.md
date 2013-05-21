@@ -2,6 +2,7 @@
 
 ## Not Yet Released
 
+- GH-401 RegEx routes stomp one another, resulting in 404
 - GH-389 StringClient should handle garbage servers that send neither
          `Content-Length` nor `Transfer-Encoding: chunked` headers.
 
