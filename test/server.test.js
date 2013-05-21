@@ -1460,3 +1460,25 @@ test('GH-384 res.json(200, {}) broken', function (t) {
                 t.end();
         });
 });
+
+
+test('GH-401 regex routing broken', function (t) {
+        function handle(req, res, next) {
+                res.send(204);
+                next();
+        }
+
+        var done = 0;
+        function client_cb(err, _, res) {
+                t.ifError(err);
+                t.equal(res.statusCode, 204);
+                if (++done === 2)
+                        t.end();
+        }
+
+        SERVER.get('/image', handle);
+        SERVER.get(/^(\/image\/)(.*)/, handle);
+
+        CLIENT.get('/image', client_cb);
+        CLIENT.get('/image/1.jpg', client_cb);
+});
