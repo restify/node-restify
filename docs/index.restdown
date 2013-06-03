@@ -142,6 +142,7 @@ below (and `listen()` takes the same arguments as node's
 ||name||String||By default, this will be set in the `Server` response header, default is `restify` ||
 ||spdy||Object||Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)||
 ||version||String||A default version to set for all routes||
+||handleUpgrades||Boolean||Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`||
 
 ## Common handlers: server.use()
 
@@ -293,6 +294,45 @@ server creation time.  Lastly, you can support multiple versions in the API
 by using an array:
 
       server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
+
+## Upgrade Requests
+
+Incoming HTTP requests that contain a `Connection: Upgrade` header are treated
+somewhat differently by the node HTTP server.  If you want restify to push
+Upgrade requests through the regular routing chain, you need to enable
+`handleUpgrades` when creating the server.
+
+To determine if a request is eligible for Upgrade, check for the existence of
+`res.claimUpgrade()`.  This method will return an object with two properties:
+the `socket` of the underlying connection, and the first received data `Buffer`
+as `head` (may be zero-length).
+
+Once `res.claimUpgrade()` is called, `res` itself is marked unusable for
+further HTTP responses; any later attempt to `send()` or `end()`, etc, will
+throw an `Error`.  Likewise if `res` has already been used to send at least
+part of a response to the client, `res.claimUpgrade()` will throw an `Error`.
+Upgrades and regular HTTP Response behaviour are mutually exclusive on any
+particular connection.
+
+Using the Upgrade mechanism, you can use a library like
+[watershed](https://github.com/jclulow/node-watershed) to negotiate WebSockets
+connections.  For example:
+    var ws = new Watershed();
+    server.get('/websocket/attach', function upgradeRoute(req, res, next) {
+      if (!res.claimUpgrade) {
+        next(new Error('Connection Must Upgrade For WebSockets'));
+        return;
+      }
+
+      var upgrade = res.claimUpgrade();
+      var shed = ws.accept(req, upgrade.socket, upgrade.head);
+      shed.on('text', function(msg) {
+        console.log('Received message from websocket client: ' + msg);
+      });
+      shed.send('hello there!');
+
+      next(false);
+    });
 
 ## Content Negotiation
 
@@ -1643,3 +1683,32 @@ Since it hasn't been mentioned yet, this convenience method (available
 on all clients), just sets the `Authorization` header for all HTTP requests:
 
     client.basicAuth('mark', 'mysupersecretpassword');
+
+### Upgrades
+
+If you successfully negotiate an Upgrade with the HTTP server, an
+`upgradeResult` event will be emitted with the arguments `err`, `res`, `socket`
+and `head`.  You can use this functionality to establish a WebSockets
+connection with a server.  For example, using the
+[watershed](https://github.com/jclulow/node-watershed) library:
+
+    var ws = new Watershed();
+    var wskey = ws.generateKey();
+    var options = {
+      path: '/websockets/attach',
+      headers: {
+        connection: 'upgrade',
+        upgrade: 'websocket',
+        'sec-websocket-key': wskey,
+      }
+    };
+    client.get(options, function(err, res, socket, head) {
+      req.once('upgradeResult', function(err, res, socket, head) {
+        var shed = ws.connect(res, socket, head, wskey);
+        shed.on('text', function(msg) {
+          console.log('message from server: ' + msg);
+          shed.end();
+        });
+        shed.send('greetings program');
+      });
+    });
