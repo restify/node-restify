@@ -112,7 +112,7 @@ test('get (path only)', function (t) {
         SERVER.once('after', function (req, res, route) {
                 t.ok(req);
                 t.ok(res);
-                t.equal(r, route);
+                t.equal(r, route.name);
                 if (++count === 2)
                         t.end();
         });
