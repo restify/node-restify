@@ -157,6 +157,7 @@ test('GET without upgrade headers', function (t) {
                         res.on('end', function () {
                                 done('client response');
                         });
+                        res.resume();
                 });
                 req.on('upgradeResult', function (err2, res) {
                         done('server upgraded unexpectedly');
@@ -211,6 +212,7 @@ test('Dueling upgrade and response handling 1', function (t) {
                         res.on('end', function () {
                                 done('client response');
                         });
+                        res.resume();
                 });
                 req.on('upgradeResult', function (err2, res) {
                         done('server upgraded unexpectedly');

@@ -70,7 +70,7 @@
                 "cover": "0.2.8",
                 "filed": "0.0.7",
                 "nodeunit": "0.8.0",
-                "watershed": "0.1.0"
+                "watershed": "0.3.0"
         },
         "scripts": {
                 "test": "nodeunit ./test"
