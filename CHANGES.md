@@ -2,6 +2,12 @@
 
 ## Not Yet Released
 
+## 2.6.0
+
+- EXPERIMENTAL: Native websocket support via watershed (Josh Clulow)
+- Pass entire route, not just route.name to `after` (Dingman)
+- Type coercion bug in Cache Control API (Chris Cannell)
+
 ## 2.5.1
 
 - GH-401 RegEx routes stomp one another, resulting in 404
