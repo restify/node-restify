@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- Set TCP SO_KEEPALIVE when default KeepAliveAgent is on (client)
+
 ## 2.6.0
 
 - EXPERIMENTAL: Native websocket support via watershed (Josh Clulow)
