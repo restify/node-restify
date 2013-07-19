@@ -2,6 +2,8 @@
 
 ## Not Yet Released
 
+- Add CSV/TSV parser (Dominik Lessel)
+- Add `req.timers`: a list of hrtime's for each handler
 - Set TCP SO_KEEPALIVE when default KeepAliveAgent is on (client)
 
 ## 2.6.0
