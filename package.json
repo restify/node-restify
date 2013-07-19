@@ -49,7 +49,7 @@
         "dependencies": {
                 "assert-plus": "0.1.2",
                 "backoff": "2.2.0",
-                "bunyan": "0.21.1",
+                "bunyan": "0.21.3",
                 "deep-equal": "0.0.0",
                 "escape-regexp-component": "1.0.2",
                 "formidable": "1.0.14",
