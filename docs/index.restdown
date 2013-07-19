@@ -1184,7 +1184,6 @@ Short-hand for:
 ||**Name**||**Type**||**Description**||
 ||code||Number||HTTP status code||
 ||contentLength||Number||short hand for the header content-length||
-||charSet||String||In conjunction with `contentType`, you can explicitly set the charSet to be written in the content-type header||
 ||contentType||String||short hand for the header content-type||
 ||headers||Object||response headers||
 ||id||String||A unique request id (x-request-id)||
