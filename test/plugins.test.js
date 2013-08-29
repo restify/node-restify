@@ -105,7 +105,6 @@ test('406', function (t) {
         });
 });
 
-
 test('authorization basic ok', function (t) {
         var authz = 'Basic ' + new Buffer('user:secret').toString('base64');
         var opts = {
@@ -768,3 +767,72 @@ test('static serves default file', function (t) {
 test('GH-379 static serves file with parentheses in path', function (t) {
         serveStaticTest(t, false, '.(tmp)');
 });
+
+function setupVersionUrlPaths(override, path) {
+        SERVER.pre(restify.pre.versionUrl(override));
+        SERVER.get({path: path, version: '1.0.0'}, function (req, res, next) {
+                res.send('1');
+                next();
+        });
+
+        SERVER.get({path: path, version: '2.0.0'},  function (req, res, next) {
+                res.send('2');
+                next();
+        });
+        SERVER.get(path, function (req, res, next) {
+                res.send('*');
+                next();
+        });
+}
+
+test('versionUrl basic', function (t) {
+        var path = '/versionBasic';
+
+        setupVersionUrlPaths(false, path);
+
+        CLIENT.get('/v1' + path, function (err, _, res) {
+                t.ifError(err);
+                t.equal(res.body, '"1"');
+                SERVER.before.pop();
+                t.end();
+        });
+});
+
+test('versionUrl without override', function (t) {
+        var path = '/versionUrlNoOverride';
+        var opts = {
+                path: '/v1' + path,
+                headers: {
+                        'accept-version': '~2.0.0'
+                }
+        };
+
+        setupVersionUrlPaths(false, path);
+
+        CLIENT.get(opts, function (err, _, res, obj) {
+                t.equal(obj.code, 'ResourceNotFound');
+                SERVER.before.pop();
+                t.end();
+        });
+});
+
+test('versionUrl with override', function (t) {
+        var path = '/versionUrlOverride';
+        var opts = {
+                path: '/v1' + path,
+                headers: {
+                        'accept-version': '~2.0.0'
+                }
+        };
+
+        setupVersionUrlPaths(true, path);
+
+        CLIENT.get(opts, function (err, _, res, obj) {
+                t.ifError(err);
+                t.equal(obj, '1');
+                SERVER.before.pop();
+                t.end();
+        });
+});
+
+/* vim: set ts=8 sw=8: */
