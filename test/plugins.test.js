@@ -790,9 +790,9 @@ test('versionUrl basic', function (t) {
 
         setupVersionUrlPaths(false, path);
 
-        CLIENT.get('/v1' + path, function (err, _, res) {
+        CLIENT.get('/v1' + path, function (err, _, res, obj) {
                 t.ifError(err);
-                t.equal(res.body, '"1"');
+                t.equal(obj, '1');
                 SERVER.before.pop();
                 t.end();
         });
@@ -803,14 +803,14 @@ test('versionUrl without override', function (t) {
         var opts = {
                 path: '/v1' + path,
                 headers: {
-                        'accept-version': '~2.0.0'
+                        'accept-version': '~2'
                 }
         };
 
         setupVersionUrlPaths(false, path);
 
         CLIENT.get(opts, function (err, _, res, obj) {
-                t.equal(obj.code, 'ResourceNotFound');
+                t.equal(obj, '2');
                 SERVER.before.pop();
                 t.end();
         });
