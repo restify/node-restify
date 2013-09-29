@@ -864,15 +864,19 @@ plugin has no impact if the client does not send `accept-encoding: gzip`.
 The serveStatic module is different than most of the other plugins, in that it
 is expected that you are going to map it to a route, as below:
 
-    server.get(/\/docs\/public\/?.*/, restify.serveStatic({
-      directory: './public'
+    server.get(/\/docs\/current\/?.*/, restify.serveStatic({
+      directory: './documentation/v1',
+      default: 'index.html'
     }));
 
-The plugin will enforce that only files under `directory` can be served; you can
-specify additional restrictions by passing in a `match` parameter, which is just
-a `RegExp` to check against the requested file name.  Lastly, you can pass in a
-`maxAge` numeric, which will set the `Cache-Control` header. Default is `3600`
-(1 hour).
+The plugin will enforce that all files under `directory` are served. The 
+`directory` served is relative to the process working directory. You can also
+provide a `default` parameter such as index.html for any directory that 
+lacks a direct file match. 
+You can specify additional restrictions by passing in a `match` parameter, 
+which is just a `RegExp` to check against the requested file name. Lastly, you 
+can pass in a `maxAge` numeric, which will set the `Cache-Control` header. 
+Default is `3600` (1 hour).
 
 ### Throttle
 
