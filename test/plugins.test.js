@@ -733,7 +733,7 @@ function serveStaticTest(t, testDefault, tmpDir) {
                         fs.writeFile(file, staticContent, function (err3) {
                                 t.ifError(err3);
                                 FILES_TO_DELETE.push(file);
-                                var opts = { directory: tmpPath };
+                                var opts = { directory: folderPath };
                                 if (testDefault) {
                                         opts.defaultFile = testFileName;
                                         routeName += ' with default';
