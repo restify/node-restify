@@ -105,7 +105,7 @@ function authenticate(req, res, next) {
                 return;
         }
 
-        if (authz.username !== allow.user || authz.password !== allow.pass) {
+        if (authz.username !== req.allow.user || authz.password !== req.allow.pass) {
                 next(new restify.ForbiddenError('invalid credentials'));
                 return;
         }
