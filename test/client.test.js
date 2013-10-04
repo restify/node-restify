@@ -90,6 +90,14 @@ before(function (callback) {
                         res.send(200, '<html><head/><body/></html>');
                         next();
                 });
+                SERVER.del('/contentLengthAllowed', function(req, res, next) {
+                        if(req.header('content-length')) {
+                                res.send(200, 'Allowed');
+                        } else {
+                                res.send(200, 'Not allowed');
+                        }
+                        next();
+                });
 
                 SERVER.get('/json/:name', sendJson);
                 SERVER.head('/json/:name', sendJson);
@@ -396,6 +404,22 @@ test('DELETE text', function (t) {
         });
 });
 
+test('DELETE allows content-length', function (t) {
+        var opts = {
+                path: '/contentLengthAllowed',
+                headers: {
+                        'content-length': '0'
+                }
+        };
+
+        STR_CLIENT.del(opts, function (err, req, res, obj) {
+                t.ifError(err);
+                t.ok(req);
+                t.ok(res);
+                t.deepEqual(obj, 'Allowed');
+                t.end();
+        });
+});
 
 test('GET raw', function (t) {
         RAW_CLIENT.get('/str/mcavage', function (connectErr, req) {
