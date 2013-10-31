@@ -90,8 +90,8 @@ before(function (callback) {
                         res.send(200, '<html><head/><body/></html>');
                         next();
                 });
-                SERVER.del('/contentLengthAllowed', function(req, res, next) {
-                        if(req.header('content-length')) {
+                SERVER.del('/contentLengthAllowed', function (req, res, next) {
+                        if (req.header('content-length')) {
                                 res.send(200, 'Allowed');
                         } else {
                                 res.send(200, 'Not allowed');

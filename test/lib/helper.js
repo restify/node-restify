@@ -4,7 +4,10 @@
 // a common logger for all tests.
 //
 
+var domain = require('domain');
+
 var bunyan = require('bunyan');
+var once = require('once');
 
 var restify = require('../../lib');
 
@@ -15,26 +18,60 @@ var restify = require('../../lib');
 module.exports = {
 
         after: function after(teardown) {
-                module.parent.exports.tearDown = teardown;
+                module.parent.exports.tearDown = function _teardown(callback) {
+                        var d = domain.create();
+                        var self = this;
+
+                        d.once('error', function (err) {
+                                console.error('after: uncaught error\n', +
+                                              err.stack);
+                                process.exit(1);
+                        });
+
+                        d.run(function () {
+                                teardown.call(self, once(callback));
+                        });
+                };
         },
 
         before: function before(setup) {
-                module.parent.exports.setUp = setup;
+                module.parent.exports.setUp = function _setup(callback) {
+                        var d = domain.create();
+                        var self = this;
+
+                        d.once('error', function (err) {
+                                console.error('before: uncaught error\n' +
+                                              err.stack);
+                                process.exit(1);
+                        });
+
+                        d.run(function () {
+                                setup.call(self, once(callback));
+                        });
+                };
         },
 
         test: function test(name, tester) {
                 module.parent.exports[name] = function _(t) {
-                        var _done = false;
-                        t.end = function end() {
-                                if (!_done) {
-                                        _done = true;
+                        var d = domain.create();
+                        var self = this;
+
+                        d.once('error', function (err) {
+                                t.ifError(err);
+                                t.end();
+                        });
+
+                        d.add(t);
+                        d.run(function () {
+                                t.end = once(function () {
                                         t.done();
-                                }
-                        };
-                        t.notOk = function notOk(ok, message) {
-                                return (t.ok(!ok, message));
-                        };
-                        return (tester(t));
+                                });
+                                t.notOk = function notOk(ok, message) {
+                                        return (t.ok(!ok, message));
+                                };
+
+                                tester.call(self, t);
+                        });
                 };
         },
 
