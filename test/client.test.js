@@ -177,11 +177,19 @@ test('GH-388 GET json, but really HTML', function (t) {
 
 
 test('GH-115 GET path with spaces', function (t) {
-        JSON_CLIENT.get('/json/foo bar', function (err, req, res, obj) {
+        // As of node v0.11, this throws, since it's never valid HTTP
+        try {
+                JSON_CLIENT.get('/json/foo bar', function (err, req, res, obj) {
+                        t.ok(err);
+                        t.equal(err.code, 'ECONNRESET');
+                        t.end();
+                });
+        } catch (err) {
                 t.ok(err);
-                t.equal(err.code, 'ECONNRESET');
+                t.equal(err.constructor, TypeError);
+                t.equal(err.message, 'Request path contains unescaped characters.');
                 t.end();
-        });
+        }
 });
 
 
