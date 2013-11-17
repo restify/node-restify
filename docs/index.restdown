@@ -537,7 +537,7 @@ You can always add your own by subclassing `restify.RestError` like:
 
     function MyError(message) {
       restify.RestError.call(this, {
-        restCode: 'MyError'
+        restCode: 'MyError',
         statusCode: 418,
         message: message,
         constructorOpt: MyError
