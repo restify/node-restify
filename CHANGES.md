@@ -2,6 +2,7 @@
 
 ## Not Yet Released
 
+- #478 Add `req.timers` to audit logging plugin.
 - #487 RequestCaptureStream: dumpDefault, haveNonRawStreams, zero ring after dump
 - #407 - bunyan 0.21.3
 - Add CSV/TSV parser (Dominik Lessel)
