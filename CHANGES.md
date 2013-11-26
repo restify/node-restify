@@ -2,6 +2,7 @@
 
 ## Not Yet Released
 
+- #487 RequestCaptureStream: dumpDefault, haveNonRawStreams, zero ring after dump
 - #407 - bunyan 0.21.3
 - Add CSV/TSV parser (Dominik Lessel)
 - Add `req.timers`: a list of hrtime's for each handler
