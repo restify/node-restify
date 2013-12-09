@@ -1,6 +1,6 @@
 # restify Changelog
 
-## Not Yet Released
+## 2.6.1
 
 - #478 Add `req.timers` to audit logging plugin.
 - #487 RequestCaptureStream: dumpDefault, haveNonRawStreams, zero ring after dump
