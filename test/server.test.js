@@ -1482,3 +1482,31 @@ test('GH-401 regex routing broken', function (t) {
         CLIENT.get('/image', client_cb);
         CLIENT.get('/image/1.jpg', client_cb);
 });
+
+test('explicitly sending a 403 with custom error', function (t) {
+    function MyCustomError() {}
+    MyCustomError.prototype = Object.create(Error.prototype);
+
+    SERVER.get('/', function (req, res, next) {
+        res.send(403, new MyCustomError('bah!'));
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 403);
+        t.end();
+    });
+});
+
+
+test('explicitly sending a 403 on error', function (t) {
+    SERVER.get('/', function (req, res, next) {
+        res.send(403, new Error('bah!'));
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 403);
+        t.end();
+    });
+});
