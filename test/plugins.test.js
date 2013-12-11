@@ -733,12 +733,14 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
                         fs.writeFile(file, staticContent, function (err3) {
                                 t.ifError(err3);
                                 FILES_TO_DELETE.push(file);
-                                var opts = { directory: folderPath };
+                                var opts = { directory: tmpPath };
                                 if (testDefault) {
                                         opts.defaultFile = testFileName;
                                         routeName += ' with default';
                                 }
-                                var re = regex || new RegExp('/' + testDir + '/?.*');
+                                var re = regex ||
+                                        new RegExp('/' + testDir + '/?.*');
+
                                 SERVER.get({
                                         path: re,
                                         name: routeName
@@ -769,7 +771,7 @@ test('static serves static files in with a root regex', function (t) {
         serveStaticTest(t, false, '.tmp', new RegExp('/.*'));
 });
 
-test('static serves static files in with a root, not greedy, regex', function (t) {
+test('static serves static files with a root, !greedy, regex', function (t) {
         serveStaticTest(t, false, '.tmp', new RegExp('/?.*'));
 });
 
