@@ -1,5 +1,13 @@
 # restify Changelog
 
+## Not Yet Released
+
+## 2.6.2
+
+- #495 Don't override client response code with custom error object
+- #494 socket connecting detection logic incorrect
+- #492 client `false` needs to actually disable retries
+
 ## 2.6.1
 
 - #478 Add `req.timers` to audit logging plugin.
