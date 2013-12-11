@@ -713,7 +713,7 @@ test('gzip body json ok', function (t) {
 });
 
 
-function serveStaticTest(t, testDefault, tmpDir) {
+function serveStaticTest(t, testDefault, tmpDir, regex) {
         var staticContent = '{"content": "abcdefg"}';
         var staticObj = JSON.parse(staticContent);
         var testDir = 'public';
@@ -738,7 +738,7 @@ function serveStaticTest(t, testDefault, tmpDir) {
                                         opts.defaultFile = testFileName;
                                         routeName += ' with default';
                                 }
-                                var re = new RegExp('/' + testDir + '/?.*');
+                                var re = regex || new RegExp('/' + testDir + '/?.*');
                                 SERVER.get({
                                         path: re,
                                         name: routeName
@@ -759,6 +759,18 @@ function serveStaticTest(t, testDefault, tmpDir) {
 
 test('static serves static files', function (t) {
         serveStaticTest(t, false, '.tmp');
+});
+
+test('static serves static files in nested folders', function (t) {
+        serveStaticTest(t, false, '.tmp/folder');
+});
+
+test('static serves static files in with a root regex', function (t) {
+        serveStaticTest(t, false, '.tmp', new RegExp('/.*'));
+});
+
+test('static serves static files in with a root, not greedy, regex', function (t) {
+        serveStaticTest(t, false, '.tmp', new RegExp('/?.*'));
 });
 
 test('static serves default file', function (t) {
