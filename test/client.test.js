@@ -660,3 +660,57 @@ test('sign a request', function (t) {
                 t.end();
         });
 });
+
+test('secure client connection with timeout', function (t) {
+        var server = restify.createServer({
+                certificate: '-----BEGIN CERTIFICATE-----\n' +
+                        'MIICgzCCAewCCQDutc3iIPK88jANBgkqhkiG9w0BAQUFADCBhTELMAkGA1UEBhMC\n' +
+                        'VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28x\n' +
+                        'FTATBgNVBAoMDEpveWVudCwgSW5jLjEPMA0GA1UECwwGUG9ydGFsMSEwHwYJKoZI\n' +
+                        'hvcNAQkBFhJzdXBwb3J0QGpveWVudC5jb20wHhcNMTMxMjAyMjI0NjU3WhcNMTQx\n' +
+                        'MjAyMjI0NjU3WjCBhTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWEx\n' +
+                        'FjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xFTATBgNVBAoMDEpveWVudCwgSW5jLjEP\n' +
+                        'MA0GA1UECwwGUG9ydGFsMSEwHwYJKoZIhvcNAQkBFhJzdXBwb3J0QGpveWVudC5j\n' +
+                        'b20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANAWr+pYW+AEP4vC48fByPa2\n' +
+                        'Fw0h8FSSgVO2zHyibH9S6nSFaNSLeHRofFdK+cD7IRt4A6jxp57IItNwjFiNNMjF\n' +
+                        'CS5NXKIdPE6HMlb1X7ae+/nN3xRy5321Bi8yQZI6p6b9ATwP8mGBcvx4ta165YFt\n' +
+                        'M2FmaYWLSNbHIwCxTQMJAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAXFT1q/uB3/fg\n' +
+                        'Iq7iZ6R7q7tBYtd9ttQKp8by8jVToIXP4jUEWZ7vE9TZ1/Wm8ZHxlAPjZtN+rsmS\n' +
+                        'LvgDV22T/s0LgSrdbB/rpYgjsJarlAGfbUYQ6gZKvCMSiZI7oJfl89HDT3PgCtSx\n' +
+                        'RqHcNabt4hoSccUuACJ1FXkszJ312fA=\n' +
+                        '-----END CERTIFICATE-----',
+                key: '-----BEGIN RSA PRIVATE KEY-----\n' +
+                        'MIICXAIBAAKBgQDQFq/qWFvgBD+LwuPHwcj2thcNIfBUkoFTtsx8omx/Uup0hWjU\n' +
+                        'i3h0aHxXSvnA+yEbeAOo8aeeyCLTcIxYjTTIxQkuTVyiHTxOhzJW9V+2nvv5zd8U\n' +
+                        'cud9tQYvMkGSOqem/QE8D/JhgXL8eLWteuWBbTNhZmmFi0jWxyMAsU0DCQIDAQAB\n' +
+                        'AoGBAJvz9OHAWRMae/mmFYqXfKMSM1J/Vhw8NLrl7HmYTZJbNSYg+kEZSiyMRmwx\n' +
+                        '3963F8f7eVq7yfFhc2BeIIEZSy23J9QJCqVIqzl6m2URP4+Dw7ZS2iWIsiPyy+L8\n' +
+                        'v8CXPQhRGouOXxU6h7WHpfw+Xy+WPVmIVARMi4UpmmOE52eBAkEA6gui4nD841Ds\n' +
+                        'UEQDMuxNpCf+B20BWKkt8PNODY1HS4rBVCh81oMbaV7VDSabZM7Ba4wrmTAhb1Sc\n' +
+                        'm7bc/YOb0QJBAOObuVTMCbJ7WZhAPHVYhGS5ptuL9fkktj2BPDcf/3KyuDsM6oVw\n' +
+                        'Rs9kUfQrSV+w7YALqxWzNCUgzq+qLYPaGbkCQF5hKuIdph0UuPb1NkUGvZiA+BOO\n' +
+                        'hYh3UKtlsggM/L8dyTBi01S9sgQf1dJjyy4vohf4gmxX2GPIvw6cAynINMECQEjc\n' +
+                        '7TOMLf6JJmFrDu+x6pAkLppR7+hWLFD8Mj6ja69YL0oYFGurSb/Sqbm0scSEa0N2\n' +
+                        'eMp1l9fa7M+ndvKiu2ECQGv4W2+yqlbD3Q3Dr14hiWaiYss5350Ohr5HiZZw2L3i\n' +
+                        's35vQZaHqRxUVZjOi6/MTCZmqvg/RpaVQYHiJHvxGzw=\n' +
+                        '-----END RSA PRIVATE KEY-----'
+        });
+        server.get('/ping', function (req, res) {
+                res.end('pong');
+        });
+        server.listen(8443);
+
+        var client = restify.createStringClient({url: 'https://127.0.0.1:8443', connectTimeout: 2000, rejectUnauthorized: false});
+        var timeout = setTimeout(function () {
+                t.ok(false, 'timed out');
+                t.end();
+        }, 2050);
+
+        client.get('/ping', function (err, req, res, body) {
+                clearTimeout(timeout);
+                t.equal(body, 'pong');
+                client.close();
+                server.close();
+                t.end();
+        });
+});
