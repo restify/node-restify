@@ -26,7 +26,8 @@
                 "Richardo Stuven",
                 "Matt Smillie",
                 "Diego Torres",
-                "Mike Williams"
+                "Mike Williams",
+                "Brian Pin"
         ],
         "name": "restify",
         "homepage": "http://mcavage.github.com/node-restify",
