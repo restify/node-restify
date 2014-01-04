@@ -66,8 +66,8 @@ function sendWhitespace(req, res, next) {
         next();
 }
 
-function requestTimeoutFunc(req, res, next) {
-        setTimeout(function() {
+function requestThatTimesOut(req, res, next) {
+        setTimeout(function () {
                 res.send('OK');
                 next();
         }, 170);
@@ -112,7 +112,7 @@ before(function (callback) {
                 SERVER.post('/json/:name', sendJson);
                 SERVER.patch('/json/:name', sendJson);
 
-                SERVER.get('/str/request_timeout', requestTimeoutFunc);
+                SERVER.get('/str/request_timeout', requestThatTimesOut);
 
                 SERVER.del('/str/:name', sendText);
                 SERVER.get('/str/:name', sendText);
