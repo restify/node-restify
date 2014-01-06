@@ -187,7 +187,8 @@ test('GH-115 GET path with spaces', function (t) {
         } catch (err) {
                 t.ok(err);
                 t.equal(err.constructor, TypeError);
-                t.equal(err.message, 'Request path contains unescaped characters.');
+                t.equal(err.message,
+                        'Request path contains unescaped characters.');
                 t.end();
         }
 });
@@ -661,6 +662,7 @@ test('sign a request', function (t) {
         });
 });
 
+/* BEGIN JSSTYLED */
 test('secure client connection with timeout', function (t) {
         var server = restify.createServer({
                 certificate: '-----BEGIN CERTIFICATE-----\n' +
@@ -714,3 +716,4 @@ test('secure client connection with timeout', function (t) {
                 t.end();
         });
 });
+/* END JSSTYLED */

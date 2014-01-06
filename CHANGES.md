@@ -1,10 +1,9 @@
 # restify Changelog
 
-## Not Yet Released
-
-## 2.6.2
+## 2.6.2 (not yet released)
 
 - #508 add server option: `ciphers` to pass down to https(tls)
+- #502 `server.on('request')` not emitting
 - #496 static plugin incorrectly handling `directories`; revert back to 2.6.0
        version
 - #495 Don't override client response code with custom error object
