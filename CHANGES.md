@@ -9,6 +9,7 @@
 - #495 Don't override client response code with custom error object
 - #494 socket connecting detection logic incorrect
 - #492 client `false` needs to actually disable retries
+- Changed indent from four to eight
 
 ## 2.6.1
 
