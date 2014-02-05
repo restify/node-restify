@@ -1,10 +1,9 @@
-
 /**
  * Module dependencies
  */
 
 if (require.cache[__dirname + '/lib/helper.js']) {
-        delete require.cache[__dirname + '/lib/helper.js'];
+    delete require.cache[__dirname + '/lib/helper.js'];
 }
 
 var restify = require('../lib');
@@ -33,114 +32,114 @@ var OBJECT_TSV = require(__dirname + '/files/object-tsv.json');
  */
 
 before(function (callback) {
-        try {
-          SERVER = restify.createServer({
+    try {
+        SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
-          });
-          SERVER.use(restify.acceptParser(SERVER.acceptable));
-          SERVER.use(restify.authorizationParser());
-          SERVER.use(restify.dateParser());
-          SERVER.use(restify.queryParser());
-          SERVER.use(restify.bodyParser());
-          SERVER.post('/data', function respond(req, res, next) {
+        });
+        SERVER.use(restify.acceptParser(SERVER.acceptable));
+        SERVER.use(restify.authorizationParser());
+        SERVER.use(restify.dateParser());
+        SERVER.use(restify.queryParser());
+        SERVER.use(restify.bodyParser());
+        SERVER.post('/data', function respond(req, res, next) {
             res.send({
-              status: 'okay',
-              parsedReq: req.body
+                status: 'okay',
+                parsedReq: req.body
             });
             return (next());
-          });
-          SERVER.listen(PORT, '127.0.0.1', function () {
+        });
+        SERVER.listen(PORT, '127.0.0.1', function () {
             CLIENT = restify.createClient({
-              url: 'http://127.0.0.1:' + PORT,
-              dtrace: helper.dtrace,
-              retry: false,
-              agent: false
+                url: 'http://127.0.0.1:' + PORT,
+                dtrace: helper.dtrace,
+                retry: false,
+                agent: false
             });
             callback();
-          });
-        } catch (e) {
-          console.error(e.stack);
-          process.exit(1);
-        }
+        });
+    } catch (e) {
+        console.error(e.stack);
+        process.exit(1);
+    }
 });
 
 after(function (callback) {
-        try {
-          CLIENT.close();
-          SERVER.close(callback);
-        } catch (e) {
-          console.error(e.stack);
-          process.exit(1);
-        }
+    try {
+        CLIENT.close();
+        SERVER.close(callback);
+    } catch (e) {
+        console.error(e.stack);
+        process.exit(1);
+    }
 });
 
 test('Parse CSV body', function (t) {
-        var options = {
-          path: '/data',
-          headers: {
+    var options = {
+        path: '/data',
+        headers: {
             'Content-Type': 'text/csv'
-          }
-        };
-        CLIENT.post(options, function (err, req) {
-          if (err) {
+        }
+    };
+    CLIENT.post(options, function (err, req) {
+        if (err) {
             t.end(err);
             return;
-          }
-          req.on('result', function (errReq, res) {
+        }
+        req.on('result', function (errReq, res) {
             if (errReq) {
-              t.end(errReq);
-              return;
+                t.end(errReq);
+                return;
             }
             res.body = '';
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
-              res.body += chunk;
+                res.body += chunk;
             });
             res.on('end', function () {
-              res.body = JSON.parse(res.body);
-              var parsedReqStr = JSON.stringify(res.body.parsedReq);
-              var objectStr = JSON.stringify(OBJECT_CSV);
-              t.equal(parsedReqStr, objectStr);
-              t.end();
+                res.body = JSON.parse(res.body);
+                var parsedReqStr = JSON.stringify(res.body.parsedReq);
+                var objectStr = JSON.stringify(OBJECT_CSV);
+                t.equal(parsedReqStr, objectStr);
+                t.end();
             });
-          });
-          req.write(DATA_CSV);
-          req.end();
         });
+        req.write(DATA_CSV);
+        req.end();
+    });
 });
 
 test('Parse TSV body', function (t) {
-        var options = {
-          path: '/data',
-          headers: {
+    var options = {
+        path: '/data',
+        headers: {
             'Content-Type': 'text/tsv'
-          }
-        };
-        CLIENT.post(options, function (err, req) {
-          if (err) {
+        }
+    };
+    CLIENT.post(options, function (err, req) {
+        if (err) {
             t.end(err);
             return;
-          }
-          req.on('result', function (errReq, res) {
+        }
+        req.on('result', function (errReq, res) {
             if (errReq) {
-              t.end(errReq);
-              return;
+                t.end(errReq);
+                return;
             }
             res.body = '';
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
-              res.body += chunk;
+                res.body += chunk;
             });
             res.on('end', function () {
-              res.body = JSON.parse(res.body);
-              var parsedReqStr = JSON.stringify(res.body.parsedReq);
-              var objectStr = JSON.stringify(OBJECT_TSV);
-              t.equal(parsedReqStr, objectStr);
-              t.end();
+                res.body = JSON.parse(res.body);
+                var parsedReqStr = JSON.stringify(res.body.parsedReq);
+                var objectStr = JSON.stringify(OBJECT_TSV);
+                t.equal(parsedReqStr, objectStr);
+                t.end();
             });
-          });
-          req.write(DATA_TSV);
-          req.end();
         });
+        req.write(DATA_TSV);
+        req.end();
+    });
 });
