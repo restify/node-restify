@@ -6,10 +6,11 @@
 - #502 `server.on('request')` not emitting
 - #496 static plugin incorrectly handling `directories`; revert back to 2.6.0
        version
-- #495 Don't override client response code with custom error object
+- #495 don't override client response code with custom error object
 - #494 socket connecting detection logic incorrect
 - #492 client `false` needs to actually disable retries
-- Changed indent from four to eight
+- changed indent from four to eight
+- #505 fix audit logger plugin bug
 
 ## 2.6.1
 
