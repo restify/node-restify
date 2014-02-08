@@ -1033,7 +1033,7 @@ You pass in the auditor a bunyan logger, and it will write out records at the
 ## Request API
 
 Wraps all of the node
-[ServerRequest](http://nodejs.org/docs/latest/api/http.html#http.ServerRequest)
+[http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage)
 APIs, events and properties, plus the following.
 
 ### header(key, [defaultValue])

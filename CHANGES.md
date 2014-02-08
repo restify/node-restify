@@ -1,15 +1,16 @@
 # restify Changelog
 
-## Not Yet Released
-
-## 2.6.2
+## 2.6.2 (not yet released)
 
 - #508 add server option: `ciphers` to pass down to https(tls)
+- #502 `server.on('request')` not emitting
 - #496 static plugin incorrectly handling `directories`; revert back to 2.6.0
        version
-- #495 Don't override client response code with custom error object
+- #495 don't override client response code with custom error object
 - #494 socket connecting detection logic incorrect
 - #492 client `false` needs to actually disable retries
+- changed indent from four to eight
+- #505 fix audit logger plugin bug
 
 ## 2.6.1
 

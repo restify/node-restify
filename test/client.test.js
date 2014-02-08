@@ -11,7 +11,6 @@ if (require.cache[__dirname + '/lib/helper.js'])
 var helper = require('./lib/helper.js');
 
 
-
 ///--- Globals
 
 var after = helper.after;
@@ -24,7 +23,6 @@ var STR_CLIENT;
 var RAW_CLIENT;
 var TIMEOUT_CLIENT;
 var SERVER;
-
 
 
 ///--- Helpers
@@ -113,7 +111,6 @@ before(function (callback) {
         SERVER.patch('/json/:name', sendJson);
 
         SERVER.get('/str/request_timeout', requestThatTimesOut);
-
         SERVER.del('/str/:name', sendText);
         SERVER.get('/str/:name', sendText);
         SERVER.head('/str/:name', sendText);
@@ -193,7 +190,7 @@ test('GH-388 GET json, but really HTML', function (t) {
 
 
 test('GH-115 GET path with spaces', function (t) {
-        // As of node v0.11, this throws, since it's never valid HTTP
+    // As of node v0.11, this throws, since it's never valid HTTP
     try {
         JSON_CLIENT.get('/json/foo bar', function (err, req, res, obj) {
             t.ok(err);
@@ -203,7 +200,8 @@ test('GH-115 GET path with spaces', function (t) {
     } catch (err) {
         t.ok(err);
         t.equal(err.constructor, TypeError);
-        t.equal(err.message, 'Request path contains unescaped characters.');
+        t.equal(err.message,
+            'Request path contains unescaped characters.');
         t.end();
     }
 });
@@ -535,66 +533,66 @@ test('GH-169 PUT json Content-MD5', function (t) {
         'updatedAt': '2012-07-06T17:59:08.581Z',
         'periods': [
             {
-            'name': 'morning',
-            'weekdayWalking': 1500,
-            'weekdayCart': 3000,
-            'weekendWalking': 2000,
-            'weekendCart': 3500,
-            'timeFrom': 0,
-            'timeTo': 780,
-            '_id': '4ff71172bc148900000010a4'
-        },
-        {
-            'timeFrom': 780,
-            'name': 'twilight',
-            'timeTo': 900,
-            'weekdayWalking': 1500,
-            'weekdayCart': 2500,
-            'weekendWalking': 1500,
-            'weekendCart': 3000,
-            '_id': '4ff7276cbc148900000010f4'
-        },
-        {
-            'timeFrom': 900,
-            'name': 'super twilight',
-            'weekdayWalking': 1200,
-            'weekdayCart': 2000,
-            'weekendWalking': 1200,
-            'weekendCart': 2500,
-            'timeTo': 1439,
-            '_id': '4ff7276cbc148900000010f3'
-        }
+                'name': 'morning',
+                'weekdayWalking': 1500,
+                'weekdayCart': 3000,
+                'weekendWalking': 2000,
+                'weekendCart': 3500,
+                'timeFrom': 0,
+                'timeTo': 780,
+                '_id': '4ff71172bc148900000010a4'
+            },
+            {
+                'timeFrom': 780,
+                'name': 'twilight',
+                'timeTo': 900,
+                'weekdayWalking': 1500,
+                'weekdayCart': 2500,
+                'weekendWalking': 1500,
+                'weekendCart': 3000,
+                '_id': '4ff7276cbc148900000010f4'
+            },
+            {
+                'timeFrom': 900,
+                'name': 'super twilight',
+                'weekdayWalking': 1200,
+                'weekdayCart': 2000,
+                'weekendWalking': 1200,
+                'weekendCart': 2500,
+                'timeTo': 1439,
+                '_id': '4ff7276cbc148900000010f3'
+            }
         ],
         'holidays': [
             {
-            'country': 'US',
-            'name': 'Flag Day',
-            'start': 1339657200000,
-            'end': 1339743600000,
-            'date': '2012-06-14'
-        },
-        {
-            'country': 'US / MX',
-            'name': 'Father\'s Day, Día del Padre ' +
-                '(Father\'s Day)',
-            'start': 1340262000000,
-            'end': 1340348400000,
-            'date': '2012-06-21'
-        },
-        {
-            'country': 'US',
-            'name': 'Independence Day',
-            'start': 1341385200000,
-            'end': 1341471600000,
-            'date': '2012-07-04'
-        },
-        {
-            'country': 'US',
-            'name': 'Labor Day',
-            'start': 1347001200000,
-            'end': 1347087600000,
-            'date': '2012-09-07'
-        }
+                'country': 'US',
+                'name': 'Flag Day',
+                'start': 1339657200000,
+                'end': 1339743600000,
+                'date': '2012-06-14'
+            },
+            {
+                'country': 'US / MX',
+                'name': 'Father\'s Day, Día del Padre ' +
+                    '(Father\'s Day)',
+                'start': 1340262000000,
+                'end': 1340348400000,
+                'date': '2012-06-21'
+            },
+            {
+                'country': 'US',
+                'name': 'Independence Day',
+                'start': 1341385200000,
+                'end': 1341471600000,
+                'date': '2012-07-04'
+            },
+            {
+                'country': 'US',
+                'name': 'Labor Day',
+                'start': 1347001200000,
+                'end': 1347087600000,
+                'date': '2012-09-07'
+            }
         ],
         'weekdaySunday': false,
         'weekdaySaturday': false,
@@ -659,11 +657,11 @@ test('sign a request', function (t) {
         called++;
         if (!request || !(request instanceof http.ClientRequest))
             throw new Error('request must be an instance of ' +
-                            'http.ClientRequest');
+                'http.ClientRequest');
         var gw = request.getHeader('Gusty-Winds');
         if (!gw)
             throw new Error('Gusty-Winds header was not ' +
-                            'present in request');
+                'present in request');
         request.setHeader('Awesome-Signature', 'Gusty Winds ' + gw);
     };
     var client = restify.createClient({
@@ -683,6 +681,7 @@ test('sign a request', function (t) {
     });
 });
 
+/* BEGIN JSSTYLED */
 test('secure client connection with timeout', function (t) {
     var server = restify.createServer({
         certificate: '-----BEGIN CERTIFICATE-----\n' +
@@ -736,3 +735,4 @@ test('secure client connection with timeout', function (t) {
         t.end();
     });
 });
+/* END JSSTYLED */

@@ -71,53 +71,51 @@ var restify = require('../../lib');
 var Logger = require('bunyan');
 
 
-
 ///--- Globals
 
 var NAME = 'exampleapp';
 
 
-
 ///--- Mainline
 
 var log = new Logger({
-        name: NAME,
-        level: 'trace',
-        service: NAME,
-        serializers: restify.bunyan.serializers
+    name: NAME,
+    level: 'trace',
+    service: NAME,
+    serializers: restify.bunyan.serializers
 });
 
 var server = restify.createServer({
-        name: NAME,
-        Logger: log,
-        formatters: {
-                'application/foo': function(req, res, body) {
-                        if (body instanceof Error) {
-                                body = body.stack;
-                        } else if (Buffer.isBuffer(body)) {
-                                body = body.toString('base64');
-                        } else {
-                                switch (typeof(body)) {
-                                case 'boolean':
-                                case 'number':
-                                case 'string':
-                                        body = body.toString();
-                                        break;
+    name: NAME,
+    Logger: log,
+    formatters: {
+        'application/foo': function (req, res, body) {
+            if (body instanceof Error) {
+                body = body.stack;
+            } else if (Buffer.isBuffer(body)) {
+                body = body.toString('base64');
+            } else {
+                switch (typeof(body)) {
+                    case 'boolean':
+                    case 'number':
+                    case 'string':
+                        body = body.toString();
+                        break;
 
-                                case 'undefined':
-                                        body = '';
-                                        break;
+                    case 'undefined':
+                        body = '';
+                        break;
 
-                                default:
-                                        body = body === null ? '' :
-                                                JSON.stringify(body);
-                                        break;
-                                }
-
-                        }
-                        return body;
+                    default:
+                        body = body === null ? '' :
+                            JSON.stringify(body);
+                        break;
                 }
+
+            }
+            return body;
         }
+    }
 });
 
 server.use(restify.acceptParser(server.acceptable));
@@ -127,50 +125,52 @@ server.use(restify.queryParser());
 server.use(restify.urlEncodedBodyParser());
 
 server.use(function slowHandler(req, res, next) {
-        setTimeout(function() { next(); }, 250);
+    setTimeout(function () {
+        next();
+    }, 250);
 });
 
 server.get({url: '/foo/:id', name: 'GetFoo'}, function (req, res, next) {
-        next();
+    next();
 }, function sendResult(req, res, next) {
-        res.send({
-                hello: req.params.id
-        });
-        next();
+    res.send({
+        hello: req.params.id
+    });
+    next();
 });
 
 server.head('/foo/:id', function (req, res, next) {
-        res.send({
-                hello: req.params.id
-        });
-        next();
+    res.send({
+        hello: req.params.id
+    });
+    next();
 });
 
 server.put('/foo/:id', function (req, res, next) {
-        res.send({
-                hello: req.params.id
-        });
-        next();
+    res.send({
+        hello: req.params.id
+    });
+    next();
 });
 
 server.post('/foo/:id', function (req, res, next) {
-        res.json(201, req.params);
-        next();
+    res.json(201, req.params);
+    next();
 });
 
 server.del('/foo/:id', function (req, res, next) {
-        res.send(204);
-        next();
+    res.send(204);
+    next();
 });
 
-server.on('after', function(req, res, name) {
-        req.log.info('%s just finished: %d.', name, res.code);
+server.on('after', function (req, res, name) {
+    req.log.info('%s just finished: %d.', name, res.code);
 });
 
-server.on('NotFound', function(req, res) {
-        res.send(404, req.url + ' was not found');
+server.on('NotFound', function (req, res) {
+    res.send(404, req.url + ' was not found');
 });
 
-server.listen(9080, function() {
-        log.info('listening: %s', server.url);
+server.listen(9080, function () {
+    log.info('listening: %s', server.url);
 });
