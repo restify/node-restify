@@ -626,7 +626,7 @@ is expected that if you listen for this event, you respond to the client.
 
 `function (request, response, cb) {}`
 
-When a client request is sent for a route that exist, but has a `content-type`
+When a client request is sent for a route that exists, but has a `content-type`
 mismatch, restify will emit this event. Note that restify checks for listeners
 on this event, and if there are none, responds with a default 415 handler.  It
 is expected that if you listen for this event, you respond to the client.
