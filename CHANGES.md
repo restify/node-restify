@@ -11,6 +11,7 @@
 - #492 client `false` needs to actually disable retries
 - changed indent from four to eight
 - #505 fix audit logger plugin bug
+- #510 request timeout support
 
 ## 2.6.1
 
