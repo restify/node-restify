@@ -21,6 +21,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var JSON_CLIENT;
 var STR_CLIENT;
 var RAW_CLIENT;
+var TIMEOUT_CLIENT;
 var SERVER;
 
 
@@ -63,6 +64,13 @@ function sendWhitespace(req, res, next) {
     next();
 }
 
+function requestThatTimesOut(req, res, next) {
+    setTimeout(function () {
+        res.send('OK');
+        next();
+    }, 170);
+}
+
 
 ///--- Tests
 
@@ -102,6 +110,7 @@ before(function (callback) {
         SERVER.post('/json/:name', sendJson);
         SERVER.patch('/json/:name', sendJson);
 
+        SERVER.get('/str/request_timeout', requestThatTimesOut);
         SERVER.del('/str/:name', sendText);
         SERVER.get('/str/:name', sendText);
         SERVER.head('/str/:name', sendText);
@@ -130,6 +139,13 @@ before(function (callback) {
                     accept: 'text/plain'
                 }
             });
+
+            TIMEOUT_CLIENT = restify.createStringClient({
+                url: 'http://127.0.0.1:' + PORT,
+                requestTimeout: 150,
+                retry: false
+            });
+
             process.nextTick(callback);
         });
     } catch (e) {
@@ -478,7 +494,6 @@ test('POST raw', function (t) {
     });
 });
 
-
 test('GH-20 connectTimeout', function (t) {
     var client = restify.createClient({
         url: 'http://169.254.1.10',
@@ -496,6 +511,13 @@ test('GH-20 connectTimeout', function (t) {
     });
 });
 
+test('requestTimeout', function (t) {
+    TIMEOUT_CLIENT.get('/str/request_timeout', function (err, req, res, obj) {
+        t.ok(err);
+        t.equal(err.name, 'RequestTimeoutError');
+        t.end();
+    });
+});
 
 test('GH-169 PUT json Content-MD5', function (t) {
     var msg = {
