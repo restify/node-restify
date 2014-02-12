@@ -1,6 +1,6 @@
 ((nil . ((indent-tabs-mode . nil)
-         (tab-width . 8)
+         (tab-width . 4)
          (fill-column . 80)))
- (js-mode . ((js-indent-level . 8)
+ (js-mode . ((js-indent-level . 4)
              (indent-tabs-mode . nil)
              )))
