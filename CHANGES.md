@@ -12,6 +12,7 @@
 - changed indent from four to eight
 - #505 fix audit logger plugin bug
 - #510 request timeout support
+- #523 added Access-Control-Allow-Credentials to the preflight handler
 
 ## 2.6.1
 
