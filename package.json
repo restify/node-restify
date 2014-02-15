@@ -75,7 +75,7 @@
     "devDependencies": {
         "cover": "0.2.9",
         "filed": "0.1.0",
-        "nodeunit": "0.8.1",
+        "nodeunit": "0.8.4",
         "watershed": "0.3.0"
     },
     "scripts": {
