@@ -1093,6 +1093,18 @@ req.is('html');
 <p>Note this is almost compliant with express, but restify does not have
 all the <code>app.is()</code> callback business express does.</p>
 
+<h3>isSecure()</h3>
+
+<p>Check if the incoming request is encrypted.</p>
+
+<h3>isChunked()</h3>
+
+<p>Check if the incoming request is chunked.</p>
+
+<h3>isKeepAlive()</h3>
+
+<p>Check if the incoming request is kept alive.</p>
+
 <h3>log</h3>
 
 <p>Note that you can piggyback on the restify logging framework, by just using
@@ -1129,9 +1141,6 @@ instance that is a child component of the one restify has:</p>
 <tr><td>log</td><td>Object</td><td>bunyan logger you can piggyback on</td></tr>
 <tr><td>id</td><td>String</td><td>A unique request id (x-request-id)</td></tr>
 <tr><td>path</td><td>String</td><td>cleaned up URL path</td></tr>
-<tr><td>query</td><td>String</td><td>the query string only</td></tr>
-<tr><td>secure</td><td>Boolean</td><td>Whether this was an SSL request</td></tr>
-<tr><td>time</td><td>Number</td><td>the time when this request arrived (ms since epoch)</td></tr>
 </tbody>
 </table>
 
