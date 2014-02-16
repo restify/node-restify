@@ -1,6 +1,7 @@
 # restify
 
 [![Build Status](https://travis-ci.org/mcavage/node-restify.png)](https://travis-ci.org/mcavage/node-restify)
+[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.png)](https://gitter.im/mcavage/node-restify)
 
 [restify](http://mcavage.github.com/node-restify) is a smallish framework,
 similar to [express](http://expressjs.com) for building REST APIs.  For full
