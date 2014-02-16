@@ -1092,6 +1092,18 @@ and it contains the give mime type.
 Note this is almost compliant with express, but restify does not have
 all the `app.is()` callback business express does.
 
+### isSecure
+
+Check if the incoming request is encrypted.
+
+### isChunked
+
+Check if the incoming request is chunked.
+
+### isKeepAlive
+
+Check if the incoming request is kept alive.
+
 ### log
 
 Note that you can piggyback on the restify logging framework, by just using
@@ -1115,6 +1127,10 @@ instance that is a child component of the one restify has:
 
     var log = req.getLogger('MyFoo');
 
+### time
+
+the time when this request arrived (ms since epoch)
+
 ### Properties
 
 ||**Name**||**Type**||**Description**||
@@ -1124,9 +1140,6 @@ instance that is a child component of the one restify has:
 ||log||Object||bunyan logger you can piggyback on||
 ||id||String||A unique request id (x-request-id)||
 ||path||String||cleaned up URL path||
-||query||String||the query string only||
-||secure||Boolean||Whether this was an SSL request||
-||time||Number||the time when this request arrived (ms since epoch)||
 
 ## Response API
 
