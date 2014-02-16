@@ -1092,15 +1092,15 @@ and it contains the give mime type.
 Note this is almost compliant with express, but restify does not have
 all the `app.is()` callback business express does.
 
-### isSecure
+### isSecure()
 
 Check if the incoming request is encrypted.
 
-### isChunked
+### isChunked()
 
 Check if the incoming request is chunked.
 
-### isKeepAlive
+### isKeepAlive()
 
 Check if the incoming request is kept alive.
 
@@ -1127,7 +1127,7 @@ instance that is a child component of the one restify has:
 
     var log = req.getLogger('MyFoo');
 
-### time
+### time()
 
 the time when this request arrived (ms since epoch)
 
