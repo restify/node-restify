@@ -14,17 +14,17 @@ var
   str = 'Hello CRC',
   strUTF8 = '<!DOCTYPE html>\n<html>\n<head>\n</head>\n<body><p>自動販売</p></body></html>';
 
-test('should support strings', function (t) {
+test('ETag generator should support strings', function (t) {
   t.equal(utils.etag(str), '"-2034458343"');
   t.end();
 });
 
-test('should support utf8 strings', function (t) {
+test('ETag generator should support utf8 strings', function (t) {
   t.equal(utils.etag(strUTF8), '"1395090196"');
   t.end();
 });
 
-test('should support buffer', function (t) {
+test('ETag generator should support buffer', function (t) {
   t.equal(utils.etag(strUTF8), '"1395090196"');
   t.equal(utils.etag(str), '"-2034458343"');
   t.end();
