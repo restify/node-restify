@@ -32,7 +32,8 @@ before(function (callback) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
-            log: helper.getLog('server')
+            log: helper.getLog('server'),
+            etag: true
         });
 
         SERVER.use(restify.acceptParser(SERVER.acceptable));

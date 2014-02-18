@@ -67,7 +67,8 @@
         "semver": "2.2.1",
         "spdy": "1.14.12",
         "tunnel-agent": "0.3.0",
-        "verror": "1.3.6"
+        "verror": "1.3.6",
+        "buffer-crc32": "~0.2.1"
     },
     "optionalDependencies": {
         "dtrace-provider": "0.2.8"
