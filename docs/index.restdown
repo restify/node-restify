@@ -966,7 +966,7 @@ Some example usage:
       res.send('hello ' + req.params.name);
     });
 
-(please check the createServer({ etag: true }) option first)
+(use the createServer({ etag: true }) option first)
 
 ### Audit Logging
 
