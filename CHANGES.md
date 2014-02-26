@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.6.2 (not yet released)
+## 2.6.3 (not yet released)
+
+## 2.6.2
 
 - #508 add server option: `ciphers` to pass down to https(tls)
 - #502 `server.on('request')` not emitting
