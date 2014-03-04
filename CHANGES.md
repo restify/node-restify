@@ -2,6 +2,8 @@
 
 ## 2.6.3 (not yet released)
 
+- Hotfix for CORS plugin if no origin was set in the options
+
 ## 2.6.2
 
 - #508 add server option: `ciphers` to pass down to https(tls)
