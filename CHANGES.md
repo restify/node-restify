@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.6.3 (not yet released)
+## 2.6.4 (not yet released)
+
+## 2.6.3
 
 - Hotfix for CORS plugin if no origin was set in the options
 
