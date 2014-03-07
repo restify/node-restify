@@ -258,7 +258,7 @@ test('POST json empty body object', function (t) {
 
 test('PUT json', function (t) {
     var data = { hello: 'foo' };
-    JSON_CLIENT.post('/json/mcavage', data, function (err, req, res, obj) {
+    JSON_CLIENT.put('/json/mcavage', data, function (err, req, res, obj) {
         t.ifError(err);
         t.ok(req);
         t.ok(res);
