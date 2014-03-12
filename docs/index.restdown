@@ -552,6 +552,10 @@ from the stack trace (you don't *have* to do that, but you probably
 want it).  In the example above, we also set the name property so
 `console.log(new MyError());` looks correct.
 
+### Handling Unexpected Errors
+
+For information on how best to handle unexpected errors, see the [Server API](#Server-API) Events section.
+
 ## Socket.IO
 
 To use [socket.io](http://socket.io/) with restify, just treat your restify
@@ -869,13 +873,13 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The plugin will enforce that all files under `directory` are served. The 
+The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
-provide a `default` parameter such as index.html for any directory that 
-lacks a direct file match. 
-You can specify additional restrictions by passing in a `match` parameter, 
-which is just a `RegExp` to check against the requested file name. Lastly, you 
-can pass in a `maxAge` numeric, which will set the `Cache-Control` header. 
+provide a `default` parameter such as index.html for any directory that
+lacks a direct file match.
+You can specify additional restrictions by passing in a `match` parameter,
+which is just a `RegExp` to check against the requested file name. Lastly, you
+can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
 Default is `3600` (1 hour).
 
 ### Throttle
