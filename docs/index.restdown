@@ -1164,6 +1164,14 @@ Get or set the response header key.
     res.header('foo', new Date());
     // => Fri, 03 Feb 2012 20:09:58 GMT
 
+### charSet(type)
+
+Appends the provided character set to the response's `Content-Type`.
+
+    res.charSet('utf-8');
+
+Will change the normal json Content-Type to `application/json; charset=utf-8`.
+
 ### cache([type], [options])
 
 Sets the cache-control header.  `type` defaults to _public_, and
