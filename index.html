@@ -19,6 +19,7 @@
     <li><div><a href="#Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></a></div></li>
     <li><div><a href="#Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></a></div></li>
     <li><div><a href="#Routing"><span class="method name"><span class="name">Routing</span></span></a></div></li>
+    <li><div><a href="#Upgrade-Requests"><span class="method name"><span class="name">Upgrade Requests</span></span></a></div></li>
     <li><div><a href="#Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></a></div></li>
     <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
     <li><div><a href="#Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></a></div></li>
@@ -109,6 +110,7 @@ and information is formatted like this:</p>
 
 function respond(req, res, next) {
   res.send('hello ' + req.params.name);
+  next();
 }
 
 var server = restify.createServer();
@@ -191,8 +193,7 @@ server.listen(8080);
 <tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, default is <code>restify</code></td></tr>
 <tr><td>spdy</td><td>Object</td><td>Any options accepted by <a href="https://github.com/indutny/node-spdy">node-spdy</a></td></tr>
 <tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
-<tr><td>responseTimeHeader</td><td>String</td><td>By default, this will be <code>X-Response-Time</code></td></tr>
-<tr><td>responseTimeFormatter</td><td>function</td><td>Allows you to apply formatting to the value of the header. The duration is passed as an argument in number of milliseconds to execute. <a href="https://gist.github.com/1970083">example</a></td></tr>
+<tr><td>handleUpgrades</td><td>Boolean</td><td>Hook the <code>upgrade</code> event from the node HTTP server, pushing <code>Connection: Upgrade</code> requests through the regular request handling chain; defaults to <code>false</code></td></tr>
 </tbody>
 </table>
 
@@ -262,6 +263,41 @@ Error object in to have restify automatically return responses to the client.</p
 chain.  This is useful if you had a <code>res.send</code> in an early filter, which is
 not an error, and you possibly have one later you want to short-circuit.</p>
 
+<p>Lastly, you can pass in a string <code>name</code> to <code>next()</code>, and restify will lookup
+that route, and assuming it exists will run the chain <em>from where you left
+off</em>.  So for example:</p>
+
+<pre><code>var count = 0;
+
+server.use(function foo(req, res, next) {
+    count++;
+    next();
+});
+
+server.get('/foo/:id', function (req, res, next) {
+   next('foo2');
+});
+
+server.get({
+    name: 'foo2',
+    path: '/foo/:id'
+}, function (req, res, next) {
+   assert.equal(count, 1);
+   res.send(200);
+   next();
+});
+</code></pre>
+
+<p>Note that <code>foo</code> only gets run once in that example.  A few caveats:</p>
+
+<ul>
+<li>If you provide a name that doesn't exist, restify will 500 that request.</li>
+<li>Don't be silly and call this in cycles.  restify won't check that.</li>
+<li>Lastly, you cannot "chain" <code>next('route')</code> calls; you can only delegate the
+routing chain once (this is a limitation of the way routes are stored
+internally, and may be revisited someday).</li>
+</ul>
+
 <h3>Versioned Routes</h3>
 
 <p>Most REST APIs tend to need versioning, and restify ships with support
@@ -319,6 +355,46 @@ server creation time.  Lastly, you can support multiple versions in the API
 by using an array:</p>
 
 <pre><code>  server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
+</code></pre>
+
+<h2 id="Upgrade-Requests"><span class="method name"><span class="name">Upgrade Requests</span></span></h2>
+
+<p>Incoming HTTP requests that contain a <code>Connection: Upgrade</code> header are treated
+somewhat differently by the node HTTP server.  If you want restify to push
+Upgrade requests through the regular routing chain, you need to enable
+<code>handleUpgrades</code> when creating the server.</p>
+
+<p>To determine if a request is eligible for Upgrade, check for the existence of
+<code>res.claimUpgrade()</code>.  This method will return an object with two properties:
+the <code>socket</code> of the underlying connection, and the first received data <code>Buffer</code>
+as <code>head</code> (may be zero-length).</p>
+
+<p>Once <code>res.claimUpgrade()</code> is called, <code>res</code> itself is marked unusable for
+further HTTP responses; any later attempt to <code>send()</code> or <code>end()</code>, etc, will
+throw an <code>Error</code>.  Likewise if <code>res</code> has already been used to send at least
+part of a response to the client, <code>res.claimUpgrade()</code> will throw an <code>Error</code>.
+Upgrades and regular HTTP Response behaviour are mutually exclusive on any
+particular connection.</p>
+
+<p>Using the Upgrade mechanism, you can use a library like
+<a href="https://github.com/jclulow/node-watershed">watershed</a> to negotiate WebSockets
+connections.  For example:
+    var ws = new Watershed();
+    server.get('/websocket/attach', function upgradeRoute(req, res, next) {
+      if (!res.claimUpgrade) {
+        next(new Error('Connection Must Upgrade For WebSockets'));
+        return;
+      }</p>
+
+<pre><code>  var upgrade = res.claimUpgrade();
+  var shed = ws.accept(req, upgrade.socket, upgrade.head);
+  shed.on('text', function(msg) {
+    console.log('Received message from websocket client: ' + msg);
+  });
+  shed.send('hello there!');
+
+  next(false);
+});
 </code></pre>
 
 <h2 id="Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></h2>
@@ -415,6 +491,17 @@ route by doing:</p>
 attribute, that will be used, otherwise a default of 500 will be used
 (unless you're using <code>res.send(4xx, new Error('blah))</code>).</p>
 
+<p>Alternatively, restify 2.1 supports a <code>next.ifError</code> API:</p>
+
+<pre><code>server.get('/hello/:name', function(req, res, next) {
+  return database.get(req.params.name, function(err, user) {
+    next.ifError(err);
+    res.send(user);
+    next();
+  });
+});
+</code></pre>
+
 <h3>HttpError</h3>
 
 <p>Now the obvious question is what that exactly does (in either case).
@@ -431,15 +518,15 @@ HTTP/1.1 409 Conflict
 Content-Type: text/plain
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version
+Access-Control-Expose-Headers: Api-Version, Request-Id, Response-Time
 Connection: close
 Content-Length: 21
 Content-MD5: up6uNh2ejV/C6JUbLlvsiw==
 Date: Tue, 03 Jan 2012 00:24:48 GMT
 Server: restify
-X-Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
-X-Response-Time: 1
+Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
+Response-Time: 1
 
 I just don't like you
 </code></pre>
@@ -478,15 +565,15 @@ HTTP/1.1 409 Conflict
 Content-Type: application/json
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version
-Access-Control-Expose-Headers: X-Api-Version, X-Request-Id, X-Response-Time
+Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version
+Access-Control-Expose-Headers: Api-Version, Request-Id, Response-Time
 Connection: close
 Content-Length: 60
 Content-MD5: MpEcO5EQFUZ2MNeUB2VaZg==
 Date: Tue, 03 Jan 2012 00:50:21 GMT
 Server: restify
-X-Request-Id: bda456dd-2fe4-478d-809c-7d159d58d579
-X-Response-Time: 3
+Request-Id: bda456dd-2fe4-478d-809c-7d159d58d579
+Response-Time: 3
 
 {
   "code": "InvalidArgument",
@@ -521,7 +608,7 @@ var util = require('util');
 
 function MyError(message) {
   restify.RestError.call(this, {
-    restCode: 'MyError'
+    restCode: 'MyError',
     statusCode: 418,
     message: message,
     constructorOpt: MyError
@@ -690,6 +777,7 @@ a hook to change request headers and the like if you need to. Note that
 <ul>
 <li>Accept header parsing</li>
 <li>Authorization header parsing</li>
+<li>CORS handling plugin</li>
 <li>Date header parsing</li>
 <li>JSONP support</li>
 <li>Gzip Response</li>
@@ -761,6 +849,24 @@ to something like:</p>
 is unrecognized, the only thing avaiable in <code>req.authorization</code> will be
 <code>scheme</code> and <code>credentials</code> - it will be up to you to parse out the rest.</p>
 
+<h3>CORS</h3>
+
+<pre><code>server.use(restify.CORS());
+</code></pre>
+
+<p>Supports tacking <a href="http://www.w3.org/TR/cors">CORS</a> headers into <code>actual</code>
+requests (as defined by the spec).  Note that preflight requests are
+automatically handled by the router, and you can override the default behavior
+on a per-URL basis with <code>server.opts(:url, ...)</code>.  To fully specify this plugin,
+a sample invocation is:</p>
+
+<pre><code>server.use(restify.CORS({
+    origins: ['foo.com', 'bar.com'],   // defaults to ['*']
+    credentials: true                  // defaults to false
+    headers: ['x-foo']                 // sets expose-headers
+}));
+</code></pre>
+
 <h3>Date Parser</h3>
 
 <pre><code>server.use(restify.dateParser());
@@ -806,15 +912,12 @@ supported.</p>
 <pre><code>server.use(restify.bodyParser({ mapParams: false }));
 </code></pre>
 
-<p>You can pass in an options object: currently there are some parameters being honored.</p>
-<p><code>mapParams</code>: this you can set to <code>false</code> to disable copying k/v pairs from the
+<p>You can pass in an options object; currently the only parameter honored is
+<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from the
 request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with the
-parsed object.  The default is to map params into <code>req.params</code>.</p>
-<p> The <code>keepExtensions</code> option is useful if you want the uploaded files to include the
+parsed object.  The default is to map params into <code>req.params</code>.  The
+<code>keepExtensions</code> option is useful if you want the uploaded files to include the
 extensions of the original files (multipart uploads only). Default is <code>false</code>.</p>
-<p><code>rejectUnknown</code>: this you can set to <code>true</code> to end the request with a
-<code>UnsupportedMediaTypeError</code> when nonone of the supported content types was given.
-Defaults to <code>false</code></p>
 
 <h3>RequestLogger</h3>
 
@@ -852,16 +955,20 @@ plugin has no impact if the client does not send <code>accept-encoding: gzip</co
 <p>The serveStatic module is different than most of the other plugins, in that it
 is expected that you are going to map it to a route, as below:</p>
 
-<pre><code>server.get(/\/docs\/public\/?.*/, restify.serveStatic({
-  directory: './public'
+<pre><code>server.get(/\/docs\/current\/?.*/, restify.serveStatic({
+  directory: './documentation/v1',
+  default: 'index.html'
 }));
 </code></pre>
 
-<p>The plugin will enforce that only files under <code>directory</code> can be served; you can
-specify additional restrictions by passing in a <code>match</code> parameter, which is just
-a <code>RegExp</code> to check against the requested file name.  You may pass in a <code>default</code> parameter, which is just a <code>string</code> to specify a default file to serve up, for example <code>'index.html'</code>. Lastly, you can pass in a
-<code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header. Default is <code>3600</code>
-(1 hour).</p>
+<p>The plugin will enforce that all files under <code>directory</code> are served. The 
+<code>directory</code> served is relative to the process working directory. You can also
+provide a <code>default</code> parameter such as index.html for any directory that 
+lacks a direct file match. 
+You can specify additional restrictions by passing in a <code>match</code> parameter, 
+which is just a <code>RegExp</code> to check against the requested file name. Lastly, you 
+can pass in a <code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header. 
+Default is <code>3600</code> (1 hour).</p>
 
 <h3>Throttle</h3>
 
@@ -1001,8 +1108,8 @@ the <code>after</code> event:</p>
         "statusCode": 200,
         "headers": {
           "access-control-allow-origin": "*",
-          "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
-          "access-control-expose-headers": "X-Api-Version, X-Request-Id, X-Response-Time",
+          "access-control-allow-headers": "Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version",
+          "access-control-expose-headers": "Api-Version, Request-Id, Response-Time",
           "server": "Joyent SmartDataCenter 7.0.0",
           "x-request-id": "ed634c3e-1af0-40e4-ad1e-68c2fb67c8e1",
           "access-control-allow-methods": "GET",
@@ -1130,6 +1237,10 @@ instance that is a child component of the one restify has:</p>
 <pre><code>var log = req.getLogger('MyFoo');
 </code></pre>
 
+<h3>time()</h3>
+
+<p>the time when this request arrived (ms since epoch)</p>
+
 <h3>Properties</h3>
 
 <table>
@@ -1166,6 +1277,15 @@ res.header('Content-Length');
 res.header('foo', new Date());
 // =&gt; Fri, 03 Feb 2012 20:09:58 GMT
 </code></pre>
+
+<h3>charSet(type)</h3>
+
+<p>Appends the provided character set to the response's <code>Content-Type</code>.</p>
+
+<pre><code>res.charSet('utf-8');
+</code></pre>
+
+<p>Will change the normal json Content-Type to <code>application/json; charset=utf-8</code>.</p>
 
 <h3>cache([type], [options])</h3>
 
@@ -1211,7 +1331,6 @@ res.send({hello: 'world'});
 <tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>code</td><td>Number</td><td>HTTP status code</td></tr>
 <tr><td>contentLength</td><td>Number</td><td>short hand for the header content-length</td></tr>
-<tr><td>charSet</td><td>String</td><td>In conjunction with <code>contentType</code>, you can explicitly set the charSet to be written in the content-type header</td></tr>
 <tr><td>contentType</td><td>String</td><td>short hand for the header content-type</td></tr>
 <tr><td>headers</td><td>Object</td><td>response headers</td></tr>
 <tr><td>id</td><td>String</td><td>A unique request id (x-request-id)</td></tr>
@@ -1558,7 +1677,7 @@ it will be an <code>HttpError</code>.</p>
 <tr><td>gzip</td><td>Object</td><td>Will compress data when sent using <code>content-encoding: gzip</code></td></tr>
 <tr><td>headers</td><td>Object</td><td>HTTP headers to set in all requests</td></tr>
 <tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
-<tr><td>retry</td><td>Object</td><td>options to provide to node-retry; defaults to 3 retries</td></tr>
+<tr><td>retry</td><td>Object</td><td>options to provide to node-retry;"false" disables retry; defaults to 4 retries</td></tr>
 <tr><td>signRequest</td><td>Function</td><td>synchronous callback for interposing headers before request is sent</td></tr>
 <tr><td>url</td><td>String</td><td>Fully-qualified URL to connect to</td></tr>
 <tr><td>userAgent</td><td>String</td><td>user-agent string to use; restify inserts one, but you can override it</td></tr>
@@ -1760,6 +1879,36 @@ and note that <code>read</code> and <code>write</code> probably need to be overr
 on all clients), just sets the <code>Authorization</code> header for all HTTP requests:</p>
 
 <pre><code>client.basicAuth('mark', 'mysupersecretpassword');
+</code></pre>
+
+<h3>Upgrades</h3>
+
+<p>If you successfully negotiate an Upgrade with the HTTP server, an
+<code>upgradeResult</code> event will be emitted with the arguments <code>err</code>, <code>res</code>, <code>socket</code>
+and <code>head</code>.  You can use this functionality to establish a WebSockets
+connection with a server.  For example, using the
+<a href="https://github.com/jclulow/node-watershed">watershed</a> library:</p>
+
+<pre><code>var ws = new Watershed();
+var wskey = ws.generateKey();
+var options = {
+  path: '/websockets/attach',
+  headers: {
+    connection: 'upgrade',
+    upgrade: 'websocket',
+    'sec-websocket-key': wskey,
+  }
+};
+client.get(options, function(err, res, socket, head) {
+  req.once('upgradeResult', function(err, res, socket, head) {
+    var shed = ws.connect(res, socket, head, wskey);
+    shed.on('text', function(msg) {
+      console.log('message from server: ' + msg);
+      shed.end();
+    });
+    shed.send('greetings program');
+  });
+});
 </code></pre>
 
     </div>
