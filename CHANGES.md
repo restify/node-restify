@@ -4,6 +4,7 @@
 
 - #547 Added mapFiles option to bodyParser
 - #552 PUT JsonClient test should use PUT not POST
+- #550 Make router preflight code more readable
 
 ## 2.6.3
 
