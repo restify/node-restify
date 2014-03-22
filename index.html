@@ -909,15 +909,61 @@ this plugin will still parse the query string properly.</p>
 <code>application/x-www-form-urlencoded</code> and <code>multipart/form-data</code> are currently
 supported.</p>
 
-<pre><code>server.use(restify.bodyParser({ mapParams: false }));
+<pre><code>server.use(restify.bodyParser({
+    maxBodySize: 0,
+    mapParams: true,
+    mapFiles: false,
+    overrideParams: false,
+    multipartHandler: function(part) {
+        part.on('data', function(data) {
+          /* do something with the multipart data */
+        });
+    },
+    multipartFileHandler: function(part) {
+        part.on('data', function(data) {
+          /* do something with the multipart file data */
+        });
+    },
+    keepExtensions: false,
+    uploadDir: os.tmpdir()
+ }));
 </code></pre>
 
-<p>You can pass in an options object; currently the only parameter honored is
-<code>mapParams</code>, which you can set to <code>false</code> to disable copying k/v pairs from the
-request body into <code>req.params</code>; instead, <code>req.body</code> will be overwritten with the
-parsed object.  The default is to map params into <code>req.params</code>.  The
-<code>keepExtensions</code> option is useful if you want the uploaded files to include the
-extensions of the original files (multipart uploads only). Default is <code>false</code>.</p>
+<p>Options:</p>
+
+<ul>
+<li><code>maxBodySize</code> - The maximum size in bytes allowed in the
+HTTP body. Useful for limiting clients from hogging server memory.</li>
+<li><code>mapParams</code> - if <code>req.params</code> should be filled with parsed
+parameters from HTTP body.</li>
+<li><code>mapFiles</code> - if <code>req.params</code> should be filled with
+the contents of files sent through a multipart request.
+<a href="https://github.com/felixge/node-formidable">formidable</a> is used
+internally for parsing, and a file is denoted as a multipart part
+with the <code>filename</code> option set in its <code>Content-Disposition</code>. This will
+only be performed if <code>mapParams</code> is true.</li>
+<li><code>overrideParams</code> - if an entry in <code>req.params</code> should be overwritten
+by the value in the body if the names are the same. For instance, if you
+have the route <code>/:someval</code>, and someone posts an <code>x-www-form-urlencoded</code>
+Content-Type with the body <code>someval=happy</code> to <code>/sad</code>, the value will be
+<code>happy</code> if <code>overrideParams</code> is <code>true</code>, <code>sad</code> otherwise.</li>
+<li><code>multipartHandler</code> - a callback to handle any multipart part which
+is not a file. If this is omitted, the default handler is invoked which
+may or may not map the parts into <code>req.params</code>, depending on the
+<code>mapParams</code>-option.</li>
+<li><code>multipartFileHandler</code> - a callback to handle any multipart file.
+It will be a file if the part have a <code>Content-Disposition</code> with the
+<code>filename</code> parameter set. This typically happens when a browser sends
+a from and there is a parameter similar to <code>&lt;input type="file" /&gt;</code>.
+If this is not provided, the default behaviour is to map the contents
+into <code>req.params</code>.</li>
+<li><code>keepExtensions</code> - if you want the uploaded files to include the
+extensions of the original files (multipart uploads only). Does nothing
+if <code>multipartFileHandler</code> is defined.</li>
+<li><code>uploadDir</code> - Where uploaded files are intermediately stored during transfer
+before the contents is mapped into <code>req.params</code>. Does nothing
+if <code>multipartFileHandler</code> is defined.</li>
+</ul>
 
 <h3>RequestLogger</h3>
 
