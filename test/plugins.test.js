@@ -253,6 +253,99 @@ test('body url-encoded ok (no params)', function (t) {
     client.end();
 });
 
+test('body multipart ok', function (t) {
+    SERVER.post('/multipart/:id',
+        restify.bodyParser(),
+        function (req, res, next) {
+            t.equal(req.params.id, 'foo');
+            t.equal(req.params.mood, 'happy')
+            t.equal(req.params.endorphins, '9000');
+            res.send();
+            next();
+        });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/multipart/foo?mood=happy',
+        agent: false,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data; boundary=huff'
+        }
+    };
+
+    var client = http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    client.write('--huff\r\nContent-Disposition: form-data; name="endorphins"\r\n\r\n9000\r\n--huff--');
+    client.end();
+});
+
+test('body multipart ok custom handling', function (t) {
+    var detailsString = 'High endorphin levels make you happy. Mostly... I guess. Whatever.';
+    SERVER.post('/multipart/:id',
+        restify.bodyParser({
+            multipartHandler: function (part) {
+                var buffer = new Buffer(0);
+                part.on('data', function (data) {
+                    buffer = Buffer.concat([ data ]);
+                });
+
+                part.on('end', function() {
+                    t.equal(part.name, 'endorphins');
+                    t.equal(buffer.toString('ascii'), '12');
+                });
+            },
+            multipartFileHandler: function (part) {
+                var buffer = new Buffer(0);
+                part.on('data', function (data) {
+                    buffer = Buffer.concat([ data ]);
+                });
+
+                part.on('end', function() {
+                    t.equal(part.name, 'details');
+                    t.equal(part.filename, 'mood_details.txt');
+                    t.equal(buffer.toString('ascii'), detailsString);
+                });
+            },
+            mapParams: false
+        }),
+        function (req, res, next) {
+            res.send();
+            next();
+        });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/multipart/foo?mood=sad',
+        agent: false,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data; boundary=huff'
+        }
+    };
+
+    var client = http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    client.write('--huff\r\n');
+    client.write('Content-Disposition: form-data; name="endorphins"\r\n\r\n');
+    client.write('12\r\n');
+
+    client.write('--huff\r\n');
+    client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
+    client.write('Content-Type: text/plain\r\n\r\n');
+    client.write(detailsString + '\r\n')
+    client.write('--huff--');
+
+    client.end();
+});
 
 test('body json ok', function (t) {
     SERVER.post('/body/:id',
