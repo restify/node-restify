@@ -258,7 +258,7 @@ test('body multipart ok', function (t) {
         restify.bodyParser(),
         function (req, res, next) {
             t.equal(req.params.id, 'foo');
-            t.equal(req.params.mood, 'happy')
+            t.equal(req.params.mood, 'happy');
             t.equal(req.params.endorphins, '9000');
             res.send();
             next();
@@ -275,17 +275,19 @@ test('body multipart ok', function (t) {
         }
     };
 
-    var client = http.request(opts, function(res) {
+    var client = http.request(opts, function (res) {
         t.equal(res.statusCode, 200);
         t.end();
     });
 
+    /* JSSTYLED */
     client.write('--huff\r\nContent-Disposition: form-data; name="endorphins"\r\n\r\n9000\r\n--huff--');
     client.end();
 });
 
 test('body multipart ok custom handling', function (t) {
-    var detailsString = 'High endorphin levels make you happy. Mostly... I guess. Whatever.';
+    var detailsString = 'High endorphin levels make you happy. ' +
+        'Mostly... I guess. Whatever.';
     SERVER.post('/multipart/:id',
         restify.bodyParser({
             multipartHandler: function (part) {
@@ -294,7 +296,7 @@ test('body multipart ok custom handling', function (t) {
                     buffer = Buffer.concat([ data ]);
                 });
 
-                part.on('end', function() {
+                part.on('end', function () {
                     t.equal(part.name, 'endorphins');
                     t.equal(buffer.toString('ascii'), '12');
                 });
@@ -305,7 +307,7 @@ test('body multipart ok custom handling', function (t) {
                     buffer = Buffer.concat([ data ]);
                 });
 
-                part.on('end', function() {
+                part.on('end', function () {
                     t.equal(part.name, 'details');
                     t.equal(part.filename, 'mood_details.txt');
                     t.equal(buffer.toString('ascii'), detailsString);
@@ -329,7 +331,7 @@ test('body multipart ok custom handling', function (t) {
         }
     };
 
-    var client = http.request(opts, function(res) {
+    var client = http.request(opts, function (res) {
         t.equal(res.statusCode, 200);
         t.end();
     });
@@ -339,9 +341,10 @@ test('body multipart ok custom handling', function (t) {
     client.write('12\r\n');
 
     client.write('--huff\r\n');
+    /* JSSTYLED */
     client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
     client.write('Content-Type: text/plain\r\n\r\n');
-    client.write(detailsString + '\r\n')
+    client.write(detailsString + '\r\n');
     client.write('--huff--');
 
     client.end();
