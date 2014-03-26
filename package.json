@@ -33,7 +33,7 @@
     "name": "restify",
     "homepage": "http://mcavage.github.com/node-restify",
     "description": "REST framework",
-    "version": "2.6.3",
+    "version": "2.7.0",
     "repository": {
         "type": "git",
         "url": "git://github.com/mcavage/node-restify.git"
@@ -46,7 +46,7 @@
         "report-latency": "./bin/report-latency"
     },
     "engines": {
-        "node": ">=0.8"
+        "node": ">=0.10"
     },
     "dependencies": {
         "assert-plus": "0.1.5",

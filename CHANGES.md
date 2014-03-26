@@ -1,6 +1,8 @@
 # restify Changelog
 
-## 2.6.4 (not yet released)
+## not yet released
+
+## 2.7.0
 
 - #547 Added mapFiles option to bodyParser
 - #552 PUT JsonClient test should use PUT not POST
