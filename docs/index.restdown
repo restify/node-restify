@@ -66,6 +66,7 @@ The most barebones echo server:
 
     function respond(req, res, next) {
       res.send('hello ' + req.params.name);
+      next();
     }
 
     var server = restify.createServer();
@@ -821,14 +822,58 @@ Blocks your chain on reading and parsing the HTTP request body.  Switches on
 `application/x-www-form-urlencoded` and `multipart/form-data` are currently
 supported.
 
-    server.use(restify.bodyParser({ mapParams: false }));
+    server.use(restify.bodyParser({
+        maxBodySize: 0,
+        mapParams: true,
+        mapFiles: false,
+        overrideParams: false,
+        multipartHandler: function(part) {
+            part.on('data', function(data) {
+              /* do something with the multipart data */
+            });
+        },
+        multipartFileHandler: function(part) {
+            part.on('data', function(data) {
+              /* do something with the multipart file data */
+            });
+        },
+        keepExtensions: false,
+        uploadDir: os.tmpdir()
+     }));
 
-You can pass in an options object; currently the only parameter honored is
-`mapParams`, which you can set to `false` to disable copying k/v pairs from the
-request body into `req.params`; instead, `req.body` will be overwritten with the
-parsed object.  The default is to map params into `req.params`.  The
-`keepExtensions` option is useful if you want the uploaded files to include the
-extensions of the original files (multipart uploads only). Default is `false`.
+Options:
+
+  * `maxBodySize` - The maximum size in bytes allowed in the
+    HTTP body. Useful for limiting clients from hogging server memory.
+  * `mapParams` - if `req.params` should be filled with parsed
+    parameters from HTTP body.
+  * `mapFiles` - if `req.params` should be filled with
+    the contents of files sent through a multipart request.
+    [formidable](https://github.com/felixge/node-formidable) is used
+    internally for parsing, and a file is denoted as a multipart part
+    with the `filename` option set in its `Content-Disposition`. This will
+    only be performed if `mapParams` is true.
+  * `overrideParams` - if an entry in `req.params` should be overwritten
+    by the value in the body if the names are the same. For instance, if you
+    have the route `/:someval`, and someone posts an `x-www-form-urlencoded`
+    Content-Type with the body `someval=happy` to `/sad`, the value will be
+    `happy` if `overrideParams` is `true`, `sad` otherwise.
+  * `multipartHandler` - a callback to handle any multipart part which
+    is not a file. If this is omitted, the default handler is invoked which
+    may or may not map the parts into `req.params`, depending on the
+    `mapParams`-option.
+  * `multipartFileHandler` - a callback to handle any multipart file.
+    It will be a file if the part have a `Content-Disposition` with the
+    `filename` parameter set. This typically happens when a browser sends
+    a from and there is a parameter similar to `<input type="file" />`.
+    If this is not provided, the default behaviour is to map the contents
+    into `req.params`.
+  * `keepExtensions` - if you want the uploaded files to include the
+    extensions of the original files (multipart uploads only). Does nothing
+    if `multipartFileHandler` is defined.
+  * `uploadDir` - Where uploaded files are intermediately stored during transfer
+    before the contents is mapped into `req.params`. Does nothing
+    if `multipartFileHandler` is defined.
 
 ### RequestLogger
 
@@ -1162,6 +1207,14 @@ Get or set the response header key.
 
     res.header('foo', new Date());
     // => Fri, 03 Feb 2012 20:09:58 GMT
+
+### charSet(type)
+
+Appends the provided character set to the response's `Content-Type`.
+
+    res.charSet('utf-8');
+
+Will change the normal json Content-Type to `application/json; charset=utf-8`.
 
 ### cache([type], [options])
 
