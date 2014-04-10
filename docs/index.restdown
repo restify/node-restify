@@ -318,6 +318,7 @@ particular connection.
 Using the Upgrade mechanism, you can use a library like
 [watershed](https://github.com/jclulow/node-watershed) to negotiate WebSockets
 connections.  For example:
+
     var ws = new Watershed();
     server.get('/websocket/attach', function upgradeRoute(req, res, next) {
       if (!res.claimUpgrade) {
@@ -914,13 +915,13 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The plugin will enforce that all files under `directory` are served. The 
+The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
-provide a `default` parameter such as index.html for any directory that 
-lacks a direct file match. 
-You can specify additional restrictions by passing in a `match` parameter, 
-which is just a `RegExp` to check against the requested file name. Lastly, you 
-can pass in a `maxAge` numeric, which will set the `Cache-Control` header. 
+provide a `default` parameter such as index.html for any directory that
+lacks a direct file match.
+You can specify additional restrictions by passing in a `match` parameter,
+which is just a `RegExp` to check against the requested file name. Lastly, you
+can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
 Default is `3600` (1 hour).
 
 ### Throttle
