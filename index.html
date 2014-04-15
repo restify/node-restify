@@ -861,7 +861,7 @@ on a per-URL basis with <code>server.opts(:url, ...)</code>.  To fully specify t
 a sample invocation is:</p>
 
 <pre><code>server.use(restify.CORS({
-    origins: ['foo.com', 'bar.com'],   // defaults to ['*']
+    origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
     credentials: true                  // defaults to false
     headers: ['x-foo']                 // sets expose-headers
 }));
