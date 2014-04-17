@@ -1076,6 +1076,39 @@ test('gh-283 maximum available versioned route matching', function (t) {
     });
 });
 
+test('versioned route matching should prefer first match if equal versions', function (t) {
+    var p = '/' + uuid.v4();
+    var i;
+
+    SERVER.get({
+        path: p,
+        version: ['1.1.0', '1.2.0']
+    }, function (req, res, next) {
+        res.json(200, {route: p});
+        next();
+    });
+
+    SERVER.get({
+        path: '/:id',
+        version: ['1.1.0', '1.2.0']
+    }, function (req, res, next) {
+        res.json(200, {route: 'id'});
+        next();
+    });
+
+    var opts = {
+        path: p,
+        headers: {
+            'accept-version': '~1'
+        }
+    };
+
+    CLIENT.get(opts, function (err, _, res, obj) {
+        t.equal(obj.route, p);
+        t.end();
+    });
+});
+
 
 test('gh-329 wrong values in res.methods', function (t) {
     function route(req, res, next) {
