@@ -2,6 +2,9 @@
 
 ## not yet released
 
+- #570 Route matching should only prefer later routes if version is greater
+- #564 Using req.accepts() according to implementation
+
 ## 2.7.0
 
 - #547 Added mapFiles option to bodyParser
