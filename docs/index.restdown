@@ -779,7 +779,7 @@ on a per-URL basis with `server.opts(:url, ...)`.  To fully specify this plugin,
 a sample invocation is:
 
     server.use(restify.CORS({
-        origins: ['foo.com', 'bar.com'],   // defaults to ['*']
+        origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
         credentials: true                  // defaults to false
         headers: ['x-foo']                 // sets expose-headers
     }));
