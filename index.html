@@ -378,15 +378,16 @@ particular connection.</p>
 
 <p>Using the Upgrade mechanism, you can use a library like
 <a href="https://github.com/jclulow/node-watershed">watershed</a> to negotiate WebSockets
-connections.  For example:
-    var ws = new Watershed();
-    server.get('/websocket/attach', function upgradeRoute(req, res, next) {
-      if (!res.claimUpgrade) {
-        next(new Error('Connection Must Upgrade For WebSockets'));
-        return;
-      }</p>
+connections.  For example:</p>
 
-<pre><code>  var upgrade = res.claimUpgrade();
+<pre><code>var ws = new Watershed();
+server.get('/websocket/attach', function upgradeRoute(req, res, next) {
+  if (!res.claimUpgrade) {
+    next(new Error('Connection Must Upgrade For WebSockets'));
+    return;
+  }
+
+  var upgrade = res.claimUpgrade();
   var shed = ws.accept(req, upgrade.socket, upgrade.head);
   shed.on('text', function(msg) {
     console.log('Received message from websocket client: ' + msg);
@@ -861,8 +862,8 @@ on a per-URL basis with <code>server.opts(:url, ...)</code>.  To fully specify t
 a sample invocation is:</p>
 
 <pre><code>server.use(restify.CORS({
-    origins: ['foo.com', 'bar.com'],   // defaults to ['*']
-    credentials: true,                 // defaults to false
+    origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
+    credentials: true                  // defaults to false
     headers: ['x-foo']                 // sets expose-headers
 }));
 </code></pre>
@@ -1007,13 +1008,13 @@ is expected that you are going to map it to a route, as below:</p>
 }));
 </code></pre>
 
-<p>The plugin will enforce that all files under <code>directory</code> are served. The 
+<p>The plugin will enforce that all files under <code>directory</code> are served. The
 <code>directory</code> served is relative to the process working directory. You can also
-provide a <code>default</code> parameter such as index.html for any directory that 
-lacks a direct file match. 
-You can specify additional restrictions by passing in a <code>match</code> parameter, 
-which is just a <code>RegExp</code> to check against the requested file name. Lastly, you 
-can pass in a <code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header. 
+provide a <code>default</code> parameter such as index.html for any directory that
+lacks a direct file match.
+You can specify additional restrictions by passing in a <code>match</code> parameter,
+which is just a <code>RegExp</code> to check against the requested file name. Lastly, you
+can pass in a <code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header.
 Default is <code>3600</code> (1 hour).</p>
 
 <h3>Throttle</h3>
