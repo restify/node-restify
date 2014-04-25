@@ -239,6 +239,22 @@ Note that `foo` only gets run once in that example.  A few caveats:
 - Lastly, you cannot "chain" `next('route')` calls; you can only delegate the
   routing chain once (this is a limitation of the way routes are stored
   internally, and may be revisited someday).
+  
+### Chaining Handlers
+
+Routes can also accept more than one handler function. For instance:
+
+    server.get(
+        '/foo/:id', 
+        function(req, res, next) {
+            console.log('Authenticate');
+            return next();
+        }, 
+        function(req, res, next) {
+            res.send(200);
+            return next();
+        }
+    );
 
 ### Versioned Routes
 
