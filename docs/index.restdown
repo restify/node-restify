@@ -480,6 +480,12 @@ do this:
     Response-Time: 1
 
     I just don't like you
+    
+Alternatively, you can access the error classes via `restify.errors`. We can do this with a simple change to the previous example:
+
+    server.get('/hello/:name', function(req, res, next) {
+      return next(new restify.errors.ConflictError("I just don't like you"));
+    });
 
 The core thing to note about an `HttpError` is that it has a numeric
 code (statusCode) and a `body`.  The statusCode will automatically
