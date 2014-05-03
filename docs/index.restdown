@@ -256,6 +256,30 @@ Routes can also accept more than one handler function. For instance:
         }
     );
 
+### Hypermedia
+
+If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.
+
+```js
+server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
+
+// in another route
+res.send({
+  country: 'Australia',
+  // render a URL by specifying the route name and parameters
+  capital: server.router.render('city', {slug: 'canberra'}, {details: true})
+});
+```
+
+Which returns:
+
+```json
+{
+  "country": "Australia",
+  "capital": "/cities/canberra?details=true"
+}
+```
+
 ### Versioned Routes
 
 Most REST APIs tend to need versioning, and restify ships with support
