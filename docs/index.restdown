@@ -66,6 +66,7 @@ The most barebones echo server:
 
     function respond(req, res, next) {
       res.send('hello ' + req.params.name);
+      next();
     }
 
     var server = restify.createServer();
@@ -238,6 +239,46 @@ Note that `foo` only gets run once in that example.  A few caveats:
 - Lastly, you cannot "chain" `next('route')` calls; you can only delegate the
   routing chain once (this is a limitation of the way routes are stored
   internally, and may be revisited someday).
+  
+### Chaining Handlers
+
+Routes can also accept more than one handler function. For instance:
+
+    server.get(
+        '/foo/:id', 
+        function(req, res, next) {
+            console.log('Authenticate');
+            return next();
+        }, 
+        function(req, res, next) {
+            res.send(200);
+            return next();
+        }
+    );
+
+### Hypermedia
+
+If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.
+
+```js
+server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
+
+// in another route
+res.send({
+  country: 'Australia',
+  // render a URL by specifying the route name and parameters
+  capital: server.router.render('city', {slug: 'canberra'}, {details: true})
+});
+```
+
+Which returns:
+
+```json
+{
+  "country": "Australia",
+  "capital": "/cities/canberra?details=true"
+}
+```
 
 ### Versioned Routes
 
@@ -317,6 +358,7 @@ particular connection.
 Using the Upgrade mechanism, you can use a library like
 [watershed](https://github.com/jclulow/node-watershed) to negotiate WebSockets
 connections.  For example:
+
     var ws = new Watershed();
     server.get('/websocket/attach', function upgradeRoute(req, res, next) {
       if (!res.claimUpgrade) {
@@ -462,6 +504,12 @@ do this:
     Response-Time: 1
 
     I just don't like you
+    
+Alternatively, you can access the error classes via `restify.errors`. We can do this with a simple change to the previous example:
+
+    server.get('/hello/:name', function(req, res, next) {
+      return next(new restify.errors.ConflictError("I just don't like you"));
+    });
 
 The core thing to note about an `HttpError` is that it has a numeric
 code (statusCode) and a `body`.  The statusCode will automatically
@@ -537,7 +585,7 @@ You can always add your own by subclassing `restify.RestError` like:
 
     function MyError(message) {
       restify.RestError.call(this, {
-        restCode: 'MyError'
+        restCode: 'MyError',
         statusCode: 418,
         message: message,
         constructorOpt: MyError
@@ -777,7 +825,7 @@ on a per-URL basis with `server.opts(:url, ...)`.  To fully specify this plugin,
 a sample invocation is:
 
     server.use(restify.CORS({
-        origins: ['foo.com', 'bar.com'],   // defaults to ['*']
+        origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
         credentials: true                  // defaults to false
         headers: ['x-foo']                 // sets expose-headers
     }));
@@ -821,14 +869,58 @@ Blocks your chain on reading and parsing the HTTP request body.  Switches on
 `application/x-www-form-urlencoded` and `multipart/form-data` are currently
 supported.
 
-    server.use(restify.bodyParser({ mapParams: false }));
+    server.use(restify.bodyParser({
+        maxBodySize: 0,
+        mapParams: true,
+        mapFiles: false,
+        overrideParams: false,
+        multipartHandler: function(part) {
+            part.on('data', function(data) {
+              /* do something with the multipart data */
+            });
+        },
+        multipartFileHandler: function(part) {
+            part.on('data', function(data) {
+              /* do something with the multipart file data */
+            });
+        },
+        keepExtensions: false,
+        uploadDir: os.tmpdir()
+     }));
 
-You can pass in an options object; currently the only parameter honored is
-`mapParams`, which you can set to `false` to disable copying k/v pairs from the
-request body into `req.params`; instead, `req.body` will be overwritten with the
-parsed object.  The default is to map params into `req.params`.  The
-`keepExtensions` option is useful if you want the uploaded files to include the
-extensions of the original files (multipart uploads only). Default is `false`.
+Options:
+
+  * `maxBodySize` - The maximum size in bytes allowed in the
+    HTTP body. Useful for limiting clients from hogging server memory.
+  * `mapParams` - if `req.params` should be filled with parsed
+    parameters from HTTP body.
+  * `mapFiles` - if `req.params` should be filled with
+    the contents of files sent through a multipart request.
+    [formidable](https://github.com/felixge/node-formidable) is used
+    internally for parsing, and a file is denoted as a multipart part
+    with the `filename` option set in its `Content-Disposition`. This will
+    only be performed if `mapParams` is true.
+  * `overrideParams` - if an entry in `req.params` should be overwritten
+    by the value in the body if the names are the same. For instance, if you
+    have the route `/:someval`, and someone posts an `x-www-form-urlencoded`
+    Content-Type with the body `someval=happy` to `/sad`, the value will be
+    `happy` if `overrideParams` is `true`, `sad` otherwise.
+  * `multipartHandler` - a callback to handle any multipart part which
+    is not a file. If this is omitted, the default handler is invoked which
+    may or may not map the parts into `req.params`, depending on the
+    `mapParams`-option.
+  * `multipartFileHandler` - a callback to handle any multipart file.
+    It will be a file if the part have a `Content-Disposition` with the
+    `filename` parameter set. This typically happens when a browser sends
+    a from and there is a parameter similar to `<input type="file" />`.
+    If this is not provided, the default behaviour is to map the contents
+    into `req.params`.
+  * `keepExtensions` - if you want the uploaded files to include the
+    extensions of the original files (multipart uploads only). Does nothing
+    if `multipartFileHandler` is defined.
+  * `uploadDir` - Where uploaded files are intermediately stored during transfer
+    before the contents is mapped into `req.params`. Does nothing
+    if `multipartFileHandler` is defined.
 
 ### RequestLogger
 
@@ -869,13 +961,13 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The plugin will enforce that all files under `directory` are served. The 
+The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
-provide a `default` parameter such as index.html for any directory that 
-lacks a direct file match. 
-You can specify additional restrictions by passing in a `match` parameter, 
-which is just a `RegExp` to check against the requested file name. Lastly, you 
-can pass in a `maxAge` numeric, which will set the `Cache-Control` header. 
+provide a `default` parameter such as index.html for any directory that
+lacks a direct file match.
+You can specify additional restrictions by passing in a `match` parameter,
+which is just a `RegExp` to check against the requested file name. Lastly, you
+can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
 Default is `3600` (1 hour).
 
 ### Throttle
@@ -1033,7 +1125,7 @@ You pass in the auditor a bunyan logger, and it will write out records at the
 ## Request API
 
 Wraps all of the node
-[ServerRequest](http://nodejs.org/docs/latest/api/http.html#http.ServerRequest)
+[http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage)
 APIs, events and properties, plus the following.
 
 ### header(key, [defaultValue])
@@ -1092,6 +1184,18 @@ and it contains the give mime type.
 Note this is almost compliant with express, but restify does not have
 all the `app.is()` callback business express does.
 
+### isSecure()
+
+Check if the incoming request is encrypted.
+
+### isChunked()
+
+Check if the incoming request is chunked.
+
+### isKeepAlive()
+
+Check if the incoming request is kept alive.
+
 ### log
 
 Note that you can piggyback on the restify logging framework, by just using
@@ -1115,6 +1219,10 @@ instance that is a child component of the one restify has:
 
     var log = req.getLogger('MyFoo');
 
+### time()
+
+the time when this request arrived (ms since epoch)
+
 ### Properties
 
 ||**Name**||**Type**||**Description**||
@@ -1124,9 +1232,6 @@ instance that is a child component of the one restify has:
 ||log||Object||bunyan logger you can piggyback on||
 ||id||String||A unique request id (x-request-id)||
 ||path||String||cleaned up URL path||
-||query||String||the query string only||
-||secure||Boolean||Whether this was an SSL request||
-||time||Number||the time when this request arrived (ms since epoch)||
 
 ## Response API
 
@@ -1149,6 +1254,14 @@ Get or set the response header key.
 
     res.header('foo', new Date());
     // => Fri, 03 Feb 2012 20:09:58 GMT
+
+### charSet(type)
+
+Appends the provided character set to the response's `Content-Type`.
+
+    res.charSet('utf-8');
+
+Will change the normal json Content-Type to `application/json; charset=utf-8`.
 
 ### cache([type], [options])
 
@@ -1495,11 +1608,12 @@ Options:
 ||**Name**||**Type**||**Description**||
 ||accept||String||Accept header to send||
 ||connectTimeout||Number||Amount of time to wait for a socket||
+||requestTimeout||Number||Amount of time to wait for the request to finish||
 ||dtrace||Object||node-dtrace-provider handle||
 ||gzip||Object||Will compress data when sent using `content-encoding: gzip`||
 ||headers||Object||HTTP headers to set in all requests||
 ||log||Object||[bunyan](https://github.com/trentm/node-bunyan) instance||
-||retry||Object||options to provide to node-retry; defaults to 3 retries||
+||retry||Object||options to provide to node-retry;"false" disables retry; defaults to 4 retries||
 ||signRequest||Function||synchronous callback for interposing headers before request is sent||
 ||url||String||Fully-qualified URL to connect to||
 ||userAgent||String||user-agent string to use; restify inserts one, but you can override it||

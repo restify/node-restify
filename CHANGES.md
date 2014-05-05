@@ -1,7 +1,40 @@
 # restify Changelog
 
-## Not Yet Released
+## not yet released
 
+- #570 Route matching should only prefer later routes if version is greater
+- #564 Using req.accepts() according to implementation
+- #504 Helper to render a route with given parameters (for hypermedia APIs)
+
+## 2.7.0
+
+- #547 Added mapFiles option to bodyParser
+- #552 PUT JsonClient test should use PUT not POST
+- #550 Make router preflight code more readable
+- #548 Allow custom handling of multipart data.
+
+## 2.6.3
+
+- Hotfix for CORS plugin if no origin was set in the options
+
+## 2.6.2
+
+- #508 add server option: `ciphers` to pass down to https(tls)
+- #502 `server.on('request')` not emitting
+- #496 static plugin incorrectly handling `directories`; revert back to 2.6.0
+       version
+- #495 don't override client response code with custom error object
+- #494 socket connecting detection logic incorrect
+- #492 client `false` needs to actually disable retries
+- changed indent from four to eight
+- #505 fix audit logger plugin bug
+- #510 request timeout support
+- #523 added Access-Control-Allow-Credentials to the preflight handler
+
+## 2.6.1
+
+- #478 Add `req.timers` to audit logging plugin.
+- #487 RequestCaptureStream: dumpDefault, haveNonRawStreams, zero ring after dump
 - #407 - bunyan 0.21.3
 - Add CSV/TSV parser (Dominik Lessel)
 - Add `req.timers`: a list of hrtime's for each handler
