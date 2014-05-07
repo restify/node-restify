@@ -711,10 +711,6 @@ test('full response', function (t) {
         t.equal(res.statusCode, 200);
         var headers = res.headers;
         t.ok(headers, 'headers ok');
-        t.ok(headers['access-control-allow-origin']);
-        t.ok(headers['access-control-allow-headers']);
-        t.ok(headers['access-control-expose-headers']);
-        t.ok(headers['access-control-allow-methods']);
         t.ok(headers.date);
         t.ok(headers['request-id']);
         t.ok(headers['response-time'] >= 0);
