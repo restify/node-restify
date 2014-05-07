@@ -736,3 +736,20 @@ test('secure client connection with timeout', function (t) {
     });
 });
 /* END JSSTYLED */
+
+test('SSLv3_method', function (t) {
+    // The rest api that I know that uses an old ssl version
+    var client = restify.createJsonClient({
+        url: 'https://api.mercadolibre.com',
+        dtrace: helper.dtrace,
+        retry: false,
+        secureProtocol: 'SSLv3_method'
+    });
+
+    client.get('/sites', function (err, req, res) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.end();
+    });
+});

@@ -1594,6 +1594,7 @@ Options:
 ||url||String||Fully-qualified URL to connect to||
 ||userAgent||String||user-agent string to use; restify inserts one, but you can override it||
 ||version||String||semver string to set the accept-version||
+||secureProtocol||String||use a different secure protocol||
 
 ### get(path, callback)
 
