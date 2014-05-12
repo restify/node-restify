@@ -2,6 +2,7 @@
 
 ## not yet released
 
+- #598 Simplify and correct path segment regexp
 - #570 Route matching should only prefer later routes if version is greater
 - #564 Using req.accepts() according to implementation
 - #504 Helper to render a route with given parameters (for hypermedia APIs)
