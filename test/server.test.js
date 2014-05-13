@@ -1076,9 +1076,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
     });
 });
 
+/* JSSTYLED */
 test('versioned route matching should prefer first match if equal versions', function (t) {
     var p = '/' + uuid.v4();
-    var i;
 
     SERVER.get({
         path: p,
