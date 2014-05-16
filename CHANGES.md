@@ -2,6 +2,10 @@
 
 ## not yet released
 
+## 2.8.1
+
+- revert #604, work around by not removing client listener
+
 ## 2.8.0
 
 - #604 trap http client errors
