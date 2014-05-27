@@ -600,6 +600,10 @@ from the stack trace (you don't *have* to do that, but you probably
 want it).  In the example above, we also set the name property so
 `console.log(new MyError());` looks correct.
 
+### Handling Unexpected Errors
+
+For information on how best to handle unexpected errors, see the [Server API](#Server-API) Events section.
+
 ## Socket.IO
 
 To use [socket.io](http://socket.io/) with restify, just treat your restify
