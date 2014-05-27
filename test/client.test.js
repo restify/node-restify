@@ -736,3 +736,13 @@ test('secure client connection with timeout', function (t) {
     });
 });
 /* END JSSTYLED */
+
+test('trailing slashes', function (t) {
+    JSON_CLIENT.get('/json/mcavage/', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
+});
