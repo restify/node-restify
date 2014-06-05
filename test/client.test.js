@@ -650,6 +650,7 @@ test('don\'t sign a request', function (t) {
     });
 });
 
+
 test('sign a request', function (t) {
     var called = 0;
     var signer = function sign(request) {
