@@ -239,17 +239,17 @@ Note that `foo` only gets run once in that example.  A few caveats:
 - Lastly, you cannot "chain" `next('route')` calls; you can only delegate the
   routing chain once (this is a limitation of the way routes are stored
   internally, and may be revisited someday).
-  
+
 ### Chaining Handlers
 
 Routes can also accept more than one handler function. For instance:
 
     server.get(
-        '/foo/:id', 
+        '/foo/:id',
         function(req, res, next) {
             console.log('Authenticate');
             return next();
-        }, 
+        },
         function(req, res, next) {
             res.send(200);
             return next();
@@ -504,7 +504,7 @@ do this:
     Response-Time: 1
 
     I just don't like you
-    
+
 Alternatively, you can access the error classes via `restify.errors`. We can do this with a simple change to the previous example:
 
     server.get('/hello/:name', function(req, res, next) {
@@ -1550,6 +1550,13 @@ Here's an example of hitting the
 
       console.log(JSON.stringify(obj, null, 2));
     });
+
+As a short-hand, a client can be initialized with a string-URL rather than
+an options object:
+
+    var restify = require('restify');
+
+    var client = restify.createJsonClient('https://us-west-1.api.joyentcloud.com');
 
 Note that all further documentation refers to the "short-hand" form of
 methods like `get/put/del` which take a string path.  You can also
