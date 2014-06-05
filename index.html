@@ -298,6 +298,47 @@ routing chain once (this is a limitation of the way routes are stored
 internally, and may be revisited someday).</li>
 </ul>
 
+<h3>Chaining Handlers</h3>
+
+<p>Routes can also accept more than one handler function. For instance:</p>
+
+<pre><code>server.get(
+    '/foo/:id',
+    function(req, res, next) {
+        console.log('Authenticate');
+        return next();
+    },
+    function(req, res, next) {
+        res.send(200);
+        return next();
+    }
+);
+</code></pre>
+
+<h3>Hypermedia</h3>
+
+<p>If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.</p>
+
+<p>```js
+server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
+
+<p>// in another route
+res.send({
+  country: 'Australia',
+  // render a URL by specifying the route name and parameters
+  capital: server.router.render('city', {slug: 'canberra'}, {details: true})
+});
+```</p>
+
+<p>Which returns:</p>
+
+<p><code>json
+{
+  "country": "Australia",
+  "capital": "/cities/canberra?details=true"
+}
+</code></p>
+
 <h3>Versioned Routes</h3>
 
 <p>Most REST APIs tend to need versioning, and restify ships with support
@@ -530,6 +571,13 @@ Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
 Response-Time: 1
 
 I just don't like you
+</code></pre>
+
+<p>Alternatively, you can access the error classes via <code>restify.errors</code>. We can do this with a simple change to the previous example:</p>
+
+<pre><code>server.get('/hello/:name', function(req, res, next) {
+  return next(new restify.errors.ConflictError("I just don't like you"));
+});
 </code></pre>
 
 <p>The core thing to note about an <code>HttpError</code> is that it has a numeric
@@ -1655,6 +1703,14 @@ client.get('/my/machines', function(err, req, res, obj) {
 
   console.log(JSON.stringify(obj, null, 2));
 });
+</code></pre>
+
+<p>As a short-hand, a client can be initialized with a string-URL rather than
+an options object:</p>
+
+<pre><code>var restify = require('restify');
+
+var client = restify.createJsonClient('https://us-west-1.api.joyentcloud.com');
 </code></pre>
 
 <p>Note that all further documentation refers to the "short-hand" form of
