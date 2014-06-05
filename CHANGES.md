@@ -2,6 +2,8 @@
 
 ## not yet released
 
+- #619 Default to url, if string provided to createClient
+
 ## 2.8.1
 
 - revert #604, work around by not removing client listener
