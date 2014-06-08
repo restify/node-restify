@@ -3,6 +3,7 @@
 ## not yet released
 
 - #619 Default to url, if string provided to createClient
+- #614 do not compute the MD5 Hash of a partial content
 
 ## 2.8.1
 
