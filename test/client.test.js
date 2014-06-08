@@ -2,6 +2,8 @@
 
 var http = require('http');
 
+var crypto = require('crypto');
+
 var uuid = require('node-uuid');
 
 var restify = require('../lib');
@@ -34,7 +36,20 @@ function sendJson(req, res, next) {
 
 
 function sendText(req, res, next) {
-    res.send('hello ' + (req.params.hello || req.params.name || ''));
+    var text = 'hello ' + (req.params.hello || req.params.name || ''); 
+
+    if (req.headers['range']){
+        var matched = req.headers['range'].match(/bytes=([0-9]+)-([0-9]*)/);
+        var start = parseInt(matched[1]);
+        var length = (matched[2]) ? parseInt(matched[2]) - start : undefined;
+        var hash = crypto.createHash('md5');
+        hash.update(text, 'utf8');
+        res.header('content-md5', hash.digest('base64'));
+        res.status(206);
+        text = text.substr(start, length);
+    };
+
+    res.send(text);
     next();
 }
 
@@ -291,6 +306,23 @@ test('GET text', function (t) {
     });
 });
 
+test('GET PARTIAL text', function (t) {
+    var opts = {
+        path: '/str/mcavage',
+        headers: {
+            Range: 'bytes=0-10'
+        }
+    };
+    STR_CLIENT.get(opts, function (err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.body, data);
+        t.equal(data, 'hello mcav');
+        t.end();
+    });
+});
+
 
 test('HEAD text', function (t) {
     STR_CLIENT.head('/str/mcavage', function (err, req, res) {
@@ -300,7 +332,6 @@ test('HEAD text', function (t) {
         t.end();
     });
 });
-
 
 test('Check error (404)', function (t) {
     STR_CLIENT.get('/' + uuid(), function (err, req, res, message) {
