@@ -49,34 +49,34 @@
         "node": ">=0.10"
     },
     "dependencies": {
-        "assert-plus": "0.1.5",
-        "backoff": "2.3.0",
-        "bunyan": "0.22.1",
-        "csv": "0.3.7",
-        "deep-equal": "0.0.0",
-        "escape-regexp-component": "1.0.2",
-        "formidable": "1.0.14",
-        "http-signature": "0.10.0",
-        "keep-alive-agent": "0.0.1",
-        "lru-cache": "2.3.1",
-        "mime": "1.2.11",
-        "negotiator": "0.3.0",
-        "node-uuid": "1.4.1",
-        "once": "1.3.0",
-        "qs": "0.6.6",
-        "semver": "2.2.1",
-        "spdy": "1.19.3",
-        "tunnel-agent": "0.4.0",
-        "verror": "1.3.7"
+        "assert-plus": "^0.1.5",
+        "backoff": "^2.3.0",
+        "bunyan": "^0.23.1",
+        "csv": "^0.4.0",
+        "deep-equal": "^0.2.1",
+        "escape-regexp-component": "^1.0.2",
+        "formidable": "^1.0.14",
+        "http-signature": "^0.10.0",
+        "keep-alive-agent": "^0.0.1",
+        "lru-cache": "^2.5.0",
+        "mime": "^1.2.11",
+        "negotiator": "^0.4.5",
+        "node-uuid": "^1.4.1",
+        "once": "^1.3.0",
+        "qs": "^0.6.6",
+        "semver": "^2.3.0",
+        "spdy": "^1.26.5",
+        "tunnel-agent": "^0.4.0",
+        "verror": "^1.4.0"
     },
     "optionalDependencies": {
-        "dtrace-provider": "0.2.8"
+        "dtrace-provider": "^0.2.8"
     },
     "devDependencies": {
-        "cover": "0.2.9",
-        "filed": "0.1.0",
-        "nodeunit": "0.8.6",
-        "watershed": "0.3.0"
+        "cover": "^0.2.9",
+        "filed": "^0.1.0",
+        "nodeunit": "^0.9.0",
+        "watershed": "^0.3.0"
     },
     "scripts": {
         "test": "nodeunit ./test"
