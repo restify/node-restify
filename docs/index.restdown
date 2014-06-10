@@ -961,6 +961,10 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
+The above `route` and `directory` combination will serve a file located in  
+`./documentation/v1/docs/current/index.html` when you attempt to hit 
+`http://localhost:8080/docs/current/`.
+
 The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
 provide a `default` parameter such as index.html for any directory that
