@@ -562,6 +562,45 @@ attributes `code` and `message`.  For example, here's a built-in RestError:
 
 The built-in restify errors are:
 
+* HttpError
+* BadRequestError
+* UnauthorizedError
+* PaymentRequiredError
+* ForbiddenError
+* NotFoundError
+* MethodNotAllowedError
+* NotAcceptableError
+* ProxyAuthenticationRequiredError
+* RequestTimeoutError
+* ConflictError
+* GoneError
+* LengthRequiredError
+* PreconditionFailedError
+* RequestEntityTooLargeError
+* RequesturiTooLargeError
+* UnsupportedMediaTypeError
+* RequestedRangeNotSatisfiableError
+* ExpectationFailedError
+* ImATeapotError
+* UnprocessableEntityError
+* LockedError
+* FailedDependencyError
+* UnorderedCollectionError
+* UpgradeRequiredError
+* PreconditionRequiredError
+* TooManyRequestsError
+* RequestHeaderFieldsTooLargeError
+* InternalServerError
+* NotImplementedError
+* BadGatewayError
+* ServiceUnavailableError
+* GatewayTimeoutError
+* HttpVersionNotSupportedError
+* VariantAlsoNegotiatesError
+* InsufficientStorageError
+* BandwidthLimitExceededError
+* NotExtendedError
+* NetworkAuthenticationRequiredError
 * RestError
 * BadDigestError
 * BadMethodError
