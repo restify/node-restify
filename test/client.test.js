@@ -36,7 +36,7 @@ function sendJson(req, res, next) {
 
 
 function sendText(req, res, next) {
-    var text = 'hello ' + (req.params.hello || req.params.name || ''); 
+    var text = 'hello ' + (req.params.hello || req.params.name || '');
 
     if (req.headers['range']){
         var matched = req.headers['range'].match(/bytes=([0-9]+)-([0-9]*)/);
@@ -817,6 +817,49 @@ test('create base client with url instead of opts', function(t) {
   client.agent = false;
 
   client.get('/str/mcavage', function (err, req, res, data) {
+    req.on('result', function(err, res) {
+        res.body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            res.body += chunk;
+        });
+
+        res.on('end', function() {
+            t.equal(res.body, '"hello mcavage"');
+            t.end();
+        });
+    });
+  });
+});
+
+
+test('create JSON client with a path prefix and trailing slash', function (t) {
+  var client = restify.createJsonClient({url: 'http://127.0.0.1:' + PORT + '/json/' });
+  client.agent = false;
+
+  client.get('/mcavage', function (err, req, res, obj) {
+      t.deepEqual(obj, {hello: 'mcavage'});
+      t.end();
+  });
+});
+
+
+test('create JSON client with a path prefix', function (t) {
+  var client = restify.createJsonClient({url: 'http://127.0.0.1:' + PORT + '/json' });
+  client.agent = false;
+
+  client.get('/mcavage', function (err, req, res, obj) {
+      t.deepEqual(obj, {hello: 'mcavage'});
+      t.end();
+  });
+});
+
+
+test('create base client with a path prefix', function(t) {
+  var client = restify.createClient({url: 'http://127.0.0.1:' + PORT + '/str' });
+  client.agent = false;
+
+  client.get('/mcavage', function (err, req, res, data) {
     req.on('result', function(err, res) {
         res.body = '';
         res.setEncoding('utf8');
