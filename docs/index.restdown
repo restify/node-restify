@@ -334,7 +334,31 @@ You can default the versions on routes by passing in a version field at
 server creation time.  Lastly, you can support multiple versions in the API
 by using an array:
 
-      server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
+      server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, sendV2);
+
+In this case you may need to know more information such as what the
+original requested version string was, and what the matching
+version from the routes supported version array was. Two methods make
+this info available:
+
+    var PATH = '/version/test';
+    server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, function (req) {
+      res.send(200, {
+        requestedVersion: req.version(),
+        matchedVersion: req.matchedVersion()
+      });
+    });
+
+Hitting this route:
+
+    $ curl -s -H 'accept-version: <2.2.0' localhost:8080/version/test | json
+    {
+      "requestedVersion": "<2.2.0",
+      "matchedVersion": "2.1.0"
+    }
+
+
+In response to the above
 
 ## Upgrade Requests
 
@@ -961,8 +985,8 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The above `route` and `directory` combination will serve a file located in  
-`./documentation/v1/docs/current/index.html` when you attempt to hit 
+The above `route` and `directory` combination will serve a file located in
+`./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`.
 
 The plugin will enforce that all files under `directory` are served. The
