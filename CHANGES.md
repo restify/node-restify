@@ -6,6 +6,8 @@
 - #614 do not compute the MD5 Hash of a partial content
 - #516 Allow an `options` object to be passed into the authorization plugin
 - Updating dependencies
+- #626 Add more built-in errors to doc
+- #460 Provide direct access to https server options if needed
 
 ## 2.8.1
 
