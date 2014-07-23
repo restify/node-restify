@@ -1271,6 +1271,28 @@ test('content-type routing params only', function (t) {
     });
 });
 
+test('malformed content type', function (t) {
+    SERVER.post({
+        name: 'foo',
+        path: '/',
+        contentType: 'application/json'
+    }, function (req, res, next) {
+        res.send(201);
+    });
+
+    var opts = {
+        path: '/',
+        headers: {
+            'content-type': 'boom'
+        }
+    };
+
+    CLIENT.post(opts, {}, function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 415);
+        t.end();
+    });
+});
 
 test('gh-193 basic', function (t) {
     SERVER.get({
