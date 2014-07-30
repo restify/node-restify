@@ -324,8 +324,8 @@ Try hitting with:
 In the first case, we didn't specify an `Accept-Version` header
 at all, so restify treats that like sending a `*`. Much as not sending
 an `Accept` header means the client gets the server's choice. Restify
-will choose the first matching route, in the order specified in the
-code. In the second case, we explicitly asked for for V1, which got
+will choose this highest matching route.
+In the second case, we explicitly asked for for V1, which got
 us the same response, but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an `Accept` header, so we got a JSON response).  Which
