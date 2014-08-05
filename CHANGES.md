@@ -8,6 +8,7 @@
 - Updating dependencies
 - #626 Add more built-in errors to doc
 - #460 Provide direct access to https server options if needed
+- #656 update qs
 
 ## 2.8.1
 
