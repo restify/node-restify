@@ -22,21 +22,35 @@ before(function(callback) {
     try {
         SERVER = restify.createServer();
         SERVER.get({
-            path: '/',
+            path: '/hello',
             host: 'subdomain1.example.com'
         }, function(req, res, next) {
             res.end('hello from subdomain 1');
             next();
         });
         SERVER.get({
-            path: '/',
+            path: '/baz',
+            host: 'subdomain1.example.com'
+        }, function(req, res, next) {
+            res.end('baz from subdomain 1');
+            next();
+        });
+        SERVER.get({
+            path: '/hello',
             host: 'subdomain2.example.com'
         }, function(req, res, next) {
             res.end('hello from subdomain 2');
             next();
         });
+        SERVER.get({
+            path: '/bar',
+            host: 'subdomain2.example.com'
+        }, function(req, res, next) {
+            res.end('bar from subdomain 2');
+            next();
+        });
         SERVER.get('/foo', function(req, res, next) {
-            res.end('hello from foo');
+            res.end('foo from any domain');
             next();
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
@@ -65,20 +79,56 @@ after(function(callback) {
     }
 });
 
-test('request for / in subdomain 1', function(t) {
+test('request for /hello in subdomain 1', function(t) {
     CLIENT.headers['Host'] = 'subdomain1.example.com';
-    CLIENT.get('/', function(err, req, res, data) {
+    CLIENT.get('/hello', function(err, req, res, data) {
         t.ifError(err);
         t.equal('hello from subdomain 1', data);
         t.end();
     });
 });
 
-test('request for / in subdomain 2', function(t) {
+test('request for /bar in subdomain 1', function(t) {
+    CLIENT.headers['Host'] = 'subdomain1.example.com';
+    CLIENT.get('/bar', function(err, req, res, data) {
+        // t.ifError(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+test('request for /bar in subdomain 2', function(t) {
     CLIENT.headers['Host'] = 'subdomain2.example.com';
-    CLIENT.get('/', function(err, req, res, data) {
+    CLIENT.get('/bar', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal('bar from subdomain 2', data);
+        t.end();
+    });
+});
+
+test('request for /hello in subdomain 2', function(t) {
+    CLIENT.headers['Host'] = 'subdomain2.example.com';
+    CLIENT.get('/hello', function(err, req, res, data) {
         t.ifError(err);
         t.equal('hello from subdomain 2', data);
+        t.end();
+    });
+});
+
+test('request for /baz in subdomain 2', function(t) {
+    CLIENT.headers['Host'] = 'subdomain2.example.com';
+    CLIENT.get('/baz', function(err, req, res, data) {
+        // t.ifError(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+test('request for /baz in subdomain 1', function(t) {
+    CLIENT.headers['Host'] = 'subdomain1.example.com';
+    CLIENT.get('/baz', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal('baz from subdomain 1', data);
         t.end();
     });
 });
@@ -87,7 +137,7 @@ test('request for /foo in subdomain 1', function(t) {
     CLIENT.headers['Host'] = 'subdomain1.example.com';
     CLIENT.get('/foo', function(err, req, res, data) {
         t.ifError(err);
-        t.equal('hello from foo', data);
+        t.equal('foo from any domain', data);
         t.end();
     });
 });
@@ -96,7 +146,7 @@ test('request for /foo in subdomain 2', function(t) {
     CLIENT.headers['Host'] = 'subdomain2.example.com';
     CLIENT.get('/foo', function(err, req, res, data) {
         t.ifError(err);
-        t.equal('hello from foo', data);
+        t.equal('foo from any domain', data);
         t.end();
     });
 });
