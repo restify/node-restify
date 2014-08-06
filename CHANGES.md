@@ -2,6 +2,8 @@
 
 ## not yet released
 
+## 2.8.2
+
 - #619 Default to url, if string provided to createClient
 - #614 do not compute the MD5 Hash of a partial content
 - #516 Allow an `options` object to be passed into the authorization plugin
