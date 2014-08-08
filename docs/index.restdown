@@ -975,6 +975,10 @@ current request id filled in, along with any other parameters you define.
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
+This logger can be used normally, with [req.log](#Request-API).
+
+This plugin does _not_ log each individual request. Use the Audit Logging
+plugin or a custom middleware for that use.
 
 ### GzipResponse
 
