@@ -257,6 +257,22 @@ Routes can also accept more than one handler function. For instance:
         }
     );
 
+### Multiple Methods
+
+An alias can be defined to use different methods on the same path.
+To prevent repetition you can use:
+
+    var route = server.route('/foo/:id');
+
+    route.get(function(req, res, next) {
+      return fs.createReadStream('README.md')).pipe(res);
+    });
+
+    route.post(function(req, res, next) {
+      console.log('Read Only')
+      return next;
+    });
+
 ### Hypermedia
 
 If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.
@@ -999,8 +1015,8 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The above `route` and `directory` combination will serve a file located in  
-`./documentation/v1/docs/current/index.html` when you attempt to hit 
+The above `route` and `directory` combination will serve a file located in
+`./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`.
 
 The plugin will enforce that all files under `directory` are served. The
