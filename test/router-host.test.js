@@ -88,6 +88,24 @@ test('request for /hello in subdomain 1', function(t) {
     });
 });
 
+test('request for /hello in subdomain 2', function(t) {
+    CLIENT.headers['Host'] = 'subdomain2.example.com';
+    CLIENT.get('/hello', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal('hello from subdomain 2', data);
+        t.end();
+    });
+});
+
+test('request for /hello in subdomain 1 (cache bust)', function(t) {
+    CLIENT.headers['Host'] = 'subdomain1.example.com';
+    CLIENT.get('/hello', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal('hello from subdomain 1', data);
+        t.end();
+    });
+});
+
 test('request for /bar in subdomain 1', function(t) {
     CLIENT.headers['Host'] = 'subdomain1.example.com';
     CLIENT.get('/bar', function(err, req, res, data) {
@@ -102,15 +120,6 @@ test('request for /bar in subdomain 2', function(t) {
     CLIENT.get('/bar', function(err, req, res, data) {
         t.ifError(err);
         t.equal('bar from subdomain 2', data);
-        t.end();
-    });
-});
-
-test('request for /hello in subdomain 2', function(t) {
-    CLIENT.headers['Host'] = 'subdomain2.example.com';
-    CLIENT.get('/hello', function(err, req, res, data) {
-        t.ifError(err);
-        t.equal('hello from subdomain 2', data);
         t.end();
     });
 });
