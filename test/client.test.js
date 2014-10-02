@@ -36,18 +36,21 @@ function sendJson(req, res, next) {
 
 
 function sendText(req, res, next) {
-    var text = 'hello ' + (req.params.hello || req.params.name || ''); 
+    var text = 'hello ' + (req.params.hello || req.params.name || '');
 
-    if (req.headers['range']){
+    if (req.headers['range']) {
+        /* JSSTYLED */
         var matched = req.headers['range'].match(/bytes=([0-9]+)-([0-9]*)/);
-        var start = parseInt(matched[1]);
-        var length = (matched[2]) ? parseInt(matched[2]) - start : undefined;
+        var start = parseInt(matched[1], 10);
+        var length = ((matched[2]) ?
+                      parseInt(matched[2], 10) - start :
+                      undefined);
         var hash = crypto.createHash('md5');
         hash.update(text, 'utf8');
         res.header('content-md5', hash.digest('base64'));
         res.status(206);
         text = text.substr(start, length);
-    };
+    }
 
     res.send(text);
     next();
@@ -770,64 +773,64 @@ test('secure client connection with timeout', function (t) {
 
 
 test('create JSON client with url instead of opts', function (t) {
-  var client = restify.createJsonClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+    var client = restify.createJsonClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/json/mcavage', function (err, req, res, obj) {
-      t.deepEqual(obj, {hello: 'mcavage'});
-      t.end();
-  });
+    client.get('/json/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
 });
 
 
 test('create string client with url instead of opts', function (t) {
-  var client = restify.createStringClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+    var client = restify.createStringClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/str/mcavage', function (err, req, res, data) {
-      t.equal(data, 'hello mcavage');
-      t.end();
-  });
+    client.get('/str/mcavage', function (err, req, res, data) {
+        t.equal(data, 'hello mcavage');
+        t.end();
+    });
 });
 
 
-test('create http client with url instead of opts', function(t) {
-  var client = restify.createHttpClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+test('create http client with url instead of opts', function (t) {
+    var client = restify.createHttpClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/str/mcavage', function (err, req) {
-      req.on('result', function(err, res) {
-          res.body = '';
-          res.setEncoding('utf8');
-          res.on('data', function(chunk) {
-              res.body += chunk;
-          });
+    client.get('/str/mcavage', function (err, req) {
+        req.on('result', function (err2, res) {
+            res.body = '';
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                res.body += chunk;
+            });
 
-          res.on('end', function() {
-              t.equal(res.body, '"hello mcavage"');
-              t.end();
-          });
-      });
-  });
-});
-
-
-test('create base client with url instead of opts', function(t) {
-  var client = restify.createClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
-
-  client.get('/str/mcavage', function (err, req, res, data) {
-    req.on('result', function(err, res) {
-        res.body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-            res.body += chunk;
-        });
-
-        res.on('end', function() {
-            t.equal(res.body, '"hello mcavage"');
-            t.end();
+            res.on('end', function () {
+                t.equal(res.body, '"hello mcavage"');
+                t.end();
+            });
         });
     });
-  });
+});
+
+
+test('create base client with url instead of opts', function (t) {
+    var client = restify.createClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
+
+    client.get('/str/mcavage', function (err, req) {
+        req.on('result', function (err2, res) {
+            res.body = '';
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                res.body += chunk;
+            });
+
+            res.on('end', function () {
+                t.equal(res.body, '"hello mcavage"');
+                t.end();
+            });
+        });
+    });
 });
