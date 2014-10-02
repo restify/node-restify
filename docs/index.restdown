@@ -923,7 +923,8 @@ supported.
             });
         },
         keepExtensions: false,
-        uploadDir: os.tmpdir()
+        uploadDir: os.tmpdir(),
+        multiples: true
      }));
 
 Options:
@@ -959,6 +960,7 @@ Options:
   * `uploadDir` - Where uploaded files are intermediately stored during transfer
     before the contents is mapped into `req.params`. Does nothing
     if `multipartFileHandler` is defined.
+  * `multiples` - if you want to support html5 multiple attribute in upload fields.
 
 ### RequestLogger
 
