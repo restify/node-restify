@@ -920,7 +920,8 @@ supported.
         },
         keepExtensions: false,
         uploadDir: os.tmpdir(),
-        multiples: true
+        multiples: true,
+        hash: 'sha1'
      }));
 
 Options:
@@ -957,6 +958,7 @@ Options:
     before the contents is mapped into `req.params`. Does nothing
     if `multipartFileHandler` is defined.
   * `multiples` - if you want to support html5 multiple attribute in upload fields.
+  * `hash` - If you want checksums calculated for incoming files, set this to either `sha1` or `md5`.
 
 ### RequestLogger
 
