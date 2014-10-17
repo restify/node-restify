@@ -653,6 +653,7 @@ server as if it were a "raw" node server:
             res.writeHead(200);
             res.end(data);
             next();
+        });
     });
 
 
