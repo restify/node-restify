@@ -531,7 +531,7 @@ test('POST raw', function (t) {
 });
 
 test('GH-20 connectTimeout', function (t) {
-    var client = restify.createClient({
+    var client = restifyClients.createClient({
         url: 'http://169.254.1.10',
         type: 'http',
         accept: 'text/plain',
@@ -671,7 +671,7 @@ test('GH-203 GET json, body is tabs', function (t) {
 
 
 test('don\'t sign a request', function (t) {
-    var client = restify.createClient({
+    var client = restifyClients.createClient({
         url: 'http://127.0.0.1:' + PORT,
         type: 'string',
         accept: 'text/plain',
@@ -700,7 +700,7 @@ test('sign a request', function (t) {
                 'present in request');
         request.setHeader('Awesome-Signature', 'Gusty Winds ' + gw);
     };
-    var client = restify.createClient({
+    var client = restifyClients.createClient({
         url: 'http://127.0.0.1:' + PORT,
         type: 'string',
         accept: 'text/plain',
@@ -757,7 +757,7 @@ test('secure client connection with timeout', function (t) {
     });
     server.listen(8443);
 
-    var client = restify.createStringClient({url: 'https://127.0.0.1:8443', connectTimeout: 2000, rejectUnauthorized: false});
+    var client = restifyClients.createStringClient({url: 'https://127.0.0.1:8443', connectTimeout: 2000, rejectUnauthorized: false});
     var timeout = setTimeout(function () {
         t.ok(false, 'timed out');
         t.end();
@@ -775,7 +775,7 @@ test('secure client connection with timeout', function (t) {
 
 
 test('create JSON client with url instead of opts', function (t) {
-    var client = restify.createJsonClient('http://127.0.0.1:' + PORT);
+    var client = restifyClients.createJsonClient('http://127.0.0.1:' + PORT);
     client.agent = false;
 
     client.get('/json/mcavage', function (err, req, res, obj) {
@@ -786,7 +786,7 @@ test('create JSON client with url instead of opts', function (t) {
 
 
 test('create string client with url instead of opts', function (t) {
-    var client = restify.createStringClient('http://127.0.0.1:' + PORT);
+    var client = restifyClients.createStringClient('http://127.0.0.1:' + PORT);
     client.agent = false;
 
     client.get('/str/mcavage', function (err, req, res, data) {
@@ -797,7 +797,7 @@ test('create string client with url instead of opts', function (t) {
 
 
 test('create http client with url instead of opts', function (t) {
-    var client = restify.createHttpClient('http://127.0.0.1:' + PORT);
+    var client = restifyClients.createHttpClient('http://127.0.0.1:' + PORT);
     client.agent = false;
 
     client.get('/str/mcavage', function (err, req) {
@@ -818,7 +818,7 @@ test('create http client with url instead of opts', function (t) {
 
 
 test('create base client with url instead of opts', function (t) {
-    var client = restify.createClient('http://127.0.0.1:' + PORT);
+    var client = restifyClients.createClient('http://127.0.0.1:' + PORT);
     client.agent = false;
 
     client.get('/str/mcavage', function (err, req) {
@@ -830,6 +830,48 @@ test('create base client with url instead of opts', function (t) {
             });
 
             res.on('end', function () {
+                t.equal(res.body, '"hello mcavage"');
+                t.end();
+            });
+        });
+    });
+});
+
+test('create JSON client with a path prefix and trailing slash', function (t) {
+    var client = restifyClients.createJsonClient({url: 'http://127.0.0.1:' + PORT + '/json/' });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
+});
+
+
+test('create JSON client with a path prefix', function (t) {
+    var client = restifyClients.createJsonClient({url: 'http://127.0.0.1:' + PORT + '/json' });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
+});
+
+
+test('create base client with a path prefix', function(t) {
+    var client = restifyClients.createClient({url: 'http://127.0.0.1:' + PORT + '/str' });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, data) {
+        req.on('result', function(err, res) {
+            res.body = '';
+            res.setEncoding('utf8');
+            res.on('data', function(chunk) {
+                res.body += chunk;
+            });
+
+            res.on('end', function() {
                 t.equal(res.body, '"hello mcavage"');
                 t.end();
             });
