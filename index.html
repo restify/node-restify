@@ -19,7 +19,7 @@
     <li><div><a href="#Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></a></div></li>
     <li><div><a href="#Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></a></div></li>
     <li><div><a href="#Routing"><span class="method name"><span class="name">Routing</span></span></a></div></li>
-    <li><div><a href="#Upgrade-Requests"><span class="method name"><span class="name">Upgrade Requests</span></span></a></div></li>
+    <li><div><a href="#Upgrade-Requests"><span  class="method name"><span class="name">Upgrade Requests</span></span></a></div></li>
     <li><div><a href="#Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></a></div></li>
     <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
     <li><div><a href="#Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></a></div></li>
@@ -319,8 +319,7 @@ internally, and may be revisited someday).</li>
 
 <p>If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.</p>
 
-<p><code>js
-server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
+<p><code>server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
 
 <p>// in another route
 res.send({
