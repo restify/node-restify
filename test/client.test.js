@@ -6,7 +6,9 @@ var crypto = require('crypto');
 
 var uuid = require('node-uuid');
 
-var restify = require('../lib');
+var restifyClients = require('../lib');
+var restify = require('restify');
+
 
 if (require.cache[__dirname + '/lib/helper.js'])
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -139,17 +141,17 @@ before(function (callback) {
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
 
-            JSON_CLIENT = restify.createJsonClient({
+            JSON_CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false
             });
-            STR_CLIENT = restify.createStringClient({
+            STR_CLIENT = restifyClients.createStringClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false
             });
-            RAW_CLIENT = restify.createClient({
+            RAW_CLIENT = restifyClients.createClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false,
@@ -158,7 +160,7 @@ before(function (callback) {
                 }
             });
 
-            TIMEOUT_CLIENT = restify.createStringClient({
+            TIMEOUT_CLIENT = restifyClients.createStringClient({
                 url: 'http://127.0.0.1:' + PORT,
                 requestTimeout: 150,
                 retry: false
