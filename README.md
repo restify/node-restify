@@ -1,4 +1,6 @@
-# restify
+# restify-clients
+
+A minimal fork of restify just for the client classes
 
 [![Build Status](https://travis-ci.org/mcavage/node-restify.png)](https://travis-ci.org/mcavage/node-restify)
 [![Gitter chat](https://badges.gitter.im/mcavage/node-restify.png)](https://gitter.im/mcavage/node-restify)
