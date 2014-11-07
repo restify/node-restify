@@ -1617,3 +1617,39 @@ test('explicitly sending a 403 on error', function (t) {
         t.end();
     });
 });
+
+test('Route with a valid RegExp params', function (t) {
+
+    SERVER.get({
+        name: 'regexp_param1',
+        path: '/foo/:id([0-9]+)'
+    }, function (req, res, next) {
+        t.equal(req.params.id, '0123456789');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/foo/0123456789', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('Route with an unvalid RegExp params', function (t) {
+
+    SERVER.get({
+        name: 'regexp_param2',
+        path: '/foo/:id([0-9]+)'
+    }, function (req, res, next) {
+        t.equal(req.params.id, 'A__M');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/foo/A__M', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
