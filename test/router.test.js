@@ -78,9 +78,9 @@ test('render route (with sub-regex param)', function (t) {
     
     try {
         link = server.router.render('my-route', {code: '111'});
-        t.fail("RegExp not used")
+        t.fail("RegExp should fail");
     } catch (ex) {
-        t.equal(ex, 'Error: Route <cities> is missing parameter <state>');
+        t.equal(ex, 'Error: Unvalid value <111> for key <code>. Regular expression not matched');
     }
     t.end();
 });
