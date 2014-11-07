@@ -76,12 +76,8 @@ test('render route (with sub-regex param)', function (t) {
     var link = server.router.render('my-route', {code: 'FR'});
     t.equal(link, '/countries/FR');
     
-    try {
-        link = server.router.render('my-route', {code: '111'});
-        t.fail("RegExp should fail");
-    } catch (ex) {
-        t.equal(ex, 'Error: Unvalid value <111> for key <code>. Regular expression not matched');
-    }
+    link = server.router.render('my-route', {code: '111'});
+    t.equal(link, '/countries/111');
     t.end();
 });
 
