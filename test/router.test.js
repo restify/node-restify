@@ -81,6 +81,19 @@ test('render route (with sub-regex param)', function (t) {
     t.end();
 });
 
+test('render route (with nested sub-regex param)', function (t) {
+
+    var server = restify.createServer();
+    server.get({name: 'my-route', path: '/code/:code(([1-9][0-9]*)|([a-c]{2,3}))'}, mockResponse);
+
+    var link = server.router.render('my-route', {code: '123456789'});
+    t.equal(link, '/code/123456789');
+    
+    link = server.router.render('my-route', {code: 'aac'});
+    t.equal(link, '/code/aac');
+    t.end();
+});
+
 test('render route (with encode)', function (t) {
 
     var server = restify.createServer();
