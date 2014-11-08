@@ -9,3 +9,4 @@ examples/todoapp/node_modules
 *.tgz
 build
 docs/*.json
+/nbproject
