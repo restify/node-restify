@@ -319,8 +319,7 @@ internally, and may be revisited someday).</li>
 
 <p>If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.</p>
 
-<p>```js
-server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
+<p><code>server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
 
 <p>// in another route
 res.send({
@@ -328,7 +327,7 @@ res.send({
   // render a URL by specifying the route name and parameters
   capital: server.router.render('city', {slug: 'canberra'}, {details: true})
 });
-```</p>
+</code></p>
 
 <p>Which returns:</p>
 
