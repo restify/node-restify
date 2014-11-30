@@ -772,6 +772,11 @@ a hook to change request headers and the like if you need to. Note that
       return next();
     });
 
+You can also clean up URLs before routes are matched with the built in
+`restify.pre.sanitizePath`. This [re-implements v1.4 behaviour](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters)
+
+    server.pre(restify.pre.sanitizePath());
+
 #### use()
 
 Allows you to add in handlers that run no matter what the route.
