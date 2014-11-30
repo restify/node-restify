@@ -383,6 +383,34 @@ test('CORS Preflight - invalid origin', function (t) {
     }).end();
 });
 
+test('CORS Preflight - any origin', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ 'http://somesite.local', '*' ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: 'localhost',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            'Origin': 'http://anysite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'http://anysite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
 test('RegExp ok', function (t) {
     SERVER.get(/\/foo/, function tester(req, res, next) {
         res.send('hi there');
