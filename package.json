@@ -29,12 +29,13 @@
         "Diego Torres",
         "Mike Williams",
         "Brian Pin",
-        "Ben Doerr"
+        "Ben Doerr",
+        "Patrick Mooney"
     ],
     "name": "restify",
     "homepage": "http://mcavage.github.com/node-restify",
     "description": "REST framework",
-    "version": "2.8.3",
+    "version": "2.8.4",
     "repository": {
         "type": "git",
         "url": "git://github.com/mcavage/node-restify.git"

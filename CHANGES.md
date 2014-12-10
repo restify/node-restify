@@ -2,6 +2,15 @@
 
 ## not yet released
 
+## 2.8.4
+
+- Update dtrace-provider, bunyan and backoff
+- Fix request URL cache interaction with dtrace probes
+
+## 2.8.3
+
+- Support html5 multiple file uploads
+
 ## 2.8.2
 
 - #619 Default to url, if string provided to createClient
