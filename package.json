@@ -51,8 +51,8 @@
     },
     "dependencies": {
         "assert-plus": "^0.1.5",
-        "backoff": "^2.3.0",
-        "bunyan": "^0.23.1",
+        "backoff": "^2.4.0",
+        "bunyan": "^1.2.3",
         "csv": "^0.4.0",
         "deep-equal": "^0.2.1",
         "escape-regexp-component": "^1.0.2",
@@ -71,7 +71,7 @@
         "verror": "^1.4.0"
     },
     "optionalDependencies": {
-        "dtrace-provider": "^0.2.8"
+        "dtrace-provider": "^0.3.1"
     },
     "devDependencies": {
         "cover": "^0.2.9",
