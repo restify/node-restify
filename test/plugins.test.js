@@ -396,6 +396,31 @@ test('body json ok (no params)', function (t) {
     });
 });
 
+test('body json ok (null params)', function (t) {
+    var STRING_CLIENT = restify.createStringClient({
+        url: 'http://127.0.0.1:' + PORT,
+        dtrace: helper.dtrace,
+        retry: false,
+        agent: false,
+        contentType: 'application/json',
+        accept: 'application/json'
+    });
+
+    SERVER.post('/body/:id',
+        restify.bodyParser(),
+        function (req, res, next) {
+            t.equal(req.params.id, 'foo');
+            t.equal(req.params.name, 'markc');
+            res.send();
+            next();
+        });
+
+    STRING_CLIENT.post('/body/foo?name=markc', 'null', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
 
 test('GH-318 get request with body (default)', function (t) {
     SERVER.get('/getWithoutBody',
