@@ -16,24 +16,24 @@
   <li><div><a href="#installation">Installation</a></div></li>
   <li><div><a href="#server-api">Server API</a></div>
   <ul>
-    <li><div><a href="#Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></a></div></li>
-    <li><div><a href="#Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></a></div></li>
-    <li><div><a href="#Routing"><span class="method name"><span class="name">Routing</span></span></a></div></li>
-    <li><div><a href="#Upgrade-Requests"><span class="method name"><span class="name">Upgrade Requests</span></span></a></div></li>
-    <li><div><a href="#Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></a></div></li>
-    <li><div><a href="#Error-handling"><span class="method name"><span class="name">Error handling</span></span></a></div></li>
-    <li><div><a href="#Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></a></div></li>
-    <li><div><a href="#Server-API"><span class="method name"><span class="name">Server API</span></span></a></div></li>
-    <li><div><a href="#Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></a></div></li>
-    <li><div><a href="#Request-API"><span class="method name"><span class="name">Request API</span></span></a></div></li>
-    <li><div><a href="#Response-API"><span class="method name"><span class="name">Response API</span></span></a></div></li>
-    <li><div><a href="#DTrace"><span class="method name"><span class="name">DTrace</span></span></a></div></li>
+    <li><div><a href="#creating-a-server">Creating a Server</a></div></li>
+    <li><div><a href="#common-handlers-serveruse">Common handlers: server.use()</a></div></li>
+    <li><div><a href="#routing">Routing</a></div></li>
+    <li><div><a href="#upgrade-requests">Upgrade Requests</a></div></li>
+    <li><div><a href="#content-negotiation">Content Negotiation</a></div></li>
+    <li><div><a href="#error-handling">Error handling</a></div></li>
+    <li><div><a href="#socketio">Socket.IO</a></div></li>
+    <li><div><a href="#server-api-2">Server API</a></div></li>
+    <li><div><a href="#bundled-plugins">Bundled Plugins</a></div></li>
+    <li><div><a href="#request-api">Request API</a></div></li>
+    <li><div><a href="#response-api">Response API</a></div></li>
+    <li><div><a href="#dtrace">DTrace</a></div></li>
   </ul></li>
   <li><div><a href="#client-api">Client API</a></div>
   <ul>
-    <li><div><a href="#JsonClient"><span class="method name"><span class="name">JsonClient</span></span></a></div></li>
-    <li><div><a href="#StringClient"><span class="method name"><span class="name">StringClient</span></span></a></div></li>
-    <li><div><a href="#HttpClient"><span class="method name"><span class="name">HttpClient</span></span></a></div></li>
+    <li><div><a href="#jsonclient">JsonClient</a></div></li>
+    <li><div><a href="#stringclient">StringClient</a></div></li>
+    <li><div><a href="#httpclient">HttpClient</a></div></li>
   </ul></li>
 </ul>
 
@@ -165,7 +165,7 @@ is, it sets the Connection header to "close" and removes the "Content-Length" he
 
 <p>See the <a href="#pre">pre</a> method for more information.</p>
 
-<h2 id="Creating-a-Server"><span class="method name"><span class="name">Creating a Server</span></span></h2>
+<h2 id="creating-a-server">Creating a Server</h2>
 
 <p>Creating a server is straightforward, as you simply invoke the
 <code>createServer</code> API, which takes an options object with the options listed
@@ -194,10 +194,11 @@ server.listen(8080);
 <tr><td>spdy</td><td>Object</td><td>Any options accepted by <a href="https://github.com/indutny/node-spdy">node-spdy</a></td></tr>
 <tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
 <tr><td>handleUpgrades</td><td>Boolean</td><td>Hook the <code>upgrade</code> event from the node HTTP server, pushing <code>Connection: Upgrade</code> requests through the regular request handling chain; defaults to <code>false</code></td></tr>
+<tr><td>httpsServerOptions</td><td>Object</td><td>Any options accepted by <a href="http://nodejs.org/api/https.html#https_https">node-https Server</a>. If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.</td></tr>
 </tbody>
 </table>
 
-<h2 id="Common-handlers:-server.use()"><span class="method name"><span class="name">Common handlers: server.use()</span></span></h2>
+<h2 id="common-handlers-serveruse">Common handlers: server.use()</h2>
 
 <p>A restify server has a <code>use()</code> method that takes handlers of
 the form <code>function (req, res, next)</code>.   Note that restify runs
@@ -209,7 +210,7 @@ some common handlers to run before any of your routes, issue calls to
 in any combination of direct functions (<code>function(res, res, next)</code>) and
 arrays of functions (<code>[function(req, res, next)]</code>).</p>
 
-<h2 id="Routing"><span class="method name"><span class="name">Routing</span></span></h2>
+<h2 id="routing">Routing</h2>
 
 <p>restify routing, in 'basic' mode, is pretty much identical to express/sinatra,
 in that HTTP verbs are used with a parameterized resource to determine
@@ -298,7 +299,7 @@ routing chain once (this is a limitation of the way routes are stored
 internally, and may be revisited someday).</li>
 </ul>
 
-<h3>Chaining Handlers</h3>
+<h3 id="chaining-handlers">Chaining Handlers</h3>
 
 <p>Routes can also accept more than one handler function. For instance:</p>
 
@@ -315,31 +316,29 @@ internally, and may be revisited someday).</li>
 );
 </code></pre>
 
-<h3>Hypermedia</h3>
+<h3 id="hypermedia">Hypermedia</h3>
 
 <p>If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.</p>
 
-<p>```js
-server.get({name: 'city', path: '/cities/:slug'}, /* ... */);</p>
+<pre><code>server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
 
-<p>// in another route
+// in another route
 res.send({
   country: 'Australia',
   // render a URL by specifying the route name and parameters
   capital: server.router.render('city', {slug: 'canberra'}, {details: true})
 });
-```</p>
+</code></pre>
 
 <p>Which returns:</p>
 
-<p><code>json
-{
+<pre><code>{
   "country": "Australia",
   "capital": "/cities/canberra?details=true"
 }
-</code></p>
+</code></pre>
 
-<h3>Versioned Routes</h3>
+<h3 id="versioned-routes">Versioned Routes</h3>
 
 <p>Most REST APIs tend to need versioning, and restify ships with support
 for <a href="http://semver.org/">semver</a> versioning in an <code>Accept-Version</code>
@@ -384,8 +383,8 @@ $ curl -s -H 'accept-version: ~3' localhost:8080/hello/mark | json
 <p>In the first case, we didn't specify an <code>Accept-Version</code> header
 at all, so restify treats that like sending a <code>*</code>. Much as not sending
 an <code>Accept</code> header means the client gets the server's choice. Restify
-will choose the first matching route, in the order specified in the
-code. In the second case, we explicitly asked for for V1, which got
+will choose this highest matching route.
+In the second case, we explicitly asked for for V1, which got
 us the same response, but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an <code>Accept</code> header, so we got a JSON response).  Which
@@ -398,7 +397,7 @@ by using an array:</p>
 <pre><code>  server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
 </code></pre>
 
-<h2 id="Upgrade-Requests"><span class="method name"><span class="name">Upgrade Requests</span></span></h2>
+<h2 id="upgrade-requests">Upgrade Requests</h2>
 
 <p>Incoming HTTP requests that contain a <code>Connection: Upgrade</code> header are treated
 somewhat differently by the node HTTP server.  If you want restify to push
@@ -439,7 +438,7 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 });
 </code></pre>
 
-<h2 id="Content-Negotiation"><span class="method name"><span class="name">Content Negotiation</span></span></h2>
+<h2 id="content-negotiation">Content Negotiation</h2>
 
 <p>If you're using <code>res.send()</code> restify will automatically select the
 content-type to respond with, by finding the first registered
@@ -512,7 +511,7 @@ res.write(body);
 res.end();
 </code></pre>
 
-<h2 id="Error-handling"><span class="method name"><span class="name">Error handling</span></span></h2>
+<h2 id="error-handling">Error handling</h2>
 
 <p>You can handle errors in restify a few different ways.  First, you can
 always just call <code>res.send(err)</code>.  You can also shorthand this in a
@@ -544,7 +543,7 @@ attribute, that will be used, otherwise a default of 500 will be used
 });
 </code></pre>
 
-<h3>HttpError</h3>
+<h3 id="httperror">HttpError</h3>
 
 <p>Now the obvious question is what that exactly does (in either case).
 restify tries to be programmer-friendly with errors by exposing all
@@ -593,7 +592,7 @@ the complete list, take a look at the
 <p>From that code above <code>418: I'm a teapot</code> would be <code>ImATeapotError</code>, as
 an example.</p>
 
-<h3>RestError</h3>
+<h3 id="resterror">RestError</h3>
 
 <p>Now, a common problem with REST APIs and HTTP is that they often end
 up needing to overload 400 and 409 to mean a bunch of different
@@ -633,21 +632,58 @@ Response-Time: 3
 <p>The built-in restify errors are:</p>
 
 <ul>
-<li>RestError</li>
-<li>BadDigestError</li>
-<li>BadMethodError</li>
-<li>InternalError</li>
-<li>InvalidArgumentError</li>
-<li>InvalidContentError</li>
-<li>InvalidCredentialsError</li>
-<li>InvalidHeaderError</li>
-<li>InvalidVersionError</li>
-<li>MissingParameterError</li>
-<li>NotAuthorizedError</li>
-<li>RequestExpiredError</li>
-<li>RequestThrottledError</li>
-<li>ResourceNotFoundError</li>
-<li>WrongAcceptError</li>
+<li>BadRequestError (400 Bad Request)</li>
+<li>UnauthorizedError (401 Unauthorized)</li>
+<li>PaymentRequiredError (402 Payment Required)</li>
+<li>ForbiddenError (403 Forbidden)</li>
+<li>NotFoundError (404 Not Found)</li>
+<li>MethodNotAllowedError (405 Method Not Allowed)</li>
+<li>NotAcceptableError (406 Not Acceptable)</li>
+<li>ProxyAuthenticationRequiredError (407 Proxy Authentication Required)</li>
+<li>RequestTimeoutError (408 Request Time-out)</li>
+<li>ConflictError (409 Conflict)</li>
+<li>GoneError (410 Gone)</li>
+<li>LengthRequiredError (411 Length Required)</li>
+<li>PreconditionFailedError (412 Precondition Failed)</li>
+<li>RequestEntityTooLargeError (413 Request Entity Too Large)</li>
+<li>RequesturiTooLargeError (414 Request-URI Too Large)</li>
+<li>UnsupportedMediaTypeError (415 Unsupported Media Type)</li>
+<li>RequestedRangeNotSatisfiableError (416 Requested Range Not Satisfiable)</li>
+<li>ExpectationFailedError (417 Expectation Failed)</li>
+<li>ImATeapotError (418 I'm a teapot)</li>
+<li>UnprocessableEntityError (422 Unprocessable Entity)</li>
+<li>LockedError (423 Locked)</li>
+<li>FailedDependencyError (424 Failed Dependency)</li>
+<li>UnorderedCollectionError (425 Unordered Collection)</li>
+<li>UpgradeRequiredError (426 Upgrade Required)</li>
+<li>PreconditionRequiredError (428 Precondition Required)</li>
+<li>TooManyRequestsError (429 Too Many Requests)</li>
+<li>RequestHeaderFieldsTooLargeError (431 Request Header Fields Too Large)</li>
+<li>InternalServerError (500 Internal Server Error)</li>
+<li>NotImplementedError (501 Not Implemented)</li>
+<li>BadGatewayError (502 Bad Gateway)</li>
+<li>ServiceUnavailableError (503 Service Unavailable)</li>
+<li>GatewayTimeoutError (504 Gateway Time-out)</li>
+<li>HttpVersionNotSupportedError (505 HTTP Version Not Supported)</li>
+<li>VariantAlsoNegotiatesError (506 Variant Also Negotiates)</li>
+<li>InsufficientStorageError (507 Insufficient Storage)</li>
+<li>BandwidthLimitExceededError (509 Bandwidth Limit Exceeded)</li>
+<li>NotExtendedError (510 Not Extended)</li>
+<li>NetworkAuthenticationRequiredError (511 Network Authentication Required)</li>
+<li>BadDigestError (400 Bad Request)</li>
+<li>BadMethodError (405 Method Not Allowed)</li>
+<li>InternalError (500 Internal Server Error)</li>
+<li>InvalidArgumentError (409 Conflict)</li>
+<li>InvalidContentError (400 Bad Request)</li>
+<li>InvalidCredentialsError (401 Unauthorized)</li>
+<li>InvalidHeaderError (400 Bad Request)</li>
+<li>InvalidVersionError (400 Bad Request)</li>
+<li>MissingParameterError (409 Conflict)</li>
+<li>NotAuthorizedError (403 Forbidden)</li>
+<li>RequestExpiredError (400 Bad Request)</li>
+<li>RequestThrottledError (429 Too Many Requests)</li>
+<li>ResourceNotFoundError (404 Not Found)</li>
+<li>WrongAcceptError (406 Not Acceptable)</li>
 </ul>
 
 <p>You can always add your own by subclassing <code>restify.RestError</code> like:</p>
@@ -673,7 +709,7 @@ from the stack trace (you don't <em>have</em> to do that, but you probably
 want it).  In the example above, we also set the name property so
 <code>console.log(new MyError());</code> looks correct.</p>
 
-<h2 id="Socket.IO"><span class="method name"><span class="name">Socket.IO</span></span></h2>
+<h2 id="socketio">Socket.IO</h2>
 
 <p>To use <a href="http://socket.io/">socket.io</a> with restify, just treat your restify
 server as if it were a "raw" node server:</p>
@@ -692,6 +728,7 @@ server.get('/', function indexHTML(req, res, next) {
         res.writeHead(200);
         res.end(data);
         next();
+    });
 });
 
 
@@ -707,15 +744,15 @@ server.listen(8080, function () {
 });
 </code></pre>
 
-<h2 id="Server-API"><span class="method name"><span class="name">Server API</span></span></h2>
+<h2 id="server-api-2">Server API</h2>
 
-<h3>Events</h3>
+<h3 id="events">Events</h3>
 
 <p>Restify servers emit all the events from the node
 <a href="http://nodejs.org/docs/latest/api/http.html#http_class_http_server">http.Server</a>
 and has several other events you want to listen on.</p>
 
-<h5>Event: 'NotFound'</h5>
+<h5 id="event-notfound">Event: 'NotFound'</h5>
 
 <p><code>function (request, response, cb) {}</code></p>
 
@@ -724,7 +761,7 @@ will emit this event. Note that restify checks for listeners on this
 event, and if there are none, responds with a default 404 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h4>Event: 'MethodNotAllowed'</h4>
+<h4 id="event-methodnotallowed">Event: 'MethodNotAllowed'</h4>
 
 <p><code>function (request, response, cb) {}</code></p>
 
@@ -734,7 +771,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 405 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h4>Event: 'VersionNotAllowed'</h4>
+<h4 id="event-versionnotallowed">Event: 'VersionNotAllowed'</h4>
 
 <p><code>function (request, response, cb) {}</code></p>
 
@@ -744,7 +781,7 @@ event. Note that restify checks for listeners on this event, and if
 there are none, responds with a default 400 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h4>Event: UnsupportedMediaType'</h4>
+<h4 id="event-unsupportedmediatype">Event: UnsupportedMediaType'</h4>
 
 <p><code>function (request, response, cb) {}</code></p>
 
@@ -753,7 +790,7 @@ mismatch, restify will emit this event. Note that restify checks for listeners
 on this event, and if there are none, responds with a default 415 handler.  It
 is expected that if you listen for this event, you respond to the client.</p>
 
-<h4>Event: 'after'</h4>
+<h4 id="event-after">Event: 'after'</h4>
 
 <p><code>function (request, response, route, error) {}</code></p>
 
@@ -765,7 +802,7 @@ be <code>null</code>. If you have registered your own listeners for those, this 
 will not be fired unless you invoke the <code>cb</code> argument that is provided with
 them.</p>
 
-<h4>Event: 'uncaughtException'</h4>
+<h4 id="event-uncaughtexception">Event: 'uncaughtException'</h4>
 
 <p><code>function (request, response, route, error) {}</code></p>
 
@@ -774,7 +811,7 @@ The default behavior is to just call <code>res.send(error)</code>, and let the b
 in restify handle transforming, but you can override to whatever you want
 here.</p>
 
-<h3>Properties</h3>
+<h3 id="properties">Properties</h3>
 
 <p>A restify server has the following properties on it:</p>
 
@@ -789,21 +826,21 @@ here.</p>
 </tbody>
 </table>
 
-<h3>Other Methods</h3>
+<h3 id="other-methods">Other Methods</h3>
 
-<h4>address()</h4>
+<h4 id="address">address()</h4>
 
 <p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_server_address">address()</a>.</p>
 
-<h4>listen(port, [host], [callback]) or listen(path, [callback])</h4>
+<h4 id="listenport-host-callback-or-listenpath-callback">listen(port, [host], [callback]) or listen(path, [callback])</h4>
 
 <p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback">listen()</a>.</p>
 
-<h4>close()</h4>
+<h4 id="close">close()</h4>
 
 <p>Wraps node's <a href="http://nodejs.org/docs/latest/api/net.html#net_event_close">close()</a>.</p>
 
-<h4>pre()</h4>
+<h4 id="pre">pre()</h4>
 
 <p>Allows you to add in handlers that run <em>before</em> routing occurs. This gives you
 a hook to change request headers and the like if you need to. Note that
@@ -815,11 +852,17 @@ a hook to change request headers and the like if you need to. Note that
 });
 </code></pre>
 
-<h4>use()</h4>
+<p>You can also clean up URLs before routes are matched with the built in
+<code>restify.pre.sanitizePath</code>. This <a href="https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters">re-implements v1.4 behaviour</a></p>
+
+<pre><code>server.pre(restify.pre.sanitizePath());
+</code></pre>
+
+<h4 id="use">use()</h4>
 
 <p>Allows you to add in handlers that run no matter what the route.</p>
 
-<h2 id="Bundled-Plugins"><span class="method name"><span class="name">Bundled Plugins</span></span></h2>
+<h2 id="bundled-plugins">Bundled Plugins</h2>
 
 <p>restify ships with several handlers you can use, specifically:</p>
 
@@ -862,7 +905,7 @@ server.use(restify.throttle({
 server.use(restify.conditionalRequest());
 </code></pre>
 
-<h3>Accept Parser</h3>
+<h3 id="accept-parser">Accept Parser</h3>
 
 <p>Parses out the <code>Accept</code> header, and ensures that the server can respond to what
 the client asked for.  You almost always want to just pass in
@@ -873,7 +916,7 @@ for a non-handled type, this plugin will return an error of <code>406</code>.</p
 <pre><code>server.use(restify.acceptParser(server.acceptable));
 </code></pre>
 
-<h3>Authorization Parser</h3>
+<h3 id="authorization-parser">Authorization Parser</h3>
 
 <pre><code>server.use(restify.authorizationParser());
 </code></pre>
@@ -898,7 +941,7 @@ to something like:</p>
 is unrecognized, the only thing avaiable in <code>req.authorization</code> will be
 <code>scheme</code> and <code>credentials</code> - it will be up to you to parse out the rest.</p>
 
-<h3>CORS</h3>
+<h3 id="cors">CORS</h3>
 
 <pre><code>server.use(restify.CORS());
 </code></pre>
@@ -916,7 +959,7 @@ a sample invocation is:</p>
 }));
 </code></pre>
 
-<h3>Date Parser</h3>
+<h3 id="date-parser">Date Parser</h3>
 
 <pre><code>server.use(restify.dateParser());
 </code></pre>
@@ -929,7 +972,7 @@ interpreted in seconds, to allow for clock skew.</p>
 server.use(restify.dateParser(60));
 </code></pre>
 
-<h3>QueryParser</h3>
+<h3 id="queryparser">QueryParser</h3>
 
 <pre><code>server.use(restify.queryParser());
 </code></pre>
@@ -942,7 +985,7 @@ in the options object:</p>
 <pre><code>server.use(restify.queryParser({ mapParams: false }));
 </code></pre>
 
-<h3>JSONP</h3>
+<h3 id="jsonp">JSONP</h3>
 
 <p>Supports checking the query string for <code>callback</code> or <code>jsonp</code> and ensuring that
 the content-type is appropriately set if JSONP params are in place.  There is
@@ -951,7 +994,7 @@ also a default <code>application/javascript</code> formatter to handle this.</p>
 <p>You <em>should</em> set the <code>queryParser</code> plugin to run before this, but if you don't
 this plugin will still parse the query string properly.</p>
 
-<h3>BodyParser</h3>
+<h3 id="bodyparser">BodyParser</h3>
 
 <p>Blocks your chain on reading and parsing the HTTP request body.  Switches on
 <code>Content-Type</code> and does the appropriate logic.  <code>application/json</code>,
@@ -974,7 +1017,8 @@ supported.</p>
         });
     },
     keepExtensions: false,
-    uploadDir: os.tmpdir()
+    uploadDir: os.tmpdir(),
+    multiples: true
  }));
 </code></pre>
 
@@ -1012,9 +1056,10 @@ if <code>multipartFileHandler</code> is defined.</li>
 <li><code>uploadDir</code> - Where uploaded files are intermediately stored during transfer
 before the contents is mapped into <code>req.params</code>. Does nothing
 if <code>multipartFileHandler</code> is defined.</li>
+<li><code>multiples</code> - if you want to support html5 multiple attribute in upload fields.</li>
 </ul>
 
-<h3>RequestLogger</h3>
+<h3 id="requestlogger">RequestLogger</h3>
 
 <p>Sets up a child <a href="https://github.com/trentm/node-bunyan">bunyan</a> logger with the
 current request id filled in, along with any other parameters you define.</p>
@@ -1031,7 +1076,7 @@ current request id filled in, along with any other parameters you define.</p>
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.</p>
 
-<h3>GzipResponse</h3>
+<h3 id="gzipresponse">GzipResponse</h3>
 
 <pre><code>server.use(restify.gzipResponse());
 </code></pre>
@@ -1045,7 +1090,7 @@ that the <code>content-length</code> header cannot be known, and so
 <code>transfer-encoding: chunked</code> will <em>always</em> be set when this is in effect.  This
 plugin has no impact if the client does not send <code>accept-encoding: gzip</code>.</p>
 
-<h3>Serve Static</h3>
+<h3 id="serve-static">Serve Static</h3>
 
 <p>The serveStatic module is different than most of the other plugins, in that it
 is expected that you are going to map it to a route, as below:</p>
@@ -1069,7 +1114,7 @@ which is just a <code>RegExp</code> to check against the requested file name. La
 can pass in a <code>maxAge</code> numeric, which will set the <code>Cache-Control</code> header.
 Default is <code>3600</code> (1 hour).</p>
 
-<h3>Throttle</h3>
+<h3 id="throttle">Throttle</h3>
 
 <p>restify ships with a fairly comprehensive implementation of
 <a href="http://en.wikipedia.org/wiki/Token_bucket">Token bucket</a>, with the ability to
@@ -1115,7 +1160,7 @@ is returned.</p>
 
 <p>Note that <code>ip</code>, <code>xff</code> and <code>username</code> are XOR'd.</p>
 
-<h4>Using an external storage mechanism for key/bucket mappings.</h4>
+<h4 id="using-an-external-storage-mechanism-for-keybucket-mappings">Using an external storage mechanism for key/bucket mappings.</h4>
 
 <p>By default, the restify throttling plugin uses an in-memory LRU to store
 mappings between throttling keys (i.e., IP address) to the actual bucket that
@@ -1128,7 +1173,7 @@ uniform request distribution.  To enable this, you can pass in
 <code>options.tokensTable</code>, which is simply any Object that supports <code>put</code> and <code>get</code>
 with a <code>String</code> key, and an <code>Object</code> value.</p>
 
-<h3>Conditional Request Handler</h3>
+<h3 id="conditional-request-handler">Conditional Request Handler</h3>
 
 <pre><code>server.use(restify.conditionalRequest());
 </code></pre>
@@ -1167,7 +1212,7 @@ server.get('/hello/:name', function(req, res, next) {
 });
 </code></pre>
 
-<h3>Audit Logging</h3>
+<h3 id="audit-logging">Audit Logging</h3>
 
 <p>Audit logging is a special plugin, as you don't use it with <code>.use()</code>, but with
 the <code>after</code> event:</p>
@@ -1234,13 +1279,13 @@ the <code>after</code> event:</p>
     }
 </code></pre>
 
-<h2 id="Request-API"><span class="method name"><span class="name">Request API</span></span></h2>
+<h2 id="request-api">Request API</h2>
 
 <p>Wraps all of the node
 <a href="http://nodejs.org/api/http.html#http_http_incomingmessage">http.IncomingMessage</a>
 APIs, events and properties, plus the following.</p>
 
-<h3>header(key, [defaultValue])</h3>
+<h3 id="headerkey-defaultvalue">header(key, [defaultValue])</h3>
 
 <p>Get the case-insensitive request header key, and optionally provide a
 default value (express-compliant):</p>
@@ -1250,7 +1295,7 @@ req.header('HOST');
 req.header('Accept', '*/*');
 </code></pre>
 
-<h3>accepts(type)</h3>
+<h3 id="acceptstype">accepts(type)</h3>
 
 <p>(express-compliant)</p>
 
@@ -1277,7 +1322,7 @@ req.accepts('png');
 // =&gt; false
 </code></pre>
 
-<h3>is(type)</h3>
+<h3 id="istype">is(type)</h3>
 
 <p>Check if the incoming request contains the Content-Type header field,
 and it contains the give mime type.</p>
@@ -1299,19 +1344,19 @@ req.is('html');
 <p>Note this is almost compliant with express, but restify does not have
 all the <code>app.is()</code> callback business express does.</p>
 
-<h3>isSecure()</h3>
+<h3 id="issecure">isSecure()</h3>
 
 <p>Check if the incoming request is encrypted.</p>
 
-<h3>isChunked()</h3>
+<h3 id="ischunked">isChunked()</h3>
 
 <p>Check if the incoming request is chunked.</p>
 
-<h3>isKeepAlive()</h3>
+<h3 id="iskeepalive">isKeepAlive()</h3>
 
 <p>Check if the incoming request is kept alive.</p>
 
-<h3>log</h3>
+<h3 id="log">log</h3>
 
 <p>Note that you can piggyback on the restify logging framework, by just using
 <code>req.log</code>.  I.e.,:</p>
@@ -1328,7 +1373,7 @@ all the <code>app.is()</code> callback business express does.</p>
 the request id is automatically injected in, so you can easily correlate
 your high-throughput logs together.</p>
 
-<h3>getLogger(component)</h3>
+<h3 id="getloggercomponent">getLogger(component)</h3>
 
 <p>Shorthand to grab a new  <a href="https://github.com/trentm/node-bunyan">bunyan</a>
 instance that is a child component of the one restify has:</p>
@@ -1336,11 +1381,11 @@ instance that is a child component of the one restify has:</p>
 <pre><code>var log = req.getLogger('MyFoo');
 </code></pre>
 
-<h3>time()</h3>
+<h3 id="time">time()</h3>
 
 <p>the time when this request arrived (ms since epoch)</p>
 
-<h3>Properties</h3>
+<h3 id="properties-2">Properties</h3>
 
 <table>
 <tbody>
@@ -1354,13 +1399,13 @@ instance that is a child component of the one restify has:</p>
 </tbody>
 </table>
 
-<h2 id="Response-API"><span class="method name"><span class="name">Response API</span></span></h2>
+<h2 id="response-api">Response API</h2>
 
 <p>Wraps all of the node
 <a href="http://nodejs.org/docs/latest/api/http.html#http.ServerResponse">ServerResponse</a>
 APIs, events and properties, plus the following.</p>
 
-<h3>header(key, value)</h3>
+<h3 id="headerkey-value">header(key, value)</h3>
 
 <p>Get or set the response header key.</p>
 
@@ -1377,7 +1422,7 @@ res.header('foo', new Date());
 // =&gt; Fri, 03 Feb 2012 20:09:58 GMT
 </code></pre>
 
-<h3>charSet(type)</h3>
+<h3 id="charsettype">charSet(type)</h3>
 
 <p>Appends the provided character set to the response's <code>Content-Type</code>.</p>
 
@@ -1386,7 +1431,7 @@ res.header('foo', new Date());
 
 <p>Will change the normal json Content-Type to <code>application/json; charset=utf-8</code>.</p>
 
-<h3>cache([type], [options])</h3>
+<h3 id="cachetype-options">cache([type], [options])</h3>
 
 <p>Sets the cache-control header.  <code>type</code> defaults to _public_, and
 options currently only takes <code>maxAge</code>.</p>
@@ -1394,14 +1439,14 @@ options currently only takes <code>maxAge</code>.</p>
 <pre><code>res.cache();
 </code></pre>
 
-<h3>status(code)</h3>
+<h3 id="statuscode">status(code)</h3>
 
 <p>Sets the response statusCode.</p>
 
 <pre><code>res.status(201);
 </code></pre>
 
-<h3>send([status], body)</h3>
+<h3 id="sendstatus-body">send([status], body)</h3>
 
 <p>You can use <code>send()</code> to wrap up all the usual <code>writeHead()</code>,
 <code>write()</code>, <code>end()</code> calls on the HTTP API of node.  You can pass send
@@ -1415,7 +1460,7 @@ res.send(201, {hello: 'world'});
 res.send(new BadRequestError('meh'));
 </code></pre>
 
-<h3>json([status], body)</h3>
+<h3 id="jsonstatus-body">json([status], body)</h3>
 
 <p>Short-hand for:</p>
 
@@ -1423,7 +1468,7 @@ res.send(new BadRequestError('meh'));
 res.send({hello: 'world'});
 </code></pre>
 
-<h3>Properties</h3>
+<h3 id="properties-3">Properties</h3>
 
 <table>
 <tbody>
@@ -1436,7 +1481,7 @@ res.send({hello: 'world'});
 </tbody>
 </table>
 
-<h3>Setting the default headers</h3>
+<h3 id="setting-the-default-headers">Setting the default headers</h3>
 
 <p>You can change what headers restify sends by default by setting the
 top-level property <code>defaultResponseHeaders</code>.  This should be a
@@ -1453,7 +1498,7 @@ restify.defaultResponseHeaders = function(data) {
 restify.defaultResponseHeaders = false; // disable altogether
 </code></pre>
 
-<h2 id="DTrace"><span class="method name"><span class="name">DTrace</span></span></h2>
+<h2 id="dtrace">DTrace</h2>
 
 <p>One of the coolest features of restify is that it automatically
 creates DTrace probes for you whenever you add a new route/handler.
@@ -1503,7 +1548,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 27 restify38789       mod-88f3f88                        route-done route-done
 </code></pre>
 
-<h3>route-start</h3>
+<h3 id="route-start">route-start</h3>
 
 <table>
 <tbody>
@@ -1517,7 +1562,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 </tbody>
 </table>
 
-<h3>handler-start</h3>
+<h3 id="handler-start">handler-start</h3>
 
 <table>
 <tbody>
@@ -1529,7 +1574,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 </tbody>
 </table>
 
-<h3>route-done</h3>
+<h3 id="route-done">route-done</h3>
 
 <table>
 <tbody>
@@ -1542,7 +1587,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 </tbody>
 </table>
 
-<h3>handler-done</h3>
+<h3 id="handler-done">handler-done</h3>
 
 <table>
 <tbody>
@@ -1554,7 +1599,7 @@ ID   PROVIDER            MODULE                          FUNCTION NAME
 </tbody>
 </table>
 
-<h3>Example D Script</h3>
+<h3 id="example-d-script">Example D Script</h3>
 
 <p>Now, if you wanted to say get a breakdown of latency by handler, you
 could do something like this:</p>
@@ -1744,7 +1789,7 @@ needs to attach a cryptographic signature of selected outgoing headers.  If
 provided, this callback will be invoked with a single parameter: the outgoing
 <code>http.ClientRequest</code> object.</p>
 
-<h2 id="JsonClient"><span class="method name"><span class="name">JsonClient</span></span></h2>
+<h2 id="jsonclient">JsonClient</h2>
 
 <p>The JSON Client is the highest-level client bundled with restify; it
 exports a set of methods that map directly to HTTP verbs.  All
@@ -1764,7 +1809,7 @@ restify HTTP errors).  If <code>obj</code> looks like a <code>RestError</code>:<
 <p>then <code>err</code> gets "upconverted" into a <code>RestError</code> for you.  Otherwise
 it will be an <code>HttpError</code>.</p>
 
-<h3>createJsonClient(options)</h3>
+<h3 id="createjsonclientoptions">createJsonClient(options)</h3>
 
 <pre><code>var client = restify.createJsonClient({
   url: 'https://api.us-west-1.joyentcloud.com',
@@ -1792,7 +1837,7 @@ it will be an <code>HttpError</code>.</p>
 </tbody>
 </table>
 
-<h3>get(path, callback)</h3>
+<h3 id="getpath-callback">get(path, callback)</h3>
 
 <p>Performs an HTTP get; if no payload was returned, <code>obj</code> defaults to
 <code>{}</code> for you (so you don't get a bunch of null pointer errors).</p>
@@ -1803,7 +1848,7 @@ it will be an <code>HttpError</code>.</p>
 });
 </code></pre>
 
-<h3>head(path, callback)</h3>
+<h3 id="headpath-callback">head(path, callback)</h3>
 
 <p>Just like <code>get</code>, but without <code>obj</code>:</p>
 
@@ -1813,7 +1858,7 @@ it will be an <code>HttpError</code>.</p>
 });
 </code></pre>
 
-<h3>post(path, object, callback)</h3>
+<h3 id="postpath-object-callback">post(path, object, callback)</h3>
 
 <p>Takes a complete object to serialize and send to the server.</p>
 
@@ -1824,7 +1869,7 @@ it will be an <code>HttpError</code>.</p>
 });
 </code></pre>
 
-<h3>put(path, object, callback)</h3>
+<h3 id="putpath-object-callback">put(path, object, callback)</h3>
 
 <p>Just like <code>post</code>:</p>
 
@@ -1835,7 +1880,7 @@ it will be an <code>HttpError</code>.</p>
 });
 </code></pre>
 
-<h3>del(path, callback)</h3>
+<h3 id="delpath-callback">del(path, callback)</h3>
 
 <p><code>del</code> doesn't take content, since you know, it should't:</p>
 
@@ -1845,7 +1890,7 @@ it will be an <code>HttpError</code>.</p>
 });
 </code></pre>
 
-<h2 id="StringClient"><span class="method name"><span class="name">StringClient</span></span></h2>
+<h2 id="stringclient">StringClient</h2>
 
 <p><code>StringClient</code> is what <code>JsonClient</code> is built on, and provides a base
 for you to write other buffering/parsing clients (like say an XML
@@ -1857,14 +1902,14 @@ the source for <code>JsonClient</code>. Effectively, you extend it, and set the
 appropriate options in the constructor and implement a <code>write</code> (for
 put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p>
 
-<h3>createStringClient(options)</h3>
+<h3 id="createstringclientoptions">createStringClient(options)</h3>
 
 <pre><code>var client = restify.createStringClient({
   url: 'https://example.com'
 })
 </code></pre>
 
-<h3>get(path, callback)</h3>
+<h3 id="getpath-callback-2">get(path, callback)</h3>
 
 <p>Performs an HTTP get; if no payload was returned, <code>data</code> defaults to
 <code>''</code> for you (so you don't get a bunch of null pointer errors).</p>
@@ -1875,7 +1920,7 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 });
 </code></pre>
 
-<h3>head(path, callback)</h3>
+<h3 id="headpath-callback-2">head(path, callback)</h3>
 
 <p>Just like <code>get</code>, but without <code>data</code>:</p>
 
@@ -1885,7 +1930,7 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 });
 </code></pre>
 
-<h3>post(path, object, callback)</h3>
+<h3 id="postpath-object-callback-2">post(path, object, callback)</h3>
 
 <p>Takes a complete object to serialize and send to the server.</p>
 
@@ -1896,7 +1941,7 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 });
 </code></pre>
 
-<h3>put(path, object, callback)</h3>
+<h3 id="putpath-object-callback-2">put(path, object, callback)</h3>
 
 <p>Just like <code>post</code>:</p>
 
@@ -1907,7 +1952,7 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 });
 </code></pre>
 
-<h3>del(path, callback)</h3>
+<h3 id="delpath-callback-2">del(path, callback)</h3>
 
 <p><code>del</code> doesn't take content, since you know, it should't:</p>
 
@@ -1917,7 +1962,7 @@ put/post) and <code>parse</code> method (for all HTTP bodies), and that's it.</p
 });
 </code></pre>
 
-<h2 id="HttpClient"><span class="method name"><span class="name">HttpClient</span></span></h2>
+<h2 id="httpclient">HttpClient</h2>
 
 <p><code>HttpClient</code> is the lowest-level client shipped in restify, and is
 basically just some sugar over the top of node's http/https modules
@@ -1980,7 +2025,7 @@ write data over those. Otherwise, all the same methods exist as
 <p>One wishing to extend the <code>HttpClient</code> should look at the internals
 and note that <code>read</code> and <code>write</code> probably need to be overridden.</p>
 
-<h3>basicAuth(username, password)</h3>
+<h3 id="basicauthusername-password">basicAuth(username, password)</h3>
 
 <p>Since it hasn't been mentioned yet, this convenience method (available
 on all clients), just sets the <code>Authorization</code> header for all HTTP requests:</p>
@@ -1988,7 +2033,7 @@ on all clients), just sets the <code>Authorization</code> header for all HTTP re
 <pre><code>client.basicAuth('mark', 'mysupersecretpassword');
 </code></pre>
 
-<h3>Upgrades</h3>
+<h3 id="upgrades">Upgrades</h3>
 
 <p>If you successfully negotiate an Upgrade with the HTTP server, an
 <code>upgradeResult</code> event will be emitted with the arguments <code>err</code>, <code>res</code>, <code>socket</code>
@@ -2018,7 +2063,7 @@ client.get(options, function(err, res, socket, head) {
 });
 </code></pre>
 
-    </div>
+    </div> <!-- #content -->
 <script type="text/javascript" charset="utf-8">
 $(function() {
     var headerHeight = $("#header").height();

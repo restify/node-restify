@@ -169,7 +169,6 @@ pre.shell code::before {
   position:absolute;
   overflow:auto;
   z-index:0;
-  -webkit-overflow-scrolling:touch;
 }
 
 #sidebar .vertical_divider {
@@ -321,3 +320,4 @@ h3:first-child {
     color: black !important;
   }
 }
+
