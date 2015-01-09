@@ -866,7 +866,7 @@ a sample invocation is:
 
     server.use(restify.CORS({
         origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-        credentials: true                  // defaults to false
+        credentials: true,                 // defaults to false
         headers: ['x-foo']                 // sets expose-headers
     }));
 
