@@ -1633,7 +1633,6 @@ test('explicitly sending a 403 with custom error', function (t) {
     });
 });
 
-
 test('explicitly sending a 403 on error', function (t) {
     SERVER.get('/', function (req, res, next) {
         res.send(403, new Error('bah!'));
@@ -1642,6 +1641,21 @@ test('explicitly sending a 403 on error', function (t) {
     CLIENT.get('/', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 403);
+        t.end();
+    });
+});
+
+test('GH-693 sending multiple response header values', function (t) {
+    SERVER.get('/', function (req, res, next) {
+        res.link("/", "self");
+        res.link("/foo", "foo");
+        res.link("/bar", "bar");
+        res.send(200, "root");
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(res.headers['link'].split(',').length, 3);
         t.end();
     });
 });
