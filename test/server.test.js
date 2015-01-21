@@ -1645,3 +1645,25 @@ test('explicitly sending a 403 on error', function (t) {
         t.end();
     });
 });
+
+
+test('fire event on error', function (t) {
+    SERVER.once('InternalServer', function (req, res, err, cb) {
+        t.ok(req);
+        t.ok(res);
+        t.ok(err);
+        t.ok(cb);
+        return (cb());
+    });
+
+    SERVER.get('/', function (req, res, next) {
+        return (next(new restify.errors.InternalServerError('bah!')));
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.expect(6);
+        t.end();
+    });
+});
