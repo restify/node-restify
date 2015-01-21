@@ -473,6 +473,23 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
       });
     });
 
+Sometimes, for all requests, you may want to handle an error condition the same
+way. As an example, you may want to serve a 500 page on all
+`InternalServerErrors`. In this case you can add a listener for this error that
+is always fired when this Error is encountered by Restify as part of a
+`next(error)` statement. This gives you a way to handle all errors of the same
+class identically across the server.
+
+    server.get('/hello/:name', function(req, res, next) {
+      // some internal unrecoverable error
+      var err = new restify.errors.InternalServerError('oh noes!');
+      return next(err);
+    });
+
+    server.on('InternalServerError', function (req, res, err, cb) {
+      err._customContent = 'something is wrong!';
+      return cb();
+    });
 
 ### HttpError
 
@@ -1003,8 +1020,8 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The above `route` and `directory` combination will serve a file located in  
-`./documentation/v1/docs/current/index.html` when you attempt to hit 
+The above `route` and `directory` combination will serve a file located in
+`./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`.
 
 The plugin will enforce that all files under `directory` are served. The
