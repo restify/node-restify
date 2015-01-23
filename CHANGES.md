@@ -2,6 +2,11 @@
 
 ## not yet released
 
+## 2.8.5
+
+- Add ability to listen for error events
+- Documentation fixes
+
 ## 2.8.4
 
 - Update dtrace-provider, bunyan and backoff
