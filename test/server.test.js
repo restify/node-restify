@@ -102,6 +102,7 @@ test('get (path only)', function (t) {
     var r = SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send();
         next();
     });
@@ -216,6 +217,7 @@ test('PUT ok', function (t) {
     SERVER.put('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), true);
         res.send();
         next();
     });
@@ -232,6 +234,7 @@ test('PATCH ok', function (t) {
     SERVER.patch('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), true);
         res.send();
         next();
     });
@@ -257,6 +260,7 @@ test('HEAD ok', function (t) {
     SERVER.head('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send('hi there');
         next();
     });
@@ -284,6 +288,7 @@ test('DELETE ok', function (t) {
     SERVER.del('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send(204, 'hi there');
         next();
     });
@@ -310,6 +315,7 @@ test('OPTIONS', function (t) {
         SERVER[method]('/foo/:id', function tester(req, res, next) {
             t.ok(req.params);
             t.equal(req.params.id, 'bar');
+            t.equal(req.isUpload(), false);
             res.send();
             next();
         });
