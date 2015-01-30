@@ -315,7 +315,6 @@ test('OPTIONS', function (t) {
         SERVER[method]('/foo/:id', function tester(req, res, next) {
             t.ok(req.params);
             t.equal(req.params.id, 'bar');
-            t.equal(req.isUpload(), false);
             res.send();
             next();
         });
