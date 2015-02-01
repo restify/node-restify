@@ -528,7 +528,7 @@ test('POST raw', function (t) {
     });
 });
 
-test('Per request agent override', function(t) {
+test('PR-726 Enable {agent: false} option override per request', function(t) {
     var opts = {
         path: '/str/noagent',
         agent: false
