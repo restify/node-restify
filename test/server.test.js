@@ -97,6 +97,16 @@ test('listen and close (socketPath)', function (t) {
     });
 });
 
+test('gh-751 ipv6 server creation', function (t) {
+    var server = restify.createServer();
+    server.listen(PORT + 1, '::1', function () {
+        t.equal(server.url, 'http://[::1]:' + (PORT + 1));
+
+        server.close(function(){
+            t.end();
+        });
+    });
+});
 
 test('get (path only)', function (t) {
     var r = SERVER.get('/foo/:id', function echoId(req, res, next) {
