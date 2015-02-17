@@ -2,6 +2,12 @@
 
 ## not yet released
 
+- Fix `request.isUpload` for PATCH requests
+- Fix JSON body parser behavior when request body is null
+- Allow per-request agent overrides
+- #751 Fix `server.url` property when using IPv6
+- Update dtrace-provider dependency
+
 ## 2.8.5
 
 - Add ability to listen for error events
