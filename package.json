@@ -74,7 +74,7 @@
         "verror": "^1.4.0"
     },
     "optionalDependencies": {
-        "dtrace-provider": "^0.3.1"
+        "dtrace-provider": "^0.4.0"
     },
     "devDependencies": {
         "cover": "^0.2.9",
