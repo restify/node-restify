@@ -1672,6 +1672,7 @@ test('fire event on error', function (t) {
         t.ok(res);
         t.ok(err);
         t.ok(cb);
+        t.equal(typeof (cb), 'function');
         return (cb());
     });
 
@@ -1682,7 +1683,36 @@ test('fire event on error', function (t) {
     CLIENT.get('/', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 500);
-        t.expect(6);
+        t.expect(7);
         t.end();
+    });
+});
+
+
+test('error handler defers "after" event', function (t) {
+    t.expect(9);
+    SERVER.once('NotFound', function (req, res, err, cb) {
+        t.ok(req);
+        t.ok(res);
+        t.ok(cb);
+        t.equal(typeof (cb), 'function');
+        t.ok(err);
+
+        SERVER.removeAllListeners('after');
+        SERVER.once('after', function (req2, res2) {
+            t.ok(req2);
+            t.ok(res2);
+            t.end();
+        });
+        res.send(404, 'foo');
+        return (cb());
+    });
+    SERVER.once('after', function () {
+        // do not fire prematurely
+        t.notOk(true);
+    });
+    CLIENT.get('/' + uuid(), function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
     });
 });
