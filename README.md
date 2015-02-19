@@ -10,7 +10,7 @@
 similar to [express](http://expressjs.com) for building REST APIs.  For full
 details, see http://mcavage.github.com/node-restify.
 
-Join us on IRC at `irc.freenode.net` in the `#restify` channgel for real-time
+Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
 chat and support.
 
 # Usage
