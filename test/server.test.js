@@ -1686,3 +1686,20 @@ test('fire event on error', function (t) {
         t.end();
     });
 });
+
+test('gh-757 req.absoluteUri() defaults path segment to req.path()', function (t) {
+    SERVER.get('/the-original-path', function (req, res, next) {
+        var prefix = 'http://127.0.0.1:' + PORT;
+        t.equal(req.absoluteUri('?key=value'), prefix + '/the-original-path/?key=value');
+        t.equal(req.absoluteUri('#fragment'), prefix + '/the-original-path/#fragment');
+        t.equal(req.absoluteUri('?key=value#fragment'), prefix + '/the-original-path/?key=value#fragment');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/the-original-path', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
