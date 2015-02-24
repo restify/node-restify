@@ -2,6 +2,7 @@
 
 ## not yet released
 
+- #758 Use v4 UUIDs for `[x-]request-id`
 - Fix `request.isUpload` for PATCH requests
 - Fix JSON body parser behavior when request body is null
 - Allow per-request agent overrides
