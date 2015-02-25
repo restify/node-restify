@@ -871,7 +871,7 @@ to something like:
     }
 
 `req.username` will also be set, and defaults to 'anonymous'.  If the scheme
-is unrecognized, the only thing avaiable in `req.authorization` will be
+is unrecognized, the only thing available in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
 
 ### CORS
