@@ -1833,7 +1833,7 @@ is already used).
         });
 
         res.on('end', function() {
-          console.log(body);
+          console.log(res.body);
         });
       });
     });
