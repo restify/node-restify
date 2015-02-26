@@ -29,7 +29,8 @@
         "Diego Torres",
         "Mike Williams",
         "Brian Pin",
-        "Ben Doerr"
+        "Ben Doerr",
+        "Guillaume Chauvet"
     ],
     "name": "restify",
     "homepage": "http://mcavage.github.com/node-restify",
