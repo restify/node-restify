@@ -82,9 +82,15 @@ test('Parse CSV body', function (t) {
         }
     };
     CLIENT.post(options, function (err, req) {
-        t.ifError(err);
+        if (err) {
+            t.end(err);
+            return;
+        }
         req.on('result', function (errReq, res) {
-            t.ifError(errReq);
+            if (errReq) {
+                t.end(errReq);
+                return;
+            }
             res.body = '';
             res.setEncoding('utf8');
             res.on('data', function (chunk) {
@@ -111,9 +117,15 @@ test('Parse TSV body', function (t) {
         }
     };
     CLIENT.post(options, function (err, req) {
-        t.ifError(err);
+        if (err) {
+            t.end(err);
+            return;
+        }
         req.on('result', function (errReq, res) {
-            t.ifError(errReq);
+            if (errReq) {
+                t.end(errReq);
+                return;
+            }
             res.body = '';
             res.setEncoding('utf8');
             res.on('data', function (chunk) {

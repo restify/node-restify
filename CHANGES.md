@@ -2,32 +2,6 @@
 
 ## not yet released
 
-- #758 Use v4 UUIDs for `[x-]request-id`
-- Fix `request.isUpload` for PATCH requests
-- Fix JSON body parser behavior when request body is null
-- Allow per-request agent overrides
-- #751 Fix `server.url` property when using IPv6
-- Update dtrace-provider dependency
-- **BREAKING** Include `err` parameter for all \*Error events:
-
-  Error events will all have the signature `function (req, res, err, cb)` to
-  become consistent with the handling functionality introduced in 2.8.5.
-  Error handlers using the `function (req, res, cb)` signature must be updated.
-
-## 2.8.5
-
-- Add ability to listen for error events
-- Documentation fixes
-
-## 2.8.4
-
-- Update dtrace-provider, bunyan and backoff
-- Fix request URL cache interaction with dtrace probes
-
-## 2.8.3
-
-- Support html5 multiple file uploads
-
 ## 2.8.2
 
 - #619 Default to url, if string provided to createClient

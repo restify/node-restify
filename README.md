@@ -1,17 +1,14 @@
 # restify
 
-[![Build Status](https://travis-ci.org/mcavage/node-restify.svg)](https://travis-ci.org/mcavage/node-restify)
-[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.svg)](https://gitter.im/mcavage/node-restify)
-[![Dependency Status](https://david-dm.org/mcavage/node-restify.svg)](https://david-dm.org/mcavage/node-restify)
-[![devDependency Status](https://david-dm.org/mcavage/node-restify/dev-status.svg)](https://david-dm.org/mcavage/node-restify#info=devDependencies)
+[![Build Status](https://travis-ci.org/mcavage/node-restify.png)](https://travis-ci.org/mcavage/node-restify)
+[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.png)](https://gitter.im/mcavage/node-restify)
+[![Dependency Status](https://david-dm.org/mcavage/node-restify.png)](https://david-dm.org/mcavage/node-restify)
+[![devDependency Status](https://david-dm.org/mcavage/node-restify/dev-status.png)](https://david-dm.org/mcavage/node-restify#info=devDependencies)
 
 
 [restify](http://mcavage.github.com/node-restify) is a smallish framework,
 similar to [express](http://expressjs.com) for building REST APIs.  For full
 details, see http://mcavage.github.com/node-restify.
-
-Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
-chat and support.
 
 # Usage
 

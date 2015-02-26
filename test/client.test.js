@@ -528,20 +528,6 @@ test('POST raw', function (t) {
     });
 });
 
-test('PR-726 Enable {agent: false} option override per request', function (t) {
-    var opts = {
-        path: '/str/noagent',
-        agent: false
-    };
-    RAW_CLIENT.get(opts, function (err, req, res) {
-        t.ifError(err);
-        t.notStrictEqual(req.agent, RAW_CLIENT.agent,
-            'request should not use client agent');
-        console.log(res);
-        t.end();
-    });
-});
-
 test('GH-20 connectTimeout', function (t) {
     var client = restify.createClient({
         url: 'http://169.254.1.10',

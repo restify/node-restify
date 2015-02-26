@@ -31,9 +31,6 @@ observability into the latency and characteristics of my
 applications.  If you don't need that, or don't care about those
 aspect(s), then it's probably not for you.
 
-For real time chat, discussion and support, join the `#restify` IRC channel on
-`irc.freenode.net`.
-
 ## About this guide
 
 This guide provides comprehensive documentation on writing a REST api (server)
@@ -476,23 +473,6 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
       });
     });
 
-Sometimes, for all requests, you may want to handle an error condition the same
-way. As an example, you may want to serve a 500 page on all
-`InternalServerErrors`. In this case you can add a listener for this error that
-is always fired when this Error is encountered by Restify as part of a
-`next(error)` statement. This gives you a way to handle all errors of the same
-class identically across the server.
-
-    server.get('/hello/:name', function(req, res, next) {
-      // some internal unrecoverable error
-      var err = new restify.errors.InternalServerError('oh noes!');
-      return next(err);
-    });
-
-    server.on('InternalServerError', function (req, res, err, cb) {
-      err._customContent = 'something is wrong!';
-      return cb();
-    });
 
 ### HttpError
 
@@ -792,11 +772,6 @@ a hook to change request headers and the like if you need to. Note that
       return next();
     });
 
-You can also clean up URLs before routes are matched with the built in
-`restify.pre.sanitizePath`. This [re-implements v1.4 behaviour](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters)
-
-    server.pre(restify.pre.sanitizePath());
-
 #### use()
 
 Allows you to add in handlers that run no matter what the route.
@@ -871,7 +846,7 @@ to something like:
     }
 
 `req.username` will also be set, and defaults to 'anonymous'.  If the scheme
-is unrecognized, the only thing available in `req.authorization` will be
+is unrecognized, the only thing avaiable in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
 
 ### CORS
@@ -886,7 +861,7 @@ a sample invocation is:
 
     server.use(restify.CORS({
         origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-        credentials: true,                 // defaults to false
+        credentials: true                  // defaults to false
         headers: ['x-foo']                 // sets expose-headers
     }));
 
@@ -1023,8 +998,8 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The above `route` and `directory` combination will serve a file located in
-`./documentation/v1/docs/current/index.html` when you attempt to hit
+The above `route` and `directory` combination will serve a file located in  
+`./documentation/v1/docs/current/index.html` when you attempt to hit 
 `http://localhost:8080/docs/current/`.
 
 The plugin will enforce that all files under `directory` are served. The
@@ -1833,7 +1808,7 @@ is already used).
         });
 
         res.on('end', function() {
-          console.log(res.body);
+          console.log(body);
         });
       });
     });
