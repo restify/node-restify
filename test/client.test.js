@@ -864,6 +864,11 @@ test('GH-738 respect NO_PROXY while setting proxy', function (t) {
     t.equal(false, clientWithoutProxy.proxy);
     t.done();
 
-    process.env.https_proxy = origProxy;
+    //Setting process.env.https_proxy to undefined, converts it to 'undefined'
+    if (typeof (origProxy) === 'undefined') {
+        delete process.env.https_proxy;
+    } else {
+        process.env.https_proxy = origProxy;
+    }
     process.env.NO_PROXY = origNoProxy;
 });
