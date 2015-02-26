@@ -1750,7 +1750,23 @@ test('GH-693 sending multiple response header values', function (t) {
 
     CLIENT.get('/', function (err, _, res) {
         t.equal(res.statusCode, 200);
-        t.equal(res.headers['link'].split(',').length, 3);
+        t.equal(res.headers.link.split(',').length, 3);
+        t.end();
+    });
+});
+
+
+test('gh-762 res.noCache()', function (t) {
+    SERVER.get('/some-path', function (req, res, next) {
+        res.noCache();
+        res.send('data');
+    });
+
+    CLIENT.get('/some-path', function (err, _, res) {
+        t.equal(res.headers['cache-control'],
+          'no-cache, no-store, must-revalidate');
+        t.equal(res.headers.pragma, 'no-cache');
+        t.equal(res.headers.expires, '0');
         t.end();
     });
 });
