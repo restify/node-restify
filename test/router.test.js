@@ -57,7 +57,7 @@ test('render route (missing params)', function (t) {
     t.end();
 });
 
-test('render route (special charaters)', function (t) {
+test('GH #704: render route (special charaters)', function (t) {
 
     var server = restify.createServer();
     server.get({name: 'my-route', path: '/countries/:name'}, mockResponse);
@@ -68,7 +68,7 @@ test('render route (special charaters)', function (t) {
     t.end();
 });
 
-test('render route (with sub-regex param)', function (t) {
+test('GH #704: render route (with sub-regex param)', function (t) {
 
     var server = restify.createServer();
     server.get({

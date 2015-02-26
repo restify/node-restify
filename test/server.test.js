@@ -1217,7 +1217,7 @@ test('<url>/?<queryString> broken', function (t) {
 });
 
 
-test('Route with a valid RegExp params', function (t) {
+test('GH #704: Route with a valid RegExp params', function (t) {
 
     SERVER.get({
         name: 'regexp_param1',
@@ -1235,7 +1235,7 @@ test('Route with a valid RegExp params', function (t) {
     });
 });
 
-test('Route with an unvalid RegExp params', function (t) {
+test('GH #704: Route with an unvalid RegExp params', function (t) {
 
     SERVER.get({
         name: 'regexp_param2',
