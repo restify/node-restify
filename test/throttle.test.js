@@ -23,7 +23,7 @@ var SERVER;
 var USERNAME = uuid();
 var PASSWORD = uuid();
 
-
+var errorMessage = 'Error message should include rate 0.5 r/s. Received: ';
 ///--- Tests
 
 
@@ -90,7 +90,8 @@ test('throttled', function (t) {
     CLIENT.get('/test/throttleMe', function (err, _, res) {
         t.ok(err);
         t.equal(err.statusCode, 429);
-        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1, 'Error message should include correct request rate 0.5 r/s. Received: ' + (err && err.message));
+        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
+            errorMessage + (err && err.message));
         t.equal(res.statusCode, 429);
         setTimeout(function () {
             t.end();
@@ -126,11 +127,12 @@ test('override limited (not throttled)', function (t) {
 });
 
 test('throttled after limited override', function (t) {
-    CLIENT.get('/test/throttleMe', function (err, _, res) {
+    CLIENT.get('/test/throttleMe', function () {
     CLIENT.get('/test/throttleMe', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 429);
-        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1, 'Error message should include correct request rate 0.5 r/s. Received: ' + (err && err.message));
+        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
+            errorMessage + (err && err.message));
         t.end();
     });
     });
@@ -155,11 +157,12 @@ test('override unlimited (not throttled)', function (t) {
 });
 
 test('throttled after unlimited override', function (t) {
-    CLIENT.get('/test/throttleMe', function (err, _, res) {
+    CLIENT.get('/test/throttleMe', function () {
     CLIENT.get('/test/throttleMe', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 429);
-        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1, 'Error message should include correct request rate 0.5 r/s. Received: ' + (err && err.message));
+        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
+            errorMessage + (err && err.message));
         t.end();
     });
     });
