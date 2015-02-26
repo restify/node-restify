@@ -834,3 +834,36 @@ test('create base client with url instead of opts', function (t) {
         });
     });
 });
+
+test('GH-738 respect NO_PROXY while setting proxy', function (t) {
+    var origProxy = process.env.https_proxy;
+    var origNoProxy = process.env.NO_PROXY;
+
+    process.env.https_proxy = 'http://192.168.1.1';
+    process.env.NO_PROXY = '';
+    var clientWithProxy = restify.createHttpClient('http://10.3.100.207');
+    t.ok(clientWithProxy.proxy);
+
+    //Blanket wildcard
+    process.env.NO_PROXY = '*';
+    var clientWithoutProxy = restify.createHttpClient('http://192.168.2.1:');
+    t.equal(false, clientWithoutProxy.proxy);
+
+    //Multiple addresses
+    process.env.NO_PROXY = '192.168.2.1, 192.168.2.2';
+    clientWithoutProxy = restify.createHttpClient('http://192.168.2.1:');
+    t.equal(false, clientWithoutProxy.proxy);
+    clientWithoutProxy = restify.createHttpClient('http://192.168.2.2:');
+    t.equal(false, clientWithoutProxy.proxy);
+
+    //Port specificity
+    process.env.NO_PROXY = '192.168.2.1:8080';
+    clientWithoutProxy = restify.createHttpClient('http://192.168.2.1:8080');
+    clientWithProxy = restify.createHttpClient('http://192.168.2.1');
+    t.ok(clientWithProxy.proxy);
+    t.equal(false, clientWithoutProxy.proxy);
+    t.done();
+
+    process.env.https_proxy = origProxy;
+    process.env.NO_PROXY = origNoProxy;
+});
