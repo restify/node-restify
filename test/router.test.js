@@ -68,6 +68,23 @@ test('render route (special charaters)', function (t) {
     t.end();
 });
 
+test('render route (with sub-regex param)', function (t) {
+
+    var server = restify.createServer();
+    server.get({name: 'my-route', path: '/countries/:code([A-Z]{2,3})'}, mockResponse);
+
+    var link = server.router.render('my-route', {code: 'FR'});
+    t.equal(link, '/countries/FR');
+    
+    try {
+        link = server.router.render('my-route', {code: '111'});
+        t.fail("RegExp not used")
+    } catch (ex) {
+        t.equal(ex, 'Error: Route <cities> is missing parameter <state>');
+    }
+    t.end();
+});
+
 test('render route (with encode)', function (t) {
 
     var server = restify.createServer();
