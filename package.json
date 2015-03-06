@@ -32,7 +32,8 @@
         "Brian Pin",
         "Ben Doerr",
         "Patrick Mooney",
-        "Yunong Xiao"
+        "Yunong Xiao",
+        "Guillaume Chauvet"
     ],
     "name": "restify",
     "homepage": "http://mcavage.github.com/node-restify",
