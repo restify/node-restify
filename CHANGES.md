@@ -2,13 +2,26 @@
 
 ## not yet released
 
-- #758 Use v4 UUIDs for `[x-]request-id`
-- Fix `request.isUpload` for PATCH requests
-- Fix JSON body parser behavior when request body is null
-- Allow per-request agent overrides
+- #688 Fix various throttle bugs
+- #691 Fix an issue where posting with text/csv content type crashes Restify
+- #693 Support multiple response header values
+- #704 Allow partial regex for named parameters
+- #726 Allow per-request agent overrides
+- #726 Ebanle `{agent: false}` option override per request
+- #727 Fix JSON body parser behavior when request body is null
+- #727 Fix a bug when `req.body === null`
+- #731 SVG badges in README
+- #734 Add API to track timers for nested handlers
+- #744 Fix `request.isUpload` for PATCH requests
 - #751 Fix `server.url` property when using IPv6
+- #758 Switch to UUID v4
+- #758 Use v4 UUIDs for `[x-]request-id`
+- #759 Documentation fix
+- #762 `res.noCache()` API to prevent all caching
+- #767 Prefer the existing `err` serializer for audit logging
 - Update dtrace-provider dependency
-- **BREAKING** Include `err` parameter for all \*Error events:
+
+- #753 **BREAKING** Include `err` parameter for all \*Error events:
 
   Error events will all have the signature `function (req, res, err, cb)` to
   become consistent with the handling functionality introduced in 2.8.5.
