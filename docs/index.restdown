@@ -1156,7 +1156,26 @@ You pass in the auditor a bunyan logger, and it will write out records at the
             },
             "httpVersion": "1.1",
             "trailers": {},
-            "version": "*"
+            "version": "*",
+            "timers": {
+              "bunyan": 52,
+              "saveAction": 8,
+              "reqResTracker": 213,
+              "addContext": 8,
+              "addModels": 4,
+              "resNamespaces": 5,
+              "parseQueryString": 11,
+              "instanceHeaders": 20,
+              "xForwardedProto": 7,
+              "httpsRedirector": 14,
+              "readBody": 21,
+              "parseBody": 6,
+              "xframe": 7,
+              "restifyCookieParser": 15,
+              "fooHandler": 23,
+              "barHandler": 14,
+              "carHandler": 14
+            }
           },
           "res": {
             "statusCode": 200,
@@ -1187,6 +1206,13 @@ You pass in the auditor a bunyan logger, and it will write out records at the
           "time": "2012-02-07T20:30:31.896Z",
           "v": 0
         }
+
+The `timers` field shows the time each handler took to run in microseconds.
+Restify by default will record this information for every handler for each
+route. However, if you decide to include nested handlers, you can track the
+timing yourself by utilizing the Request
+[startHandlerTimer](#starthandlertimerhandlername) and
+[endHandlerTimer](#endhandlertimerhandlername) API.
 
 ## Request API
 
@@ -1287,7 +1313,36 @@ instance that is a child component of the one restify has:
 
 ### time()
 
-the time when this request arrived (ms since epoch)
+The time when this request arrived (ms since epoch)
+
+### startHandlerTimer(handlerName)
+
+Start the timer for a request handler. You might want to use this if you've got
+a Restify request handler in your chain that contains nested handlers.
+
+    function fooHandler(req, res, next) {
+        vasync.pipeline(funcs: [
+            function nestedHandler1(req, res, next) {
+                req.startHandlerTimer('nestedHandler1');
+                // do something
+                req.endHandlerTimer('nestedHandler1');
+                return next();
+            },
+            function nestedHandler1(req, res, next) {
+                req.startHandlerTimer('nestedHandler2');
+                // do something
+                req.endHandlerTimer('nestedHandler2');
+                return next();
+
+            }...
+        ]...
+    }
+
+### endHandlerTimer(handlerName)
+
+End the timer for a request handler. You must invoke this function if you
+called `startRequestHandler` on a handler. Otherwise the time recorded will be
+incorrect.
 
 ### Properties
 

@@ -1,12 +1,16 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+var fs = require('fs');
 var http = require('http');
 var net = require('net');
+var path = require('path');
+var stream = require('stream');
+var util = require('util');
+
+var bunyan = require('bunyan');
 
 var restify = require('../lib');
 
-var path = require('path');
-var fs = require('fs');
 
 if (require.cache[__dirname + '/lib/helper.js'])
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -842,6 +846,131 @@ test('gzip body json ok', function (t) {
 });
 
 
+test('static serves static files', function (t) {
+    serveStaticTest(t, false, '.tmp');
+});
+
+
+test('static serves static files in nested folders', function (t) {
+    serveStaticTest(t, false, '.tmp/folder');
+});
+
+
+test('static serves static files in with a root regex', function (t) {
+    serveStaticTest(t, false, '.tmp', new RegExp('/.*'));
+});
+
+
+test('static serves static files with a root, !greedy, regex', function (t) {
+    serveStaticTest(t, false, '.tmp', new RegExp('/?.*'));
+});
+
+
+test('static serves default file', function (t) {
+    serveStaticTest(t, true, '.tmp');
+});
+
+
+test('GH-379 static serves file with parentheses in path', function (t) {
+    serveStaticTest(t, false, '.(tmp)');
+});
+
+
+test('audit logger timer test', function (t) {
+    // Dirty hack to capture the log record using a ring buffer.
+    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+    SERVER.once('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams:[ {
+                level: 'info',
+                type: 'raw',
+                stream: ringbuffer
+            }]
+        })
+    }));
+
+    SERVER.get('/audit', function aTestHandler(req, res, next) {
+        req.startHandlerTimer('audit-sub');
+
+        setTimeout(function () {
+            req.endHandlerTimer('audit-sub');
+            res.send('');
+            return (next());
+        }, 1000);
+    });
+
+    CLIENT.get('/audit', function (err, req, res) {
+        t.ifError(err);
+        // check timers
+        t.ok(ringbuffer.records[0], 'no log records');
+        t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
+        t.ok(ringbuffer.records[0].req.timers.aTestHandler > 1000000,
+             'atestHandler should be > 1000000');
+        t.ok(ringbuffer.records[0].req.timers['aTestHandler-audit-sub'] >
+             1000000, 'aTestHandler-audit-sub should be > 1000000');
+        var handlers = Object.keys(ringbuffer.records[0].req.timers);
+        t.equal(handlers[handlers.length - 2], 'aTestHandler-audit-sub',
+                'sub handler timer not in order');
+        t.equal(handlers[handlers.length - 1], 'aTestHandler',
+                'aTestHandler not last');
+        t.end();
+    });
+});
+
+
+test('audit logger anonymous timer test', function (t) {
+    // Dirty hack to capture the log record using a ring buffer.
+    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+    SERVER.once('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams:[ {
+                level: 'info',
+                type: 'raw',
+                stream: ringbuffer
+            }]
+        })
+    }));
+
+    SERVER.get('/audit', function (req, res, next) {
+        setTimeout(function () {
+            return (next());
+        }, 1000);
+    }, function (req, res, next) {
+        req.startHandlerTimer('audit-sub');
+
+        setTimeout(function () {
+            req.endHandlerTimer('audit-sub');
+            res.send('');
+            return (next());
+        }, 1000);
+    });
+
+    CLIENT.get('/audit', function (err, req, res) {
+        t.ifError(err);
+        // check timers
+        t.ok(ringbuffer.records[0], 'no log records');
+        t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
+        t.ok(ringbuffer.records[0].req.timers['handler-0'] > 1000000,
+             'handler-0 should be > 1000000');
+        t.ok(ringbuffer.records[0].req.timers['handler-1'] > 1000000,
+             'handler-1 should be > 1000000');
+        t.ok(ringbuffer.records[0].req.timers['handler-1-audit-sub'] >
+             1000000, 'handler-0-audit-sub should be > 1000000');
+        var handlers = Object.keys(ringbuffer.records[0].req.timers);
+        t.equal(handlers[handlers.length - 2], 'handler-1-audit-sub',
+                'sub handler timer not in order');
+        t.equal(handlers[handlers.length - 1], 'handler-1',
+                'handler-1 not last');
+        t.end();
+    });
+});
+
+
+///--- Privates
 function serveStaticTest(t, testDefault, tmpDir, regex) {
     var staticContent = '{"content": "abcdefg"}';
     var staticObj = JSON.parse(staticContent);
@@ -887,27 +1016,3 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
         });
     });
 }
-
-test('static serves static files', function (t) {
-    serveStaticTest(t, false, '.tmp');
-});
-
-test('static serves static files in nested folders', function (t) {
-    serveStaticTest(t, false, '.tmp/folder');
-});
-
-test('static serves static files in with a root regex', function (t) {
-    serveStaticTest(t, false, '.tmp', new RegExp('/.*'));
-});
-
-test('static serves static files with a root, !greedy, regex', function (t) {
-    serveStaticTest(t, false, '.tmp', new RegExp('/?.*'));
-});
-
-test('static serves default file', function (t) {
-    serveStaticTest(t, true, '.tmp');
-});
-
-test('GH-379 static serves file with parentheses in path', function (t) {
-    serveStaticTest(t, false, '.(tmp)');
-});
