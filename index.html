@@ -70,6 +70,9 @@ observability into the latency and characteristics of my
 applications.  If you don't need that, or don't care about those
 aspect(s), then it's probably not for you.</p>
 
+<p>For real time chat, discussion and support, join the <code>#restify</code> IRC channel on
+<code>irc.freenode.net</code>.</p>
+
 <h2>About this guide</h2>
 
 <p>This guide provides comprehensive documentation on writing a REST api (server)
@@ -543,6 +546,25 @@ attribute, that will be used, otherwise a default of 500 will be used
 });
 </code></pre>
 
+<p>Sometimes, for all requests, you may want to handle an error condition the same
+way. As an example, you may want to serve a 500 page on all
+<code>InternalServerErrors</code>. In this case you can add a listener for this error that
+is always fired when this Error is encountered by Restify as part of a
+<code>next(error)</code> statement. This gives you a way to handle all errors of the same
+class identically across the server.</p>
+
+<pre><code>server.get('/hello/:name', function(req, res, next) {
+  // some internal unrecoverable error
+  var err = new restify.errors.InternalServerError('oh noes!');
+  return next(err);
+});
+
+server.on('InternalServerError', function (req, res, err, cb) {
+  err._customContent = 'something is wrong!';
+  return cb();
+});
+</code></pre>
+
 <h3 id="httperror">HttpError</h3>
 
 <p>Now the obvious question is what that exactly does (in either case).
@@ -938,7 +960,7 @@ to something like:</p>
 </code></pre>
 
 <p><code>req.username</code> will also be set, and defaults to 'anonymous'.  If the scheme
-is unrecognized, the only thing avaiable in <code>req.authorization</code> will be
+is unrecognized, the only thing available in <code>req.authorization</code> will be
 <code>scheme</code> and <code>credentials</code> - it will be up to you to parse out the rest.</p>
 
 <h3 id="cors">CORS</h3>
@@ -954,7 +976,7 @@ a sample invocation is:</p>
 
 <pre><code>server.use(restify.CORS({
     origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-    credentials: true                  // defaults to false
+    credentials: true,                 // defaults to false
     headers: ['x-foo']                 // sets expose-headers
 }));
 </code></pre>
@@ -1101,8 +1123,8 @@ is expected that you are going to map it to a route, as below:</p>
 }));
 </code></pre>
 
-<p>The above <code>route</code> and <code>directory</code> combination will serve a file located in <br />
-<code>./documentation/v1/docs/current/index.html</code> when you attempt to hit 
+<p>The above <code>route</code> and <code>directory</code> combination will serve a file located in
+<code>./documentation/v1/docs/current/index.html</code> when you attempt to hit
 <code>http://localhost:8080/docs/current/</code>.</p>
 
 <p>The plugin will enforce that all files under <code>directory</code> are served. The
@@ -1246,7 +1268,26 @@ the <code>after</code> event:</p>
         },
         "httpVersion": "1.1",
         "trailers": {},
-        "version": "*"
+        "version": "*",
+        "timers": {
+          "bunyan": 52,
+          "saveAction": 8,
+          "reqResTracker": 213,
+          "addContext": 8,
+          "addModels": 4,
+          "resNamespaces": 5,
+          "parseQueryString": 11,
+          "instanceHeaders": 20,
+          "xForwardedProto": 7,
+          "httpsRedirector": 14,
+          "readBody": 21,
+          "parseBody": 6,
+          "xframe": 7,
+          "restifyCookieParser": 15,
+          "fooHandler": 23,
+          "barHandler": 14,
+          "carHandler": 14
+        }
       },
       "res": {
         "statusCode": 200,
@@ -1278,6 +1319,13 @@ the <code>after</code> event:</p>
       "v": 0
     }
 </code></pre>
+
+<p>The <code>timers</code> field shows the time each handler took to run in microseconds.
+Restify by default will record this information for every handler for each
+route. However, if you decide to include nested handlers, you can track the
+timing yourself by utilizing the Request
+<a href="#starthandlertimerhandlername">startHandlerTimer</a> and
+<a href="#endhandlertimerhandlername">endHandlerTimer</a> API.</p>
 
 <h2 id="request-api">Request API</h2>
 
@@ -1383,7 +1431,37 @@ instance that is a child component of the one restify has:</p>
 
 <h3 id="time">time()</h3>
 
-<p>the time when this request arrived (ms since epoch)</p>
+<p>The time when this request arrived (ms since epoch)</p>
+
+<h3 id="starthandlertimerhandlername">startHandlerTimer(handlerName)</h3>
+
+<p>Start the timer for a request handler. You might want to use this if you've got
+a Restify request handler in your chain that contains nested handlers.</p>
+
+<pre><code>function fooHandler(req, res, next) {
+    vasync.pipeline(funcs: [
+        function nestedHandler1(req, res, next) {
+            req.startHandlerTimer('nestedHandler1');
+            // do something
+            req.endHandlerTimer('nestedHandler1');
+            return next();
+        },
+        function nestedHandler1(req, res, next) {
+            req.startHandlerTimer('nestedHandler2');
+            // do something
+            req.endHandlerTimer('nestedHandler2');
+            return next();
+
+        }...
+    ]...
+}
+</code></pre>
+
+<h3 id="endhandlertimerhandlername">endHandlerTimer(handlerName)</h3>
+
+<p>End the timer for a request handler. You must invoke this function if you
+called <code>startRequestHandler</code> on a handler. Otherwise the time recorded will be
+incorrect.</p>
 
 <h3 id="properties-2">Properties</h3>
 
@@ -1989,7 +2067,7 @@ client.get('/str/mcavage', function(err, req) {
     });
 
     res.on('end', function() {
-      console.log(body);
+      console.log(res.body);
     });
   });
 });
