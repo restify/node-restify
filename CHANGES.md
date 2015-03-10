@@ -1,6 +1,6 @@
 # restify Changelog
 
-## not yet released
+## 2.9.0
 
 - #688 Fix various throttle bugs
 - #691 Fix an issue where posting with text/csv content type crashes Restify
