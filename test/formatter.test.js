@@ -114,7 +114,7 @@ test('q-val priority', function (t) {
     });
 });
 
-test('Content-Type in route not matching client Accept sends 406', function (t) {
+test('Content-Type in route not matching client Accept; 406', function (t) {
     var opts = {
         path: '/tmp2',
         headers: {
