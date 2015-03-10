@@ -20,9 +20,7 @@
 - #762 `res.noCache()` API to prevent all caching
 - #767 Prefer the existing `err` serializer for audit logging
 - Update dtrace-provider dependency
-
 - #753 **BREAKING** Include `err` parameter for all \*Error events:
-
   Error events will all have the signature `function (req, res, err, cb)` to
   become consistent with the handling functionality introduced in 2.8.5.
   Error handlers using the `function (req, res, cb)` signature must be updated.
