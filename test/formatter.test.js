@@ -41,6 +41,9 @@ before(function (callback) {
                 },
                 'application/foo; q=0.9': function () {
                     return ('foo!');
+                },
+                'application/bar; q=0.1': function () {
+                    return ('bar!');
                 }
             },
             dtrace: helper.dtrace,
@@ -110,6 +113,22 @@ test('q-val priority', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(data, 'foo!');
+        t.end();
+    });
+});
+
+test('q-val priority on */*', function (t) {
+    var opts = {
+        path: '/tmp',
+        headers: {
+            accept: '*/*'
+        }
+    };
+    CLIENT.get(opts, function (err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(data, 'sync fmt');
         t.end();
     });
 });
