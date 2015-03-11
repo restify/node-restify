@@ -1,5 +1,9 @@
 # restify Changelog
 
+## 3.0.0
+
+- Bumping major because of #753
+
 ## 2.9.0
 
 - #688 Fix various throttle bugs
