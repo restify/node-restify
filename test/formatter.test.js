@@ -117,7 +117,7 @@ test('q-val priority', function (t) {
     });
 });
 
-test('q-val priority on */*', function (t) {
+test('GH-771 q-val priority on */*', function (t) {
     var opts = {
         path: '/tmp',
         headers: {
