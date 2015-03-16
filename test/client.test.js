@@ -100,6 +100,7 @@ before(function (callback) {
         });
 
         SERVER.use(restify.acceptParser(['json', 'text/plain']));
+        SERVER.use(restify.jsonp()); // Added for GH-729
         SERVER.use(restify.dateParser());
         SERVER.use(restify.authorizationParser());
         SERVER.use(restify.queryParser());
@@ -202,6 +203,17 @@ test('GH-388 GET json, but really HTML', function (t) {
         t.ok(req);
         t.ok(res);
         t.deepEqual(obj, {});
+        t.end();
+    });
+});
+
+
+test('GH-729 GET jsonp', function (t) {
+    JSON_CLIENT.get('/json/jsonp?callback=testCallback', function (err, req, res) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.body, 'typeof testCallback === \'function\' && testCallback({"hello":"jsonp"});');
         t.end();
     });
 });
