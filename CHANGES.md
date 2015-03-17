@@ -1,5 +1,9 @@
 # restify Changelog
 
+## 3.0.1
+- #779 set-cookie headers should not include comma separated values. See:
+  http://tools.ietf.org/html/rfc6265#section-3
+
 ## 3.0.0
 
 - Bumping major because of #753
