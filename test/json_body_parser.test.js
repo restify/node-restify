@@ -1,4 +1,7 @@
 var restify = require('../lib');
+if (require.cache[__dirname + '/lib/helper.js']) {
+    delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
