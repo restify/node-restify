@@ -7,51 +7,51 @@ var helper = require('../helper.js');
 var test = helper.test;
 
 test('reviver', function (t) {
-  var jsonBodyParser = restify.plugins.jsonBodyParser;
+    var jsonBodyParser = restify.plugins.jsonBodyParser;
 
-  var parser = jsonBodyParser({
-    bodyReader: true,
-    reviver: function(key, value) {
-      if (key === '') { return value; }
-      return value + value;
-    }
-  })[0];
+    var parser = jsonBodyParser({
+        bodyReader: true,
+        reviver: function (key, value) {
+            if (key === '') { return value; }
+            return (value + value);
+        }
+    })[0];
 
-  var req = {
-    getContentType: function() {
-      return 'application/json';
-    },
-    body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
-    params: {}
-  };
+    var req = {
+        getContentType: function () {
+            return ('application/json');
+        },
+        body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
+        params: {}
+    };
 
-  parser(req, null, function() {
-    t.equal(req.params.apple, 'redred');
-    t.equal(req.params.orange, 'orangeorange');
-    t.equal(req.params.banana, 'yellowyellow');
-    t.end();
-  });
+    parser(req, null, function () {
+        t.equal(req.params.apple, 'redred');
+        t.equal(req.params.orange, 'orangeorange');
+        t.equal(req.params.banana, 'yellowyellow');
+        t.end();
+    });
 });
 
 test('no reviver', function (t) {
-  var jsonBodyParser = restify.plugins.jsonBodyParser;
+    var jsonBodyParser = restify.plugins.jsonBodyParser;
 
-  var parser = jsonBodyParser({
-    bodyReader: true
-  })[0];
+    var parser = jsonBodyParser({
+        bodyReader: true
+    })[0];
 
-  var req = {
-    getContentType: function() {
-      return 'application/json';
-    },
-    body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
-    params: {}
-  };
+    var req = {
+        getContentType: function () {
+            return ('application/json');
+        },
+        body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
+        params: {}
+    };
 
-  parser(req, null, function() {
-    t.equal(req.params.apple, 'red');
-    t.equal(req.params.orange, 'orange');
-    t.equal(req.params.banana, 'yellow');
-    t.end();
-  });
+    parser(req, null, function () {
+        t.equal(req.params.apple, 'red');
+        t.equal(req.params.orange, 'orange');
+        t.equal(req.params.banana, 'yellow');
+        t.end();
+    });
 });
