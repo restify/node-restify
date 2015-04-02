@@ -1,5 +1,5 @@
-var restify = require('../../../lib');
-var helper = require('../helper.js');
+var restify = require('../lib');
+var helper = require('./lib/helper.js');
 
 
 ///--- Globals
@@ -12,7 +12,9 @@ test('reviver', function (t) {
     var parser = jsonBodyParser({
         bodyReader: true,
         reviver: function (key, value) {
-            if (key === '') { return value; }
+            if (key === '') {
+                return (value);
+            }
             return (value + value);
         }
     })[0];
@@ -21,7 +23,11 @@ test('reviver', function (t) {
         getContentType: function () {
             return ('application/json');
         },
-        body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
+        body: JSON.stringify({
+            apple: 'red',
+            orange: 'orange',
+            banana: 'yellow'
+        }),
         params: {}
     };
 
@@ -44,7 +50,11 @@ test('no reviver', function (t) {
         getContentType: function () {
             return ('application/json');
         },
-        body: JSON.stringify({apple: 'red', orange: 'orange', banana: 'yellow'}),
+        body: JSON.stringify({
+            apple: 'red',
+            orange: 'orange',
+            banana: 'yellow'
+        }),
         params: {}
     };
 
