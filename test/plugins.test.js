@@ -982,8 +982,8 @@ test('GH-774 utf8 corruption in body parser', function (t) {
         });
 
     // create a long string of unicode characters
-    var tx = "";
-    for (var i = 0; i < slen; ++i) tx += "\u2661";
+    var tx = '';
+    for (var i = 0; i < slen; ++i) tx += '\u2661';
 
     CLIENT.post('/utf8', { text: tx }, function (err, _, res) {
         t.ifError(err);
