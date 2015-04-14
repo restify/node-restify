@@ -969,6 +969,29 @@ test('audit logger anonymous timer test', function (t) {
     });
 });
 
+test('GH-774 utf8 corruption in body parser', function (t) {
+    var slen = 100000;
+
+    SERVER.post('/utf8',
+        restify.bodyParser({ mapParams: false }),
+        function (req, res, next) {
+            t.notOk(/\ufffd/.test(req.body.text))
+            t.equal(req.body.text.length, slen)
+            res.send({ len: req.body.text.length });
+            next();
+        });
+
+    // create a long string of unicode characters
+    var tx = ""
+    for (var i = 0; i < slen; ++i) tx += "\u2661"
+
+    CLIENT.post('/utf8', { text: tx }, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
 
 ///--- Privates
 function serveStaticTest(t, testDefault, tmpDir, regex) {
