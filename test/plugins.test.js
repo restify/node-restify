@@ -400,7 +400,7 @@ test('body json ok (no params)', function (t) {
     });
 });
 
-test('body json ok (large)', function (t) {
+test('GH-792 body json ok (large)', function (t) {
     SERVER.post('/body/:id',
         restify.bodyParser({ mapParams: false }),
         function (req, res, next) {
@@ -408,6 +408,9 @@ test('body json ok (large)', function (t) {
             t.equal(req.params.name, 'markc');
             t.notOk(req.params.phone);
             t.equal(req.body.phone, '(206) 555-1212');
+            for (var i = 0; i<10000; i++) {
+                t.equal(req.body.extra[i], 'padding \u586b\u5145');
+            }
             res.send();
             next();
         });
@@ -418,7 +421,7 @@ test('body json ok (large)', function (t) {
         extra: []
     };
     for (var i = 0; i<10000; i++) {
-        obj.extra.push('padding padding');
+        obj.extra.push('padding \u586b\u5145');
     }
     CLIENT.post('/body/foo?name=markc', obj, function (err, _, res) {
         t.ifError(err);
