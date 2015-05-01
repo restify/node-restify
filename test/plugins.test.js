@@ -400,6 +400,36 @@ test('body json ok (no params)', function (t) {
     });
 });
 
+test('GH-792 body json ok (large)', function (t) {
+    SERVER.post('/body/:id',
+        restify.bodyParser({ mapParams: false }),
+        function (req, res, next) {
+            t.equal(req.params.id, 'foo');
+            t.equal(req.params.name, 'markc');
+            t.notOk(req.params.phone);
+            t.equal(req.body.phone, '(206) 555-1212');
+            for (var i = 0; i<10000; i++) {
+                t.equal(req.body.extra[i], 'padding \u586b\u5145');
+            }
+            res.send();
+            next();
+        });
+
+    var obj = {
+        phone: '(206) 555-1212',
+        name: 'somethingelse',
+        extra: []
+    };
+    for (var i = 0; i<10000; i++) {
+        obj.extra.push('padding \u586b\u5145');
+    }
+    CLIENT.post('/body/foo?name=markc', obj, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
 test('body json ok (null params)', function (t) {
     var STRING_CLIENT = restify.createStringClient({
         url: 'http://127.0.0.1:' + PORT,
