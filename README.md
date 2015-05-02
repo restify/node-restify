@@ -8,7 +8,7 @@
 
 [restify](http://mcavage.github.com/node-restify) is a smallish framework,
 similar to [express](http://expressjs.com) for building REST APIs.  For full
-details, see http://mcavage.github.com/node-restify.
+details, see http://restifyjs.com
 
 Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
 chat and support.

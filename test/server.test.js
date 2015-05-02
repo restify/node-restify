@@ -1402,6 +1402,29 @@ test('gh-193 basic', function (t) {
     });
 });
 
+test('gh-193 route name normalization', function (t) {
+    SERVER.get({
+        name: 'foo',
+        path: '/foo'
+    }, function (req, res, next) {
+        next('b-a-r');
+    });
+
+    SERVER.get({
+        name: 'b-a-r',
+        path: '/bar'
+    }, function (req, res, next) {
+        res.send(200);
+        next();
+    });
+
+    CLIENT.get('/foo', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
 
 test('gh-193 route ENOEXIST', function (t) {
     SERVER.get({
@@ -1805,6 +1828,23 @@ test('gh-762 res.noCache()', function (t) {
           'no-cache, no-store, must-revalidate');
         t.equal(res.headers.pragma, 'no-cache');
         t.equal(res.headers.expires, '0');
+        t.end();
+    });
+});
+
+
+test('gh-779 set-cookie fields should never have commas', function (t) {
+    SERVER.get('/set-cookie', function (req, res, next) {
+        res.header('set-cookie', 'foo');
+        res.header('set-cookie', 'bar');
+        res.send(200);
+    });
+
+    CLIENT.get('/set-cookie', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.headers['set-cookie'].length, 1,
+                'set-cookie header should only have 1 element');
+        t.equal(res.headers['set-cookie'], 'bar');
         t.end();
     });
 });

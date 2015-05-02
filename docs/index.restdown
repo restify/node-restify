@@ -698,7 +698,7 @@ and has several other events you want to listen on.
 
 ##### Event: 'NotFound'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a URL that does not exist, restify
 will emit this event. Note that restify checks for listeners on this
@@ -707,7 +707,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'MethodNotAllowed'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a URL that does exist, but you have
 not registered a route for that HTTP verb, restify will emit this
@@ -717,7 +717,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'VersionNotAllowed'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a route that exists, but does not
 match the version(s) on those routes, restify will emit this
@@ -727,7 +727,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: UnsupportedMediaType'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a route that exist, but has a `content-type`
 mismatch, restify will emit this event. Note that restify checks for listeners
@@ -999,6 +999,10 @@ current request id filled in, along with any other parameters you define.
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
+This logger can be used normally, with [req.log](#Request-API).
+
+This plugin does _not_ log each individual request. Use the Audit Logging
+plugin or a custom middleware for that use.
 
 ### GzipResponse
 
