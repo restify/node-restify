@@ -1,5 +1,13 @@
 # restify Changelog
 
+## 3.0.3
+- #669 Fix socket.io 1.x integration. Mark Doeswijk
+- #662 Improve request logger doc. Jordan Klassen
+- #793 Update Server API error event listener doc. github.com/durkes
+- #795 Remove unused vars in source. James Womack
+- #796 Hypermedia API fails when paths have multiple patterns with sub-regexs. Morten Fangel
+- #775 Fix UTF-8 corruption in body parser. Michał Moskal
+
 ## 3.0.2
 - #785 update semver dependency.
 ## 3.0.1
