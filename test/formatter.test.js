@@ -113,3 +113,23 @@ test('q-val priority', function (t) {
         t.end();
     });
 });
+
+test('Content-Type in route not matching client Accept; 406', function (t) {
+    var opts = {
+        path: '/tmp2',
+        headers: {
+            accept: 'application/foo'
+        }
+    };
+
+    SERVER.get('/tmp2', function (req, res) {
+        res.header('Content-Type', 'text/plain');
+        res.send('dummy response');
+    });
+
+
+    CLIENT.get(opts, function (err, req, res, data) {
+        t.equal(res.statusCode, 406);
+        t.end();
+    });
+});
