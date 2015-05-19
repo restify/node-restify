@@ -776,7 +776,7 @@ and has several other events you want to listen on.</p>
 
 <h5 id="event-notfound">Event: 'NotFound'</h5>
 
-<p><code>function (request, response, cb) {}</code></p>
+<p><code>function (request, response, error, cb) {}</code></p>
 
 <p>When a client request is sent for a URL that does not exist, restify
 will emit this event. Note that restify checks for listeners on this
@@ -785,7 +785,7 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4 id="event-methodnotallowed">Event: 'MethodNotAllowed'</h4>
 
-<p><code>function (request, response, cb) {}</code></p>
+<p><code>function (request, response, error, cb) {}</code></p>
 
 <p>When a client request is sent for a URL that does exist, but you have
 not registered a route for that HTTP verb, restify will emit this
@@ -795,7 +795,7 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4 id="event-versionnotallowed">Event: 'VersionNotAllowed'</h4>
 
-<p><code>function (request, response, cb) {}</code></p>
+<p><code>function (request, response, error, cb) {}</code></p>
 
 <p>When a client request is sent for a route that exists, but does not
 match the version(s) on those routes, restify will emit this
@@ -805,7 +805,7 @@ is expected that if you listen for this event, you respond to the client.</p>
 
 <h4 id="event-unsupportedmediatype">Event: UnsupportedMediaType'</h4>
 
-<p><code>function (request, response, cb) {}</code></p>
+<p><code>function (request, response, error, cb) {}</code></p>
 
 <p>When a client request is sent for a route that exist, but has a <code>content-type</code>
 mismatch, restify will emit this event. Note that restify checks for listeners
@@ -1096,7 +1096,11 @@ current request id filled in, along with any other parameters you define.</p>
 
 <p>You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
-logger created at server creation time will be used as the parent logger.</p>
+logger created at server creation time will be used as the parent logger.
+This logger can be used normally, with <a href="#Request-API">req.log</a>.</p>
+
+<p>This plugin does _not_ log each individual request. Use the Audit Logging
+plugin or a custom middleware for that use.</p>
 
 <h3 id="gzipresponse">GzipResponse</h3>
 
