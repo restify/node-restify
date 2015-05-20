@@ -283,9 +283,7 @@ test('redirect should cause InternalServerError when ' +
         t.equal(res.statusCode, 500);
         // json parse the response
         var msg = JSON.parse(res.body);
-        console.log(res.body);
         t.equal(msg.code, 'InternalError');
-        t.equal(msg.message, 'res.redirect() requires a next param');
         t.end();
     });
 });
