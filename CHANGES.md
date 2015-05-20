@@ -1,11 +1,71 @@
 # restify Changelog
 
-## not yet released
+## 3.0.3
+- #669 Fix socket.io 1.x integration. Mark Doeswijk
+- #662 Improve request logger doc. Jordan Klassen
+- #793 Update Server API error event listener doc. github.com/durkes
+- #795 Remove unused vars in source. James Womack
+- #796 Hypermedia API fails when paths have multiple patterns with sub-regexs. Morten Fangel
+- #775 Fix UTF-8 corruption in body parser. Michał Moskal
+
+## 3.0.2
+- #785 update semver dependency.
+## 3.0.1
+- #779 set-cookie headers should not include comma separated values. See:
+  http://tools.ietf.org/html/rfc6265#section-3
+
+## 3.0.0
+
+- Bumping major because of #753
+
+## 2.9.0
+
+- #688 Fix various throttle bugs
+- #691 Fix an issue where posting with text/csv content type crashes Restify
+- #693 Support multiple response header values
+- #704 Allow partial regex for named parameters
+- #726 Allow per-request agent overrides
+- #726 Ebanle `{agent: false}` option override per request
+- #727 Fix JSON body parser behavior when request body is null
+- #727 Fix a bug when `req.body === null`
+- #731 SVG badges in README
+- #734 Add API to track timers for nested handlers
+- #744 Fix `request.isUpload` for PATCH requests
+- #751 Fix `server.url` property when using IPv6
+- #758 Switch to UUID v4
+- #758 Use v4 UUIDs for `[x-]request-id`
+- #759 Documentation fix
+- #762 `res.noCache()` API to prevent all caching
+- #767 Prefer the existing `err` serializer for audit logging
+- Update dtrace-provider dependency
+- #753 **BREAKING** Include `err` parameter for all \*Error events:
+  Error events will all have the signature `function (req, res, err, cb)` to
+  become consistent with the handling functionality introduced in 2.8.5.
+  Error handlers using the `function (req, res, cb)` signature must be updated.
+
+## 2.8.5
+
+- Add ability to listen for error events
+- Documentation fixes
+
+## 2.8.4
+
+- Update dtrace-provider, bunyan and backoff
+- Fix request URL cache interaction with dtrace probes
+
+## 2.8.3
+
+- Support html5 multiple file uploads
+
+## 2.8.2
 
 - #619 Default to url, if string provided to createClient
 - #614 do not compute the MD5 Hash of a partial content
 - #516 Allow an `options` object to be passed into the authorization plugin
 - Updating dependencies
+- #626 Add more built-in errors to doc
+- #460 Provide direct access to https server options if needed
+- #656 update qs
 
 ## 2.8.1
 

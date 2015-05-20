@@ -36,18 +36,21 @@ function sendJson(req, res, next) {
 
 
 function sendText(req, res, next) {
-    var text = 'hello ' + (req.params.hello || req.params.name || ''); 
+    var text = 'hello ' + (req.params.hello || req.params.name || '');
 
-    if (req.headers['range']){
+    if (req.headers['range']) {
+        /* JSSTYLED */
         var matched = req.headers['range'].match(/bytes=([0-9]+)-([0-9]*)/);
-        var start = parseInt(matched[1]);
-        var length = (matched[2]) ? parseInt(matched[2]) - start : undefined;
+        var start = parseInt(matched[1], 10);
+        var length = ((matched[2]) ?
+                      parseInt(matched[2], 10) - start :
+                      undefined);
         var hash = crypto.createHash('md5');
         hash.update(text, 'utf8');
         res.header('content-md5', hash.digest('base64'));
         res.status(206);
         text = text.substr(start, length);
-    };
+    }
 
     res.send(text);
     next();
@@ -97,6 +100,7 @@ before(function (callback) {
         });
 
         SERVER.use(restify.acceptParser(['json', 'text/plain']));
+        SERVER.use(restify.jsonp()); // Added for GH-778
         SERVER.use(restify.dateParser());
         SERVER.use(restify.authorizationParser());
         SERVER.use(restify.queryParser());
@@ -192,6 +196,20 @@ test('GET json', function (t) {
     });
 });
 
+test('GH-778 GET jsonp', function (t) {
+    // Using variables here to keep lines under 80 chars
+    var jsonpUrl = '/json/jsonp?callback=testCallback';
+    var expectedResult = 'typeof testCallback === \'function\' && ' +
+                         'testCallback({"hello":"jsonp"});';
+
+    JSON_CLIENT.get(jsonpUrl, function (err, req, res) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.body, expectedResult);
+        t.end();
+    });
+});
 
 test('GH-388 GET json, but really HTML', function (t) {
     JSON_CLIENT.get('/json/boom', function (err, req, res, obj) {
@@ -525,6 +543,19 @@ test('POST raw', function (t) {
     });
 });
 
+test('PR-726 Enable {agent: false} option override per request', function (t) {
+    var opts = {
+        path: '/str/noagent',
+        agent: false
+    };
+    RAW_CLIENT.get(opts, function (err, req, res) {
+        t.ifError(err);
+        t.notStrictEqual(req.agent, RAW_CLIENT.agent,
+            'request should not use client agent');
+        t.end();
+    });
+});
+
 test('GH-20 connectTimeout', function (t) {
     var client = restify.createClient({
         url: 'http://169.254.1.10',
@@ -770,64 +801,64 @@ test('secure client connection with timeout', function (t) {
 
 
 test('create JSON client with url instead of opts', function (t) {
-  var client = restify.createJsonClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+    var client = restify.createJsonClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/json/mcavage', function (err, req, res, obj) {
-      t.deepEqual(obj, {hello: 'mcavage'});
-      t.end();
-  });
+    client.get('/json/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
 });
 
 
 test('create string client with url instead of opts', function (t) {
-  var client = restify.createStringClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+    var client = restify.createStringClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/str/mcavage', function (err, req, res, data) {
-      t.equal(data, 'hello mcavage');
-      t.end();
-  });
+    client.get('/str/mcavage', function (err, req, res, data) {
+        t.equal(data, 'hello mcavage');
+        t.end();
+    });
 });
 
 
-test('create http client with url instead of opts', function(t) {
-  var client = restify.createHttpClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
+test('create http client with url instead of opts', function (t) {
+    var client = restify.createHttpClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
 
-  client.get('/str/mcavage', function (err, req) {
-      req.on('result', function(err, res) {
-          res.body = '';
-          res.setEncoding('utf8');
-          res.on('data', function(chunk) {
-              res.body += chunk;
-          });
+    client.get('/str/mcavage', function (err, req) {
+        req.on('result', function (err2, res) {
+            res.body = '';
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                res.body += chunk;
+            });
 
-          res.on('end', function() {
-              t.equal(res.body, '"hello mcavage"');
-              t.end();
-          });
-      });
-  });
-});
-
-
-test('create base client with url instead of opts', function(t) {
-  var client = restify.createClient('http://127.0.0.1:' + PORT);
-  client.agent = false;
-
-  client.get('/str/mcavage', function (err, req, res, data) {
-    req.on('result', function(err, res) {
-        res.body = '';
-        res.setEncoding('utf8');
-        res.on('data', function(chunk) {
-            res.body += chunk;
-        });
-
-        res.on('end', function() {
-            t.equal(res.body, '"hello mcavage"');
-            t.end();
+            res.on('end', function () {
+                t.equal(res.body, '"hello mcavage"');
+                t.end();
+            });
         });
     });
-  });
+});
+
+
+test('create base client with url instead of opts', function (t) {
+    var client = restify.createClient('http://127.0.0.1:' + PORT);
+    client.agent = false;
+
+    client.get('/str/mcavage', function (err, req) {
+        req.on('result', function (err2, res) {
+            res.body = '';
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                res.body += chunk;
+            });
+
+            res.on('end', function () {
+                t.equal(res.body, '"hello mcavage"');
+                t.end();
+            });
+        });
+    });
 });

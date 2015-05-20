@@ -31,6 +31,9 @@ observability into the latency and characteristics of my
 applications.  If you don't need that, or don't care about those
 aspect(s), then it's probably not for you.
 
+For real time chat, discussion and support, join the `#restify` IRC channel on
+`irc.freenode.net`.
+
 ## About this guide
 
 This guide provides comprehensive documentation on writing a REST api (server)
@@ -144,6 +147,7 @@ below (and `listen()` takes the same arguments as node's
 ||spdy||Object||Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)||
 ||version||String||A default version to set for all routes||
 ||handleUpgrades||Boolean||Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`||
+||httpsServerOptions||Object||Any options accepted by [node-https Server](http://nodejs.org/api/https.html#https_https). If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.||
 
 ## Common handlers: server.use()
 
@@ -260,25 +264,21 @@ Routes can also accept more than one handler function. For instance:
 
 If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.
 
-```js
-server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
+    server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
 
-// in another route
-res.send({
-  country: 'Australia',
-  // render a URL by specifying the route name and parameters
-  capital: server.router.render('city', {slug: 'canberra'}, {details: true})
-});
-```
+    // in another route
+    res.send({
+      country: 'Australia',
+      // render a URL by specifying the route name and parameters
+      capital: server.router.render('city', {slug: 'canberra'}, {details: true})
+    });
 
 Which returns:
 
-```json
-{
-  "country": "Australia",
-  "capital": "/cities/canberra?details=true"
-}
-```
+    {
+      "country": "Australia",
+      "capital": "/cities/canberra?details=true"
+    }
 
 ### Versioned Routes
 
@@ -323,8 +323,8 @@ Try hitting with:
 In the first case, we didn't specify an `Accept-Version` header
 at all, so restify treats that like sending a `*`. Much as not sending
 an `Accept` header means the client gets the server's choice. Restify
-will choose the first matching route, in the order specified in the
-code. In the second case, we explicitly asked for for V1, which got
+will choose this highest matching route.
+In the second case, we explicitly asked for for V1, which got
 us the same response, but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an `Accept` header, so we got a JSON response).  Which
@@ -476,6 +476,23 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
       });
     });
 
+Sometimes, for all requests, you may want to handle an error condition the same
+way. As an example, you may want to serve a 500 page on all
+`InternalServerErrors`. In this case you can add a listener for this error that
+is always fired when this Error is encountered by Restify as part of a
+`next(error)` statement. This gives you a way to handle all errors of the same
+class identically across the server.
+
+    server.get('/hello/:name', function(req, res, next) {
+      // some internal unrecoverable error
+      var err = new restify.errors.InternalServerError('oh noes!');
+      return next(err);
+    });
+
+    server.on('InternalServerError', function (req, res, err, cb) {
+      err._customContent = 'something is wrong!';
+      return cb();
+    });
 
 ### HttpError
 
@@ -562,21 +579,58 @@ attributes `code` and `message`.  For example, here's a built-in RestError:
 
 The built-in restify errors are:
 
-* RestError
-* BadDigestError
-* BadMethodError
-* InternalError
-* InvalidArgumentError
-* InvalidContentError
-* InvalidCredentialsError
-* InvalidHeaderError
-* InvalidVersionError
-* MissingParameterError
-* NotAuthorizedError
-* RequestExpiredError
-* RequestThrottledError
-* ResourceNotFoundError
-* WrongAcceptError
+* BadRequestError (400 Bad Request)
+* UnauthorizedError (401 Unauthorized)
+* PaymentRequiredError (402 Payment Required)
+* ForbiddenError (403 Forbidden)
+* NotFoundError (404 Not Found)
+* MethodNotAllowedError (405 Method Not Allowed)
+* NotAcceptableError (406 Not Acceptable)
+* ProxyAuthenticationRequiredError (407 Proxy Authentication Required)
+* RequestTimeoutError (408 Request Time-out)
+* ConflictError (409 Conflict)
+* GoneError (410 Gone)
+* LengthRequiredError (411 Length Required)
+* PreconditionFailedError (412 Precondition Failed)
+* RequestEntityTooLargeError (413 Request Entity Too Large)
+* RequesturiTooLargeError (414 Request-URI Too Large)
+* UnsupportedMediaTypeError (415 Unsupported Media Type)
+* RequestedRangeNotSatisfiableError (416 Requested Range Not Satisfiable)
+* ExpectationFailedError (417 Expectation Failed)
+* ImATeapotError (418 I'm a teapot)
+* UnprocessableEntityError (422 Unprocessable Entity)
+* LockedError (423 Locked)
+* FailedDependencyError (424 Failed Dependency)
+* UnorderedCollectionError (425 Unordered Collection)
+* UpgradeRequiredError (426 Upgrade Required)
+* PreconditionRequiredError (428 Precondition Required)
+* TooManyRequestsError (429 Too Many Requests)
+* RequestHeaderFieldsTooLargeError (431 Request Header Fields Too Large)
+* InternalServerError (500 Internal Server Error)
+* NotImplementedError (501 Not Implemented)
+* BadGatewayError (502 Bad Gateway)
+* ServiceUnavailableError (503 Service Unavailable)
+* GatewayTimeoutError (504 Gateway Time-out)
+* HttpVersionNotSupportedError (505 HTTP Version Not Supported)
+* VariantAlsoNegotiatesError (506 Variant Also Negotiates)
+* InsufficientStorageError (507 Insufficient Storage)
+* BandwidthLimitExceededError (509 Bandwidth Limit Exceeded)
+* NotExtendedError (510 Not Extended)
+* NetworkAuthenticationRequiredError (511 Network Authentication Required)
+* BadDigestError (400 Bad Request)
+* BadMethodError (405 Method Not Allowed)
+* InternalError (500 Internal Server Error)
+* InvalidArgumentError (409 Conflict)
+* InvalidContentError (400 Bad Request)
+* InvalidCredentialsError (401 Unauthorized)
+* InvalidHeaderError (400 Bad Request)
+* InvalidVersionError (400 Bad Request)
+* MissingParameterError (409 Conflict)
+* NotAuthorizedError (403 Forbidden)
+* RequestExpiredError (400 Bad Request)
+* RequestThrottledError (429 Too Many Requests)
+* ResourceNotFoundError (404 Not Found)
+* WrongAcceptError (406 Not Acceptable)
 
 You can always add your own by subclassing `restify.RestError` like:
 
@@ -619,6 +673,7 @@ server as if it were a "raw" node server:
             res.writeHead(200);
             res.end(data);
             next();
+        });
     });
 
 
@@ -643,7 +698,7 @@ and has several other events you want to listen on.
 
 ##### Event: 'NotFound'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a URL that does not exist, restify
 will emit this event. Note that restify checks for listeners on this
@@ -652,7 +707,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'MethodNotAllowed'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a URL that does exist, but you have
 not registered a route for that HTTP verb, restify will emit this
@@ -662,7 +717,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: 'VersionNotAllowed'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a route that exists, but does not
 match the version(s) on those routes, restify will emit this
@@ -672,7 +727,7 @@ is expected that if you listen for this event, you respond to the client.
 
 #### Event: UnsupportedMediaType'
 
-`function (request, response, cb) {}`
+`function (request, response, error, cb) {}`
 
 When a client request is sent for a route that exist, but has a `content-type`
 mismatch, restify will emit this event. Note that restify checks for listeners
@@ -736,6 +791,11 @@ a hook to change request headers and the like if you need to. Note that
       req.headers.accept = 'application/json';  // screw you client!
       return next();
     });
+
+You can also clean up URLs before routes are matched with the built in
+`restify.pre.sanitizePath`. This [re-implements v1.4 behaviour](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters)
+
+    server.pre(restify.pre.sanitizePath());
 
 #### use()
 
@@ -811,7 +871,7 @@ to something like:
     }
 
 `req.username` will also be set, and defaults to 'anonymous'.  If the scheme
-is unrecognized, the only thing avaiable in `req.authorization` will be
+is unrecognized, the only thing available in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
 
 ### CORS
@@ -826,7 +886,7 @@ a sample invocation is:
 
     server.use(restify.CORS({
         origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-        credentials: true                  // defaults to false
+        credentials: true,                 // defaults to false
         headers: ['x-foo']                 // sets expose-headers
     }));
 
@@ -885,7 +945,8 @@ supported.
             });
         },
         keepExtensions: false,
-        uploadDir: os.tmpdir()
+        uploadDir: os.tmpdir(),
+        multiples: true
      }));
 
 Options:
@@ -921,6 +982,7 @@ Options:
   * `uploadDir` - Where uploaded files are intermediately stored during transfer
     before the contents is mapped into `req.params`. Does nothing
     if `multipartFileHandler` is defined.
+  * `multiples` - if you want to support html5 multiple attribute in upload fields.
 
 ### RequestLogger
 
@@ -937,6 +999,10 @@ current request id filled in, along with any other parameters you define.
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
+This logger can be used normally, with [req.log](#Request-API).
+
+This plugin does _not_ log each individual request. Use the Audit Logging
+plugin or a custom middleware for that use.
 
 ### GzipResponse
 
@@ -961,8 +1027,8 @@ is expected that you are going to map it to a route, as below:
       default: 'index.html'
     }));
 
-The above `route` and `directory` combination will serve a file located in  
-`./documentation/v1/docs/current/index.html` when you attempt to hit 
+The above `route` and `directory` combination will serve a file located in
+`./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`.
 
 The plugin will enforce that all files under `directory` are served. The
@@ -1094,7 +1160,26 @@ You pass in the auditor a bunyan logger, and it will write out records at the
             },
             "httpVersion": "1.1",
             "trailers": {},
-            "version": "*"
+            "version": "*",
+            "timers": {
+              "bunyan": 52,
+              "saveAction": 8,
+              "reqResTracker": 213,
+              "addContext": 8,
+              "addModels": 4,
+              "resNamespaces": 5,
+              "parseQueryString": 11,
+              "instanceHeaders": 20,
+              "xForwardedProto": 7,
+              "httpsRedirector": 14,
+              "readBody": 21,
+              "parseBody": 6,
+              "xframe": 7,
+              "restifyCookieParser": 15,
+              "fooHandler": 23,
+              "barHandler": 14,
+              "carHandler": 14
+            }
           },
           "res": {
             "statusCode": 200,
@@ -1125,6 +1210,13 @@ You pass in the auditor a bunyan logger, and it will write out records at the
           "time": "2012-02-07T20:30:31.896Z",
           "v": 0
         }
+
+The `timers` field shows the time each handler took to run in microseconds.
+Restify by default will record this information for every handler for each
+route. However, if you decide to include nested handlers, you can track the
+timing yourself by utilizing the Request
+[startHandlerTimer](#starthandlertimerhandlername) and
+[endHandlerTimer](#endhandlertimerhandlername) API.
 
 ## Request API
 
@@ -1225,7 +1317,36 @@ instance that is a child component of the one restify has:
 
 ### time()
 
-the time when this request arrived (ms since epoch)
+The time when this request arrived (ms since epoch)
+
+### startHandlerTimer(handlerName)
+
+Start the timer for a request handler. You might want to use this if you've got
+a Restify request handler in your chain that contains nested handlers.
+
+    function fooHandler(req, res, next) {
+        vasync.pipeline(funcs: [
+            function nestedHandler1(req, res, next) {
+                req.startHandlerTimer('nestedHandler1');
+                // do something
+                req.endHandlerTimer('nestedHandler1');
+                return next();
+            },
+            function nestedHandler1(req, res, next) {
+                req.startHandlerTimer('nestedHandler2');
+                // do something
+                req.endHandlerTimer('nestedHandler2');
+                return next();
+
+            }...
+        ]...
+    }
+
+### endHandlerTimer(handlerName)
+
+End the timer for a request handler. You must invoke this function if you
+called `startRequestHandler` on a handler. Otherwise the time recorded will be
+incorrect.
 
 ### Properties
 
@@ -1771,7 +1892,7 @@ is already used).
         });
 
         res.on('end', function() {
-          console.log(body);
+          console.log(res.body);
         });
       });
     });

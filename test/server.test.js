@@ -98,10 +98,25 @@ test('listen and close (socketPath)', function (t) {
 });
 
 
+test('gh-751 IPv4/IPv6 server URL', function (t) {
+    t.equal(SERVER.url, 'http://127.0.0.1:' + PORT, 'ipv4 url');
+
+    var server = restify.createServer();
+    server.listen(PORT + 1, '::1', function () {
+        t.equal(server.url, 'http://[::1]:' + (PORT + 1), 'ipv6 url');
+
+        server.close(function () {
+            t.end();
+        });
+    });
+});
+
+
 test('get (path only)', function (t) {
     var r = SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send();
         next();
     });
@@ -216,6 +231,7 @@ test('PUT ok', function (t) {
     SERVER.put('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), true);
         res.send();
         next();
     });
@@ -232,6 +248,7 @@ test('PATCH ok', function (t) {
     SERVER.patch('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), true);
         res.send();
         next();
     });
@@ -257,6 +274,7 @@ test('HEAD ok', function (t) {
     SERVER.head('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send('hi there');
         next();
     });
@@ -284,6 +302,7 @@ test('DELETE ok', function (t) {
     SERVER.del('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
         res.send(204, 'hi there');
         next();
     });
@@ -378,6 +397,34 @@ test('CORS Preflight - invalid origin', function (t) {
     http.request(opts, function (res) {
         t.equal(res.headers['access-control-allow-origin'], '*');
         t.equal(res.headers['access-control-allow-credentials'], undefined);
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
+test('CORS Preflight - any origin', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ 'http://somesite.local', '*' ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: 'localhost',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            'Origin': 'http://anysite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'http://anysite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
         t.equal(res.statusCode, 200);
         t.end();
     }).end();
@@ -1170,6 +1217,44 @@ test('<url>/?<queryString> broken', function (t) {
 });
 
 
+test('GH #704: Route with a valid RegExp params', function (t) {
+
+    SERVER.get({
+        name: 'regexp_param1',
+        path: '/foo/:id([0-9]+)'
+    }, function (req, res, next) {
+        t.equal(req.params.id, '0123456789');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/foo/0123456789', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('GH #704: Route with an unvalid RegExp params', function (t) {
+
+    SERVER.get({
+        name: 'regexp_param2',
+        path: '/foo/:id([0-9]+)'
+    }, function (req, res, next) {
+        t.equal(req.params.id, 'A__M');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/foo/A__M', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+
 test('content-type routing vendor', function (t) {
     SERVER.post({
         name: 'foo',
@@ -1271,6 +1356,28 @@ test('content-type routing params only', function (t) {
     });
 });
 
+test('malformed content type', function (t) {
+    SERVER.post({
+        name: 'foo',
+        path: '/',
+        contentType: 'application/json'
+    }, function (req, res, next) {
+        res.send(201);
+    });
+
+    var opts = {
+        path: '/',
+        headers: {
+            'content-type': 'boom'
+        }
+    };
+
+    CLIENT.post(opts, {}, function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 415);
+        t.end();
+    });
+});
 
 test('gh-193 basic', function (t) {
     SERVER.get({
@@ -1282,6 +1389,29 @@ test('gh-193 basic', function (t) {
 
     SERVER.get({
         name: 'bar',
+        path: '/bar'
+    }, function (req, res, next) {
+        res.send(200);
+        next();
+    });
+
+    CLIENT.get('/foo', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('gh-193 route name normalization', function (t) {
+    SERVER.get({
+        name: 'foo',
+        path: '/foo'
+    }, function (req, res, next) {
+        next('b-a-r');
+    });
+
+    SERVER.get({
+        name: 'b-a-r',
         path: '/bar'
     }, function (req, res, next) {
         res.send(200);
@@ -1583,7 +1713,6 @@ test('explicitly sending a 403 with custom error', function (t) {
     });
 });
 
-
 test('explicitly sending a 403 on error', function (t) {
     SERVER.get('/', function (req, res, next) {
         res.send(403, new Error('bah!'));
@@ -1592,6 +1721,130 @@ test('explicitly sending a 403 on error', function (t) {
     CLIENT.get('/', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 403);
+        t.end();
+    });
+});
+
+
+test('fire event on error', function (t) {
+    SERVER.once('InternalServer', function (req, res, err, cb) {
+        t.ok(req);
+        t.ok(res);
+        t.ok(err);
+        t.ok(cb);
+        t.equal(typeof (cb), 'function');
+        return (cb());
+    });
+
+    SERVER.get('/', function (req, res, next) {
+        return (next(new restify.errors.InternalServerError('bah!')));
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.expect(7);
+        t.end();
+    });
+});
+
+
+test('error handler defers "after" event', function (t) {
+    t.expect(9);
+    SERVER.once('NotFound', function (req, res, err, cb) {
+        t.ok(req);
+        t.ok(res);
+        t.ok(cb);
+        t.equal(typeof (cb), 'function');
+        t.ok(err);
+
+        SERVER.removeAllListeners('after');
+        SERVER.once('after', function (req2, res2) {
+            t.ok(req2);
+            t.ok(res2);
+            t.end();
+        });
+        res.send(404, 'foo');
+        return (cb());
+    });
+    SERVER.once('after', function () {
+        // do not fire prematurely
+        t.notOk(true);
+    });
+    CLIENT.get('/' + uuid(), function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+
+test('gh-757 req.absoluteUri() defaults path segment to req.path()',
+     function (t) {
+    SERVER.get('/the-original-path', function (req, res, next) {
+        var prefix = 'http://127.0.0.1:' + PORT;
+        t.equal(req.absoluteUri('?key=value'),
+                prefix + '/the-original-path/?key=value');
+        t.equal(req.absoluteUri('#fragment'),
+                prefix + '/the-original-path/#fragment');
+        t.equal(req.absoluteUri('?key=value#fragment'),
+                prefix + '/the-original-path/?key=value#fragment');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/the-original-path', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('GH-693 sending multiple response header values', function (t) {
+    SERVER.get('/', function (req, res, next) {
+        res.link('/', 'self');
+        res.link('/foo', 'foo');
+        res.link('/bar', 'bar');
+        res.send(200, 'root');
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(res.headers.link.split(',').length, 3);
+        t.end();
+    });
+});
+
+
+test('gh-762 res.noCache()', function (t) {
+    SERVER.get('/some-path', function (req, res, next) {
+        res.noCache();
+        res.send('data');
+    });
+
+    CLIENT.get('/some-path', function (err, _, res) {
+        t.equal(res.headers['cache-control'],
+          'no-cache, no-store, must-revalidate');
+        t.equal(res.headers.pragma, 'no-cache');
+        t.equal(res.headers.expires, '0');
+        t.end();
+    });
+});
+
+
+test('gh-779 set-cookie fields should never have commas', function (t) {
+    SERVER.get('/set-cookie', function (req, res, next) {
+        res.header('set-cookie', 'foo');
+        res.header('set-cookie', 'bar');
+        res.send(200);
+    });
+
+    CLIENT.get('/set-cookie', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.headers['set-cookie'].length, 1,
+                'set-cookie header should only have 1 element');
+        t.equal(res.headers['set-cookie'], 'bar');
         t.end();
     });
 });
