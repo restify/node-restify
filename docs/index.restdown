@@ -1414,6 +1414,27 @@ that.
     res.send(201, {hello: 'world'});
     res.send(new BadRequestError('meh'));
 
+### redirect(status, url, next)
+### redirect([url | options], next)
+
+A convenience method for 301/302 redirects. Using this method will
+tell restify to stop execution of your handler chain. You can also
+use an options object. `next` is required.
+
+    res.redirect('/foo', next);
+    res.redirect('http://www.foo.com', next);
+    res.redirect(301, '/foo', next);
+    res.redirect({
+      hostname: 'www.foo.com',
+      pathname: '/bar',
+      port: 80,                 // defaults to 80
+      secure: true,             // sets https
+      permanent: true,
+      query: {
+        a: 1
+      }
+    }, next);  // => redirects to 301 https://www.foo.com/bar?a=1
+
 ### json([status], body)
 
 Short-hand for:
