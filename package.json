@@ -84,6 +84,7 @@
     "nodeunit": "^0.9.0",
     "watershed": "^0.3.0"
   },
+  "license": "MIT",
   "scripts": {
     "test": "make prepush"
   }
