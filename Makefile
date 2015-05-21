@@ -20,15 +20,15 @@
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 NODECOVER	:= ./node_modules/.bin/cover
 BUNYAN		:= ./node_modules/.bin/bunyan
+ESLINT		:= ./node_modules/.bin/eslint
 NPM		:= npm
 
 #
 # Files
 #
 DOC_FILES	 = index.restdown
+ESLINT_JS_FILES  = '.'
 JS_FILES	:= $(shell find lib test bin -name '*.js')
-JSL_CONF_NODE	 = tools/jsl.node.conf
-JSL_FILES_NODE   = $(JS_FILES)
 JSSTYLE_FILES	 = $(JS_FILES)
 JSSTYLE_FLAGS    = -f tools/jsstyle.conf
 SHRINKWRAP	 = npm-shrinkwrap.json

@@ -1,19 +1,20 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+'use strict';
+
 var fs = require('fs');
 var http = require('http');
 var net = require('net');
 var path = require('path');
-var stream = require('stream');
-var util = require('util');
 
 var bunyan = require('bunyan');
 
 var restify = require('../lib');
 
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
@@ -839,8 +840,9 @@ test('gzip body json ok', function (t) {
     CLIENT.post('/body/foo?name=markc', obj, function (err, _, res) {
         t.ifError(err);
         t.ok(res);
-        if (res)
+        if (res) {
             t.equal(res.statusCode, 200);
+        }
         t.end();
     });
 });
@@ -983,7 +985,9 @@ test('GH-774 utf8 corruption in body parser', function (t) {
 
     // create a long string of unicode characters
     var tx = '';
-    for (var i = 0; i < slen; ++i) tx += '\u2661';
+    for (var i = 0; i < slen; ++i) {
+        tx += '\u2661';
+    }
 
     CLIENT.post('/utf8', { text: tx }, function (err, _, res) {
         t.ifError(err);

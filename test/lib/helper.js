@@ -4,6 +4,8 @@
 // a common logger for all tests.
 //
 
+'use strict';
+
 var domain = require('domain');
 
 var bunyan = require('bunyan');
@@ -22,8 +24,7 @@ module.exports = {
             var self = this;
 
             d.once('error', function (err) {
-                console.error('after: uncaught error\n', +
-                    err.stack);
+                console.error('after: uncaught error\n', err.stack);
                 process.exit(1);
             });
 

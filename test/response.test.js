@@ -1,8 +1,12 @@
-var restify = require('../lib');
+'use strict';
+
 var url = require('url');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+var restify = require('../lib');
+
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 

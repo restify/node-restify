@@ -45,31 +45,13 @@
 #	DOC_FILES	Restdown (documentation source) files. These are
 #			assumed to be contained in "docs/", and must NOT
 #			contain the "docs/" prefix.
-#
-#	JSL_CONF_NODE	Specify JavaScriptLint configuration files
-#	JSL_CONF_WEB	(paths relative to top-level Makefile)
-#
-#			Node.js and Web configuration files are separate
-#			because you'll usually want different global variable
-#			configurations.  If no file is specified, none is given
-#			to jsl, which causes it to use a default configuration,
-#			which probably isn't what you want.
-#
-#	JSL_FILES_NODE	JavaScript files to check with Node config file.
-#	JSL_FILES_WEB	JavaScript files to check with Web config file.
-#
+##
 # You can also override these variables:
 #
 #	BASH		Path to bash (default: bash)
 #
 #	CSCOPE_DIRS	Directories to search for source files for the cscope
 #			index. (default: ".")
-#
-#	JSL		Path to JavaScriptLint (default: "jsl")
-#
-#	JSL_FLAGS_NODE	Additional flags to pass through to JSL
-#	JSL_FLAGS_WEB
-#	JSL_FLAGS
 #
 #	JSSTYLE		Path to jsstyle (default: jsstyle)
 #
@@ -84,13 +66,11 @@ BASHSTYLE	?= tools/bashstyle
 CP		?= cp
 CSCOPE		?= cscope
 CSCOPE_DIRS	?= .
-JSL		?= jsl
 JSSTYLE		?= jsstyle
 MKDIR		?= mkdir -p
 MV		?= mv
 RESTDOWN_FLAGS	?=
 RMTREE		?= rm -rf
-JSL_FLAGS  	?= --nologo --nosummary
 
 ifeq ($(shell uname -s),SunOS)
 	TAR	?= gtar
@@ -106,16 +86,6 @@ BUILD		= build
 DISTCLEAN_FILES += $(BUILD)
 DOC_BUILD	= $(BUILD)/docs/public
 
-#
-# Configure JSL_FLAGS_{NODE,WEB} based on JSL_CONF_{NODE,WEB}.
-#
-ifneq ($(origin JSL_CONF_NODE), undefined)
-	JSL_FLAGS_NODE += --conf=$(JSL_CONF_NODE)
-endif
-
-ifneq ($(origin JSL_CONF_WEB), undefined)
-	JSL_FLAGS_WEB += --conf=$(JSL_CONF_WEB)
-endif
 
 #
 # Targets. For descriptions on what these are supposed to do, see the
@@ -157,27 +127,18 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 %.bashstyle: %
 	$(BASHSTYLE) $^
 
-.PHONY: check-jsl check-jsl-node check-jsl-web
-check-jsl: check-jsl-node check-jsl-web
-
-check-jsl-node: $(JSL_FILES_NODE:%=%.jslnodechk)
-
-check-jsl-web: $(JSL_FILES_WEB:%=%.jslwebchk)
-
-%.jslnodechk: % $(JSL_EXEC)
-	$(JSL) $(JSL_FLAGS) $(JSL_FLAGS_NODE) $<
-
-%.jslwebchk: % $(JSL_EXEC)
-	$(JSL) $(JSL_FLAGS) $(JSL_FLAGS_WEB) $<
-
 .PHONY: check-jsstyle
 check-jsstyle: $(JSSTYLE_FILES:%=%.jsstylechk)
+
+.PHONY: check-eslint
+check-eslint::
+	$(ESLINT) $(ESLINT_JS_FILES)
 
 %.jsstylechk: % $(JSSTYLE_EXEC)
 	$(JSSTYLE) $(JSSTYLE_FLAGS) $<
 
 .PHONY: check
-check: check-jsl check-jsstyle check-bash
+check: check-eslint check-jsstyle check-bash
 	@echo check ok
 
 .PHONY: clean

@@ -1,18 +1,19 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+'use strict';
+
 var assert = require('assert-plus');
-var fs = require('fs');
 var http = require('http');
 
 var filed = require('filed');
 var uuid = require('node-uuid');
 
-var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
@@ -126,15 +127,17 @@ test('get (path only)', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(r, route.name);
-        if (++count === 2)
+        if (++count === 2) {
             t.end();
+        }
     });
 
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        if (++count === 2)
+        if (++count === 2) {
             t.end();
+        }
     });
 });
 
@@ -890,8 +893,9 @@ test('test matches params with custom regex', function (t) {
                 } else {
                     t.ok(err);
                 }
-                if (++done === count)
+                if (++done === count) {
                     t.end();
+                }
             });
         });
 
@@ -1107,8 +1111,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
         });
     }
 
-    for (i = 0; i < versions.length; i++)
+    for (i = 0; i < versions.length; i++) {
         mnt(versions[i]);
+    }
 
     var opts = {
         path: p,
@@ -1276,8 +1281,9 @@ test('content-type routing vendor', function (t) {
         var _done = 0;
 
         function done() {
-            if (++_done === 2)
+            if (++_done === 2) {
                 t.end();
+            }
         }
 
         var opts = {
@@ -1327,8 +1333,9 @@ test('content-type routing params only', function (t) {
     var _done = 0;
 
     function done() {
-        if (++_done === 2)
+        if (++_done === 2) {
             t.end();
+        }
     }
 
     var opts = {
@@ -1685,8 +1692,9 @@ test('GH-401 regex routing broken', function (t) {
     function client_cb(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 204);
-        if (++done === 2)
+        if (++done === 2) {
             t.end();
+        }
     }
 
     SERVER.get('/image', handle);

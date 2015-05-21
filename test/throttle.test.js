@@ -1,27 +1,22 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
-var http = require('http');
-
-var uuid = require('node-uuid');
+'use strict';
 
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
 ///--- Globals
 
-var after = helper.after;
-var before = helper.before;
 var test = helper.test;
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
-var USERNAME = uuid();
-var PASSWORD = uuid();
 
 var errorMessage = 'Error message should include rate 0.5 r/s. Received: ';
 ///--- Tests
@@ -36,8 +31,9 @@ test('setup', function (t) {
     });
 
     SERVER.use(function ghettoAuthenticate(req, res, next) {
-        if (req.params.name)
+        if (req.params.name) {
             req.username = req.params.name;
+        }
 
         next();
     });

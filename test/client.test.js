@@ -1,5 +1,7 @@
 // Copyright 2012 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
+'use strict';
+
 var http = require('http');
 
 var crypto = require('crypto');
@@ -8,8 +10,9 @@ var uuid = require('node-uuid');
 
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
@@ -38,9 +41,9 @@ function sendJson(req, res, next) {
 function sendText(req, res, next) {
     var text = 'hello ' + (req.params.hello || req.params.name || '');
 
-    if (req.headers['range']) {
+    if (req.headers.range) {
         /* JSSTYLED */
-        var matched = req.headers['range'].match(/bytes=([0-9]+)-([0-9]*)/);
+        var matched = req.headers.range.match(/bytes=([0-9]+)-([0-9]*)/);
         var start = parseInt(matched[1], 10);
         var length = ((matched[2]) ?
                       parseInt(matched[2], 10) - start :
@@ -717,13 +720,15 @@ test('sign a request', function (t) {
     var called = 0;
     var signer = function sign(request) {
         called++;
-        if (!request || !(request instanceof http.ClientRequest))
+        if (!request || !(request instanceof http.ClientRequest)) {
             throw new Error('request must be an instance of ' +
                 'http.ClientRequest');
+        }
         var gw = request.getHeader('Gusty-Winds');
-        if (!gw)
+        if (!gw) {
             throw new Error('Gusty-Winds header was not ' +
                 'present in request');
+        }
         request.setHeader('Awesome-Signature', 'Gusty Winds ' + gw);
     };
     var client = restify.createClient({

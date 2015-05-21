@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "cover": "^0.2.9",
+    "eslint": "^0.21.2",
     "filed": "^0.1.0",
     "nodeunit": "^0.9.0",
     "watershed": "^0.3.0"
