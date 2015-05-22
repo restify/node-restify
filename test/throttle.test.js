@@ -43,11 +43,11 @@ test('setup', function (t) {
         rate: 0.5,
         username: true,
         overrides: {
-            'admin': {
+            admin: {
                 burst: 0,
                 rate: 0
             },
-            'special': {
+            special: {
                 burst: 3,
                 rate: 1
             }
@@ -124,13 +124,13 @@ test('override limited (not throttled)', function (t) {
 
 test('throttled after limited override', function (t) {
     CLIENT.get('/test/throttleMe', function () {
-    CLIENT.get('/test/throttleMe', function (err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 429);
-        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
-            errorMessage + (err && err.message));
-        t.end();
-    });
+        CLIENT.get('/test/throttleMe', function (err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 429);
+            t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
+                errorMessage + (err && err.message));
+            t.end();
+        });
     });
 });
 
@@ -154,13 +154,13 @@ test('override unlimited (not throttled)', function (t) {
 
 test('throttled after unlimited override', function (t) {
     CLIENT.get('/test/throttleMe', function () {
-    CLIENT.get('/test/throttleMe', function (err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 429);
-        t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
-            errorMessage + (err && err.message));
-        t.end();
-    });
+        CLIENT.get('/test/throttleMe', function (err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 429);
+            t.ok(err && err.message && err.message.indexOf('0.5 r/s') !== -1,
+                errorMessage + (err && err.message));
+            t.end();
+        });
     });
 });
 

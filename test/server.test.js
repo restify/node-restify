@@ -366,7 +366,7 @@ test('CORS Preflight - valid origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://somesite.local'
+            Origin: 'http://somesite.local'
         }
     };
     http.request(opts, function (res) {
@@ -394,7 +394,7 @@ test('CORS Preflight - invalid origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://othersite.local'
+            Origin: 'http://othersite.local'
         }
     };
     http.request(opts, function (res) {
@@ -421,7 +421,7 @@ test('CORS Preflight - any origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://anysite.local'
+            Origin: 'http://anysite.local'
         }
     };
     http.request(opts, function (res) {
@@ -791,7 +791,7 @@ test('GH-149 limit request body size', function (t) {
         method: 'POST',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/x-www-form-urlencoded',
             'transfer-encoding': 'chunked'
         }
@@ -821,7 +821,7 @@ test('GH-149 limit request body size (json)', function (t) {
         method: 'POST',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/json',
             'transfer-encoding': 'chunked'
         }
@@ -923,7 +923,7 @@ test('GH-180 can parse DELETE body', function (t) {
         method: 'DELETE',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/json',
             'transfer-encoding': 'chunked'
         }
@@ -1128,8 +1128,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
     });
 });
 
-/* JSSTYLED */
-test('versioned route matching should prefer first match if equal versions', function (t) {
+
+test('versioned route matching should prefer \
+    first match if equal versions', function (t) {
     var p = '/' + uuid.v4();
 
     SERVER.get({
@@ -1207,7 +1208,6 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
 test('<url>/?<queryString> broken', function (t) {
     SERVER.pre(restify.pre.sanitizePath());
     SERVER.use(restify.queryParser());
-    /* JSSTYLED */
     SERVER.get(/\/.*/, function (req, res, next) {
         res.send(req.params);
     });

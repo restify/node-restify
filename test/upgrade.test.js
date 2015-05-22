@@ -29,7 +29,7 @@ var TIMEOUT = 15000;
 ///--- Test Helper
 
 function
-    finish_latch(_test, _names) {
+    finishLatch(_test, _names) {
     var complete = false;
     var t = _test;
     var names = _names;
@@ -44,6 +44,7 @@ function
             Object.keys(names).join(', '));
         t.done();
     }, TIMEOUT);
+
     return (function (name, err) {
         if (complete) {
             return;
@@ -123,7 +124,7 @@ after(function (cb) {
 
 
 test('GET without upgrade headers', function (t) {
-    var done = finish_latch(t, {
+    var done = finishLatch(t, {
         'client response': 1,
         'server response': 1
     });
@@ -137,7 +138,7 @@ test('GET without upgrade headers', function (t) {
 
     var options = {
         headers: {
-            'uprgade': 'ebfrockets'
+            upgrade: 'ebfrockets'
         },
         path: '/attach'
     };
@@ -165,7 +166,7 @@ test('GET without upgrade headers', function (t) {
 
 
 test('Dueling upgrade and response handling 1', function (t) {
-    var done = finish_latch(t, {
+    var done = finishLatch(t, {
         'expected requestUpgrade error': 1,
         'client response': 1
     });
@@ -191,8 +192,8 @@ test('Dueling upgrade and response handling 1', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -221,7 +222,7 @@ test('Dueling upgrade and response handling 1', function (t) {
 
 
 test('Dueling upgrade and response handling 2', function (t) {
-    var done = finish_latch(t, {
+    var done = finishLatch(t, {
         'expected res.send error': 1,
         'expected server to reset': 1
     });
@@ -251,8 +252,8 @@ test('Dueling upgrade and response handling 2', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -266,7 +267,7 @@ test('Dueling upgrade and response handling 2', function (t) {
 
 
 test('GET with upgrade headers', function (t) {
-    var done = finish_latch(t, {
+    var done = finishLatch(t, {
         'client shed end': 1,
         'server shed end': 1
     });
@@ -293,8 +294,8 @@ test('GET with upgrade headers', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -331,7 +332,7 @@ test('GET with upgrade headers', function (t) {
 
 
 test('GET with some websocket traffic', function (t) {
-    var done = finish_latch(t, {
+    var done = finishLatch(t, {
         'client shed end': 1,
         'server shed end': 1,
         'server receive message': 5,
@@ -367,8 +368,8 @@ test('GET with some websocket traffic', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -387,8 +388,7 @@ test('GET with some websocket traffic', function (t) {
             t.equal(typeof (socket), 'object');
             t.ok(Buffer.isBuffer(head), 'head is Buffer');
             t.doesNotThrow(function () {
-                var shed = WATERSHED.connect(res, socket, head,
-                    wskey);
+                var shed = WATERSHED.connect(res, socket, head, wskey);
                 SHEDLIST.push(shed);
                 shed.on('error', function (err3) {
                     t.ifError(err3);

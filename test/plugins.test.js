@@ -285,8 +285,8 @@ test('body multipart ok', function (t) {
         t.end();
     });
 
-    /* JSSTYLED */
-    client.write('--huff\r\nContent-Disposition: form-data; name="endorphins"\r\n\r\n9000\r\n--huff--');
+    client.write('--huff\r\nContent-Disposition: form-data; ' +
+                 'name="endorphins"\r\n\r\n9000\r\n--huff--');
     client.end();
 });
 
@@ -346,8 +346,9 @@ test('body multipart ok custom handling', function (t) {
     client.write('12\r\n');
 
     client.write('--huff\r\n');
-    /* JSSTYLED */
+    // jscs:disable maximumLineLength
     client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
+    // jscs:enable maximumLineLength
     client.write('Content-Type: text/plain\r\n\r\n');
     client.write(detailsString + '\r\n');
     client.write('--huff--');
@@ -517,8 +518,8 @@ test('GH-279 more JSON Arrays', function (t) {
 
     var obj = [
         {
-            'id': '123654',
-            'name': 'mimi'
+            id: '123654',
+            name: 'mimi'
         },
         {
             id: '987654',

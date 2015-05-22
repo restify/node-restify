@@ -276,8 +276,8 @@ test('redirect using options.url', function (t) {
 });
 
 
-test('redirect should cause InternalServerError when ' +
-      'invoked without next', function (t) {
+// jscs:disable maximumLineLength
+test('redirect should cause InternalServerError when invoked without next', function (t) {
 
     SERVER.get('/9', function (req, res, next) {
         res.redirect();
@@ -291,7 +291,7 @@ test('redirect should cause InternalServerError when ' +
         t.end();
     });
 });
-
+// jscs:enable maximumLineLength
 
 test('redirect should call next with false to stop ' +
       'handler stack execution', function (t) {

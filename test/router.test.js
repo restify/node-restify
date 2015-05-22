@@ -124,8 +124,8 @@ test('render route (query string)', function (t) {
         'cities/towns': 5
     });
 
-    /* JSSTYLED */
-    t.equal(country1, '/countries/Australia?state=New%20South%20Wales&cities%2Ftowns=5');
+    t.equal(country1,
+            '/countries/Australia?state=New%20South%20Wales&cities%2Ftowns=5');
 
     var country2 = server.router.render('country', {
         name: 'Australia'
@@ -134,8 +134,8 @@ test('render route (query string)', function (t) {
         'cities&towns': 5
     });
 
-    /* JSSTYLED */
-    t.equal(country2, '/countries/Australia?state=NSW%20%26%20VIC&cities%26towns=5');
+    t.equal(country2,
+            '/countries/Australia?state=NSW%20%26%20VIC&cities%26towns=5');
 
     t.end();
 });
