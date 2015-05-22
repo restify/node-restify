@@ -1,7 +1,10 @@
+'use strict';
+
 var mergeQs = require('../lib/utils').mergeQs;
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 ///--- Globals

@@ -1,15 +1,16 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
-var assert = require('assert-plus');
+'use strict';
+
 var restify = require('../lib');
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
 ///--- Globals
 
-var realizeUrl = restify.realizeUrl;
 var test = helper.test;
 var mockResponse = function respond(req, res, next) {
     res.send(200);
