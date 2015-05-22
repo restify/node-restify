@@ -6,4 +6,5 @@ bin/
 deps/
 docs/
 examples/
+cover_html/
 

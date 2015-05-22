@@ -100,9 +100,9 @@
         "no-path-concat": [ 0 ],
         "no-process-exit": [ 0 ],
 
-        // stylistic
+        // stylistic - turn off all style rules. we use a separate style checker
         "camelcase": [ 0 ],
-        "eol-last": [ 2 ],
+        "eol-last": [ 0 ],
         "key-spacing": [ 0 ],
         "new-cap": [ 0 ],
         "no-array-constructor": [ 0 ],
