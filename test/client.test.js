@@ -61,6 +61,7 @@ function sendText(req, res, next) {
 function sendSignature(req, res, next) {
     res.header('content-type', 'text/plain');
     var hdr = req.header('Awesome-Signature');
+
     if (!hdr) {
         res.send('request NOT signed');
     } else {
@@ -71,6 +72,7 @@ function sendSignature(req, res, next) {
 
 function sendWhitespace(req, res, next) {
     var body = ' ';
+
     if (req.params.flavor === 'spaces') {
         body = '   ';
     } else if (req.params.flavor === 'tabs') {
@@ -719,11 +721,13 @@ test('sign a request', function (t) {
     var called = 0;
     var signer = function sign(request) {
         called++;
+
         if (!request || !(request instanceof http.ClientRequest)) {
             throw new Error('request must be an instance of ' +
                 'http.ClientRequest');
         }
         var gw = request.getHeader('Gusty-Winds');
+
         if (!gw) {
             throw new Error('Gusty-Winds header was not ' +
                 'present in request');
@@ -782,6 +786,7 @@ test('secure client connection with timeout', function (t) {
             's35vQZaHqRxUVZjOi6/MTCZmqvg/RpaVQYHiJHvxGzw=\n' +
             '-----END RSA PRIVATE KEY-----'
     });
+
     // jscs:enable maximumLineLength
     server.get('/ping', function (req, res) {
         res.end('pong');

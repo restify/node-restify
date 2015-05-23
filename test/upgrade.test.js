@@ -113,6 +113,7 @@ after(function (cb) {
             SERVER = null;
             cb();
         });
+
         while (SHEDLIST.length > 0) {
             SHEDLIST.pop().destroy();
         }

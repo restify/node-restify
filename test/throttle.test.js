@@ -19,6 +19,7 @@ var CLIENT;
 var SERVER;
 
 var errorMessage = 'Error message should include rate 0.5 r/s. Received: ';
+
 ///--- Tests
 
 

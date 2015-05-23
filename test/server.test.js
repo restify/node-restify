@@ -127,6 +127,7 @@ test('get (path only)', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(r, route.name);
+
         if (++count === 2) {
             t.end();
         }
@@ -135,6 +136,7 @@ test('get (path only)', function (t) {
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
+
         if (++count === 2) {
             t.end();
         }
@@ -893,6 +895,7 @@ test('test matches params with custom regex', function (t) {
                 } else {
                     t.ok(err);
                 }
+
                 if (++done === count) {
                     t.end();
                 }
@@ -1692,6 +1695,7 @@ test('GH-401 regex routing broken', function (t) {
     function client_cb(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 204);
+
         if (++done === 2) {
             t.end();
         }

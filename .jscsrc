@@ -63,11 +63,8 @@
         "for",
         "if",
         "switch",
-        "case",
         "try",
-        "while",
-        "return",
-        "function"
+        "while"
     ],
     "requirePaddingNewLinesBeforeLineComments": {
         "allExcept": "firstAfterCurly"

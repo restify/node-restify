@@ -88,6 +88,7 @@ module.exports = {
 
     get dtrace() {
         var dtp;
+
         try {
             var d = require('dtrace-provider');
             dtp = d.createDTraceProvider('restifyUnitTest');
