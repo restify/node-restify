@@ -53,10 +53,6 @@
 #	CSCOPE_DIRS	Directories to search for source files for the cscope
 #			index. (default: ".")
 #
-#	JSSTYLE		Path to jsstyle (default: jsstyle)
-#
-#	JSSTYLE_FLAGS	Additional flags to pass through to jsstyle
-#
 
 #
 # Defaults for the various tools we use.
@@ -66,7 +62,6 @@ BASHSTYLE	?= tools/bashstyle
 CP		?= cp
 CSCOPE		?= cscope
 CSCOPE_DIRS	?= .
-JSSTYLE		?= jsstyle
 MKDIR		?= mkdir -p
 MV		?= mv
 RESTDOWN_FLAGS	?=
@@ -127,18 +122,16 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 %.bashstyle: %
 	$(BASHSTYLE) $^
 
-.PHONY: check-jsstyle
-check-jsstyle: $(JSSTYLE_FILES:%=%.jsstylechk)
+.PHONY: check-jscs
+check-jscs::
+	$(JSCS) $(JS_FILES)
 
 .PHONY: check-eslint
 check-eslint::
-	$(ESLINT) $(ESLINT_JS_FILES)
-
-%.jsstylechk: % $(JSSTYLE_EXEC)
-	$(JSSTYLE) $(JSSTYLE_FLAGS) $<
+	$(ESLINT) $(JS_FILES)
 
 .PHONY: check
-check: check-eslint check-jsstyle check-bash
+check: check-eslint check-jscs check-bash
 	@echo check ok
 
 .PHONY: clean

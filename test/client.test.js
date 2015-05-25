@@ -42,7 +42,6 @@ function sendText(req, res, next) {
     var text = 'hello ' + (req.params.hello || req.params.name || '');
 
     if (req.headers.range) {
-        /* JSSTYLED */
         var matched = req.headers.range.match(/bytes=([0-9]+)-([0-9]*)/);
         var start = parseInt(matched[1], 10);
         var length = ((matched[2]) ?
@@ -62,6 +61,7 @@ function sendText(req, res, next) {
 function sendSignature(req, res, next) {
     res.header('content-type', 'text/plain');
     var hdr = req.header('Awesome-Signature');
+
     if (!hdr) {
         res.send('request NOT signed');
     } else {
@@ -72,6 +72,7 @@ function sendSignature(req, res, next) {
 
 function sendWhitespace(req, res, next) {
     var body = ' ';
+
     if (req.params.flavor === 'spaces') {
         body = '   ';
     } else if (req.params.flavor === 'tabs') {
@@ -586,86 +587,86 @@ test('requestTimeout', function (t) {
 
 test('GH-169 PUT json Content-MD5', function (t) {
     var msg = {
-        '_id': '4ff71172bc148900000010a3',
-        'userId': '4f711b377579dbf65e000001',
-        'courseId': '4f69021bff338faffa000001',
-        'createdByUserId': '4f711b377579dbf65e000001',
-        'dateFrom': '2012-06-04',
-        'dateTo': '2012-09-30',
-        'notes': 'Rates do not include tax & are subject to change ' +
+        _id: '4ff71172bc148900000010a3',
+        userId: '4f711b377579dbf65e000001',
+        courseId: '4f69021bff338faffa000001',
+        createdByUserId: '4f711b377579dbf65e000001',
+        dateFrom: '2012-06-04',
+        dateTo: '2012-09-30',
+        notes: 'Rates do not include tax & are subject to change ' +
             'without notice\\nRental Clubs are available for $30 ' +
             'per set\\nAll major credit cards accepted',
-        'updatedAt': '2012-07-06T17:59:08.581Z',
-        'periods': [
+        updatedAt: '2012-07-06T17:59:08.581Z',
+        periods: [
             {
-                'name': 'morning',
-                'weekdayWalking': 1500,
-                'weekdayCart': 3000,
-                'weekendWalking': 2000,
-                'weekendCart': 3500,
-                'timeFrom': 0,
-                'timeTo': 780,
-                '_id': '4ff71172bc148900000010a4'
+                name: 'morning',
+                weekdayWalking: 1500,
+                weekdayCart: 3000,
+                weekendWalking: 2000,
+                weekendCart: 3500,
+                timeFrom: 0,
+                timeTo: 780,
+                _id: '4ff71172bc148900000010a4'
             },
             {
-                'timeFrom': 780,
-                'name': 'twilight',
-                'timeTo': 900,
-                'weekdayWalking': 1500,
-                'weekdayCart': 2500,
-                'weekendWalking': 1500,
-                'weekendCart': 3000,
-                '_id': '4ff7276cbc148900000010f4'
+                timeFrom: 780,
+                name: 'twilight',
+                timeTo: 900,
+                weekdayWalking: 1500,
+                weekdayCart: 2500,
+                weekendWalking: 1500,
+                weekendCart: 3000,
+                _id: '4ff7276cbc148900000010f4'
             },
             {
-                'timeFrom': 900,
-                'name': 'super twilight',
-                'weekdayWalking': 1200,
-                'weekdayCart': 2000,
-                'weekendWalking': 1200,
-                'weekendCart': 2500,
-                'timeTo': 1439,
-                '_id': '4ff7276cbc148900000010f3'
+                timeFrom: 900,
+                name: 'super twilight',
+                weekdayWalking: 1200,
+                weekdayCart: 2000,
+                weekendWalking: 1200,
+                weekendCart: 2500,
+                timeTo: 1439,
+                _id: '4ff7276cbc148900000010f3'
             }
         ],
-        'holidays': [
+        holidays: [
             {
-                'country': 'US',
-                'name': 'Flag Day',
-                'start': 1339657200000,
-                'end': 1339743600000,
-                'date': '2012-06-14'
+                country: 'US',
+                name: 'Flag Day',
+                start: 1339657200000,
+                end: 1339743600000,
+                date: '2012-06-14'
             },
             {
-                'country': 'US / MX',
-                'name': 'Father\'s Day, Día del Padre ' +
+                country: 'US / MX',
+                name: 'Father\'s Day, Día del Padre ' +
                     '(Father\'s Day)',
-                'start': 1340262000000,
-                'end': 1340348400000,
-                'date': '2012-06-21'
+                start: 1340262000000,
+                end: 1340348400000,
+                date: '2012-06-21'
             },
             {
-                'country': 'US',
-                'name': 'Independence Day',
-                'start': 1341385200000,
-                'end': 1341471600000,
-                'date': '2012-07-04'
+                country: 'US',
+                name: 'Independence Day',
+                start: 1341385200000,
+                end: 1341471600000,
+                date: '2012-07-04'
             },
             {
-                'country': 'US',
-                'name': 'Labor Day',
-                'start': 1347001200000,
-                'end': 1347087600000,
-                'date': '2012-09-07'
+                country: 'US',
+                name: 'Labor Day',
+                start: 1347001200000,
+                end: 1347087600000,
+                date: '2012-09-07'
             }
         ],
-        'weekdaySunday': false,
-        'weekdaySaturday': false,
-        'weekdayFriday': false,
-        'weekdayThursday': true,
-        'weekdayWednesday': true,
-        'weekdayTuesday': true,
-        'weekdayMonday': true
+        weekdaySunday: false,
+        weekdaySaturday: false,
+        weekdayFriday: false,
+        weekdayThursday: true,
+        weekdayWednesday: true,
+        weekdayTuesday: true,
+        weekdayMonday: true
     };
 
     JSON_CLIENT.put('/json/md5', msg, function (err, req, res, obj) {
@@ -720,11 +721,13 @@ test('sign a request', function (t) {
     var called = 0;
     var signer = function sign(request) {
         called++;
+
         if (!request || !(request instanceof http.ClientRequest)) {
             throw new Error('request must be an instance of ' +
                 'http.ClientRequest');
         }
         var gw = request.getHeader('Gusty-Winds');
+
         if (!gw) {
             throw new Error('Gusty-Winds header was not ' +
                 'present in request');
@@ -748,7 +751,7 @@ test('sign a request', function (t) {
     });
 });
 
-/* BEGIN JSSTYLED */
+// jscs:disable maximumLineLength
 test('secure client connection with timeout', function (t) {
     var server = restify.createServer({
         certificate: '-----BEGIN CERTIFICATE-----\n' +
@@ -783,12 +786,18 @@ test('secure client connection with timeout', function (t) {
             's35vQZaHqRxUVZjOi6/MTCZmqvg/RpaVQYHiJHvxGzw=\n' +
             '-----END RSA PRIVATE KEY-----'
     });
+
+    // jscs:enable maximumLineLength
     server.get('/ping', function (req, res) {
         res.end('pong');
     });
     server.listen(8443);
 
-    var client = restify.createStringClient({url: 'https://127.0.0.1:8443', connectTimeout: 2000, rejectUnauthorized: false});
+    var client = restify.createStringClient({
+        url: 'https://127.0.0.1:8443',
+        connectTimeout: 2000,
+        rejectUnauthorized: false
+    });
     var timeout = setTimeout(function () {
         t.ok(false, 'timed out');
         t.end();
@@ -802,7 +811,6 @@ test('secure client connection with timeout', function (t) {
         t.end();
     });
 });
-/* END JSSTYLED */
 
 
 test('create JSON client with url instead of opts', function (t) {

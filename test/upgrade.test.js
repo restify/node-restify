@@ -44,7 +44,7 @@ function
             Object.keys(names).join(', '));
         t.done();
     }, TIMEOUT);
-    return (function (name, err) {
+    return function (name, err) {
         if (complete) {
             return;
         }
@@ -73,7 +73,7 @@ function
             iv = null;
             t.done();
         }
-    });
+    };
 }
 
 
@@ -112,6 +112,7 @@ after(function (cb) {
             SERVER = null;
             cb();
         });
+
         while (SHEDLIST.length > 0) {
             SHEDLIST.pop().destroy();
         }
@@ -137,7 +138,7 @@ test('GET without upgrade headers', function (t) {
 
     var options = {
         headers: {
-            'uprgade': 'ebfrockets'
+            uprgade: 'ebfrockets'  // this is intentional misspelling of upgrade
         },
         path: '/attach'
     };
@@ -191,8 +192,8 @@ test('Dueling upgrade and response handling 1', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -251,8 +252,8 @@ test('Dueling upgrade and response handling 2', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -293,8 +294,8 @@ test('GET with upgrade headers', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -313,8 +314,7 @@ test('GET with upgrade headers', function (t) {
             t.equal(typeof (socket), 'object');
             t.ok(Buffer.isBuffer(head), 'head is Buffer');
             t.doesNotThrow(function () {
-                var shed = WATERSHED.connect(res, socket, head,
-                    wskey);
+                var shed = WATERSHED.connect(res, socket, head, wskey);
                 SHEDLIST.push(shed);
                 shed.end('ok, done');
                 shed.on('error', function (err3) {
@@ -367,8 +367,8 @@ test('GET with some websocket traffic', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'

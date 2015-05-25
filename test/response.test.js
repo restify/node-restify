@@ -201,6 +201,7 @@ test('redirect should extend existing query params', function (t) {
         });
         t.equal(parsedUrl.query.b, 2);
         t.equal(parsedUrl.pathname, '/6');
+
         // t.equal(res.headers.location, join(LOCALHOST, '/6?a=1&b=2'));
         t.end();
     });
@@ -276,8 +277,8 @@ test('redirect using options.url', function (t) {
 });
 
 
-test('redirect should cause InternalServerError when ' +
-      'invoked without next', function (t) {
+// jscs:disable maximumLineLength
+test('redirect should cause InternalServerError when invoked without next', function (t) {
 
     SERVER.get('/9', function (req, res, next) {
         res.redirect();
@@ -285,6 +286,7 @@ test('redirect should cause InternalServerError when ' +
 
     CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
         t.equal(res.statusCode, 500);
+
         // json parse the response
         var msg = JSON.parse(res.body);
         t.equal(msg.code, 'InternalError');
@@ -292,6 +294,7 @@ test('redirect should cause InternalServerError when ' +
     });
 });
 
+// jscs:enable maximumLineLength
 
 test('redirect should call next with false to stop ' +
       'handler stack execution', function (t) {
@@ -316,6 +319,7 @@ test('redirect should call next with false to stop ' +
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, '/10');
+
         // handler B should not be executed
         t.equal(wasRun, false);
         t.end();

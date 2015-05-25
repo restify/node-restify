@@ -15,13 +15,6 @@
 #
 
 
-# jsstyle
-#
-JSSTYLE_EXEC	?= deps/jsstyle/jsstyle
-JSSTYLE		?= $(JSSTYLE_EXEC)
-
-$(JSSTYLE_EXEC): | deps/jsstyle/.git
-
 #
 # restdown
 #

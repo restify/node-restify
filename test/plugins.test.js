@@ -70,6 +70,7 @@ before(function (callback) {
 
 after(function (callback) {
     var i;
+
     try {
         for (i = 0; i < FILES_TO_DELETE.length; ++i) {
             try {
@@ -78,6 +79,7 @@ after(function (callback) {
             catch (err) { /* normal */
             }
         }
+
         for (i = 0; i < DIRS_TO_DELETE.length; ++i) {
             try {
                 fs.rmdirSync(DIRS_TO_DELETE[i]);
@@ -285,8 +287,8 @@ test('body multipart ok', function (t) {
         t.end();
     });
 
-    /* JSSTYLED */
-    client.write('--huff\r\nContent-Disposition: form-data; name="endorphins"\r\n\r\n9000\r\n--huff--');
+    client.write('--huff\r\nContent-Disposition: form-data; ' +
+                 'name="endorphins"\r\n\r\n9000\r\n--huff--');
     client.end();
 });
 
@@ -346,8 +348,11 @@ test('body multipart ok custom handling', function (t) {
     client.write('12\r\n');
 
     client.write('--huff\r\n');
-    /* JSSTYLED */
+
+    // jscs:disable maximumLineLength
     client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
+
+    // jscs:enable maximumLineLength
     client.write('Content-Type: text/plain\r\n\r\n');
     client.write(detailsString + '\r\n');
     client.write('--huff--');
@@ -517,8 +522,8 @@ test('GH-279 more JSON Arrays', function (t) {
 
     var obj = [
         {
-            'id': '123654',
-            'name': 'mimi'
+            id: '123654',
+            name: 'mimi'
         },
         {
             id: '987654',
@@ -770,10 +775,12 @@ test('gzip large response', function (t) {
     require('util').inherits(TestStream, require('stream'));
     TestStream.prototype.resume = function () {
         var self = this;
+
         if (!this.interval) {
             this.interval = setInterval(function () {
                 var chunkSize = Math.min(self.totalSize -
                     self.sentSize, 65536);
+
                 if (chunkSize > 0) {
                     var chunk = new Array(chunkSize + 1);
                     chunk = chunk.join('a');
@@ -840,6 +847,7 @@ test('gzip body json ok', function (t) {
     CLIENT.post('/body/foo?name=markc', obj, function (err, _, res) {
         t.ifError(err);
         t.ok(res);
+
         if (res) {
             t.equal(res.statusCode, 200);
         }
@@ -905,6 +913,7 @@ test('audit logger timer test', function (t) {
 
     CLIENT.get('/audit', function (err, req, res) {
         t.ifError(err);
+
         // check timers
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
@@ -953,6 +962,7 @@ test('audit logger anonymous timer test', function (t) {
 
     CLIENT.get('/audit', function (err, req, res) {
         t.ifError(err);
+
         // check timers
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
@@ -985,6 +995,7 @@ test('GH-774 utf8 corruption in body parser', function (t) {
 
     // create a long string of unicode characters
     var tx = '';
+
     for (var i = 0; i < slen; ++i) {
         tx += '\u2661';
     }
@@ -1019,6 +1030,7 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
                 t.ifError(err3);
                 FILES_TO_DELETE.push(file);
                 var opts = { directory: tmpPath };
+
                 if (testDefault) {
                     opts.defaultFile = testFileName;
                     routeName += ' with default';

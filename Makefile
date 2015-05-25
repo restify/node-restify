@@ -21,16 +21,14 @@ NODEUNIT	:= ./node_modules/.bin/nodeunit
 NODECOVER	:= ./node_modules/.bin/cover
 BUNYAN		:= ./node_modules/.bin/bunyan
 ESLINT		:= ./node_modules/.bin/eslint
+JSCS		:= ./node_modules/.bin/jscs
 NPM		:= npm
 
 #
 # Files
 #
 DOC_FILES	 = index.restdown
-ESLINT_JS_FILES  = '.'
-JS_FILES	:= $(shell find lib test bin -name '*.js')
-JSSTYLE_FILES	 = $(JS_FILES)
-JSSTYLE_FLAGS    = -f tools/jsstyle.conf
+JS_FILES	 = '.'
 SHRINKWRAP	 = npm-shrinkwrap.json
 
 CLEAN_FILES	+= node_modules $(SHRINKWRAP) cscope.files

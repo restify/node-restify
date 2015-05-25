@@ -6,7 +6,6 @@
     },
     "rules": {
         // possible errors
-        "comma-dangle": [ 2 ],
         "no-cond-assign": [ 2 ],
         "no-console": [ 0 ],
         "no-constant-condition": [ 2 ],
@@ -36,7 +35,7 @@
         // best practices
         "block-scoped-var": [ 2 ],
         "consistent-return": [ 2 ],
-        "curly": [ 2 ],
+        "curly": [ 0 ],  // in jscs
         "default-case": [ 2 ],
         "dot-notation": [ [ 2 ], { "allowKeywords": true } ],
         "eqeqeq": [ 2 ],
@@ -56,6 +55,7 @@
         "no-lone-blocks": [ 2 ],
         "no-loop-func": [ 0 ],
         "no-multi-spaces": [ 0 ],
+        "no-multi-str": [ 0 ],
         "no-native-reassign": [ 2 ],
         "no-new": [ 0 ],
         "no-new-func": [ 2 ],
@@ -100,26 +100,24 @@
         "no-path-concat": [ 0 ],
         "no-process-exit": [ 0 ],
 
-        // stylistic - turn off all style rules. we use a separate style checker
+        // stylistic.
+        // we use JSCS, set most to off because they're on by default.
+        // turn the few on that aren't handled by JSCS today.
         "camelcase": [ 0 ],
-        "eol-last": [ 0 ],
+        "comma-dangle": [ 0 ],
         "key-spacing": [ 0 ],
         "new-cap": [ 0 ],
-        "no-array-constructor": [ 0 ],
-        "no-mixed-spaces-and-tabs": [ 0 ],
-        "no-nested-ternary": [ 0 ],
-        "no-new-object": [ 0 ],
+        "no-lonely-if": [ 0 ],
+        "no-multi-str": [ 0 ],
         "no-underscore-dangle": [ 0 ],
-        "no-trailing-spaces": [ 0 ],
-        "no-wrap-func": [ 0 ],
-        "semi": [ 0, "always" ],
-        "space-after-keywords": [ 0 ],
-        "space-before-blocks": [ 0 ],
-        "space-before-function-paren": [ 0 ],
+        "quotes": [ 0 ],
+        "semi": [ 0 ],
         "space-infix-ops": [ 0 ],
         "space-return-throw-case": [ 0 ],
         "space-unary-ops": [ 0 ],
-        "spaced-line-comment": [ 0 ],
-        "quotes": [ 0 ]
+
+        "no-array-constructor": [ 2 ],
+        "no-nested-ternary": [ 2 ],
+        "no-new-object": [ 2 ]
     }
 }
