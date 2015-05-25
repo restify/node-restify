@@ -26,6 +26,9 @@
     },
     "validateIndentation": 4,
 
+    // newline on EOF
+    "requireLineFeedAtFileEnd": true,
+
     // disallow rules
     "disallowImplicitTypeConversion": [
         "numeric",
