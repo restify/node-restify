@@ -152,7 +152,7 @@ xref: cscope.files
 .PHONY: cscope.files
 cscope.files:
 	find $(CSCOPE_DIRS) -name '*.c' -o -name '*.h' -o -name '*.cc' \
-		-o -name '*.js' -o -name '*.s' -o -name '*.cpp' > $@
+	    -o -name '*.js' -o -name '*.s' -o -name '*.cpp' > $@
 
 #
 # The "docs" target is complicated because we do several things here:
@@ -187,25 +187,25 @@ DOC_MEDIA_FILES_BUILD := $(DOC_MEDIA_FILES:%=$(DOC_BUILD)/media/%)
 #
 .PHONY: docs
 docs:							\
-	$(DOC_FILES:%.restdown=$(DOC_BUILD)/%.html)		\
-	$(DOC_FILES:%.restdown=$(DOC_BUILD)/%.json)		\
-	$(DOC_MEDIA_FILES_BUILD)
+    $(DOC_FILES:%.restdown=$(DOC_BUILD)/%.html)		\
+    $(DOC_FILES:%.restdown=$(DOC_BUILD)/%.json)		\
+    $(DOC_MEDIA_FILES_BUILD)
 
 #
 # We keep the intermediate files so that the next build can see whether the
 # files in DOC_BUILD are up to date.
 #
 .PRECIOUS:					\
-	$(DOC_FILES:%.restdown=docs/%.html)		\
-	$(DOC_FILES:%.restdown=docs/%json)
+    $(DOC_FILES:%.restdown=docs/%.html)		\
+    $(DOC_FILES:%.restdown=docs/%json)
 
 #
 # We do clean those intermediate files, as well as all of DOC_BUILD.
 #
 CLEAN_FILES +=					\
-	$(DOC_BUILD)				\
-	$(DOC_FILES:%.restdown=docs/%.html)		\
-	$(DOC_FILES:%.restdown=docs/%.json)
+    $(DOC_BUILD)				\
+    $(DOC_FILES:%.restdown=docs/%.html)		\
+    $(DOC_FILES:%.restdown=docs/%.json)
 
 #
 # Before installing the files, we must make sure the directories exist. The |

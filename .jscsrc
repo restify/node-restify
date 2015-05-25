@@ -18,7 +18,12 @@
     },
 
     // alignment rules
-    "maximumLineLength": 80,
+    "maximumLineLength": {
+        "value": 80,
+        "allowComments": true,
+        "allowUrlComments": true,
+        "allowRegex": true
+    },
     "validateIndentation": 4,
 
     // disallow rules
@@ -66,18 +71,15 @@
         "try",
         "while"
     ],
-    "requirePaddingNewLinesBeforeLineComments": {
-        "allExcept": "firstAfterCurly"
-    },
-    "requireParenthesesAroundIIFE": true,
     "requireSemicolons": true,
     "requireSpaceAfterBinaryOperators": true,
     "requireSpaceAfterKeywords": true,
-
     "requireSpaceBeforeBinaryOperators": true,
     "requireSpaceBeforeBlockStatements": true,
     "requireSpaceBeforeKeywords": [
-        "else", "while", "catch"
+        "else",
+        "while",
+        "catch"
     ],
     "requireSpaceBetweenArguments": true,
     "requireSpacesInAnonymousFunctionExpression": {
