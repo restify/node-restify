@@ -17,11 +17,11 @@
 #
 # Tools
 #
-NODEUNIT	:= ./node_modules/.bin/nodeunit
-NODECOVER	:= ./node_modules/.bin/cover
 BUNYAN		:= ./node_modules/.bin/bunyan
 ESLINT		:= ./node_modules/.bin/eslint
 JSCS		:= ./node_modules/.bin/jscs
+NODEUNIT	:= ./node_modules/.bin/nodeunit
+NODECOVER	:= ./node_modules/.bin/cover
 NPM		:= npm
 
 #
