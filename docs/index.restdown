@@ -1680,13 +1680,13 @@ field, which is use *on each retry*.  The default is not to set a
 `connectTimeout`, so you end up with the node.js socket defaults.
 
 Here's an example of hitting the
-[Joyent CloudAPI](https://api.us-west-1.joyentcloud.com):
+[Joyent CloudAPI](https://api.us-east-1.joyent.com):
 
     var restify = require('restify');
 
     // Creates a JSON client
     var client = restify.createJsonClient({
-      url: 'https://us-west-1.api.joyentcloud.com'
+      url: 'https://us-east-1.api.joyent.com'
     });
 
 
@@ -1702,7 +1702,7 @@ an options object:
 
     var restify = require('restify');
 
-    var client = restify.createJsonClient('https://us-west-1.api.joyentcloud.com');
+    var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
 
 Note that all further documentation refers to the "short-hand" form of
 methods like `get/put/del` which take a string path.  You can also
@@ -1752,7 +1752,7 @@ it will be an `HttpError`.
 ### createJsonClient(options)
 
     var client = restify.createJsonClient({
-      url: 'https://api.us-west-1.joyentcloud.com',
+      url: 'https://api.us-east-1.joyent.com',
       version: '*'
     });
 
