@@ -981,6 +981,7 @@ test('audit logger anonymous timer test', function (t) {
     });
 });
 
+
 test('GH-774 utf8 corruption in body parser', function (t) {
     var slen = 100000;
 
@@ -1006,6 +1007,7 @@ test('GH-774 utf8 corruption in body parser', function (t) {
         t.end();
     });
 });
+
 
 test('request expiry testing to ensure that invalid ' +
      'requests will error.', function (t) {
@@ -1035,6 +1037,7 @@ test('request expiry testing to ensure that invalid ' +
     });
 });
 
+
 test('request expiry testing to ensure that valid ' +
      'requests will succeed.', function (t) {
     var key = 'x-request-expiry';
@@ -1063,6 +1066,7 @@ test('request expiry testing to ensure that valid ' +
         t.end();
     });
 });
+
 
 test('request expiry testing to ensure that valid ' +
      'requests without headers will succeed.', function (t) {

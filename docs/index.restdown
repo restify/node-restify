@@ -1084,18 +1084,22 @@ Note that `ip`, `xff` and `username` are XOR'd.
 
 ### Request Expiry
 
-Request expiry is used to kick out old requests that have been timed out somewhere upstream.
-The plugin will take in the key to use for looking up the expired time in the header.  The
-expired time should be absolute time.  If the expire time is in the future (greater than
-`Date.now()` or does not exist the request will continue to execute the chain.  If the
-provided expiry time is less than `Date.now()` next will be provided a 504, Gateway
-Timeout Error.
+Request Expiry can be used to throttle requests that have already exceeded
+their client timeouts. Requests can be sent with a configurable client timeout
+header, e.g. 'x-request-expiry-time', which gives in absolute ms since epoch,
+when this request will be timed out by the client.
+
+This plugin will throttle all incoming requests via a 504 where
+'x-request-expiry-time' < Date.now() -- since these incoming requests have
+already been timed out by the client. This prevents the server from
+processing unnecessary requests.
 
     server.use(restify.requestExpiry({
         header: 'x-request-expiry-time'
     });
 
-The only options provided is `header` which is the key used to look in each request header.
+The only option provided is `header` which is the request header used to specify
+the client timeout.
 
 #### Using an external storage mechanism for key/bucket mappings.
 
