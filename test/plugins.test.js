@@ -1013,7 +1013,8 @@ test('request expiry testing to ensure that invalid ' +
     var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
-    SERVER.get(path,
+    SERVER.get(
+        getPath,
         expires,
         function (req, res, next) {
             called = true;
@@ -1040,7 +1041,8 @@ test('request expiry testing to ensure that valid ' +
     var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
-    SERVER.get(path,
+    SERVER.get(
+        getPath,
         expires,
         function (req, res, next) {
             called = true;
@@ -1068,7 +1070,8 @@ test('request expiry testing to ensure that valid ' +
     var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
-    SERVER.get(path,
+    SERVER.get(
+        getPath,
         expires,
         function (req, res, next) {
             called = true;
