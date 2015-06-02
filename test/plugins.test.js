@@ -1007,6 +1007,84 @@ test('GH-774 utf8 corruption in body parser', function (t) {
     });
 });
 
+test('request expiry testing to ensure that invalid requests will error.', function (t) {
+    var key = 'x-request-expiry';
+    var path = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(path,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: path,
+        headers: {
+            'x-request-expiry': Date.now() - 100
+        }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 504);
+        t.equal(called, false);
+        t.end();
+    });
+});
+
+test('request expiry testing to ensure that valid requests will succeed.', function (t) {
+    var key = 'x-request-expiry';
+    var path = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(path,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: path,
+        headers: {
+            'x-request-expiry': Date.now() + 100
+        }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(called, true);
+        t.ifError(err);
+        t.end();
+    });
+});
+
+test('request expiry testing to ensure that valid requests without headers will succeed.', function (t) {
+    var key = 'x-request-expiry';
+    var path = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(path,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: path,
+        headers: { }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(called, true);
+        t.ifError(err);
+        t.end();
+    });
+});
+
 
 ///--- Privates
 function serveStaticTest(t, testDefault, tmpDir, regex) {
