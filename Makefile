@@ -17,7 +17,6 @@
 #
 # Tools
 #
-BUNYAN		:= ./node_modules/.bin/bunyan
 ESLINT		:= ./node_modules/.bin/eslint
 JSCS		:= ./node_modules/.bin/jscs
 NODEUNIT	:= ./node_modules/.bin/nodeunit
@@ -51,14 +50,14 @@ $(NODECOVER): | $(NPM_EXEC)
 .PHONY: cover
 cover: $(NODECOVER)
 	@rm -fr ./.coverage_data
-	$(NODECOVER) run $(NODEUNIT) test/*.test.js | $(BUNYAN)
+	$(NODECOVER) run $(NODEUNIT) test/*.test.js
 	$(NODECOVER) report html
 
 CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 
 .PHONY: test
 test: $(NODEUNIT)
-	$(NODEUNIT) test/*.test.js | $(BUNYAN)
+	$(NODEUNIT) test/*.test.js
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
