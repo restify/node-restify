@@ -1007,7 +1007,8 @@ test('GH-774 utf8 corruption in body parser', function (t) {
     });
 });
 
-test('request expiry testing to ensure that invalid requests will error.', function (t) {
+test('request expiry testing to ensure that invalid ' +
+     'requests will error.', function (t) {
     var key = 'x-request-expiry';
     var getPath = '/request/expiry';
     var called = false;
@@ -1033,7 +1034,8 @@ test('request expiry testing to ensure that invalid requests will error.', funct
     });
 });
 
-test('request expiry testing to ensure that valid requests will succeed.', function (t) {
+test('request expiry testing to ensure that valid ' +
+     'requests will succeed.', function (t) {
     var key = 'x-request-expiry';
     var getPath = '/request/expiry';
     var called = false;
@@ -1060,7 +1062,8 @@ test('request expiry testing to ensure that valid requests will succeed.', funct
     });
 });
 
-test('request expiry testing to ensure that valid requests without headers will succeed.', function (t) {
+test('request expiry testing to ensure that valid ' +
+     'requests without headers will succeed.', function (t) {
     var key = 'x-request-expiry';
     var getPath = '/request/expiry';
     var called = false;
