@@ -1009,7 +1009,7 @@ test('GH-774 utf8 corruption in body parser', function (t) {
 
 test('request expiry testing to ensure that invalid requests will error.', function (t) {
     var key = 'x-request-expiry';
-    var path = '/request/expiry';
+    var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
     SERVER.get(path,
@@ -1021,7 +1021,7 @@ test('request expiry testing to ensure that invalid requests will error.', funct
         });
 
     var obj = {
-        path: path,
+        path: getPath,
         headers: {
             'x-request-expiry': Date.now() - 100
         }
@@ -1035,7 +1035,7 @@ test('request expiry testing to ensure that invalid requests will error.', funct
 
 test('request expiry testing to ensure that valid requests will succeed.', function (t) {
     var key = 'x-request-expiry';
-    var path = '/request/expiry';
+    var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
     SERVER.get(path,
@@ -1047,7 +1047,7 @@ test('request expiry testing to ensure that valid requests will succeed.', funct
         });
 
     var obj = {
-        path: path,
+        path: getPath,
         headers: {
             'x-request-expiry': Date.now() + 100
         }
@@ -1062,7 +1062,7 @@ test('request expiry testing to ensure that valid requests will succeed.', funct
 
 test('request expiry testing to ensure that valid requests without headers will succeed.', function (t) {
     var key = 'x-request-expiry';
-    var path = '/request/expiry';
+    var getPath = '/request/expiry';
     var called = false;
     var expires = restify.requestExpiry({ header: key });
     SERVER.get(path,
@@ -1074,7 +1074,7 @@ test('request expiry testing to ensure that valid requests without headers will 
         });
 
     var obj = {
-        path: path,
+        path: getPath,
         headers: { }
     };
     CLIENT.get(obj, function (err, _, res) {
