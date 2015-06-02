@@ -828,6 +828,7 @@ Here's some example code using all the shipped plugins:
     server.use(restify.jsonp());
     server.use(restify.gzipResponse());
     server.use(restify.bodyParser());
+    server.use(restify.requestExpiry());
     server.use(restify.throttle({
       burst: 100,
       rate: 50,
@@ -1080,6 +1081,21 @@ Options:
 ||maxKeys||Number||If using the built-in storage table, the maximum distinct throttling keys to allow at a time||
 
 Note that `ip`, `xff` and `username` are XOR'd.
+
+### Request Expiry
+
+Request expiry is used to kick out old requests that have been timed out somewhere upstream.
+The plugin will take in the key to use for looking up the expired time in the header.  The
+expired time should be absolute time.  If the expire time is in the future (greater than
+`Date.now()` or does not exist the request will continue to execute the chain.  If the
+provided expiry time is less than `Date.now()` next will be provided a 504, Gateway
+Timeout Error.
+
+    server.use(restify.requestExpiry({
+        header: 'x-request-expiry-time'
+    });
+
+The only options provided is `header` which is the key used to look in each request header.
 
 #### Using an external storage mechanism for key/bucket mappings.
 
