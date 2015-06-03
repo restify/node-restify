@@ -981,6 +981,7 @@ test('audit logger anonymous timer test', function (t) {
     });
 });
 
+
 test('GH-774 utf8 corruption in body parser', function (t) {
     var slen = 100000;
 
@@ -1003,6 +1004,93 @@ test('GH-774 utf8 corruption in body parser', function (t) {
     CLIENT.post('/utf8', { text: tx }, function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('request expiry testing to ensure that invalid ' +
+     'requests will error.', function (t) {
+    var key = 'x-request-expiry';
+    var getPath = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(
+        getPath,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: getPath,
+        headers: {
+            'x-request-expiry': Date.now() - 100
+        }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 504);
+        t.equal(called, false);
+        t.end();
+    });
+});
+
+
+test('request expiry testing to ensure that valid ' +
+     'requests will succeed.', function (t) {
+    var key = 'x-request-expiry';
+    var getPath = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(
+        getPath,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: getPath,
+        headers: {
+            'x-request-expiry': Date.now() + 100
+        }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(called, true);
+        t.ifError(err);
+        t.end();
+    });
+});
+
+
+test('request expiry testing to ensure that valid ' +
+     'requests without headers will succeed.', function (t) {
+    var key = 'x-request-expiry';
+    var getPath = '/request/expiry';
+    var called = false;
+    var expires = restify.requestExpiry({ header: key });
+    SERVER.get(
+        getPath,
+        expires,
+        function (req, res, next) {
+            called = true;
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: getPath,
+        headers: { }
+    };
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(called, true);
+        t.ifError(err);
         t.end();
     });
 });

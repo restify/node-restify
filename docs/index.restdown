@@ -828,6 +828,7 @@ Here's some example code using all the shipped plugins:
     server.use(restify.jsonp());
     server.use(restify.gzipResponse());
     server.use(restify.bodyParser());
+    server.use(restify.requestExpiry());
     server.use(restify.throttle({
       burst: 100,
       rate: 50,
@@ -1080,6 +1081,25 @@ Options:
 ||maxKeys||Number||If using the built-in storage table, the maximum distinct throttling keys to allow at a time||
 
 Note that `ip`, `xff` and `username` are XOR'd.
+
+### Request Expiry
+
+Request Expiry can be used to throttle requests that have already exceeded
+their client timeouts. Requests can be sent with a configurable client timeout
+header, e.g. 'x-request-expiry-time', which gives in absolute ms since epoch,
+when this request will be timed out by the client.
+
+This plugin will throttle all incoming requests via a 504 where
+'x-request-expiry-time' < Date.now() -- since these incoming requests have
+already been timed out by the client. This prevents the server from
+processing unnecessary requests.
+
+    server.use(restify.requestExpiry({
+        header: 'x-request-expiry-time'
+    });
+
+The only option provided is `header` which is the request header used to specify
+the client timeout.
 
 #### Using an external storage mechanism for key/bucket mappings.
 
