@@ -1169,4 +1169,5 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
             });
         });
     });
+
 }
