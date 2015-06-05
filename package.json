@@ -37,12 +37,12 @@
     "Yunong Xiao"
   ],
   "name": "restify",
-  "homepage": "http://mcavage.github.com/node-restify",
+  "homepage": "http://restifyjs.com",
   "description": "REST framework",
   "version": "3.0.3",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mcavage/node-restify.git"
+    "url": "git://github.com/restify/node-restify.git"
   },
   "main": "lib/index.js",
   "directories": {

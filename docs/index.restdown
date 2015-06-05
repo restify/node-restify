@@ -44,7 +44,7 @@ Note this documentation refers to the 2.x version(s) of restify;
 these versions are not backwards-compatible with the 0.x and 1.x versions.
 
 If you're migrating from an earlier version of restify, see
-[1.4 to 2.0 Migration Tips](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips)
+[1.4 to 2.0 Migration Tips](https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips)
 
 ## Conventions
 
@@ -793,7 +793,7 @@ a hook to change request headers and the like if you need to. Note that
     });
 
 You can also clean up URLs before routes are matched with the built in
-`restify.pre.sanitizePath`. This [re-implements v1.4 behaviour](https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters)
+`restify.pre.sanitizePath`. This [re-implements v1.4 behaviour](https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters)
 
     server.pre(restify.pre.sanitizePath());
 
