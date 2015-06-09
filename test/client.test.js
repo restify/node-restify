@@ -93,6 +93,24 @@ function requestThatTimesOut(req, res, next) {
     }, 170);
 }
 
+function sendJsonZero(req, res, next){
+    res.header('content-type', 'json');
+    res.send(200, 0);
+    next();
+}
+
+function sendJsonFalse(req, res, next){
+    res.header('content-type', 'json');
+    res.send(200, false);
+    next();
+}
+
+function sendJsonNull(req, res, next){
+    res.header('content-type', 'json');
+    res.send(200, null);
+    next();
+}
+
 
 ///--- Tests
 
@@ -126,6 +144,10 @@ before(function (callback) {
             }
             next();
         });
+
+        SERVER.get('/json/zero', sendJsonZero);
+        SERVER.get('/json/false', sendJsonFalse);
+        SERVER.get('/json/null', sendJsonNull);
 
         SERVER.get('/json/:name', sendJson);
         SERVER.head('/json/:name', sendJson);
@@ -312,6 +334,42 @@ test('PATCH json', function (t) {
         t.ok(req);
         t.ok(res);
         t.deepEqual(obj, {hello: 'foo'});
+        t.end();
+    });
+});
+
+
+test('GH-800 GET json 0', function(t){
+    JSON_CLIENT.get('/json/zero', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.deepEqual(obj, {});
+        t.strictEqual(res.body, '0');
+        t.end();
+    });
+});
+
+
+test('GH-800 GET json false', function(t){
+    JSON_CLIENT.get('/json/false', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.deepEqual(obj, {});
+        t.strictEqual(res.body, 'false');
+        t.end();
+    });
+});
+
+
+test('GH-800 GET json null', function(t){
+    JSON_CLIENT.get('/json/null', function (err, req, res, obj) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.deepEqual(obj, {});
+        t.strictEqual(res.body, 'null');
         t.end();
     });
 });
