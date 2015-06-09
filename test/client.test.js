@@ -93,19 +93,19 @@ function requestThatTimesOut(req, res, next) {
     }, 170);
 }
 
-function sendJsonZero(req, res, next){
+function sendJsonZero(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, 0);
     next();
 }
 
-function sendJsonFalse(req, res, next){
+function sendJsonFalse(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, false);
     next();
 }
 
-function sendJsonNull(req, res, next){
+function sendJsonNull(req, res, next) {
     res.header('content-type', 'json');
     res.send(200, null);
     next();
@@ -339,7 +339,7 @@ test('PATCH json', function (t) {
 });
 
 
-test('GH-800 GET json 0', function(t){
+test('GH-800 GET json 0', function (t) {
     JSON_CLIENT.get('/json/zero', function (err, req, res, obj) {
         t.ifError(err);
         t.ok(req);
@@ -351,7 +351,7 @@ test('GH-800 GET json 0', function(t){
 });
 
 
-test('GH-800 GET json false', function(t){
+test('GH-800 GET json false', function (t) {
     JSON_CLIENT.get('/json/false', function (err, req, res, obj) {
         t.ifError(err);
         t.ok(req);
@@ -363,7 +363,7 @@ test('GH-800 GET json false', function(t){
 });
 
 
-test('GH-800 GET json null', function(t){
+test('GH-800 GET json null', function (t) {
     JSON_CLIENT.get('/json/null', function (err, req, res, obj) {
         t.ifError(err);
         t.ok(req);
