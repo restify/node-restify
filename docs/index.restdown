@@ -1005,6 +1005,10 @@ This logger can be used normally, with [req.log](#Request-API).
 This plugin does _not_ log each individual request. Use the Audit Logging
 plugin or a custom middleware for that use.
 
+Options:
+  * `headers` - A list of headers to transfer from the request to top level
+    props on the log.
+
 ### GzipResponse
 
     server.use(restify.gzipResponse());

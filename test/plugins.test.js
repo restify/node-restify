@@ -1095,6 +1095,33 @@ test('request expiry testing to ensure that valid ' +
     });
 });
 
+test('tests the requestLoggers extra header properties', function (t) {
+    var key = 'x-request-uuid';
+    var badKey = 'x-foo-bar';
+    var getPath = '/requestLogger/extraHeaders';
+    var headers = [key, badKey];
+    SERVER.get(
+        getPath,
+        restify.requestLogger({headers: headers}),
+        function (req, res, next) {
+            t.equal(req.log.fields[key], 'foo-for-eva');
+            t.equal(req.log.fields.hasOwnProperty(badKey), false);
+            res.send();
+            next();
+        });
+
+    var obj = {
+        path: getPath,
+        headers: { }
+    };
+    obj.headers[key] = 'foo-for-eva';
+    CLIENT.get(obj, function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.ifError(err);
+        t.end();
+    });
+});
+
 
 ///--- Privates
 function serveStaticTest(t, testDefault, tmpDir, regex) {
@@ -1142,4 +1169,5 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
             });
         });
     });
+
 }
