@@ -1,7 +1,9 @@
+.coverage_data
 .dir-locals.el
 .gitmodules
 .travis.yml
 Makefile
+cover_html
 deps
 docs
 examples

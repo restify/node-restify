@@ -14,22 +14,6 @@
 # common tools here.
 #
 
-#
-# javascriptlint
-#
-JSL_EXEC	?= deps/javascriptlint/build/install/jsl
-JSL		?= $(JSL_EXEC)
-
-$(JSL_EXEC): | deps/javascriptlint/.git
-	cd deps/javascriptlint && make install
-
-#
-# jsstyle
-#
-JSSTYLE_EXEC	?= deps/jsstyle/jsstyle
-JSSTYLE		?= $(JSSTYLE_EXEC)
-
-$(JSSTYLE_EXEC): | deps/jsstyle/.git
 
 #
 # restdown

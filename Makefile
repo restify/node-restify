@@ -17,20 +17,17 @@
 #
 # Tools
 #
+ESLINT		:= ./node_modules/.bin/eslint
+JSCS		:= ./node_modules/.bin/jscs
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 NODECOVER	:= ./node_modules/.bin/cover
-BUNYAN		:= ./node_modules/.bin/bunyan
 NPM		:= npm
 
 #
 # Files
 #
 DOC_FILES	 = index.restdown
-JS_FILES	:= $(shell find lib test bin -name '*.js')
-JSL_CONF_NODE	 = tools/jsl.node.conf
-JSL_FILES_NODE   = $(JS_FILES)
-JSSTYLE_FILES	 = $(JS_FILES)
-JSSTYLE_FLAGS    = -f tools/jsstyle.conf
+JS_FILES	 = '.'
 SHRINKWRAP	 = npm-shrinkwrap.json
 
 CLEAN_FILES	+= node_modules $(SHRINKWRAP) cscope.files
@@ -53,14 +50,14 @@ $(NODECOVER): | $(NPM_EXEC)
 .PHONY: cover
 cover: $(NODECOVER)
 	@rm -fr ./.coverage_data
-	$(NODECOVER) run $(NODEUNIT) test/*.test.js | $(BUNYAN)
+	$(NODECOVER) run $(NODEUNIT) test/*.test.js
 	$(NODECOVER) report html
 
 CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 
 .PHONY: test
 test: $(NODEUNIT)
-	$(NODEUNIT) test/*.test.js | $(BUNYAN)
+	$(NODEUNIT) test/*.test.js
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ

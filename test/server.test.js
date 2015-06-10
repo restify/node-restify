@@ -1,18 +1,19 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+'use strict';
+
 var assert = require('assert-plus');
-var fs = require('fs');
 var http = require('http');
 
 var filed = require('filed');
 var uuid = require('node-uuid');
 
-var HttpError = require('../lib/errors').HttpError;
 var RestError = require('../lib/errors').RestError;
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
@@ -126,15 +127,19 @@ test('get (path only)', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(r, route.name);
-        if (++count === 2)
+
+        if (++count === 2) {
             t.end();
+        }
     });
 
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        if (++count === 2)
+
+        if (++count === 2) {
             t.end();
+        }
     });
 });
 
@@ -363,7 +368,7 @@ test('CORS Preflight - valid origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://somesite.local'
+            Origin: 'http://somesite.local'
         }
     };
     http.request(opts, function (res) {
@@ -391,7 +396,7 @@ test('CORS Preflight - invalid origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://othersite.local'
+            Origin: 'http://othersite.local'
         }
     };
     http.request(opts, function (res) {
@@ -418,7 +423,7 @@ test('CORS Preflight - any origin', function (t) {
         headers: {
             'Access-Control-Request-Headers': 'accept, content-type',
             'Access-Control-Request-Method': 'POST',
-            'Origin': 'http://anysite.local'
+            Origin: 'http://anysite.local'
         }
     };
     http.request(opts, function (res) {
@@ -788,7 +793,7 @@ test('GH-149 limit request body size', function (t) {
         method: 'POST',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/x-www-form-urlencoded',
             'transfer-encoding': 'chunked'
         }
@@ -818,7 +823,7 @@ test('GH-149 limit request body size (json)', function (t) {
         method: 'POST',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/json',
             'transfer-encoding': 'chunked'
         }
@@ -890,8 +895,10 @@ test('test matches params with custom regex', function (t) {
                 } else {
                     t.ok(err);
                 }
-                if (++done === count)
+
+                if (++done === count) {
                     t.end();
+                }
             });
         });
 
@@ -919,7 +926,7 @@ test('GH-180 can parse DELETE body', function (t) {
         method: 'DELETE',
         agent: false,
         headers: {
-            'accept': 'application/json',
+            accept: 'application/json',
             'content-type': 'application/json',
             'transfer-encoding': 'chunked'
         }
@@ -1107,8 +1114,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
         });
     }
 
-    for (i = 0; i < versions.length; i++)
+    for (i = 0; i < versions.length; i++) {
         mnt(versions[i]);
+    }
 
     var opts = {
         path: p,
@@ -1123,8 +1131,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
     });
 });
 
-/* JSSTYLED */
-test('versioned route matching should prefer first match if equal versions', function (t) {
+
+test('versioned route matching should prefer \
+    first match if equal versions', function (t) {
     var p = '/' + uuid.v4();
 
     SERVER.get({
@@ -1202,7 +1211,6 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
 test('<url>/?<queryString> broken', function (t) {
     SERVER.pre(restify.pre.sanitizePath());
     SERVER.use(restify.queryParser());
-    /* JSSTYLED */
     SERVER.get(/\/.*/, function (req, res, next) {
         res.send(req.params);
     });
@@ -1276,8 +1284,9 @@ test('content-type routing vendor', function (t) {
         var _done = 0;
 
         function done() {
-            if (++_done === 2)
+            if (++_done === 2) {
                 t.end();
+            }
         }
 
         var opts = {
@@ -1327,8 +1336,9 @@ test('content-type routing params only', function (t) {
     var _done = 0;
 
     function done() {
-        if (++_done === 2)
+        if (++_done === 2) {
             t.end();
+        }
     }
 
     var opts = {
@@ -1389,6 +1399,29 @@ test('gh-193 basic', function (t) {
 
     SERVER.get({
         name: 'bar',
+        path: '/bar'
+    }, function (req, res, next) {
+        res.send(200);
+        next();
+    });
+
+    CLIENT.get('/foo', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('gh-193 route name normalization', function (t) {
+    SERVER.get({
+        name: 'foo',
+        path: '/foo'
+    }, function (req, res, next) {
+        next('b-a-r');
+    });
+
+    SERVER.get({
+        name: 'b-a-r',
         path: '/bar'
     }, function (req, res, next) {
         res.send(200);
@@ -1662,8 +1695,10 @@ test('GH-401 regex routing broken', function (t) {
     function client_cb(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 204);
-        if (++done === 2)
+
+        if (++done === 2) {
             t.end();
+        }
     }
 
     SERVER.get('/image', handle);
@@ -1805,6 +1840,23 @@ test('gh-762 res.noCache()', function (t) {
           'no-cache, no-store, must-revalidate');
         t.equal(res.headers.pragma, 'no-cache');
         t.equal(res.headers.expires, '0');
+        t.end();
+    });
+});
+
+
+test('gh-779 set-cookie fields should never have commas', function (t) {
+    SERVER.get('/set-cookie', function (req, res, next) {
+        res.header('set-cookie', 'foo');
+        res.header('set-cookie', 'bar');
+        res.send(200);
+    });
+
+    CLIENT.get('/set-cookie', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.headers['set-cookie'].length, 1,
+                'set-cookie header should only have 1 element');
+        t.equal(res.headers['set-cookie'], 'bar');
         t.end();
     });
 });

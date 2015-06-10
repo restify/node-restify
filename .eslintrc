@@ -1,0 +1,123 @@
+{
+    "env": {
+        "browser": false,
+        "node": true,
+        "es6": false
+    },
+    "rules": {
+        // possible errors
+        "no-cond-assign": [ 2 ],
+        "no-console": [ 0 ],
+        "no-constant-condition": [ 2 ],
+        "no-control-regex": [ 2 ],
+        "no-debugger": [ 2 ],
+        "no-dupe-args": [ 2 ],
+        "no-dupe-keys": [ 2 ],
+        "no-duplicate-case": [ 2 ],
+        "no-empty": [ 2 ],
+        "no-empty-class": [ 2 ],
+        "no-ex-assign": [ 2 ],
+        "no-extra-boolean-cast": [ 2 ],
+        "no-extra-semi": [ 2 ],
+        "no-func-assign": [ 2 ],
+        // this is for variable hoisting, not necessary if we use block scoped declarations
+        // "no-inner-declarations": [ 2, "both" ],
+        "no-invalid-regexp": [ 2 ],
+        "no-irregular-whitespace": [ 2 ],
+        "no-negated-in-lhs": [ 2 ],
+        "no-reserved-keys": [ 0 ],
+        "no-regex-spaces": [ 2 ],
+        "no-sparse-arrays": [ 2 ],
+        "no-unreachable": [ 2 ],
+        "use-isnan": [ 2 ],
+        "valid-typeof": [ 2 ],
+
+        // best practices
+        "block-scoped-var": [ 2 ],
+        "consistent-return": [ 2 ],
+        "curly": [ 0 ],  // in jscs
+        "default-case": [ 2 ],
+        "dot-notation": [ [ 2 ], { "allowKeywords": true } ],
+        "eqeqeq": [ 2 ],
+        "guard-for-in": [ 2 ],
+        "no-alert": [ 2 ],
+        "no-caller": [ 2 ],
+        "no-div-regex": [ 2 ],
+        "no-eq-null": [ 2 ],
+        "no-eval": [ 2 ],
+        "no-extend-native": [ 2 ],
+        "no-extra-bind": [ 2 ],
+        "no-fallthrough": [ 2 ],
+        "no-floating-decimal": [ 2 ],
+        "no-implied-eval": [ 2 ],
+        "no-iterator": [ 2 ],
+        "no-labels": [ 2 ],
+        "no-lone-blocks": [ 2 ],
+        "no-loop-func": [ 0 ],
+        "no-multi-spaces": [ 0 ],
+        "no-multi-str": [ 0 ],
+        "no-native-reassign": [ 2 ],
+        "no-new": [ 0 ],
+        "no-new-func": [ 2 ],
+        "no-new-wrappers": [ 2 ],
+        "no-octal": [ 2 ],
+        "no-octal-escape": [ 2 ],
+        "no-param-reassign": [ 0 ],
+        "no-proto": [ 2 ],
+        "no-process-env": [ 0 ],
+        "no-redeclare": [ 2 ],
+        "no-return-assign": [ 2 ],
+        "no-script-url": [ 2 ],
+        "no-self-compare": [ 2 ],
+        "no-sequences": [ 2 ],
+        "no-throw-literal": [ 2 ],
+        "no-unused-expressions": [ 2 ],
+
+        "no-warning-comments": [ 1 ],
+        "no-with": [ 2 ],
+        "radix": [ 2 ],
+        "wrap-iife": [ 2 ],
+        "yoda": [ 0 ],
+
+        // strict mode
+        "strict": [ 2, "global" ],
+
+        // variables
+        "no-catch-shadow": [ 2 ],
+        "no-delete-var": [ 2 ],
+        "no-shadow": [ 2 ],
+        "no-shadow-restricted-names": [ 2 ],
+        "no-undef": [ 2 ],
+        "no-undef-init": [ 2 ],
+        "no-undefined": [ 0 ],
+        "no-unused-vars": [ 2, { "vars": "all", "args": "none" } ],
+        "no-use-before-define": [ 2, "nofunc" ],
+
+        // node.js
+        "handle-callback-err": [ 2, "^.*(e|E)rr" ],
+        "no-mixed-requires": [ 2 ],
+        "no-new-require": [ 2 ],
+        "no-path-concat": [ 0 ],
+        "no-process-exit": [ 0 ],
+
+        // stylistic.
+        // we use JSCS, set most to off because they're on by default.
+        // turn the few on that aren't handled by JSCS today.
+        "camelcase": [ 0 ],
+        "comma-dangle": [ 0 ],
+        "key-spacing": [ 0 ],
+        "new-cap": [ 0 ],
+        "no-lonely-if": [ 0 ],
+        "no-multi-str": [ 0 ],
+        "no-underscore-dangle": [ 0 ],
+        "quotes": [ 0 ],
+        "semi": [ 0 ],
+        "space-infix-ops": [ 0 ],
+        "space-return-throw-case": [ 0 ],
+        "space-unary-ops": [ 0 ],
+
+        "no-array-constructor": [ 2 ],
+        "no-nested-ternary": [ 2 ],
+        "no-new-object": [ 2 ]
+    }
+}

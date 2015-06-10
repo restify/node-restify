@@ -1,9 +1,12 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
+'use strict';
+
 var restify = require('../lib/index');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 

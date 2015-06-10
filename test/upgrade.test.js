@@ -1,18 +1,14 @@
 // Copyright (c) 2013, Joyent, Inc. All rights reserved.
 // vim: set ts=8 sts=8 sw=8 et:
 
-var http = require('http');
+'use strict';
 
 var Watershed = require('watershed').Watershed;
-
-var HttpError = require('../lib/errors').HttpError;
-var RestError = require('../lib/errors').RestError;
-var InvalidUpgradeStateError =
-    require('../lib/upgrade').InvalidUpgradeStateError;
 var restify = require('../lib');
 
-if (require.cache[__dirname + '/lib/helper.js'])
+if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
+}
 var helper = require('./lib/helper.js');
 
 
@@ -38,8 +34,9 @@ function
     var t = _test;
     var names = _names;
     var iv = setTimeout(function () {
-        if (complete)
+        if (complete) {
             return;
+        }
 
         complete = true;
         t.ok(false, 'timeout after ' + TIMEOUT + 'ms');
@@ -47,9 +44,10 @@ function
             Object.keys(names).join(', '));
         t.done();
     }, TIMEOUT);
-    return (function (name, err) {
-        if (complete)
+    return function (name, err) {
+        if (complete) {
             return;
+        }
 
         if (names[name] === undefined) {
             complete = true;
@@ -61,8 +59,9 @@ function
             return;
         }
 
-        if (--names[name] === 0)
+        if (--names[name] === 0) {
             delete names[name];
+        }
 
         /*
          * Check that all latch names are done, and if so,
@@ -74,7 +73,7 @@ function
             iv = null;
             t.done();
         }
-    });
+    };
 }
 
 
@@ -113,6 +112,7 @@ after(function (cb) {
             SERVER = null;
             cb();
         });
+
         while (SHEDLIST.length > 0) {
             SHEDLIST.pop().destroy();
         }
@@ -138,7 +138,7 @@ test('GET without upgrade headers', function (t) {
 
     var options = {
         headers: {
-            'uprgade': 'ebfrockets'
+            uprgade: 'ebfrockets'  // this is intentional misspelling of upgrade
         },
         path: '/attach'
     };
@@ -149,8 +149,9 @@ test('GET without upgrade headers', function (t) {
             done('client error');
         });
         req.on('result', function (err2, res) {
-            if (err2 && err2.name !== 'BadRequestError')
+            if (err2 && err2.name !== 'BadRequestError') {
                 t.ifError(err2);
+            }
             t.equal(res.statusCode, 400);
             res.on('end', function () {
                 done('client response');
@@ -191,8 +192,8 @@ test('Dueling upgrade and response handling 1', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -204,8 +205,9 @@ test('Dueling upgrade and response handling 1', function (t) {
             done('client error');
         });
         req.on('result', function (err2, res) {
-            if (err2 && err2.name !== 'BadRequestError')
+            if (err2 && err2.name !== 'BadRequestError') {
                 t.ifError(err2);
+            }
             t.equal(res.statusCode, 400);
             res.on('end', function () {
                 done('client response');
@@ -237,8 +239,9 @@ test('Dueling upgrade and response handling 2', function (t) {
         try {
             res.send(400);
         } catch (ex) {
-            if (ex.name !== 'InvalidUpgradeStateError')
+            if (ex.name !== 'InvalidUpgradeStateError') {
                 t.ifError(ex);
+            }
             done('expected res.send error');
             return;
         }
@@ -249,8 +252,8 @@ test('Dueling upgrade and response handling 2', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -291,8 +294,8 @@ test('GET with upgrade headers', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -311,8 +314,7 @@ test('GET with upgrade headers', function (t) {
             t.equal(typeof (socket), 'object');
             t.ok(Buffer.isBuffer(head), 'head is Buffer');
             t.doesNotThrow(function () {
-                var shed = WATERSHED.connect(res, socket, head,
-                    wskey);
+                var shed = WATERSHED.connect(res, socket, head, wskey);
                 SHEDLIST.push(shed);
                 shed.end('ok, done');
                 shed.on('error', function (err3) {
@@ -348,8 +350,9 @@ test('GET with some websocket traffic', function (t) {
                 done('server shed error');
             });
             shed.on('text', function (msg) {
-                if (msg === 'to server')
+                if (msg === 'to server') {
                     done('server receive message');
+                }
             });
             shed.on('end', function () {
                 done('server shed end');
@@ -364,8 +367,8 @@ test('GET with some websocket traffic', function (t) {
     var wskey = WATERSHED.generateKey();
     var options = {
         headers: {
-            'connection': 'upgrade',
-            'upgrade': 'websocket',
+            connection: 'upgrade',
+            upgrade: 'websocket',
             'sec-websocket-key': wskey
         },
         path: '/attach'
@@ -395,8 +398,9 @@ test('GET with some websocket traffic', function (t) {
                     done('client shed end');
                 });
                 shed.on('text', function (msg) {
-                    if (msg === 'to client')
+                    if (msg === 'to client') {
                         done('client receive message');
+                    }
                 });
                 var count = 5;
                 var iv = setInterval(function () {

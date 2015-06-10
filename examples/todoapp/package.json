@@ -7,7 +7,7 @@
                 "assert-plus": "0.1.2",
                 "bunyan": "0.21.1",
                 "posix-getopt": "1.0.0",
-                "restify": "git://github.com/mcavage/node-restify.git#master"
+                "restify": "git://github.com/restify/node-restify.git#master"
         },
         "devDependencies": {
                 "nodeunit": "0.8.0"

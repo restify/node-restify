@@ -2,6 +2,8 @@
  * Module dependencies
  */
 
+'use strict';
+
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
 }

@@ -1,0 +1,10 @@
+# node_modules ignored by default
+node_modules/
+
+# other ignored directories
+bin/
+deps/
+docs/
+examples/
+cover_html/
+
