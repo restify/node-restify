@@ -1183,6 +1183,9 @@ You pass in the auditor a bunyan logger, and it will write out records at the
               "accept": "application/json"
             },
             "httpVersion": "1.1",
+            "query": {
+                foo: "bar"
+            },
             "trailers": {},
             "version": "*",
             "timers": {

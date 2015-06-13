@@ -982,6 +982,75 @@ test('audit logger anonymous timer test', function (t) {
 });
 
 
+test('GH-812 audit logger has query params string', function (t) {
+
+    // Dirty hack to capture the log record using a ring buffer.
+    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+    SERVER.once('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams:[ {
+                level: 'info',
+                type: 'raw',
+                stream: ringbuffer
+            }]
+        })
+    }));
+
+    SERVER.get('/audit', function (req, res, next) {
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/audit?a=1&b=2', function (err, req, res) {
+        t.ifError(err);
+
+        // check timers
+        t.ok(ringbuffer.records[0], 'no log records');
+        t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
+        t.ok(ringbuffer.records[0].req.query, 'a=1&b=2');
+        t.end();
+    });
+});
+
+
+test('GH-812 audit logger has query params obj', function (t) {
+
+    // Dirty hack to capture the log record using a ring buffer.
+    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+    SERVER.once('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams:[ {
+                level: 'info',
+                type: 'raw',
+                stream: ringbuffer
+            }]
+        })
+    }));
+
+    SERVER.get('/audit', [
+        restify.queryParser(),
+        function (req, res, next) {
+            res.send();
+            next();
+        }
+    ]);
+
+    CLIENT.get('/audit?a=1&b=2', function (err, req, res) {
+        t.ifError(err);
+
+        // check timers
+        t.ok(ringbuffer.records[0], 'no log records');
+        t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
+        t.deepEqual(ringbuffer.records[0].req.query, { a: 1, b: 2});
+        t.end();
+    });
+});
+
+
 test('GH-774 utf8 corruption in body parser', function (t) {
     var slen = 100000;
 
