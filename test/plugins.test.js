@@ -166,8 +166,7 @@ test('query ok', function (t) {
 
 test('GH-124 query ok no query string', function (t) {
     SERVER.get('/query/:id', function (req, res, next) {
-        t.ok(req.getQuery());
-        t.equal(typeof (req.getQuery()), 'object');
+        t.equal(req.getQuery(), '');
         res.send();
         next();
     });
