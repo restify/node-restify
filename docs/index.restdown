@@ -1339,6 +1339,12 @@ instance that is a child component of the one restify has:
 
     var log = req.getLogger('MyFoo');
 
+### getQuery()
+
+Returns the raw query string. Returns empty string if no query string is found.
+To get the parsed query object, use the `queryParser` plugin. More info can
+be found about the plugin in the [bundled plugins](#bundled-plugins) section.
+
 ### time()
 
 The time when this request arrived (ms since epoch)
