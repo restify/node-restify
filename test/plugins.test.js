@@ -359,6 +359,46 @@ test('body multipart ok custom handling', function (t) {
     client.end();
 });
 
+test('GH-694 pass hash option through to Formidable', function (t) {
+    var content = 'Hello World!';
+    var hash = '2ef7bde608ce5404e97d5f042f95f89f1c232871';
+    SERVER.post('/multipart',
+        restify.bodyParser({hash: 'sha1'}),
+        function (req, res, next) {
+            t.equal(req.files.details.hash, hash);
+            res.send();
+            next();
+        });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/multipart',
+        agent: false,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data; boundary=huff'
+        }
+    };
+
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    client.write('--huff\r\n');
+
+    // jscs:disable maximumLineLength
+    client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
+
+    // jscs:enable maximumLineLength
+    client.write('Content-Type: text/plain\r\n\r\n');
+    client.write(content + '\r\n');
+    client.write('--huff--');
+
+    client.end();
+});
+
 test('body json ok', function (t) {
     SERVER.post('/body/:id',
         restify.bodyParser(),
