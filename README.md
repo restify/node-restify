@@ -8,7 +8,7 @@
 
 [restify](http://restifyjs.com) is a smallish framework,
 similar to [express](http://expressjs.com) for building REST APIs.  For full
-details, see http://restifyjs.com
+details, see http://restify.com
 
 Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
 chat and support.
