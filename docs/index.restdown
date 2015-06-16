@@ -1980,6 +1980,44 @@ write data over those. Otherwise, all the same methods exist as
 One wishing to extend the `HttpClient` should look at the internals
 and note that `read` and `write` probably need to be overridden.
 
+### Proxy
+
+There are several options for enabling a proxy for the
+http client. The following options are available to set a proxy url:
+
+    // Set the proxy option in the client configuration
+    restify.createClient({
+        proxy: 'http://127.0.0.1'
+    });
+
+From environment variables:
+
+    $ export HTTPS_PROXY = 'https://127.0.0.1'
+    $ export HTTP_PROXY = 'http://127.0.0.1'
+
+There is an option to disable the use of a proxy on a url basis or for
+all urls. This can be enabled by setting an environment variable.
+
+Don't proxy requests to any urls
+
+    $ export NO_PROXY='*'
+
+Don't proxy requests to localhost
+
+    $ export NO_PROXY='127.0.0.1'
+
+Don't proxy requests to localhost on port 8000
+
+    $ export NO_PROXY='localhost:8000'
+
+Don't proxy requests to multiple IPs
+
+    $ export NO_PROXY='127.0.0.1, 8.8.8.8'
+
+**Note**: The url being requested must match the full hostname in
+the proxy configuration or NO_PROXY environment variable. DNS
+lookups are not performed to determine the IP address of a hostname.
+
 ### basicAuth(username, password)
 
 Since it hasn't been mentioned yet, this convenience method (available
