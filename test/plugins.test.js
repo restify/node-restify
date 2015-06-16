@@ -925,6 +925,13 @@ test('GH-379 static serves file with parentheses in path', function (t) {
 });
 
 
+test('GH-719 serve a specific static file', function (t) {
+    // serve the same default file .tmp/public/index.json
+    // but get it from opts.file
+    serveStaticTest(t, false, '.tmp', null, true);
+});
+
+
 test('audit logger timer test', function (t) {
     // Dirty hack to capture the log record using a ring buffer.
     var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
@@ -1234,7 +1241,7 @@ test('tests the requestLoggers extra header properties', function (t) {
 
 
 ///--- Privates
-function serveStaticTest(t, testDefault, tmpDir, regex) {
+function serveStaticTest(t, testDefault, tmpDir, regex, staticFile) {
     var staticContent = '{"content": "abcdefg"}';
     var staticObj = JSON.parse(staticContent);
     var testDir = 'public';
@@ -1254,7 +1261,12 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
             fs.writeFile(file, staticContent, function (err3) {
                 t.ifError(err3);
                 FILES_TO_DELETE.push(file);
+                var p = '/' + testDir + '/' + testFileName;
                 var opts = { directory: tmpPath };
+
+                if (staticFile) {
+                    opts.file = p;
+                }
 
                 if (testDefault) {
                     opts.defaultFile = testFileName;
@@ -1268,7 +1280,6 @@ function serveStaticTest(t, testDefault, tmpDir, regex) {
                     name: routeName
                 }, restify.serveStatic(opts));
 
-                var p = '/' + testDir + '/' + testFileName;
                 CLIENT.get(p, function (err4, req, res, obj) {
                     t.ifError(err4);
                     t.equal(res.headers['cache-control'],
