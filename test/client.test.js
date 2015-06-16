@@ -934,6 +934,7 @@ test('create base client with url instead of opts', function (t) {
     });
 });
 
+
 test('GH-738 respect NO_PROXY while setting proxy', function (t) {
     var origProxy = process.env.https_proxy;
     var origNoProxy = process.env.NO_PROXY;
