@@ -83,7 +83,7 @@ the DTrace integration present in restify.</p>
 these versions are not backwards-compatible with the 0.x and 1.x versions.</p>
 
 <p>If you're migrating from an earlier version of restify, see
-<a href="https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips">1.4 to 2.0 Migration Tips</a></p>
+<a href="https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips">1.4 to 2.0 Migration Tips</a></p>
 
 <h2>Conventions</h2>
 
@@ -875,7 +875,7 @@ a hook to change request headers and the like if you need to. Note that
 </code></pre>
 
 <p>You can also clean up URLs before routes are matched with the built in
-<code>restify.pre.sanitizePath</code>. This <a href="https://github.com/mcavage/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters">re-implements v1.4 behaviour</a></p>
+<code>restify.pre.sanitizePath</code>. This <a href="https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips#trailing--characters">re-implements v1.4 behaviour</a></p>
 
 <pre><code>server.pre(restify.pre.sanitizePath());
 </code></pre>
@@ -913,6 +913,7 @@ server.use(restify.queryParser());
 server.use(restify.jsonp());
 server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
+server.use(restify.requestExpiry());
 server.use(restify.throttle({
   burst: 100,
   rate: 50,
@@ -1041,6 +1042,7 @@ supported.</p>
     keepExtensions: false,
     uploadDir: os.tmpdir(),
     multiples: true
+    hash: 'sha1'
  }));
 </code></pre>
 
@@ -1079,6 +1081,7 @@ if <code>multipartFileHandler</code> is defined.</li>
 before the contents is mapped into <code>req.params</code>. Does nothing
 if <code>multipartFileHandler</code> is defined.</li>
 <li><code>multiples</code> - if you want to support html5 multiple attribute in upload fields.</li>
+<li><code>hash</code> - If you want checksums calculated for incoming files, set this to either <code>sha1</code> or <code>md5</code>.</li>
 </ul>
 
 <h3 id="requestlogger">RequestLogger</h3>
@@ -1101,6 +1104,10 @@ This logger can be used normally, with <a href="#Request-API">req.log</a>.</p>
 
 <p>This plugin does _not_ log each individual request. Use the Audit Logging
 plugin or a custom middleware for that use.</p>
+
+<p>Options:
+  * <code>headers</code> - A list of headers to transfer from the request to top level
+    props on the log.</p>
 
 <h3 id="gzipresponse">GzipResponse</h3>
 
@@ -1185,6 +1192,26 @@ is returned.</p>
 </table>
 
 <p>Note that <code>ip</code>, <code>xff</code> and <code>username</code> are XOR'd.</p>
+
+<h3 id="request-expiry">Request Expiry</h3>
+
+<p>Request Expiry can be used to throttle requests that have already exceeded
+their client timeouts. Requests can be sent with a configurable client timeout
+header, e.g. 'x-request-expiry-time', which gives in absolute ms since epoch,
+when this request will be timed out by the client.</p>
+
+<p>This plugin will throttle all incoming requests via a 504 where
+'x-request-expiry-time' &lt; Date.now() -- since these incoming requests have
+already been timed out by the client. This prevents the server from
+processing unnecessary requests.</p>
+
+<pre><code>server.use(restify.requestExpiry({
+    header: 'x-request-expiry-time'
+});
+</code></pre>
+
+<p>The only option provided is <code>header</code> which is the request header used to specify
+the client timeout.</p>
 
 <h4 id="using-an-external-storage-mechanism-for-keybucket-mappings">Using an external storage mechanism for key/bucket mappings.</h4>
 
@@ -1271,6 +1298,9 @@ the <code>after</code> event:</p>
           "accept": "application/json"
         },
         "httpVersion": "1.1",
+        "query": {
+            foo: "bar"
+        },
         "trailers": {},
         "version": "*",
         "timers": {
@@ -1433,6 +1463,12 @@ instance that is a child component of the one restify has:</p>
 <pre><code>var log = req.getLogger('MyFoo');
 </code></pre>
 
+<h3 id="getquery">getQuery()</h3>
+
+<p>Returns the raw query string. Returns empty string if no query string is found.
+To get the parsed query object, use the <code>queryParser</code> plugin. More info can
+be found about the plugin in the <a href="#bundled-plugins">bundled plugins</a> section.</p>
+
 <h3 id="time">time()</h3>
 
 <p>The time when this request arrived (ms since epoch)</p>
@@ -1540,6 +1576,29 @@ that.</p>
 <pre><code>res.send({hello: 'world'});
 res.send(201, {hello: 'world'});
 res.send(new BadRequestError('meh'));
+</code></pre>
+
+<h3 id="redirectstatus-url-next">redirect(status, url, next)</h3>
+
+<h3 id="redirecturl-options-next">redirect([url | options], next)</h3>
+
+<p>A convenience method for 301/302 redirects. Using this method will
+tell restify to stop execution of your handler chain. You can also
+use an options object. <code>next</code> is required.</p>
+
+<pre><code>res.redirect('/foo', next);
+res.redirect('http://www.foo.com', next);
+res.redirect(301, '/foo', next);
+res.redirect({
+  hostname: 'www.foo.com',
+  pathname: '/bar',
+  port: 80,                 // defaults to 80
+  secure: true,             // sets https
+  permanent: true,
+  query: {
+    a: 1
+  }
+}, next);  // =&gt; redirects to 301 https://www.foo.com/bar?a=1
 </code></pre>
 
 <h3 id="jsonstatus-body">json([status], body)</h3>
@@ -1818,13 +1877,13 @@ field, which is use <em>on each retry</em>.  The default is not to set a
 <code>connectTimeout</code>, so you end up with the node.js socket defaults.</p>
 
 <p>Here's an example of hitting the
-<a href="https://api.us-west-1.joyentcloud.com">Joyent CloudAPI</a>:</p>
+<a href="https://api.us-east-1.joyent.com">Joyent CloudAPI</a>:</p>
 
 <pre><code>var restify = require('restify');
 
 // Creates a JSON client
 var client = restify.createJsonClient({
-  url: 'https://us-west-1.api.joyentcloud.com'
+  url: 'https://us-east-1.api.joyent.com'
 });
 
 
@@ -1841,7 +1900,7 @@ an options object:</p>
 
 <pre><code>var restify = require('restify');
 
-var client = restify.createJsonClient('https://us-west-1.api.joyentcloud.com');
+var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
 </code></pre>
 
 <p>Note that all further documentation refers to the "short-hand" form of
@@ -1894,7 +1953,7 @@ it will be an <code>HttpError</code>.</p>
 <h3 id="createjsonclientoptions">createJsonClient(options)</h3>
 
 <pre><code>var client = restify.createJsonClient({
-  url: 'https://api.us-west-1.joyentcloud.com',
+  url: 'https://api.us-east-1.joyent.com',
   version: '*'
 });
 </code></pre>
@@ -2106,6 +2165,50 @@ write data over those. Otherwise, all the same methods exist as
 
 <p>One wishing to extend the <code>HttpClient</code> should look at the internals
 and note that <code>read</code> and <code>write</code> probably need to be overridden.</p>
+
+<h3 id="proxy">Proxy</h3>
+
+<p>There are several options for enabling a proxy for the
+http client. The following options are available to set a proxy url:</p>
+
+<pre><code>// Set the proxy option in the client configuration
+restify.createClient({
+    proxy: 'http://127.0.0.1'
+});
+</code></pre>
+
+<p>From environment variables:</p>
+
+<pre class="shell"><code>export HTTPS_PROXY = 'https://127.0.0.1'
+$ export HTTP_PROXY = 'http://127.0.0.1'
+</code></pre>
+
+<p>There is an option to disable the use of a proxy on a url basis or for
+all urls. This can be enabled by setting an environment variable.</p>
+
+<p>Don't proxy requests to any urls</p>
+
+<pre class="shell"><code>export NO_PROXY='*'
+</code></pre>
+
+<p>Don't proxy requests to localhost</p>
+
+<pre class="shell"><code>export NO_PROXY='127.0.0.1'
+</code></pre>
+
+<p>Don't proxy requests to localhost on port 8000</p>
+
+<pre class="shell"><code>export NO_PROXY='localhost:8000'
+</code></pre>
+
+<p>Don't proxy requests to multiple IPs</p>
+
+<pre class="shell"><code>export NO_PROXY='127.0.0.1, 8.8.8.8'
+</code></pre>
+
+<p><strong>Note</strong>: The url being requested must match the full hostname in
+the proxy configuration or NO_PROXY environment variable. DNS
+lookups are not performed to determine the IP address of a hostname.</p>
 
 <h3 id="basicauthusername-password">basicAuth(username, password)</h3>
 
