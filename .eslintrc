@@ -30,6 +30,12 @@
         "no-sparse-arrays": [ 2 ],
         "no-unreachable": [ 2 ],
         "use-isnan": [ 2 ],
+        "valid-jsdoc": [ 2, {
+            "requireReturnDescription": false,
+            "prefer": {
+                "return": "returns"
+            }
+        }],
         "valid-typeof": [ 2 ],
 
         // best practices
