@@ -1047,6 +1047,16 @@ which is just a `RegExp` to check against the requested file name. Lastly, you
 can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
 Default is `3600` (1 hour).
 
+An additional option for serving a static file is to pass `file` in to the
+serveStatic method as an option. The following will serve index.html from
+the documentation/v1/ directory anytime a client requests `/home/`.
+
+    server.get(/\/home\//, restify.serveStatic({
+      directory: './documentation/v1',
+      file: 'index.html'
+    }));
+
+
 ### Throttle
 
 restify ships with a fairly comprehensive implementation of
