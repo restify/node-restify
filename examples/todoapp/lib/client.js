@@ -3,8 +3,6 @@
 var util = require('util');
 
 var assert = require('assert-plus');
-var bunyan = require('bunyan');
-var getopt = require('posix-getopt');
 var restify = require('restify');
 
 
@@ -22,7 +20,6 @@ function TodoClient(options) {
     assert.optionalString(options.url, 'options.url');
     assert.optionalString(options.version, 'options.version');
 
-    var self = this;
     var ver = options.version || '~1.0';
 
     this.client = restify.createClient({

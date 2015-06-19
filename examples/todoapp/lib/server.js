@@ -96,13 +96,15 @@ function authenticate(req, res, next) {
     }
 
     var authz = req.authorization.basic;
+
     if (!authz) {
         res.setHeader('WWW-Authenticate', 'Basic realm="todoapp"');
         next(new restify.UnauthorizedError('authentication required'));
         return;
     }
 
-    if (authz.username !== req.allow.user || authz.password !== req.allow.pass) {
+    if (authz.username !== req.allow.user ||
+        authz.password !== req.allow.pass) {
         next(new restify.ForbiddenError('invalid credentials'));
         return;
     }
@@ -276,8 +278,9 @@ function loadTodos(req, res, next) {
         } else {
             req.todos = files;
 
-            if (req.params.name)
+            if (req.params.name) {
                 req.todo = req.dir + '/' + req.params.name;
+            }
 
             req.log.debug({
                 todo: req.todo,
@@ -311,12 +314,6 @@ function putTodo(req, res, next) {
         next(new MissingTaskError());
         return;
     }
-
-    // Force the name to be what we sent this to
-    var todo = {
-        name: req.params.name,
-        task: req.params.task
-    };
 
     fs.writeFile(req.todo, JSON.stringify(req.body), function (err) {
         if (err) {
@@ -369,7 +366,7 @@ function createServer(options) {
     server.use(restify.throttle({
         burst: 10,
         rate: 5,
-        ip: true,
+        ip: true
     }));
 
     // Use the common stuff you probably want
@@ -385,6 +382,7 @@ function createServer(options) {
     // at https://github.com/joyent/node-http-signature
     server.use(function setup(req, res, next) {
         req.dir = options.directory;
+
         if (options.user && options.password) {
             req.allow = {
                 user: options.user,
