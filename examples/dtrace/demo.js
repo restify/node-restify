@@ -95,7 +95,7 @@ var server = restify.createServer({
             } else if (Buffer.isBuffer(body)) {
                 body = body.toString('base64');
             } else {
-                switch (typeof(body)) {
+                switch (typeof body) {
                     case 'boolean':
                     case 'number':
                     case 'string':

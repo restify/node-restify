@@ -10,3 +10,5 @@ examples/todoapp/node_modules
 build
 docs/*.json
 nbproject
+deps/javascriptlint
+deps/jsstyle

@@ -2,9 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var util = require('util');
 
-var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var getopt = require('posix-getopt');
 var restify = require('restify');
@@ -59,7 +57,7 @@ var LOG = bunyan.createLogger({
  */
 function parseOptions() {
     var option;
-    var opts = {}
+    var opts = {};
     var parser = new getopt.BasicParser('hvd:p:u:z:', process.argv);
 
     while ((option = parser.getopt()) !== undefined) {
@@ -84,8 +82,10 @@ function parseOptions() {
                 // Allows us to set -vvv -> this little hackery
                 // just ensures that we're never < TRACE
                 LOG.level(Math.max(bunyan.TRACE, (LOG.level() - 10)));
-                if (LOG.level() <= bunyan.DEBUG)
+
+                if (LOG.level() <= bunyan.DEBUG) {
                     LOG = LOG.child({src: true});
+                }
                 break;
 
             case 'z':
@@ -103,8 +103,9 @@ function parseOptions() {
 
 
 function usage(msg) {
-    if (msg)
+    if (msg) {
         console.error(msg);
+    }
 
     var str = 'usage: ' +
         NAME +
@@ -123,6 +124,7 @@ function usage(msg) {
 
     // First setup our 'database'
     var dir = path.normalize((options.directory || '/tmp') + '/todos');
+
     try {
         fs.mkdirSync(dir);
     } catch (e) {

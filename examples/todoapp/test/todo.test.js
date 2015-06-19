@@ -3,7 +3,6 @@
 var fs = require('fs');
 
 var bunyan = require('bunyan');
-var nodeunit = require('nodeunit');
 var restify = require('restify');
 
 var todo = require('../lib');
@@ -58,8 +57,10 @@ exports.listEmpty = function (t) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
-        if (todos)
+
+        if (todos) {
             t.equal(todos.length, 0);
+        }
         t.done();
     });
 };
@@ -70,6 +71,7 @@ exports.create = function (t) {
     CLIENT.create(task, function (err, todo) {
         t.ifError(err);
         t.ok(todo);
+
         if (todo) {
             t.ok(todo.name);
             t.equal(todo.task, task);
@@ -84,6 +86,7 @@ exports.listAndGet = function (t) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
+
         if (todos) {
             t.equal(todos.length, 1);
             CLIENT.get(todos[0], function (err2, todo) {
@@ -103,6 +106,7 @@ exports.update = function (t) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
+
         if (todos) {
             t.equal(todos.length, 1);
 
