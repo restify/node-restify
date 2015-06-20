@@ -21,7 +21,6 @@ var CLIENT;
 var SERVER;
 
 var isFirstRequest = true;
-var isSecondRequest = true;
 
 
 ///--- Tests
@@ -35,14 +34,6 @@ before(function (callback) {
                         process.nextTick(function () {
                             isFirstRequest = false;
                             cb(null, 'async fmt');
-                        });
-                        return (this);
-                    }
-
-                    if (isSecondRequest) {
-                        process.nextTick(function () {
-                            isSecondRequest = false;
-                            cb(new Error('async fmt failed'), null);
                         });
                         return (this);
                     }
@@ -96,17 +87,6 @@ test('async formatter', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(data, 'async fmt');
-        t.end();
-    });
-});
-
-
-test('async formatter blow up', function (t) {
-    CLIENT.get('/tmp', function (err, req, res, data) {
-        t.ok(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(res.statusCode, 500);
         t.end();
     });
 });
