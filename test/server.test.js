@@ -1131,7 +1131,8 @@ test('gh-283 maximum available versioned route matching', function (t) {
     });
 });
 
-test('routes matching multiple versions should know what the max matched version was', function (t) {
+
+test('gh-635 routes match the maximum version', function (t) {
     var p = '/' + uuid.v4();
 
     SERVER.get({
@@ -1159,7 +1160,7 @@ test('routes matching multiple versions should know what the max matched version
     });
 });
 
-/* JSSTYLED */
+
 test('versioned route matching should prefer \
     first match if equal versions', function (t) {
     var p = '/' + uuid.v4();
