@@ -972,3 +972,54 @@ test('GH-738 respect NO_PROXY while setting proxy', function (t) {
     }
     process.env.NO_PROXY = origNoProxy;
 });
+
+
+test('GH-628 create JSON client with a path prefix \
+     and trailing slash', function (t) {
+    var client = restify.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT + '/json/'
+    });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
+});
+
+
+test('GH-628 create JSON client with a path prefix', function (t) {
+    var client = restify.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT + '/json'
+    });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, obj) {
+        t.deepEqual(obj, {hello: 'mcavage'});
+        t.end();
+    });
+});
+
+
+test('GH-628 create base client with a path prefix', function (t) {
+    var client = restify.createClient({
+        url: 'http://127.0.0.1:' + PORT + '/str'
+    });
+    client.agent = false;
+
+    client.get('/mcavage', function (err, req, res, data) {
+        req.on('result', function (error, response) {
+            t.ifError(error);
+            response.body = '';
+            response.setEncoding('utf8');
+            response.on('data', function (chunk) {
+                response.body += chunk;
+            });
+
+            response.on('end', function () {
+                t.equal(response.body, '"hello mcavage"');
+                t.end();
+            });
+        });
+    });
+});
