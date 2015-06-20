@@ -1860,3 +1860,11 @@ test('gh-779 set-cookie fields should never have commas', function (t) {
         t.end();
     });
 });
+
+
+test('gh-630 handle server versions as an array or string', function (t) {
+    t.ok(SERVER.toString().indexOf('0.5.4,1.4.3,2.0.0') > -1);
+    SERVER.versions = '3.0.0';
+    t.ok(SERVER.toString().indexOf('3.0.0') > -1);
+    t.end();
+});
