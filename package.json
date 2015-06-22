@@ -70,6 +70,7 @@
     "node-uuid": "^1.4.1",
     "once": "^1.3.0",
     "restify-clients": "1.0.0",
+    "restify-errors": "git+ssh://git@github.com/restify/errors.git#cleanup",
     "qs": "^3.1.0",
     "semver": "^4.3.3",
     "spdy": "^1.26.5",
