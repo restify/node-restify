@@ -1132,6 +1132,35 @@ test('gh-283 maximum available versioned route matching', function (t) {
 });
 
 
+test('gh-635 routes match the maximum version', function (t) {
+    var p = '/' + uuid.v4();
+
+    SERVER.get({
+        path: p,
+        version: ['1.2.0', '1.2.1', '1.2.2']
+    }, function (req, res, next) {
+        res.json(200, {
+            requestedVersion: req.version(),
+            matchedVersion: req.matchedVersion()
+        });
+        next();
+    });
+
+    var opts = {
+        path: p,
+        headers: {
+            'accept-version': '<1.2.2'
+        }
+    };
+
+    CLIENT.get(opts, function (err, _, res, obj) {
+        t.equal(obj.requestedVersion, '<1.2.2');
+        t.equal(obj.matchedVersion, '1.2.1');
+        t.end();
+    });
+});
+
+
 test('versioned route matching should prefer \
     first match if equal versions', function (t) {
     var p = '/' + uuid.v4();
