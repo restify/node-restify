@@ -259,7 +259,7 @@ test('PATCH ok', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'PATCH',
@@ -285,7 +285,7 @@ test('HEAD ok', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'HEAD',
@@ -313,7 +313,7 @@ test('DELETE ok', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'DELETE',
@@ -340,7 +340,7 @@ test('OPTIONS', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '*',
         method: 'OPTIONS',
@@ -360,7 +360,7 @@ test('CORS Preflight - valid origin', function (t) {
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'OPTIONS',
@@ -388,7 +388,7 @@ test('CORS Preflight - invalid origin', function (t) {
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'OPTIONS',
@@ -415,7 +415,7 @@ test('CORS Preflight - any origin', function (t) {
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/foo/bar',
         method: 'OPTIONS',
@@ -505,7 +505,7 @@ test('GH-56 streaming with filed (download)', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/',
         method: 'GET',
@@ -548,7 +548,7 @@ test('GH-63 res.send 204 is sending a body', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/hello/mark',
         method: 'DELETE',
@@ -586,7 +586,7 @@ test('GH-64 prerouting chain', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/hello/mark',
         method: 'GET',
@@ -920,7 +920,7 @@ test('GH-180 can parse DELETE body', function (t) {
     });
 
     var opts = {
-        hostname: 'localhost',
+        hostname: '127.0.0.1',
         port: PORT,
         path: '/',
         method: 'DELETE',
