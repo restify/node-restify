@@ -73,6 +73,7 @@
     "semver": "^4.3.3",
     "spdy": "^1.26.5",
     "tunnel-agent": "^0.4.0",
+    "vasync": "1.6.3",
     "verror": "^1.4.0"
   },
   "optionalDependencies": {

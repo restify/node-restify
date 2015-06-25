@@ -291,6 +291,110 @@ test('body multipart ok', function (t) {
     client.end();
 });
 
+test('gh-847 body multipart no files ok', function (t) {
+    SERVER.post('/multipart/:id',
+        restify.bodyParser({
+            mapFiles: true,
+            mapParams: true,
+            keepExtensions: true,
+            uploadDir: '/tmp/',
+            override: true
+        }),
+        function (req, res, next) {
+            t.equal(req.params.id, 'foo');
+            t.equal(req.params.mood, 'happy');
+            t.equal(req.params.endorphins, '9000');
+            res.send();
+            next();
+        });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/multipart/foo?mood=happy',
+        agent: false,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data; boundary=huff'
+        }
+    };
+
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    // don't actually upload a file
+    client.write('--huff\r\nContent-Disposition: form-data; ' +
+                 'name="endorphins"\r\n\r\n9000\r\n--huff--');
+    client.end();
+});
+
+test('gh-847 body multipart files ok', function (t) {
+    var shine = 'Well you wore out your welcome with random precision, rode ' +
+        'on the steel breeze. Come on you raver, you seer of visions, come on' +
+        ' you painter, you piper, you prisoner, and shine!';
+    var echoes = 'Overhead the albatross hangs motionless upon the air And ' +
+        'deep beneath the rolling waves in labyrinths of coral caves The ' +
+        'echo of a distant tide Comes willowing across the sand And ' +
+        'everything is green and submarine';
+    SERVER.post('/multipart/:id',
+        restify.bodyParser({
+            mapFiles: true,
+            mapParams: true,
+            keepExtensions: true,
+            uploadDir: '/tmp/',
+            override: true
+        }),
+        function (req, res, next) {
+            t.equal(req.params.id, 'foo');
+            t.equal(req.params.mood, 'happy');
+            t.equal(req.params.endorphins, '12');
+            t.ok(req.params.shine);
+            t.ok(req.params.echoes);
+            t.equal(req.params.shine.toString('utf8'), shine);
+            t.equal(req.params.echoes.toString('utf8'), echoes);
+            res.send();
+            next();
+        });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/multipart/foo?mood=happy',
+        agent: false,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data; boundary=huff'
+        }
+    };
+
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    client.write('--huff\r\n');
+    client.write('Content-Disposition: form-data; name="endorphins"\r\n\r\n');
+    client.write('12\r\n');
+
+    client.write('--huff\r\n');
+
+    client.write('Content-Disposition: form-data; name="shine"; ' +
+                 'filename="shine.txt"\r\n');
+    client.write('Content-Type: text/plain\r\n\r\n');
+    client.write(shine + '\r\n');
+    client.write('--huff\r\n');
+
+    client.write('Content-Disposition: form-data; name="echoes"; ' +
+                 'filename="echoes.txt"\r\n');
+    client.write('Content-Type: text/plain\r\n\r\n');
+    client.write(echoes + '\r\n');
+    client.write('--huff--');
+
+    client.end();
+});
+
 test('body multipart ok custom handling', function (t) {
     var detailsString = 'High endorphin levels make you happy. ' +
         'Mostly... I guess. Whatever.';
