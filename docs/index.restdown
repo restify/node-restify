@@ -1420,12 +1420,12 @@ incorrect.
 ### Properties
 
 ||**Name**||**Type**||**Description**||
-||contentLength||Number||short hand for the header content-length||
-||contentType||String||short hand for the header content-type||
-||href||String||url.parse(req.url) href||
+||contentLength()||Number||short hand for the header content-length||
+||contentType()||String||short hand for the header content-type||
+||href()||String||url.parse(req.url) href||
 ||log||Object||bunyan logger you can piggyback on||
-||id||String||A unique request id (x-request-id)||
-||path||String||cleaned up URL path||
+||id()||String||A unique request id (x-request-id)||
+||path()||String||cleaned up URL path||
 
 ## Response API
 
