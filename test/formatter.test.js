@@ -20,7 +20,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-var isFirstRequest = true;
+var reqCount = 0;
 
 
 ///--- Tests
@@ -30,21 +30,25 @@ before(function (callback) {
         SERVER = restify.createServer({
             formatters: {
                 'text/plain': function (req, res, body, cb) {
-                    if (isFirstRequest) {
+                    if (reqCount === 0) {
                         process.nextTick(function () {
-                            isFirstRequest = false;
+                            reqCount++;
                             cb(null, 'async fmt');
                         });
-                        return (this);
+                    } else if (reqCount === 1) {
+                        process.nextTick(function () {
+                            reqCount++;
+                            cb(new Error('foobar'), 'async fmt');
+                        });
+                    } else {
+                        return cb(null, 'sync fmt');
                     }
-
-                    return ('sync fmt');
                 },
-                'application/foo; q=0.9': function () {
-                    return ('foo!');
+                'application/foo; q=0.9': function (req, res, body, cb) {
+                    return cb(null, 'foo!');
                 },
-                'application/bar; q=0.1': function () {
-                    return ('bar!');
+                'application/bar; q=0.1': function (req, res, body, cb) {
+                    return cb(null, 'bar!');
                 }
             },
             dtrace: helper.dtrace,
@@ -91,6 +95,21 @@ test('async formatter', function (t) {
     });
 });
 
+test('async formatter error', function (t) {
+    SERVER.once('after', function (req, res, route, e) {
+        console.log('XXX', route, e);
+    });
+    CLIENT.get('/tmp', function (err, req, res, data) {
+        console.log('XXX', err, data);
+        t.ok(err);
+        t.equal(err.statusCode, 500);
+        t.ok(req);
+        t.ok(res);
+        t.notOk(data);
+        t.end();
+    });
+});
+
 test('sync formatter', function (t) {
     CLIENT.get('/tmp', function (err, req, res, data) {
         t.ifError(err);
@@ -100,7 +119,6 @@ test('sync formatter', function (t) {
         t.end();
     });
 });
-
 
 test('q-val priority', function (t) {
     var opts = {
