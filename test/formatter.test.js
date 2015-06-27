@@ -97,10 +97,10 @@ test('async formatter', function (t) {
 
 test('async formatter error', function (t) {
     SERVER.once('after', function (req, res, route, e) {
-        console.log('XXX', route, e);
+        // TODO: add a test here to verify error has been emitted.
+        // Pending #845
     });
     CLIENT.get('/tmp', function (err, req, res, data) {
-        console.log('XXX', err, data);
         t.ok(err);
         t.equal(err.statusCode, 500);
         t.ok(req);
