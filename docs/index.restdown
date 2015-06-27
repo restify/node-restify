@@ -412,14 +412,14 @@ in a hash of content-type -> parser at server creation time:
 
     var server = restify.createServer({
       formatters: {
-        'application/foo': function formatFoo(req, res, body) {
+        'application/foo': function formatFoo(req, res, body, cb) {
           if (body instanceof Error)
             return body.stack;
 
           if (Buffer.isBuffer(body))
-            return body.toString('base64');
+            return cb(null, body.toString('base64'));
 
-          return util.inspect(body);
+          return cb(null, util.inspect(body));
         }
       }
     });
@@ -445,14 +445,14 @@ ensure sorting happens the way you want:
 
     restify.createServer({
       formatters: {
-        'application/foo; q=0.9': function formatFoo(req, res, body) {
+        'application/foo; q=0.9': function formatFoo(req, res, body, cb) {
           if (body instanceof Error)
-            return body.stack;
+            return cb(body);
 
           if (Buffer.isBuffer(body))
-            return body.toString('base64');
+            return cb(null, body.toString('base64'));
 
-          return util.inspect(body);
+          return cb(null, util.inspect(body));
         }
       }
     });
