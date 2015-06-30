@@ -43,7 +43,7 @@
         "consistent-return": [ 2 ],
         "curly": [ 0 ],  // in jscs
         "default-case": [ 2 ],
-        "dot-notation": [ [ 2 ], { "allowKeywords": true } ],
+        "dot-notation": [ 2, { "allowKeywords": true } ],
         "eqeqeq": [ 2 ],
         "guard-for-in": [ 2 ],
         "no-alert": [ 2 ],
