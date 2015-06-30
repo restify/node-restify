@@ -6,6 +6,7 @@ var assert = require('assert-plus');
 var http = require('http');
 
 var filed = require('filed');
+var restifyClients = require('restify-clients');
 var uuid = require('node-uuid');
 
 var RestError = require('../lib/errors').RestError;
@@ -39,7 +40,7 @@ before(function (cb) {
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
-            CLIENT = restify.createJsonClient({
+            CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false

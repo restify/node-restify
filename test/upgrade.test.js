@@ -3,6 +3,7 @@
 
 'use strict';
 
+var restifyClients = require('restify-clients');
 var Watershed = require('watershed').Watershed;
 var restify = require('../lib');
 
@@ -89,7 +90,7 @@ before(function (cb) {
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
-            CLIENT = restify.createHttpClient({
+            CLIENT = restifyClients.createHttpClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false
