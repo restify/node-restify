@@ -249,6 +249,64 @@ test('PUT ok', function (t) {
 });
 
 
+[
+  'DELETE',
+  'GET',
+  'HEAD',
+  'PATCH',
+  'POST',
+  'PUT'
+].forEach(function testForVerb(VERB) {
+    test('all "' + VERB + '" ok', function (t) {
+        SERVER.all('/foo/:id', function tester(req, res, next) {
+            t.ok(req.params);
+            t.equal(req.params.id, 'bar');
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/foo/bar',
+            method: VERB,
+            agent: false
+        };
+        http.request(opts, function (res) {
+            t.equal(res.statusCode, 200);
+            res.on('end', function () {
+                t.end();
+            });
+            res.resume();
+        }).end();
+    });
+});
+
+test('all returns a Route map', function (t) {
+    var routeMap = SERVER.all('/foo/:id', function noop () { });
+
+    var keys = Object.keys(routeMap);
+
+    t.deepEqual(keys, [
+        'del',
+        'get',
+        'head',
+        'opts',
+        'post',
+        'put',
+        'patch'
+    ]);
+
+    t.ok(keys.map(function mapToRoute(key) {
+        return routeMap[key];
+    }).every(function isString(route) {
+        return typeof route === 'string';
+    }));
+
+    t.end();
+});
+
+
 test('PATCH ok', function (t) {
     SERVER.patch('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
