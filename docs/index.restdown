@@ -246,6 +246,28 @@ Note that `foo` only gets run once in that example.  A few caveats:
   routing chain once (this is a limitation of the way routes are stored
   internally, and may be revisited someday).
 
+### Naming Handlers
+
+It's possible to name a handler. This name will be used for logging purpose mainly.
+
+If handler is a named function, this function name will be used.
+
+If the handler is anonymous function (or binded function), or if you want to
+override the function's name, just add a string "handlerName" property to the handler function.
+
+    function myHandler(req, res, next) {
+        res.send(200);
+        return next();
+    }
+
+    myHandler.handlerName = 'myRenamedHandler';
+
+    server.get(
+        '/foo',
+        myHandler
+    );
+
+
 ### Chaining Handlers
 
 Routes can also accept more than one handler function. For instance:
