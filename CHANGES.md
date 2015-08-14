@@ -1,4 +1,23 @@
 # restify Changelog
+## 4.0.0
+- #877 content-type can be case-insensitive. Yunong Xiao
+- #856 update various dependencies. Alex Liu
+- #851 fix formatters such that they always return cb. Yunong Xiao
+- #847 fix body parser race condition. Yunong Xiao
+- #842 add `req.matchedVersion()` Nathan Peck, Micah Ransdall
+- #840 Fix issue with server toString Method. OiNutter, Micah Ransdall
+- #836 Add JSDoc comments. Alex Liu
+- #835 Update static.js to allow for serving static files that do not use the route as a path. Wavewash, Micah Ransdall
+- #831 Support hash option to Formidable for multipart file uploads. blakevanian, ManRueda
+- #832 Updated dtrace-provider. yads
+- #812 add query parameters to auditlogger. Alex Liu
+- #800 Allow 0, false, and null as json body. Alex Dobeck
+- #771 q-value choice on wildcards ignores default q-value of 1. Kevin Peno
+- #822 Allow optional headers to be added as properties to bunyan logs. Michael Paulson.
+- #824 Don't include large coverage files in published packages. Trent Mick
+- #819 Add a feature to allow the expiration of old unprocessed requests. Michael Paulson
+- #803 Add redirect support to Response. Alex Liu
+- #686 `res.send` can't send 0, false and null. Alex Dobeck
 
 ## 3.0.3
 - #669 Fix socket.io 1.x integration. Mark Doeswijk
