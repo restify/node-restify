@@ -72,3 +72,30 @@ test('no reviver', function (t) {
     });
 });
 
+test('case-insensitive content-type', function (t) {
+    var jsonBodyParser = restify.plugins.jsonBodyParser;
+
+    var parser = jsonBodyParser({
+        bodyReader: true
+    })[0];
+
+    var req = {
+        getContentType: function () {
+            return ('Application/Json');
+        },
+        body: JSON.stringify({
+            apple: 'red',
+            orange: 'orange',
+            banana: 'yellow'
+        }),
+        params: {}
+    };
+
+    parser(req, null, function () {
+        t.equal(req.params.apple, 'red');
+        t.equal(req.params.orange, 'orange');
+        t.equal(req.params.banana, 'yellow');
+        t.end();
+    });
+});
+
