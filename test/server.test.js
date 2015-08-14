@@ -1897,3 +1897,32 @@ test('gh-630 handle server versions as an array or string', function (t) {
     t.ok(SERVER.toString().indexOf('3.0.0') > -1);
     t.end();
 });
+
+
+test('GH-877 content-type should be case insensitive', function (t) {
+    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+
+    SERVER.get('/cl', function (req, res, next) {
+        t.equal(req.getContentType(), 'application/json');
+        res.send(200);
+        next();
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/cl',
+        method: 'GET',
+        agent: false,
+        headers: {
+            accept: 'application/json',
+            'content-type': 'APPLicatioN/JSon',
+            'transfer-encoding': 'chunked'
+        }
+    };
+    var client = http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+    client.end();
+});
