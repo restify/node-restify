@@ -1,3 +1,5 @@
+'use strict';
+
 // There's an example D script here to showcase a "slow" handler where it's
 // wildcard'd by the route name.  In "real life" you'd probably start with a
 // d script that breaks down the route -start and -done, and then you'd want
@@ -89,7 +91,7 @@ var server = restify.createServer({
     name: NAME,
     Logger: log,
     formatters: {
-        'application/foo': function (req, res, body) {
+        'application/foo': function (req, res, body, cb) {
             if (body instanceof Error) {
                 body = body.stack;
             } else if (Buffer.isBuffer(body)) {
@@ -108,12 +110,13 @@ var server = restify.createServer({
 
                     default:
                         body = body === null ? '' :
-                            JSON.stringify(body);
+                            'Demoing application/foo formatter; ' +
+                              JSON.stringify(body);
                         break;
                 }
 
             }
-            return body;
+            return cb(null, body);
         }
     }
 });
@@ -133,6 +136,7 @@ server.use(function slowHandler(req, res, next) {
 server.get({url: '/foo/:id', name: 'GetFoo'}, function (req, res, next) {
     next();
 }, function sendResult(req, res, next) {
+    res.contentType = 'application/foo';
     res.send({
         hello: req.params.id
     });
