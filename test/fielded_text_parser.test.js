@@ -9,6 +9,7 @@ if (require.cache[__dirname + '/lib/helper.js']) {
 }
 
 var restify = require('../lib');
+var restifyClients = require('restify-clients');
 var fs = require('fs');
 var helper = require('./lib/helper.js');
 var before = helper.before;
@@ -52,7 +53,7 @@ before(function (callback) {
             return (next());
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
-            CLIENT = restify.createClient({
+            CLIENT = restifyClients.createClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false,

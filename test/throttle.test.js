@@ -2,6 +2,8 @@
 
 'use strict';
 
+var restifyClients = require('restify-clients');
+
 var restify = require('../lib');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
@@ -62,7 +64,7 @@ test('setup', function (t) {
 
     SERVER.listen(PORT, '127.0.0.1', function () {
         PORT = SERVER.address().port;
-        CLIENT = restify.createJsonClient({
+        CLIENT = restifyClients.createJsonClient({
             url: 'http://127.0.0.1:' + PORT,
             dtrace: helper.dtrace,
             retry: false,

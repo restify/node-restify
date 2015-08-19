@@ -8,6 +8,7 @@ var net = require('net');
 var path = require('path');
 
 var bunyan = require('bunyan');
+var restifyClients = require('restify-clients');
 
 var restify = require('../lib');
 
@@ -52,7 +53,7 @@ before(function (callback) {
 
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
-            CLIENT = restify.createJsonClient({
+            CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false,
@@ -550,7 +551,7 @@ test('body json ok (no params)', function (t) {
 });
 
 test('body json ok (null params)', function (t) {
-    var STRING_CLIENT = restify.createStringClient({
+    var STRING_CLIENT = restifyClients.createStringClient({
         url: 'http://127.0.0.1:' + PORT,
         dtrace: helper.dtrace,
         retry: false,
