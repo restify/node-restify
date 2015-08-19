@@ -1,4 +1,7 @@
 # restify Changelog
+## Current
+ - #855 Clients now live in its own repo and npm module.
+
 ## 4.0.0
 - #877 content-type can be case-insensitive. Yunong Xiao
 - #856 update various dependencies. Alex Liu
