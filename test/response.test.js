@@ -279,7 +279,7 @@ test('redirect using options.url', function (t) {
 
 
 // jscs:disable maximumLineLength
-test('redirect should cause InternalServerError when invoked without next', function (t) {
+test('redirect should cause InternalError when invoked without next', function (t) {
 
     SERVER.get('/9', function (req, res, next) {
         res.redirect();
@@ -290,7 +290,7 @@ test('redirect should cause InternalServerError when invoked without next', func
 
         // json parse the response
         var msg = JSON.parse(res.body);
-        t.equal(msg.code, 'InternalError');
+        t.equal(msg.code, 'Internal');
         t.end();
     });
 });
