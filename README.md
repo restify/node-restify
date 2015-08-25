@@ -1,4 +1,4 @@
-# restify
+![restify](/../gh-images/logo/png/restify_logo_black_transp_288x288.png?raw=true "restify")
 
 [![Build Status](https://travis-ci.org/restify/node-restify.svg)](https://travis-ci.org/restify/node-restify)
 [![Gitter chat](https://badges.gitter.im/mcavage/node-restify.svg)](https://gitter.im/mcavage/node-restify)
