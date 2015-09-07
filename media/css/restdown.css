@@ -123,8 +123,6 @@ pre.shell code::before {
 /* ---- header and sidebar */
 
 #header {
-  background:#C3BDB3;
-  background:#1C313C;
   height:66px;
   left:0px;
   position:absolute;
@@ -132,17 +130,20 @@ pre.shell code::before {
   width:100%;
   z-index:1;
   font-size:0.7em;
+  background: url(../img/logo.png) no-repeat;
+  background-color: #1C313C;
+  background-position: 0;
+  background-size: 6%;
 }
 
 #header h1 {
   width: 424px;
   height: 35px;
   display:block;
-  background: url(../img/logo.png) no-repeat;
   line-height:2.1em;
   padding:0;
   padding-left:140px;
-  margin-top:18px;
+  margin-top:15px;
   margin-left:20px;
   color:white;
   text-transform: uppercase;
