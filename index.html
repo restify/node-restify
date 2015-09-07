@@ -195,7 +195,7 @@ server.listen(8080);
 <tr><td>log</td><td>Object</td><td>You can optionally pass in a <a href="https://github.com/trentm/node-bunyan">bunyan</a> instance; not required</td></tr>
 <tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, default is <code>restify</code></td></tr>
 <tr><td>spdy</td><td>Object</td><td>Any options accepted by <a href="https://github.com/indutny/node-spdy">node-spdy</a></td></tr>
-<tr><td>version</td><td>String</td><td>A default version to set for all routes</td></tr>
+<tr><td>version</td><td>String|Array</td><td>A default version to set for all routes</td></tr>
 <tr><td>handleUpgrades</td><td>Boolean</td><td>Hook the <code>upgrade</code> event from the node HTTP server, pushing <code>Connection: Upgrade</code> requests through the regular request handling chain; defaults to <code>false</code></td></tr>
 <tr><td>httpsServerOptions</td><td>Object</td><td>Any options accepted by <a href="http://nodejs.org/api/https.html#https_https">node-https Server</a>. If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.</td></tr>
 </tbody>
@@ -397,8 +397,33 @@ segues us nicely into content negotiation.</p>
 server creation time.  Lastly, you can support multiple versions in the API
 by using an array:</p>
 
-<pre><code>  server.get({path: PATH, version: ['2.0.0', '2.1.0']}, sendV2);
+<pre><code>  server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, sendV2);
 </code></pre>
+
+<p>In this case you may need to know more information such as what the
+original requested version string was, and what the matching
+version from the routes supported version array was. Two methods make
+this info available:</p>
+
+<pre><code>var PATH = '/version/test';
+server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, function (req) {
+  res.send(200, {
+    requestedVersion: req.version(),
+    matchedVersion: req.matchedVersion()
+  });
+});
+</code></pre>
+
+<p>Hitting this route:</p>
+
+<pre class="shell"><code>curl -s -H 'accept-version: &lt;2.2.0' localhost:8080/version/test | json
+{
+  "requestedVersion": "&lt;2.2.0",
+  "matchedVersion": "2.1.0"
+}
+</code></pre>
+
+<p>In response to the above</p>
 
 <h2 id="upgrade-requests">Upgrade Requests</h2>
 
@@ -453,14 +478,14 @@ in a hash of content-type -> parser at server creation time:</p>
 
 <pre><code>var server = restify.createServer({
   formatters: {
-    'application/foo': function formatFoo(req, res, body) {
+    'application/foo': function formatFoo(req, res, body, cb) {
       if (body instanceof Error)
         return body.stack;
 
       if (Buffer.isBuffer(body))
-        return body.toString('base64');
+        return cb(null, body.toString('base64'));
 
-      return util.inspect(body);
+      return cb(null, util.inspect(body));
     }
   }
 });
@@ -487,14 +512,14 @@ ensure sorting happens the way you want:</p>
 
 <pre><code>restify.createServer({
   formatters: {
-    'application/foo; q=0.9': function formatFoo(req, res, body) {
+    'application/foo; q=0.9': function formatFoo(req, res, body, cb) {
       if (body instanceof Error)
-        return body.stack;
+        return cb(body);
 
       if (Buffer.isBuffer(body))
-        return body.toString('base64');
+        return cb(null, body.toString('base64'));
 
-      return util.inspect(body);
+      return cb(null, util.inspect(body));
     }
   }
 });
@@ -841,7 +866,7 @@ here.</p>
 <tbody>
 <tr><td><strong>Name</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
 <tr><td>name</td><td>String</td><td>name of the server</td></tr>
-<tr><td>version</td><td>String</td><td>default version to use in all routes</td></tr>
+<tr><td>version</td><td>String|Array</td><td>default version to use in all routes</td></tr>
 <tr><td>log</td><td>Object</td><td><a href="https://github.com/trentm/node-bunyan">bunyan</a> instance</td></tr>
 <tr><td>acceptable</td><td>Array(String)</td><td>list of content-types this server can respond with</td></tr>
 <tr><td>url</td><td>String</td><td>Once listen() is called, this will be filled in with where the server is running</td></tr>
