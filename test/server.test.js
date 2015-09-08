@@ -2044,3 +2044,82 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
     });
 });
 
+
+test('GH-667 emit error event for generic Errors', function (t) {
+
+    var restifyErrorFired = 0;
+    var notFoundFired = 0;
+    var myErr = new errors.NotFoundError('foobar');
+
+    SERVER.get('/1', function (req, res, next) {
+        return next(new Error('foobar'));
+    });
+
+    SERVER.get('/2', function (req, res, next) {
+        return next(myErr);
+    });
+
+    SERVER.get('/3', function (req, res, next) {
+        SERVER.on('NotFound', function (req2, res2, err, cb) {
+            notFoundFired++;
+            t.ok(err);
+            t.equal(err, myErr);
+            t.end();
+            return cb();
+        });
+        return next(myErr);
+    });
+
+    SERVER.on('restifyError', function (req, res, err, cb) {
+        restifyErrorFired++;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+
+        if (err instanceof errors.NotFoundError) {
+            t.equal(err, myErr);
+        }
+        return cb();
+    });
+
+    /* eslint-disable no-shadow */
+    CLIENT.get('/1', function (err, req, res, data) {
+        // should get regular error
+        t.ok(err);
+        t.equal(restifyErrorFired, 1);
+
+        CLIENT.get('/2', function (err, req, res, data) {
+            // should get not found error
+            t.ok(err);
+            t.equal(restifyErrorFired, 2);
+
+            CLIENT.get('/3', function (err, req, res, data) {
+                // should get notfounderror
+                t.ok(err);
+                t.equal(restifyErrorFired, 3);
+                t.equal(notFoundFired, 1);
+            });
+        });
+    });
+    /* eslint-enable no-shadow */
+});
+
+
+test('GH-667 returning error in error handler should not do anything',
+function (t) {
+
+    SERVER.on('ImATeapot', function (req, res, err, cb) {
+        // attempt to pass a new error back
+        return cb(new errors.LockedError('oh noes'));
+    });
+
+    SERVER.get('/1', function (req, res, next) {
+        return next(new errors.ImATeapotError('foobar'));
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ok(err);
+        // should still get the original error
+        t.equal(err.name, 'ImATeapotError');
+        t.end();
+    });
+});

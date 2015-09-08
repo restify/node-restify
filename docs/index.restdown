@@ -503,10 +503,12 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
 
 Sometimes, for all requests, you may want to handle an error condition the same
 way. As an example, you may want to serve a 500 page on all
-`InternalServerErrors`. In this case, you can add a listener for the `InternalServer` error event that
-is always fired when this Error is encountered by Restify as part of a
-`next(error)` statement. This gives you a way to handle all errors of the same
-class identically across the server.
+`InternalServerErrors`. In this case, you can add a listener for the
+`InternalServer` error event that is always fired when this Error is
+encountered by Restify as part of a `next(error)` statement. This gives you a
+way to handle all errors of the same class identically across the server. You
+can also use a generic `restifyError` event which will catch errors of all types.
+
 
     server.get('/hello/:name', function(req, res, next) {
       // some internal unrecoverable error
@@ -514,10 +516,35 @@ class identically across the server.
       return next(err);
     });
 
-    server.on('InternalServer', function (req, res, err, cb) {
-      err.body = 'something is wrong!';
+    server.get('/hello/:foo', function(req, res, next) {
+      // resource not found error
+      var err = new restify.errors.NotFoundError('oh noes!');
+      return next(err);
+    });
+
+    server.on('NotFound', function (req, res, err, cb) {
+      // do not call res.send! you are now in an error context and are outside
+      // of the normal next chain. you can log or do metrics here, and invoke
+      // the callback when you're done. restify will automtically render the 
+      // NotFoundError as a JSON response.
       return cb();
     });
+    
+    server.on('InternalServer', function (req, res, err, cb) {
+      // if you don't want restify to automatically render the Error object
+      // as a JSON response, you can customize the response by setting the 
+      // `body` property of the error
+      err.body = '<html><body>some custom error content!</body></html>';
+      return cb();
+    });
+    
+    server.on('restifyError', function (req, res, err, cb) {
+      // this listener will fire after both events above!
+      // `err` here is the same as the error that was passed to the above
+      // error handlers.
+      return cb();
+    });
+
 
 ### HttpError
 
