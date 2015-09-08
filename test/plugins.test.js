@@ -199,6 +199,125 @@ test('query object', function (t) {
 });
 
 
+test('query nested object', function (t) {
+    SERVER.get('/', function (req, res, next) {
+        t.ok(req.params.pizza);
+        t.deepEqual(req.params.pizza.left, ['pepperoni', 'bacon']);
+        t.deepEqual(req.query.pizza.right, ['ham']);
+        res.send();
+        next();
+    });
+
+    var p = '/?pizza[left][]=pepperoni&pizza[left][]=bacon&pizza[right][]=ham';
+    CLIENT.get(p, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('query implied array', function (t) {
+    SERVER.get('/query/:id', function (req, res, next) {
+        t.equal(req.params.id, 'foo');
+        t.ok(req.params.field);
+        t.deepEqual(req.params.field, ['a', 'b', 'c']);
+        res.send();
+        next();
+    });
+
+    var p = '/query/foo?field[]=a&field[]=b&field[]=c';
+    CLIENT.get(p, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('query merge scalar into implied array ', function (t) {
+    SERVER.get('/query/:id', function (req, res, next) {
+        t.equal(req.params.id, 'foo');
+        t.ok(req.params.field);
+        t.deepEqual(req.params.field, ['rock', 'paper', 'scissor', 'shoot']);
+        res.send();
+        next();
+    });
+
+    var p = '/query/foo?field[]=rock&field[]=paper&field[]=scissor&field=shoot';
+    CLIENT.get(p, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('body array ok', function (t) {
+    SERVER.post('/order/:food',
+        restify.bodyParser(),
+        function (req, res, next) {
+            t.equal(req.params.food, 'pizza');
+            t.equal(req.params.size, 'large');
+            t.deepEqual(req.params.left, ['pepperoni', 'bacon']);
+            t.deepEqual(req.params.right, ['ham']);
+            res.send();
+            next();
+        });
+
+    var obj = {
+        left: ['pepperoni', 'bacon'],
+        right: ['ham']
+    };
+
+    var STRING_CLIENT = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + PORT,
+        dtrace: helper.dtrace,
+        retry: false,
+        agent: false
+    });
+
+    STRING_CLIENT.post('/order/pizza?size=large', obj, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+});
+
+
+test('body object ok', function (t) {
+    var obj = {
+        arms: { broken : false, hands: [
+            { fingers: [ 'thumb', 'index', 'middle', 'ring', 'pinky' ] },
+            { fingers: [ 'pinky', 'ring', 'middle', 'index', 'thumb' ] }
+        ]}
+    };
+
+    SERVER.post('/patient/bodysheet',
+        restify.bodyParser(),
+        function (req, res, next) {
+            t.equal(req.params.id, '1');
+            t.deepEqual(req.params.arms, obj.arms);
+            res.send();
+            next();
+        });
+
+    var STRING_CLIENT = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + PORT,
+        dtrace: helper.dtrace,
+        retry: false,
+        agent: false
+    });
+
+    STRING_CLIENT.post('/patient/bodysheet?id=1', obj, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
 test('body url-encoded ok', function (t) {
     SERVER.post('/bodyurl/:id',
         restify.bodyParser(),
