@@ -27,6 +27,7 @@ var test = helper.test;
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
+var FAST_CLIENT;
 var SERVER;
 
 
@@ -46,6 +47,12 @@ before(function (cb) {
                 dtrace: helper.dtrace,
                 retry: false
             });
+            FAST_CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                dtrace: helper.dtrace,
+                retry: false,
+                requestTimeout: 10
+            });
 
             cb();
         });
@@ -59,6 +66,7 @@ before(function (cb) {
 after(function (cb) {
     try {
         CLIENT.close();
+        FAST_CLIENT.close();
         SERVER.close(function () {
             CLIENT = null;
             SERVER = null;
@@ -1930,6 +1938,7 @@ test('GH-877 content-type should be case insensitive', function (t) {
     client.end();
 });
 
+
 test('GH-882: route name is same as specified', function (t) {
     SERVER.get({
         name: 'my-r$-%-x',
@@ -1944,3 +1953,39 @@ test('GH-882: route name is same as specified', function (t) {
         t.end();
     });
 });
+
+
+test('GH-733 if request is closed early, stop processing', function (t) {
+
+    var numCount = 0;
+
+    SERVER.get('/', [
+        function delay (req, res, next) {
+            setTimeout(function () {
+                next();
+            }, 50);
+        },
+        function send(req, res, next) {
+            numCount++;
+            res.send({ hello: 'world'});
+            next();
+        }
+    ]);
+
+    CLIENT.get('/', function (err, req, res, data) {
+        t.ifError(err);
+        t.deepEqual(data, { hello: 'world' });
+
+        FAST_CLIENT.get('/', function (err2, req2, res2, data2) {
+            t.ok(err2);
+            t.equal(err2.name, 'RequestTimeoutError');
+            t.deepEqual(data2, {});
+            // fast client short circuits, should never run second handler
+            setTimeout(function () {
+                t.equal(numCount, 1);
+                t.end();
+            }, 500);
+        });
+    });
+});
+
