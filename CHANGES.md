@@ -1,6 +1,9 @@
 # restify Changelog
-## Current
- - #855 Clients now live in its own repo and npm module.
+## 4.0.1
+ - #889 Bump dependencies to latest, Micah Ransdell
+ - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
+ - #844 Move Errors to their own module, Alex Liu
+ - #855 Clients now live in its own repo and npm module, Alex Liu
 
 ## 4.0.0
 - #877 content-type can be case-insensitive. Yunong Xiao
