@@ -73,7 +73,7 @@
     "restify-errors": "3.0.0",
     "qs": "^5.0.0",
     "semver": "^5.0.1",
-    "spdy": "^2.0.5",
+    "spdy": "^1.26.5",
     "tunnel-agent": "^0.4.0",
     "vasync": "1.6.3",
     "verror": "^1.4.0"
