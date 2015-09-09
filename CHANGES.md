@@ -1,4 +1,8 @@
 # restify Changelog
+
+## 4.0.2
+- #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
+
 ## 4.0.0
 - #877 content-type can be case-insensitive. Yunong Xiao
 - #856 update various dependencies. Alex Liu
