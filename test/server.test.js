@@ -6,10 +6,11 @@ var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var http = require('http');
 
+var errors = require('restify-errors');
 var filed = require('filed');
+var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
 var uuid = require('node-uuid');
-var errors = require('restify-errors');
 
 var RestError = errors.RestError;
 var restify = require('../lib');
@@ -539,21 +540,6 @@ test('GH-56 streaming with filed (download)', function (t) {
 });
 
 
-test('GH-59 Query params with / result in a 404', function (t) {
-    SERVER.get('/', function tester(req, res, next) {
-        res.send('hello world');
-        next();
-    });
-
-    CLIENT.get('/?foo=bar/foo', function (err, _, res, obj) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(obj, 'hello world');
-        t.end();
-    });
-});
-
-
 test('GH-63 res.send 204 is sending a body', function (t) {
     SERVER.del('/hello/:name', function tester(req, res, next) {
         res.send(204);
@@ -758,99 +744,6 @@ test('upload routing based on content-type fail', function (t) {
 });
 
 
-test('full response', function (t) {
-    SERVER.use(restify.fullResponse());
-    SERVER.del('/bar/:id', function tester(req, res, next) {
-        res.send();
-        next();
-    });
-    SERVER.get('/bar/:id', function tester2(req, res, next) {
-        t.ok(req.params);
-        t.equal(req.params.id, 'bar');
-        res.send();
-        next();
-    });
-
-    CLIENT.get('/bar/bar', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        var headers = res.headers;
-        t.ok(headers, 'headers ok');
-        t.ok(headers['access-control-allow-origin']);
-        t.ok(headers['access-control-allow-headers']);
-        t.ok(headers['access-control-expose-headers']);
-        t.ok(headers['access-control-allow-methods']);
-        t.ok(headers.date);
-        t.ok(headers['request-id']);
-        t.ok(headers['response-time'] >= 0);
-        t.equal(headers.server, 'restify');
-        t.equal(headers.connection, 'Keep-Alive');
-        t.equal(headers['api-version'], '2.0.0');
-        t.end();
-    });
-});
-
-
-test('GH-149 limit request body size', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
-
-    SERVER.post('/', function (req, res, next) {
-        res.send(200, {length: req.body.length});
-        next();
-    });
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/',
-        method: 'POST',
-        agent: false,
-        headers: {
-            accept: 'application/json',
-            'content-type': 'application/x-www-form-urlencoded',
-            'transfer-encoding': 'chunked'
-        }
-    };
-    var client = http.request(opts, function (res) {
-        t.equal(res.statusCode, 413);
-        res.once('end', t.end.bind(t));
-        res.resume();
-    });
-    client.write(new Array(1028).join('x'));
-    client.end();
-});
-
-
-test('GH-149 limit request body size (json)', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
-
-    SERVER.post('/', function (req, res, next) {
-        res.send(200, {length: req.body.length});
-        next();
-    });
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/',
-        method: 'POST',
-        agent: false,
-        headers: {
-            accept: 'application/json',
-            'content-type': 'application/json',
-            'transfer-encoding': 'chunked'
-        }
-    };
-    var client = http.request(opts, function (res) {
-        t.equal(res.statusCode, 413);
-        res.once('end', t.end.bind(t));
-        res.resume();
-    });
-    client.write('{"a":[' + new Array(512).join('1,') + '0]}');
-    client.end();
-});
-
-
 test('path+flags ok', function (t) {
     SERVER.get({path: '/foo', flags: 'i'}, function (req, res, next) {
         res.send('hi');
@@ -925,7 +818,7 @@ test('test matches params with custom regex', function (t) {
 
 
 test('GH-180 can parse DELETE body', function (t) {
-    SERVER.use(restify.bodyParser({mapParams: false}));
+    SERVER.use(plugins.bodyParser({mapParams: false}));
 
     SERVER.del('/', function (req, res, next) {
         res.send(200, req.body);
@@ -1279,40 +1172,6 @@ test('gh-329 wrong values in res.methods', function (t) {
     CLIENT.post('/stuff/foo', {}, function (err, _, res) {
         t.ok(err);
         t.end();
-    });
-});
-
-
-test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
-    SERVER.pre(restify.pre.sanitizePath());
-    SERVER.use(restify.queryParser());
-    SERVER.get('/hello/:name', function (req, res, next) {
-        res.send(req.params);
-    });
-
-    SERVER.listen(8080, function () {
-        CLIENT.get('/hello/foo/?bar=baz', function (err, _, __, obj) {
-            t.ifError(err);
-            t.deepEqual(obj, {name: 'foo', bar: 'baz'});
-            t.end();
-        });
-    });
-});
-
-
-test('<url>/?<queryString> broken', function (t) {
-    SERVER.pre(restify.pre.sanitizePath());
-    SERVER.use(restify.queryParser());
-    SERVER.get(/\/.*/, function (req, res, next) {
-        res.send(req.params);
-    });
-
-    SERVER.listen(8080, function () {
-        CLIENT.get('/?bar=baz', function (err, _, __, obj) {
-            t.ifError(err);
-            t.deepEqual(obj, {bar: 'baz'});
-            t.end();
-        });
     });
 });
 
@@ -1963,7 +1822,7 @@ test('gh-630 handle server versions as an array or string', function (t) {
 
 
 test('GH-877 content-type should be case insensitive', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+    SERVER.use(plugins.bodyParser({maxBodySize: 1024}));
 
     SERVER.get('/cl', function (req, res, next) {
         t.equal(req.getContentType(), 'application/json');
@@ -2050,7 +1909,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
 
         // set up audit logs
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
-        SERVER.once('after', restify.auditLogger({
+        SERVER.once('after', plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
