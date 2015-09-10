@@ -502,7 +502,7 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
 
 Sometimes, for all requests, you may want to handle an error condition the same
 way. As an example, you may want to serve a 500 page on all
-`InternalServerErrors`. In this case you can add a listener for this error that
+`InternalServerErrors`. In this case, you can add a listener for the `InternalServer` error event that
 is always fired when this Error is encountered by Restify as part of a
 `next(error)` statement. This gives you a way to handle all errors of the same
 class identically across the server.
@@ -513,8 +513,8 @@ class identically across the server.
       return next(err);
     });
 
-    server.on('InternalServerError', function (req, res, err, cb) {
-      err._customContent = 'something is wrong!';
+    server.on('InternalServer', function (req, res, err, cb) {
+      err.body = 'something is wrong!';
       return cb();
     });
 
