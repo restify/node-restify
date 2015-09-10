@@ -1,5 +1,6 @@
 # restify Changelog
-## 4.0.1
+## Current
+ - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
  - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
  - #844 Move Errors to their own module, Alex Liu
