@@ -573,7 +573,7 @@ attribute, that will be used, otherwise a default of 500 will be used
 
 <p>Sometimes, for all requests, you may want to handle an error condition the same
 way. As an example, you may want to serve a 500 page on all
-<code>InternalServerErrors</code>. In this case you can add a listener for this error that
+<code>InternalServerErrors</code>. In this case, you can add a listener for the <code>InternalServer</code> error event that
 is always fired when this Error is encountered by Restify as part of a
 <code>next(error)</code> statement. This gives you a way to handle all errors of the same
 class identically across the server.</p>
@@ -584,8 +584,8 @@ class identically across the server.</p>
   return next(err);
 });
 
-server.on('InternalServerError', function (req, res, err, cb) {
-  err._customContent = 'something is wrong!';
+server.on('InternalServer', function (req, res, err, cb) {
+  err.body = 'something is wrong!';
   return cb();
 });
 </code></pre>
