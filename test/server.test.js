@@ -3,6 +3,7 @@
 'use strict';
 
 var assert = require('assert-plus');
+var bunyan = require('bunyan');
 var http = require('http');
 
 var filed = require('filed');
@@ -51,7 +52,7 @@ before(function (cb) {
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false,
-                requestTimeout: 10
+                requestTimeout: 500
             });
 
             cb();
@@ -69,6 +70,7 @@ after(function (cb) {
         FAST_CLIENT.close();
         SERVER.close(function () {
             CLIENT = null;
+            FAST_CLIENT = null;
             SERVER = null;
             cb();
         });
@@ -1955,36 +1957,88 @@ test('GH-882: route name is same as specified', function (t) {
 });
 
 
-test('GH-733 if request is closed early, stop processing', function (t) {
-
+test('GH-733 if request closed early, stop processing. ensure only ' +
+     'relevant audit logs output.', function (t) {
+    // Dirty hack to capture the log record using a ring buffer.
     var numCount = 0;
 
-    SERVER.get('/', [
-        function delay (req, res, next) {
+    // FAST_CLIENT times out at 500ms, should capture two records then close
+    // the request.
+    SERVER.get('/audit', [
+        function first(req, res, next) {
+            req.startHandlerTimer('first');
             setTimeout(function () {
-                next();
-            }, 50);
+                numCount++;
+                req.endHandlerTimer('first');
+                return next();
+            }, 300);
         },
-        function send(req, res, next) {
+        function second(req, res, next) {
+            req.startHandlerTimer('second');
+            setTimeout(function () {
+                numCount++;
+                req.endHandlerTimer('second');
+                return next();
+            }, 300);
+        },
+        function third(req, res, next) {
+            req.endHandlerTimer('third');
             numCount++;
             res.send({ hello: 'world'});
-            next();
+            return next();
         }
     ]);
 
-    CLIENT.get('/', function (err, req, res, data) {
+
+    CLIENT.get('/audit', function (err, req, res, data) {
         t.ifError(err);
         t.deepEqual(data, { hello: 'world' });
+        t.equal(numCount, 3);
 
-        FAST_CLIENT.get('/', function (err2, req2, res2, data2) {
-            t.ok(err2);
-            t.equal(err2.name, 'RequestTimeoutError');
-            t.deepEqual(data2, {});
-            // fast client short circuits, should never run second handler
+        // reset numCount
+        numCount = 0;
+
+        // set up audit logs
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        SERVER.once('after', restify.auditLogger({
+            log: bunyan.createLogger({
+                name: 'audit',
+                streams:[ {
+                    level: 'info',
+                    type: 'raw',
+                    stream: ringbuffer
+                }]
+            })
+        }));
+
+
+        FAST_CLIENT.get('/audit', function (err2, req2, res2, data2) {
             setTimeout(function () {
-                t.equal(numCount, 1);
+                // should request timeout error
+                t.ok(err2);
+                t.equal(err2.name, 'RequestTimeoutError');
+                t.deepEqual(data2, {});
+
+                // check records
+                t.ok(ringbuffer.records[0], 'no log records');
+                t.equal(ringbuffer.records.length, 1,
+                        'should only have 1 log record');
+
+                // check timers
+                var handlers = Object.keys(ringbuffer.records[0].req.timers);
+                t.equal(handlers.length, 2,
+                        'should only have 2 req timers');
+                t.equal(handlers[0], 'first',
+                        'first handler timer not in order');
+                t.equal(handlers[handlers.length - 1], 'second',
+                        'second handler not last');
                 t.end();
+
+                // ensure third handler never ran
+                t.equal(numCount, 2);
             }, 500);
+            // don't start tests until a little after the request times out so
+            // that server can start the audit logs.
         });
     });
 });
