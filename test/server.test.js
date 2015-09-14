@@ -1929,3 +1929,18 @@ test('GH-877 content-type should be case insensitive', function (t) {
     });
     client.end();
 });
+
+test('GH-882: route name is same as specified', function (t) {
+    SERVER.get({
+        name: 'my-r$-%-x',
+        path: '/m1'
+    }, function (req, res, next) {
+        res.send({name: req.route.name});
+    });
+
+    CLIENT.get('/m1', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.body, '{"name":"my-r$-%-x"}');
+        t.end();
+    });
+});
