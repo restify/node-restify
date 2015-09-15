@@ -2023,6 +2023,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
                 t.ok(ringbuffer.records[0], 'no log records');
                 t.equal(ringbuffer.records.length, 1,
                         'should only have 1 log record');
+                t.equal(ringbuffer.records[0].req.clientClosed, true);
 
                 // check timers
                 var handlers = Object.keys(ringbuffer.records[0].req.timers);
