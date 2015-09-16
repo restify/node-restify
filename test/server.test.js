@@ -2026,9 +2026,6 @@ test('GH-877 content-type should be case insensitive', function(t) {
     client.end();
 });
 
-test('GH-882: route name is same as specified', function (t) {
-
-test('GH-882: route name is same as specified', function (t) {
 test('GH-882: route name is same as specified', function(t) {
     SERVER.get({
         name: 'my-r$-%-x',
