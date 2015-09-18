@@ -1,5 +1,8 @@
 # restify Changelog
 
+## 4.0.3
+- #917 Fix: HTTP 413 status name, Micah Ransdell
+
 ## 4.0.2
 - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
 
