@@ -1052,7 +1052,7 @@ test('GH-719 serve a specific static file', function (t) {
 
 
 test('test audit logger buffer', function (t) {
-    var logBuffer = new restify.LogMetrix({bufSize: 1000});
+    var logBuffer = new restify.logMetrics({bufSize: 1000});
     var fooRequest, barRequest, collectLog;
     SERVER.on('after', restify.auditLogger({
         log: bunyan.createLogger({
@@ -1063,7 +1063,7 @@ test('test audit logger buffer', function (t) {
             }]
         }),
         server: SERVER,
-        logMetrix : logBuffer
+        logMetrics : logBuffer
     }));
 
     var self = this;
