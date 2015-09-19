@@ -6,10 +6,12 @@ var fs = require('fs');
 var http = require('http');
 var net = require('net');
 var path = require('path');
+var util = require('util');
 
 var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var restifyClients = require('restify-clients');
+var vasync = require('vasync');
 
 var restify = require('../lib');
 
@@ -19,7 +21,6 @@ if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
 }
 var helper = require('./lib/helper.js');
-
 
 ///--- Globals
 
@@ -1048,6 +1049,85 @@ test('GH-719 serve a specific static file', function (t) {
     serveStaticTest(t, false, '.tmp', null, true);
 });
 
+
+
+test('test audit logger buffer', function (t) {
+    var logBuffer = new restify.LogMetrix({bufSize: 1000});
+    var fooRequest, barRequest, collectLog;
+    SERVER.on('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams: [{
+                level: 'info',
+                stream: process.stdout
+            }]
+        }),
+        server: SERVER,
+        logMetrix : logBuffer
+    }));
+
+    var self = this;
+    SERVER.get('/foo',
+        function (req, res, next) {
+            res.send(200, {testdata : 'foo'});
+            next();
+        }
+    );
+    SERVER.get('/bar',
+        function (req, res, next) {
+            res.send(200, {testdata : 'bar'});
+            next();
+        }
+    );
+    SERVER.get('/auditrecords',
+        function (req, res, next) {
+            var data = logBuffer.getLog().records;
+            res.send(200, data);
+            next();
+        }
+    );
+
+
+    fooRequest = function (_, callback) {
+        CLIENT.get('/foo', function (err, req, res) {
+            t.ifError(err);
+            t.equal(JSON.parse(res.body).testdata, 'foo');
+            return callback(err);
+        });
+    };
+
+    barRequest = function (_, callback) {
+        CLIENT.get('/bar', function (err, req, res) {
+            t.ifError(err);
+            t.equal(JSON.parse(res.body).testdata, 'bar');
+            return callback(err);
+        });
+    };
+    collectLog = function (_, callback) {
+        CLIENT.get('/auditrecords', function (err, req, res) {
+            t.ifError(err);
+            var data = JSON.parse(res.body);
+            t.ok(data);
+            data.forEach(function (d) {
+                assert.isNumber(d.latency);
+            });
+            return callback(err);
+        });
+    };
+    vasync.pipeline({
+        funcs: [
+            fooRequest,
+            barRequest,
+            collectLog
+        ],
+        args: self
+    }, function (err, results) {
+        t.ifError(err);
+        console.log('results: %s', util.inspect(results, null, 3));
+        t.end();
+    });
+});
+
 test('test audit logger emit', function (t) {
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
@@ -1080,6 +1160,7 @@ test('test audit logger emit', function (t) {
     });
 
 });
+
 test('audit logger timer test', function (t) {
     // Dirty hack to capture the log record using a ring buffer.
     var ringbuffer = new bunyan.RingBuffer({
