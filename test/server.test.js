@@ -174,6 +174,53 @@ test('use + get (path only)', function (t) {
     });
 });
 
+test('use + get duplicate path', function (t) {
+    SERVER.use(function (req, res, next) {
+        next();
+    });
+    SERVER.get({
+        url: '/foo/something',
+        version: '1.1.1'
+    }, function tester(req, res, next) {
+        res.send(200, {
+            testdata: 1
+        });
+        next();
+    });
+
+    SERVER.get({
+        url: '/foo/something',
+        version: '1.1.1'
+    }, function tester(req, res, next) {
+        res.contentType = 'json';
+        res.send(200, {
+            testdata: 2
+        });
+        next();
+    });
+    //when route path and version are exactly duplicated, the first one
+    //registered handles it
+    CLIENT.get({
+        path: '/foo/something',
+        headers: {
+            'accept-version': '1.1.1'
+        }
+    }, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var body = res.body;
+
+        try {
+            t.equal(JSON.parse(body).testdata, 1);
+        } catch (e) {
+            console.log(e);
+        }
+
+        t.end();
+
+    });
+});
+
 
 test('rm', function (t) {
     var route = SERVER.get('/foo/:id', function foosy(req, res, next) {
