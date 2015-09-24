@@ -12,3 +12,5 @@ docs/*.json
 nbproject
 deps/javascriptlint
 deps/jsstyle
+*.*~
+.idea/
