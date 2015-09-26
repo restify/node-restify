@@ -1087,7 +1087,9 @@ test('audit logger timer test', function (t) {
 });
 
 test('test audit logger buffer', function (t) {
-    var logBuffer = new restify.logMetrics({bufSize: 1000});
+    var logBuffer = new bunyan.RingBuffer({
+        limit: 1000
+    });
     var fooRequest, barRequest, collectLog;
     SERVER.on('after', restify.auditLogger({
         log: bunyan.createLogger({
@@ -1098,7 +1100,8 @@ test('test audit logger buffer', function (t) {
             }]
         }),
         server: SERVER,
-        logMetrics : logBuffer
+        logMetrics : logBuffer,
+        printLog : false
     }));
 
     var self = this;
@@ -1116,7 +1119,7 @@ test('test audit logger buffer', function (t) {
     );
     SERVER.get('/auditrecords',
         function (req, res, next) {
-            var data = logBuffer.getLog().records;
+            var data = logBuffer.records;
             res.send(200, data);
             next();
         }
@@ -1162,7 +1165,70 @@ test('test audit logger buffer', function (t) {
         t.end();
     });
 });
+test('test audit logger print log by default', function (t) {
+    var logBuffer = new bunyan.RingBuffer({
+        limit: 1000
+    });
+    var collectLog;
+    SERVER.on('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams: [{
+                level: 'info',
+                stream: process.stdout
+            }]
+        }),
+        server: SERVER,
+        logMetrics : logBuffer
+    }));
 
+
+    SERVER.get('/foo',
+        function (req, res, next) {
+            res.send(200, {testdata : 'foo'});
+            next();
+        }
+    );
+    SERVER.get('/bar',
+        function (req, res, next) {
+            res.send(200, {testdata : 'bar'});
+            next();
+        }
+    );
+    SERVER.get('/auditrecords',
+        function (req, res, next) {
+            var data = logBuffer.records;
+            res.send(200, data);
+            next();
+        }
+    );
+
+    collectLog = function () {
+        CLIENT.get('/auditrecords', function (err, req, res) {
+            t.ifError(err);
+            var data = JSON.parse(res.body);
+            t.ok(data);
+            data.forEach(function (d) {
+                assert.isNumber(d.latency);
+            });
+            t.end();
+        });
+    };
+    vasync.forEachParallel({
+        func: function clientRequest(urlPath, callback) {
+            CLIENT.get(urlPath, function (err, req, res) {
+            t.ifError(err);
+            t.ok(JSON.parse(res.body));
+            return callback(err, JSON.parse(res.body));
+        });
+        },
+        inputs: ['/foo', '/bar']
+    }, function (err, results) {
+        t.ifError(err);
+        console.log('results: %s', util.inspect(results, null, 2));
+        collectLog();
+    });
+});
 test('test audit logger emit', function (t) {
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
