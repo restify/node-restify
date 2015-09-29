@@ -9,7 +9,7 @@
 ## 4.0.0
 - #877 content-type can be case-insensitive. Yunong Xiao
 - #856 update various dependencies. Alex Liu
-- #851 fix formatters such that they always return cb. Yunong Xiao
+- #851 **BREAKING** fix formatters such that they always return cb. Yunong Xiao
 - #847 fix body parser race condition. Yunong Xiao
 - #842 add `req.matchedVersion()` Nathan Peck, Micah Ransdell
 - #840 Fix issue with server toString Method. OiNutter, Micah Ransdell
