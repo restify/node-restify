@@ -1196,11 +1196,15 @@ the `after` event:
       log: bunyan.createLogger({
         name: 'audit',
         stream: process.stdout
-      })
+      }),
+      server: SERVER,
+      logMetrics : logBuffer,
+      printLog : true
     }));
 
-You pass in the auditor a bunyan logger, and it will write out records at the
-`info` level.  Records will look like this:
+You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if 
+log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out 
+record lookling like this:
 
         {
           "name": "audit",
@@ -1281,6 +1285,11 @@ timing yourself by utilizing the Request
 [startHandlerTimer](#starthandlertimerhandlername) and
 [endHandlerTimer](#endhandlertimerhandlername) API.
 
+You can also listen to auditlog event and get same above log object when log event emits. For example
+SERVER.on('auditlog', function (data) {
+        //do some process with log
+    });
+Log is also accumulated in the Ringbuffer object, if user choose to pass in during auditlogger construction time.
 ## Request API
 
 Wraps all of the node
