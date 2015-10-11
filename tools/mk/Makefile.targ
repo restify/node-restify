@@ -64,7 +64,7 @@ CSCOPE		?= cscope
 CSCOPE_DIRS	?= .
 MKDIR		?= mkdir -p
 MV		?= mv
-RESTDOWN_FLAGS	?=
+RESTDOWN_FLAGS	?= -b docs/branding
 RMTREE		?= rm -rf
 
 ifeq ($(shell uname -s),SunOS)
