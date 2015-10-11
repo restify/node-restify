@@ -33,11 +33,15 @@ $(function() {
     }
     /** end of http://code.activestate.com/recipes/577787/ }}} */
 
+    /* See <https://github.com/trentm/restdown/issues/11>. */
+    function safechars(s) {
+      return s.replace(_slugify_strip_re, '');
+    }
 
     $("#content").scroll(function() {
-        var scrollDistance = $("#content").attr('scrollTop');
+        var scrollDistance = $("#content").scrollTop();
         var sectionIdx = getSectionIdx(scrollDistance);
-    
+
         if (sectionIdx !== currSectionIdx) {
             $("#sidebar li>div").removeClass("current");
             currSectionIdx = sectionIdx;
@@ -47,9 +51,15 @@ $(function() {
                     slugify(heading), // h1 or non-method h2
                     heading.replace(/ /g, '-'), // h2 method, just name or just endpoint
                     heading.slice(0, heading.lastIndexOf(' (')).trimRight().replace(/ /g, '-'), // h2 method, name and endpoint
-                ]
+                ];
                 for (var i=0; i < possibleAnchors.length; i++) {
-                    $("#sidebar a[href|=#" + possibleAnchors[i] + "]").parent().addClass("current");
+                    var anchor = safechars(possibleAnchors[i]);
+                    try {
+                        $("#sidebar a[href=#" + anchor + "]").parent().addClass("current");
+                    } catch (e) {
+                        /* Ignore error if no such element. */
+                        console.log(e)
+                    }
                 }
             }
         }
