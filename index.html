@@ -182,11 +182,12 @@ is, it sets the Connection header to "close" and removes the "Content-Length" he
 below (and <code>listen()</code> takes the same arguments as node's
 <a href="http://nodejs.org/docs/latest/api/http.html#http_server_listen_port_hostname_backlog_callback">http.Server.listen</a>):</p>
 
-<pre><code>var restify = require('restify');
+<pre><code>var restify = require('restify'),
+fs = require('fs');
 
 var server = restify.createServer({
-  certificate: ...,
-  key: ...,
+  certificate: fs.readFileSync('path/to/server/certificate'),
+  key: fs.readFileSync('path/to/server/key'),
   name: 'MyApp',
 });
 
@@ -196,8 +197,8 @@ server.listen(8080);
 <table>
 <tbody>
 <tr><td><strong>Option</strong></td><td><strong>Type</strong></td><td><strong>Description</strong></td></tr>
-<tr><td>certificate</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
-<tr><td>key</td><td>String</td><td>If you want to create an HTTPS server, pass in the PEM-encoded certificate and key</td></tr>
+<tr><td>certificate</td><td>String</td><td>If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key</td></tr>
+<tr><td>key</td><td>String</td><td>If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key</td></tr>
 <tr><td>formatters</td><td>Object</td><td>Custom response formatters for <code>res.send()</code></td></tr>
 <tr><td>log</td><td>Object</td><td>You can optionally pass in a <a href="https://github.com/trentm/node-bunyan">bunyan</a> instance; not required</td></tr>
 <tr><td>name</td><td>String</td><td>By default, this will be set in the <code>Server</code> response header, default is <code>restify</code></td></tr>
