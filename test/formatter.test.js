@@ -63,8 +63,15 @@ before(function (callback) {
                 retry: false,
                 agent: false
             });
-            SERVER.get('/tmp', function (req, res) {
+            SERVER.get('/tmp', function (req, res, next) {
                 res.send('dummy response');
+                return next();
+            });
+            SERVER.get('/tmp2', function (req, res, next) {
+                delete res.formatters['application/octet-stream'];
+                res.setHeader('content-type', 'text/html');
+                res.send('dummy response');
+                return next();
             });
             process.nextTick(callback);
         });
@@ -148,6 +155,46 @@ test('GH-771 q-val priority on */*', function (t) {
         t.ok(req);
         t.ok(res);
         t.equal(data, 'sync fmt');
+        t.end();
+    });
+});
+
+test('GH-937 should return 406 when no content-type header set on response ' +
+'matching an acceptable type found by matching client', function (t) {
+
+    // ensure client accepts only a type not specified by server
+    var opts = {
+        path: '/tmp',
+        headers: {
+            accept: 'text/html'
+        }
+    };
+
+    CLIENT.get(opts, function (err, req, res, data) {
+        t.ok(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.statusCode, 406);
+        t.end();
+    });
+});
+
+test('GH-937 should return 500 when no default formatter found ' +
+'and octet-stream is not available', function (t) {
+
+    // ensure client accepts only a type not specified by server
+    var opts = {
+        path: '/tmp2',
+        headers: {
+            accept: 'text/html'
+        }
+    };
+
+    CLIENT.get(opts, function (err, req, res, data) {
+        t.ok(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.statusCode, 500);
         t.end();
     });
 });
