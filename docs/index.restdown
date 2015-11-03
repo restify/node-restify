@@ -489,7 +489,7 @@ route by doing:
 
 If you invoke `res.send()` with an error that has a `statusCode`
 attribute, that will be used, otherwise a default of 500 will be used
-(unless you're using `res.send(4xx, new Error('blah))`).
+(unless you're using `res.send(4xx, new Error('blah'))`).
 
 Alternatively, restify 2.1 supports a `next.ifError` API:
 
@@ -1000,7 +1000,7 @@ Options:
   * `multipartFileHandler` - a callback to handle any multipart file.
     It will be a file if the part have a `Content-Disposition` with the
     `filename` parameter set. This typically happens when a browser sends
-    a from and there is a parameter similar to `<input type="file" />`.
+    a form and there is a parameter similar to `<input type="file" />`.
     If this is not provided, the default behaviour is to map the contents
     into `req.params`.
   * `keepExtensions` - if you want the uploaded files to include the
