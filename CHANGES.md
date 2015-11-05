@@ -1,9 +1,18 @@
 # restify Changelog
 
 ## Current
+ - #944 Support generic event listener, Alex Liu
+ - #943 Fix typos in documentation, azollyx
+ - #939 Fix issue where missing content-type header would hang response, Alex
+   Liu
+ - #935 Clearer docs for using certs, Vikram Tiwari
+ - #932 Update to spdy 2.x, Fedor Indutny
+ - #924 Update docs for async formatter breaking change, Magnus Wolffelt
+ - #891 stop processing requests when 'close' event has been fired (early
+   client termination), Alex Liu
+ - #883 hypens no longer stripped from route names, Sean Wragg
  - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
- - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
 
@@ -43,6 +52,7 @@
 
 ## 3.0.2
 - #785 update semver dependency.
+
 ## 3.0.1
 - #779 set-cookie headers should not include comma separated values. See:
   http://tools.ietf.org/html/rfc6265#section-3
