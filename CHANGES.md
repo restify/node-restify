@@ -1,10 +1,17 @@
 # restify Changelog
+
 ## Current
  - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
  - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
+
+## 4.0.3
+- #917 Fix: HTTP 413 status name, Micah Ransdell
+
+## 4.0.2
+- #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
 
 ## 4.0.0
 - #877 content-type can be case-insensitive. Yunong Xiao
