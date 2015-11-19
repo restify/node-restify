@@ -712,7 +712,7 @@ To use [socket.io](http://socket.io/) with restify, just treat your restify
 server as if it were a "raw" node server:
 
     var server = restify.createServer();
-    var io = socketio.listen(server);
+    var io = socketio.listen(server.server);
 
     server.get('/', function indexHTML(req, res, next) {
         fs.readFile(__dirname + '/index.html', function (err, data) {
