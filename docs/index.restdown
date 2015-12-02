@@ -2117,8 +2117,8 @@ connection with a server.  For example, using the
       }
     };
     client.get(options, function(err, res, socket, head) {
-      req.once('upgradeResult', function(err, res, socket, head) {
-        var shed = ws.connect(res, socket, head, wskey);
+      res.once('upgradeResult', function(err2, res2, socket2, head2) {
+        var shed = ws.connect(res2, socket2, head2, wskey);
         shed.on('text', function(msg) {
           console.log('message from server: ' + msg);
           shed.end();
