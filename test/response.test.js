@@ -346,3 +346,18 @@ test('should fail to set header due to missing formatter', function (t) {
         t.end();
     });
 });
+
+
+test('should not fail to send null as body', function (t) {
+
+    SERVER.get('/12', function handle(req, res, next) {
+        res.send(200, null);
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/12'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
