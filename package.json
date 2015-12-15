@@ -24,6 +24,7 @@
     "Guillaume Chauvet",
     "Isaac Schlueter",
     "Jacob Quatier",
+    "James Womack",
     "Jonathan Dahan",
     "Josh Clulow",
     "Matt Smillie",
@@ -58,27 +59,23 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "assert-plus": "^0.1.5",
-    "backoff": "^2.4.0",
+    "assert-plus": "0.1.5",
     "bunyan": "^1.4.0",
     "csv": "^0.4.0",
     "escape-regexp-component": "^1.0.2",
     "formidable": "^1.0.14",
     "http-signature": "^0.11.0",
-    "keep-alive-agent": "^0.0.1",
     "lru-cache": "^2.5.0",
     "mime": "^1.2.11",
     "negotiator": "^0.5.1",
     "node-uuid": "^1.4.1",
     "once": "^1.3.0",
+    "qs": "^5.0.0",
     "restify-clients": "1.1.0",
     "restify-errors": "3.0.0",
-    "qs": "^5.0.0",
     "semver": "^5.0.1",
     "spdy": "^2.0.5",
-    "tunnel-agent": "^0.4.0",
-    "vasync": "1.6.3",
-    "verror": "^1.4.0"
+    "vasync": "1.6.3"
   },
   "optionalDependencies": {
     "dtrace-provider": "^0.6.0"

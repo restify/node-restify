@@ -328,6 +328,65 @@ test('redirect should call next with false to stop ' +
 });
 
 
+test('redirect should emit a redirect event', function (t) {
+    var wasEmitted = false;
+    var redirectLocation;
+
+    function preRedirectHandler(req, res, next) {
+        res.on('redirect', function (payload) {
+            wasEmitted = true;
+            redirectLocation = payload;
+        });
+        console.log('about to call next');
+        next();
+    }
+    function redirect(req, res, next) {
+        res.redirect('/10', next);
+    }
+
+    SERVER.get('/10', [preRedirectHandler, redirect]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, '/10');
+
+        // event 'redirect' should have been emitted
+        t.equal(wasEmitted, true);
+        t.equal(redirectLocation, '/10');
+        t.end();
+    });
+});
+
+
+test('writeHead should emit a header event', function (t) {
+    var wasEmitted = false;
+    var payloadPlaceholder;
+
+    // writeHead is called on each request
+    function handler(req, res, next) {
+        res.on('header', function (payload) {
+            wasEmitted = true;
+            payloadPlaceholder = payload;
+        });
+        res.send(302);
+        next();
+    }
+
+    SERVER.get('/10', [handler]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+
+        // event 'header' should have been emitted
+        t.equal(wasEmitted, true);
+        t.equal(payloadPlaceholder, undefined);
+        t.end();
+    });
+});
+
+
 test('should fail to set header due to missing formatter', function (t) {
 
     // when a formatter is not set up for a specific content-type, restify will
