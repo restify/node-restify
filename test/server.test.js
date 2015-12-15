@@ -984,6 +984,24 @@ test('emitting error from a handler (with domains)', function (t) {
 });
 
 
+test('re-emitting redirect from a response', function (t) {
+    var redirectLocation;
+
+    SERVER.on('redirect', function (payload) {
+        redirectLocation = payload;
+    });
+
+    SERVER.get('/', function (req, res, next) {
+        res.redirect('/10', next);
+    });
+
+    CLIENT.get('/', function (err, _, res) {
+        t.equal(redirectLocation, '/10');
+        t.end();
+    });
+});
+
+
 test('throwing error from a handler (with domains)', function (t) {
     SERVER.get('/', function (req, res, next) {
         process.nextTick(function () {
