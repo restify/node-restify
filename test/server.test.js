@@ -202,15 +202,16 @@ test('rm', function (t) {
 
 
 test('use - throws TypeError on non function as argument', function (t) {
-    var err = assert.AssertionError('handler (function) is required');
+
+    var errMsg = 'handler (function) is required';
 
     t.throws(function () {
         SERVER.use('/nonfn');
-    }, err);
+    }, assert.AssertionError, errMsg);
 
     t.throws(function () {
         SERVER.use({an: 'object'});
-    }, err);
+    }, assert.AssertionError, errMsg);
 
     t.throws(function () {
         SERVER.use(
@@ -221,7 +222,7 @@ test('use - throws TypeError on non function as argument', function (t) {
             {
                 really: 'bad'
             });
-    }, err);
+    }, assert.AssertionError, errMsg);
 
     t.end();
 });
