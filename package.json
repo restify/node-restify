@@ -85,7 +85,8 @@
     "eslint": "^1.10.3",
     "filed": "^0.1.0",
     "jscs": "^2.7.0",
-    "nodeunit": "^0.9.0",
+    "nodeunit": "^0.9.1",
+    "nsp": "^2.1.0",
     "watershed": "^0.3.0"
   },
   "license": "MIT",
