@@ -4,14 +4,14 @@
         "description": "Kitchen Sink App of restify",
         "main": "main.js",
         "dependencies": {
-                "assert-plus": "0.1.2",
-                "bunyan": "0.21.1",
-                "posix-getopt": "1.0.0",
+                "assert-plus": "0.2.0",
+                "bunyan": "1.5.1",
+                "posix-getopt": "1.2.0",
                 "restify-errors": "^3.1.0",
-                "restify": "git://github.com/restify/node-restify.git#master"
+                "restify": "^4.0.3"
         },
         "devDependencies": {
-                "nodeunit": "0.8.0"
+                "nodeunit": "0.9.1"
         },
         "scripts": {
                 "start": "node main.js 2>&1 | bunyan",
