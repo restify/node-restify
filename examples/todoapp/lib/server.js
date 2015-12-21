@@ -7,52 +7,29 @@ var util = require('util');
 var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var restify = require('restify');
+var errors = require('restify-errors');
 
 
 ///--- Errors
 
-function MissingTaskError() {
-    restify.RestError.call(this, {
-        statusCode: 409,
-        restCode: 'MissingTask',
-        message: '"task" is a required parameter',
-        constructorOpt: MissingTaskError
-    });
-
-    this.name = 'MissingTaskError';
-}
-util.inherits(MissingTaskError, restify.RestError);
+errors.makeConstructor('MissingTaskError', {
+    statusCode: 409,
+    restCode: 'MissingTask',
+    message: '"task" is a required parameter'
+});
 
 
-function TodoExistsError(name) {
-    assert.string(name, 'name');
+errors.makeConstructor('TodoExistsError', {
+    statusCode: 409,
+    restCode: 'TodoExists',
+    message: 'Todo already exists'
+});
 
-    restify.RestError.call(this, {
-        statusCode: 409,
-        restCode: 'TodoExists',
-        message: name + ' already exists',
-        constructorOpt: TodoExistsError
-    });
-
-    this.name = 'TodoExistsError';
-}
-util.inherits(TodoExistsError, restify.RestError);
-
-
-function TodoNotFoundError(name) {
-    assert.string(name, 'name');
-
-    restify.RestError.call(this, {
+errors.makeConstructor('TodoNotFoundError', {
         statusCode: 404,
         restCode: 'TodoNotFound',
-        message: name + ' was not found',
-        constructorOpt: TodoNotFoundError
-    });
-
-    this.name = 'TodoNotFoundError';
-}
-util.inherits(TodoNotFoundError, restify.RestError);
-
+        message: 'Todo was not found'
+});
 
 ///--- Formatters
 
@@ -61,7 +38,7 @@ util.inherits(TodoNotFoundError, restify.RestError);
  * demonstrate how to support additional content-types.  Really this is
  * the same as text/plain, where we pick out 'task' if available
  */
-function formatTodo(req, res, body) {
+function formatTodo(req, res, body, cb) {
     if (body instanceof Error) {
         res.statusCode = body.statusCode || 500;
         body = body.message;
@@ -72,7 +49,7 @@ function formatTodo(req, res, body) {
     }
 
     res.setHeader('Content-Length', Buffer.byteLength(body));
-    return (body);
+    return cb(null, body);
 }
 
 
@@ -99,13 +76,13 @@ function authenticate(req, res, next) {
 
     if (!authz) {
         res.setHeader('WWW-Authenticate', 'Basic realm="todoapp"');
-        next(new restify.UnauthorizedError('authentication required'));
+        next(new errors.UnauthorizedError('authentication required'));
         return;
     }
 
     if (authz.username !== req.allow.user ||
         authz.password !== req.allow.pass) {
-        next(new restify.ForbiddenError('invalid credentials'));
+        next(new errors.ForbiddenError('invalid credentials'));
         return;
     }
 
@@ -129,7 +106,7 @@ function authenticate(req, res, next) {
 function createTodo(req, res, next) {
     if (!req.params.task) {
         req.log.warn({params: p}, 'createTodo: missing task');
-        next(new MissingTaskError());
+        next(new errors.MissingTaskError());
         return;
     }
 
@@ -140,7 +117,7 @@ function createTodo(req, res, next) {
 
     if (req.todos.indexOf(todo.name) !== -1) {
         req.log.warn('%s already exists', todo.name);
-        next(new TodoExistsError(todo.name));
+        next(new errors.TodoExistsError(todo.name));
         return;
     }
 
@@ -213,7 +190,7 @@ function ensureTodo(req, res, next) {
 
     if (req.params.name && req.todos.indexOf(req.params.name) === -1) {
         req.log.warn('%s not found', req.params.name);
-        next(new TodoNotFoundError(req.params.name));
+        next(new errors.TodoNotFoundError(req.params.name));
     } else {
         next();
     }
@@ -311,7 +288,7 @@ function listTodos(req, res, next) {
 function putTodo(req, res, next) {
     if (!req.params.task) {
         req.log.warn({params: req.params}, 'putTodo: missing task');
-        next(new MissingTaskError());
+        next(new errors.MissingTaskError());
         return;
     }
 
