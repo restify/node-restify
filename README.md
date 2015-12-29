@@ -85,6 +85,15 @@ SOFTWARE.
 
 See <https://github.com/restify/node-restify/issues>.
 
+## Contributing
+
+restify has been broken out into a couple of different repositories. The repo
+here here contains only the core functionality of the server.
+
+- For plugins, please go [here](https://github.com/restify/errors).
+- For the errors module, please go [here](https://github.com/restify/plugins).
+
+
 ## Mailing list
 
 See the

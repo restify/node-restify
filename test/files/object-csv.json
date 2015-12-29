@@ -1,6 +1,0 @@
-[
-  { "field1": "1", "field2": "2", "field3": "3", "index": 0 },
-  { "field1": "3", "field2": "2", "field3": "1", "index": 1 },
-  { "field1": "a", "field2": "b", "field3": "c", "index": 2 },
-  { "field1": "\"c", "field2": "b", "field3": "a", "index": 3 }
-]
