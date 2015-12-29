@@ -420,3 +420,18 @@ test('should not fail to send null as body', function (t) {
         t.end();
     });
 });
+
+
+test('should not fail to send null as body without status code', function (t) {
+
+    SERVER.get('/13', function handle(req, res, next) {
+        res.send(null);
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/13'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
