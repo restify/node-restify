@@ -1813,6 +1813,44 @@ test('gh-779 set-cookie fields should never have commas', function (t) {
 });
 
 
+test('gh-986 content-type fields should never have commas'
+    + ' (via `res.header(...)`)', function (t) {
+
+        SERVER.get('/content-type', function (req, res, next) {
+            res.header('content-type', 'foo');
+            res.header('content-type', 'bar');
+            res.send(200);
+        });
+
+        CLIENT.get('/content-type', function (err, _, res) {
+            t.ifError(err);
+            t.equal(Array.isArray(res.headers['content-type']), false,
+                    'content-type header should not be an array');
+            t.equal(res.headers['content-type'], 'bar');
+            t.end();
+        });
+    });
+
+
+test('gh-986 content-type fields should never have commas'
+    + ' (via `res.setHeader(...)`)', function (t) {
+
+        SERVER.get('/content-type', function (req, res, next) {
+            res.setHeader('content-type', 'foo');
+            res.setHeader('content-type', 'bar');
+            res.send(200);
+        });
+
+        CLIENT.get('/content-type', function (err, _, res) {
+            t.ifError(err);
+            t.equal(Array.isArray(res.headers['content-type']), false,
+                    'content-type header should not be an array');
+            t.equal(res.headers['content-type'], 'bar');
+            t.end();
+        });
+    });
+
+
 test('gh-630 handle server versions as an array or string', function (t) {
     t.ok(SERVER.toString().indexOf('0.5.4,1.4.3,2.0.0') > -1);
     SERVER.versions = '3.0.0';
