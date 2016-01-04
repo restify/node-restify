@@ -960,6 +960,7 @@ test('GH-180 can parse DELETE body', function (t) {
 
 test('returning error from a handler (with domains)', function (t) {
     SERVER.get('/', function (req, res, next) {
+        // doesn't work
         next(new errors.InternalError('bah!'));
     });
 
@@ -1124,7 +1125,7 @@ test('next.ifError', function (t) {
     CLIENT.get('/foo/bar', function (err) {
         t.ok(err);
         t.equal(err.statusCode, 400);
-        t.equal(err.message, 'screw you client');
+        t.equal(err.body.message, 'screw you client');
         t.end();
     });
 });

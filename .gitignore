@@ -3,6 +3,7 @@ cover_html
 node_modules
 docs/*.html
 docs/pkg
+.idea
 examples/todoapp/node_modules
 *.log
 *.tar.gz
