@@ -85,7 +85,7 @@
     "filed": "^0.1.0",
     "jscs": "^2.7.0",
     "nodeunit": "^0.9.1",
-    "nsp": "^2.1.0",
+    "nsp": "^2.2.0",
     "restify-clients": "^1.1.1",
     "restify-plugins": "^1.0.2",
     "watershed": "^0.3.0"

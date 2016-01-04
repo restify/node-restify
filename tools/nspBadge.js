@@ -17,6 +17,8 @@ process.stdin.on('data', function (exitCodeBuf) {
     var nspExitCode = parseInt(exitCodeBuf.toString(), 10);
 
     if (isNaN(nspExitCode)) {
+        // output any success message
+        console.warn(exitCodeBuf.toString());
         nspExitCode = 0;
     }
 
