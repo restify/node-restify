@@ -290,7 +290,7 @@ test('redirect should cause InternalError when invoked without next', function (
 
         // json parse the response
         var msg = JSON.parse(res.body);
-        t.equal(msg.code, 'Internal');
+        t.equal(msg.body.code, 'Internal');
         t.end();
     });
 });
