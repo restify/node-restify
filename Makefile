@@ -64,7 +64,7 @@ test: $(NODEUNIT)
 .PHONY: nsp
 nsp: node_modules $(NSP)
 	@$(NPM) shrinkwrap --dev
-	@($(NSP) check || echo 1) | $(NSP_BADGE)
+	@($(NSP) check) | $(NSP_BADGE)
 	@rm $(SHRINKWRAP)
 
 include ./tools/mk/Makefile.deps
