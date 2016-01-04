@@ -1353,8 +1353,8 @@ test('jsonp plugin with res.json()', function (t) {
 
     CLIENT.get('/jsonp?callback=c._0', function (err, _, res) {
         t.equal(res.statusCode, 200);
-        var body = 'typeof c._0 === \'function\' && c._0({"x":"w00t!"});';
-        t.equal(res.body, body);
+        t.equal(res.headers['content-type'], 'application/json');
+        t.equal(res.body, '{"x":"w00t!"}');
         t.end();
     });
 });
