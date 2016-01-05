@@ -64,7 +64,7 @@ CSCOPE		?= cscope
 CSCOPE_DIRS	?= .
 MKDIR		?= mkdir -p
 MV		?= mv
-RESTDOWN_FLAGS	?=
+RESTDOWN_FLAGS	?= -b docs/branding
 RMTREE		?= rm -rf
 
 ifeq ($(shell uname -s),SunOS)
@@ -236,4 +236,4 @@ $(DOC_MEDIA_DIRS_BUILD):
 test:
 
 .PHONY: prepush
-prepush: check test
+prepush: check test nsp

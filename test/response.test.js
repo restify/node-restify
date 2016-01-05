@@ -2,6 +2,7 @@
 
 var url = require('url');
 var restifyClients = require('restify-clients');
+var plugins = require('restify-plugins');
 
 var restify = require('../lib');
 
@@ -32,7 +33,7 @@ before(function (cb) {
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
-        SERVER.use(restify.queryParser());
+        SERVER.use(plugins.queryParser());
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
@@ -415,6 +416,21 @@ test('should not fail to send null as body', function (t) {
     });
 
     CLIENT.get(join(LOCALHOST, '/12'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should not fail to send null as body without status code', function (t) {
+
+    SERVER.get('/13', function handle(req, res, next) {
+        res.send(null);
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/13'), function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
