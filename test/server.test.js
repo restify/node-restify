@@ -1101,7 +1101,24 @@ test('gh-278 missing router error events (415)', function (t) {
     });
 });
 
+/*
 
+ var data = body ? JSON.stringify(body) : '';
+ ^
+
+ TypeError: Converting circular structure to JSON
+ at Object.stringify (native)
+ at ServerResponse.formatJSON (/Users/cbongiorno/development/node-restify/lib/formatters/json.js:16:28)
+ at ServerResponse.format (/Users/cbongiorno/development/node-restify/lib/response.js:152:23)
+ at ServerResponse.send (/Users/cbongiorno/development/node-restify/lib/response.js:340:14)
+ at RestError.next (/Users/cbongiorno/development/node-restify/lib/server.js:885:25)
+ at RestError.f [as _restify_next] (/Users/cbongiorno/development/node-restify/node_modules/once/once.js:17:25)
+ at Domain.onError (/Users/cbongiorno/development/node-restify/lib/server.js:999:17)
+ at emitOne (events.js:77:13)
+ at Domain.emit (events.js:169:7)
+ at emitError (domain.js:65:24)
+
+*/
 test('next.ifError', function (t) {
     SERVER.use(function (req, res, next) {
         next.ifError(null);
@@ -1110,6 +1127,8 @@ test('next.ifError', function (t) {
 
     SERVER.get('/foo/:id', function tester(req, res, next) {
         process.nextTick(function () {
+            // this object fails to become JSON because it's picking up the
+            // arguments of the call stack which includes itself
             var e = new RestError({
                 statusCode: 400,
                 restCode: 'Foo',
@@ -2103,6 +2122,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
     /* eslint-disable no-shadow */
     CLIENT.get('/1', function (err, req, res, data) {
         // should get regular error
+        // fail here. But why?
         t.ok(err);
         t.equal(restifyErrorFired, 1);
 
