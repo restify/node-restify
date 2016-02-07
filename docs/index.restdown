@@ -1297,6 +1297,10 @@ You pass in the auditor a bunyan logger, and it will write out records at the
           "v": 0
         }
 
+||**Option**||**Type**||**Description**||
+||log||Object||Bunyan||
+||body||Boolean||Include `req.body` and `res.body` in log entries; defaults to `false`||
+
 The `timers` field shows the time each handler took to run in microseconds.
 Restify by default will record this information for every handler for each
 route. However, if you decide to include nested handlers, you can track the
