@@ -1557,22 +1557,6 @@ Short-hand for:
 ||headers||Object||response headers||
 ||id||String||A unique request id (x-request-id)||
 
-### Setting the default headers
-
-You can change what headers restify sends by default by setting the
-top-level property `defaultResponseHeaders`.  This should be a
-function that takes one argument `data`, which is the already
-serialized response body.  `data` can be either a String or Buffer (or
-null).  The `this` object will be the response itself.
-
-    var restify = require('restify');
-
-    restify.defaultResponseHeaders = function(data) {
-      this.header('Server', 'helloworld');
-    };
-
-    restify.defaultResponseHeaders = false; // disable altogether
-
 ## DTrace
 
 One of the coolest features of restify is that it automatically
