@@ -61,7 +61,6 @@
         "no-lone-blocks": [ 2 ],
         "no-loop-func": [ 0 ],
         "no-multi-spaces": [ 0 ],
-        "no-multi-str": [ 0 ],
         "no-native-reassign": [ 2 ],
         "no-new": [ 0 ],
         "no-new-func": [ 2 ],
