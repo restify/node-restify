@@ -1,5 +1,9 @@
 # restify Changelog
 
+## 4.0.4
+- #937 Fix: hanging response when a formatter isn't defined for a specified
+  content-type, Alex Liu
+
 ## 4.0.3
 - #917 Fix: HTTP 413 status name, Micah Ransdell
 
