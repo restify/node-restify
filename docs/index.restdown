@@ -1090,9 +1090,13 @@ The plugin will enforce that all files under `directory` are served. The
 provide a `default` parameter such as index.html for any directory that
 lacks a direct file match.
 You can specify additional restrictions by passing in a `match` parameter,
-which is just a `RegExp` to check against the requested file name. Lastly, you
-can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
-Default is `3600` (1 hour).
+which is just a `RegExp` to check against the requested file name.
+Additionally, you may set the `charSet` parameter, which will append a
+character set to the content-type detected by the plugin.  For example,
+`charSet: 'utf-8'` will result in HTML being served with a Content-Type
+of `text/html; charset=utf-8`.
+Lastly, you can pass in a `maxAge` numeric, which will set the
+`Cache-Control` header. Default is `3600` (1 hour).
 
 An additional option for serving a static file is to pass `file` in to the
 serveStatic method as an option. The following will serve index.html from
