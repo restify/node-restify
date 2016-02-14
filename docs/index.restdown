@@ -61,7 +61,7 @@ and information is formatted like this:
 
     $ npm install restify
 
-# Node Server API
+# Server API
 
 The most barebones echo server:
 
@@ -735,7 +735,7 @@ server as if it were a "raw" node server:
         console.log('socket.io server listening at %s', server.url);
     });
 
-## Server API
+## Node Server API
 
 ### Events
 
