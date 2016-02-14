@@ -61,7 +61,7 @@ and information is formatted like this:
 
     $ npm install restify
 
-# Server API
+# Node Server API
 
 The most barebones echo server:
 
