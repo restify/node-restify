@@ -447,6 +447,118 @@ test('CORS Preflight - any origin', function (t) {
     }).end();
 });
 
+test('CORS Preflight - any protocol', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ 'somesite.local' ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            Origin: 'http://somesite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'http://somesite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
+test('CORS Preflight - any subdomain', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ 'http://*.somesite.local' ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            Origin: 'http://test.somesite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'http://test.somesite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
+test('CORS Preflight - any subdomain, any protocol', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ '*.somesite.local' ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            Origin: 'https://test.somesite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'https://test.somesite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
+test('CORS Preflight - regular expression', function (t) {
+    SERVER.use(restify.CORS({
+        credentials: true,
+        origins: [ /^https?:\/\/test[0-9]+\.somesite\.local$/ ]
+    }));
+    SERVER.post('/foo/:id', function tester(req, res, next) {});
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'OPTIONS',
+        agent: false,
+        headers: {
+            'Access-Control-Request-Headers': 'accept, content-type',
+            'Access-Control-Request-Method': 'POST',
+            Origin: 'https://test1.somesite.local'
+        }
+    };
+    http.request(opts, function (res) {
+        t.equal(res.headers['access-control-allow-origin'],
+            'https://test1.somesite.local');
+        t.equal(res.headers['access-control-allow-credentials'], 'true');
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
 test('RegExp ok', function (t) {
     SERVER.get(/\/foo/, function tester(req, res, next) {
         res.send('hi there');
@@ -2043,4 +2155,3 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
         });
     });
 });
-
