@@ -2072,44 +2072,44 @@ function (t) {
 });
 
 test('GH-10xx next(err) should only call res.send once ever', function (t) {
-  SERVER.get('/1',
-             function hOne (req, res, next) {
-               res.send(200);
-               return next();
-             },
-             function hTwo (req, res, next) {
-               var err = new errors.InternalServerError('No Listener');
-               return next(err);
-             });
-  
-  SERVER.get('/2',
-             function hOne (req, res, next) {
-               res.send(200);
-               return next();
-             },
-             function hTwo (req, res, next) {
-               var err = new errors.ImATeapotError('Has Listener');
-               return next(err);
-             });
+    SERVER.get('/1',
+               function hOne (req, res, next) {
+                   res.send(200);
+                   return next();
+               },
+               function hTwo (req, res, next) {
+                   var err = new errors.InternalServerError('No Listener');
+                   return next(err);
+               });
+    
+    SERVER.get('/2',
+               function hOne (req, res, next) {
+                   res.send(200);
+                   return next();
+               },
+               function hTwo (req, res, next) {
+                   var err = new errors.ImATeapotError('Has Listener');
+                   return next(err);
+               });
 
-  SERVER.on('ImATeapot', function (req, res, err, cb) {
-    t.ok(err);
-    return cb(err);
-  });
-  
-  SERVER.on('uncaughtException', function (req, res, route, err) {
-    // Technically, we mean only notOk(/Can't set headers/.test(err.message)),
-    // but we keep it here in case that message ever changes.
-    t.notOk(err); 
-    t.end();
-  });
-  
-  CLIENT.get('/1', function (err, req, res, data) {
-    t.notOk(err);
-  });
+    SERVER.on('ImATeapot', function (req, res, err, cb) {
+        t.ok(err);
+        return cb(err);
+    });
+    
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        // Technically, we mean only notOk(/Can't set headers/.test(err.message)),
+        // but we keep it here in case that message ever changes.
+        t.notOk(err); 
+        t.end();
+    });
+    
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.notOk(err);
+    });
 
-  CLIENT.get('/2', function (err, req, res, data) {
-    t.notOk(err);
-    t.end();
-  });
+    CLIENT.get('/2', function (err, req, res, data) {
+        t.notOk(err);
+        t.end();
+    });
 });
