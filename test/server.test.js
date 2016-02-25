@@ -2101,7 +2101,7 @@ test('GH-10xx next(err) should only call res.send once ever', function (t) {
         // Technically, we mean only
         // notOk(/Can't set headers/.test(err.message)),
         // but we keep it here in case that message ever changes.
-        t.notOk(err); 
+        t.notOk(err);
         t.end();
     });
 
