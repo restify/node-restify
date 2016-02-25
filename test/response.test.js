@@ -2,6 +2,7 @@
 
 var url = require('url');
 var restifyClients = require('restify-clients');
+var plugins = require('restify-plugins');
 
 var restify = require('../lib');
 
@@ -32,7 +33,7 @@ before(function (cb) {
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
-        SERVER.use(restify.queryParser());
+        SERVER.use(plugins.queryParser());
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
@@ -323,6 +324,115 @@ test('redirect should call next with false to stop ' +
 
         // handler B should not be executed
         t.equal(wasRun, false);
+        t.end();
+    });
+});
+
+
+test('redirect should emit a redirect event', function (t) {
+    var wasEmitted = false;
+    var redirectLocation;
+
+    function preRedirectHandler(req, res, next) {
+        res.on('redirect', function (payload) {
+            wasEmitted = true;
+            redirectLocation = payload;
+        });
+        console.log('about to call next');
+        next();
+    }
+    function redirect(req, res, next) {
+        res.redirect('/10', next);
+    }
+
+    SERVER.get('/10', [preRedirectHandler, redirect]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, '/10');
+
+        // event 'redirect' should have been emitted
+        t.equal(wasEmitted, true);
+        t.equal(redirectLocation, '/10');
+        t.end();
+    });
+});
+
+
+test('writeHead should emit a header event', function (t) {
+    var wasEmitted = false;
+    var payloadPlaceholder;
+
+    // writeHead is called on each request
+    function handler(req, res, next) {
+        res.on('header', function (payload) {
+            wasEmitted = true;
+            payloadPlaceholder = payload;
+        });
+        res.send(302);
+        next();
+    }
+
+    SERVER.get('/10', [handler]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+
+        // event 'header' should have been emitted
+        t.equal(wasEmitted, true);
+        t.equal(payloadPlaceholder, undefined);
+        t.end();
+    });
+});
+
+
+test('should fail to set header due to missing formatter', function (t) {
+
+    // when a formatter is not set up for a specific content-type, restify will
+    // default to octet-stream.
+
+    SERVER.get('/11', function handle(req, res, next) {
+        res.header('content-type', 'application/hal+json');
+        res.send(200, JSON.stringify({ hello: 'world' }));
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/11'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(res.headers['content-type'], 'application/octet-stream');
+        t.end();
+    });
+});
+
+
+test('should not fail to send null as body', function (t) {
+
+    SERVER.get('/12', function handle(req, res, next) {
+        res.send(200, null);
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/12'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should not fail to send null as body without status code', function (t) {
+
+    SERVER.get('/13', function handle(req, res, next) {
+        res.send(null);
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/13'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
         t.end();
     });
 });

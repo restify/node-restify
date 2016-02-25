@@ -19,8 +19,10 @@
 #
 ESLINT		:= ./node_modules/.bin/eslint
 JSCS		:= ./node_modules/.bin/jscs
+NSP         := ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 NODECOVER	:= ./node_modules/.bin/cover
+NSP_BADGE   := ./tools/nspBadge.js
 NPM		:= npm
 
 #
@@ -58,6 +60,12 @@ CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 .PHONY: test
 test: $(NODEUNIT)
 	$(NODEUNIT) test/*.test.js
+
+.PHONY: nsp
+nsp: node_modules $(NSP)
+	@$(NPM) shrinkwrap --dev
+	@($(NSP) check) | $(NSP_BADGE)
+	@rm $(SHRINKWRAP)
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ

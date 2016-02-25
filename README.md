@@ -1,12 +1,13 @@
 ![restify](/../gh-images/logo/png/restify_logo_black_transp_288x288.png?raw=true "restify")
 
 [![Build Status](https://travis-ci.org/restify/node-restify.svg)](https://travis-ci.org/restify/node-restify)
-[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.svg)](https://gitter.im/mcavage/node-restify)
+[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.svg)](https://gitter.im/restify/node-restify)
 [![Dependency Status](https://david-dm.org/restify/node-restify.svg)](https://david-dm.org/restify/node-restify)
 [![devDependency Status](https://david-dm.org/restify/node-restify/dev-status.svg)](https://david-dm.org/restify/node-restify#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/node-restify/badges/score.svg)](https://www.bithound.io/github/restify/node-restify/master)
+[![NSP Status](https://img.shields.io/badge/NSP%20status-no%20vulnerabilities-green.svg)](https://travis-ci.org/restify/node-restify)
 
-[restify](http://restifyjs.com) is a smallish framework,
+[restify](http://restify.com) is a smallish framework,
 similar to [express](http://expressjs.com) for building REST APIs.  For full
 details, see http://restify.com
 
@@ -83,6 +84,15 @@ SOFTWARE.
 ## Bugs
 
 See <https://github.com/restify/node-restify/issues>.
+
+## Contributing
+
+restify has been broken out into a couple of different repositories. The repo
+here here contains only the core functionality of the server.
+
+- For plugins, please go [here](https://github.com/restify/plugins).
+- For the errors module, please go [here](https://github.com/restify/errors).
+
 
 ## Mailing list
 

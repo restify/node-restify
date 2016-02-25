@@ -236,4 +236,4 @@ $(DOC_MEDIA_DIRS_BUILD):
 test:
 
 .PHONY: prepush
-prepush: check test
+prepush: check test nsp

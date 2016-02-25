@@ -511,7 +511,7 @@ route by doing:
 
 If you invoke `res.send()` with an error that has a `statusCode`
 attribute, that will be used, otherwise a default of 500 will be used
-(unless you're using `res.send(4xx, new Error('blah))`).
+(unless you're using `res.send(4xx, new Error('blah'))`).
 
 Alternatively, restify 2.1 supports a `next.ifError` API:
 
@@ -525,10 +525,12 @@ Alternatively, restify 2.1 supports a `next.ifError` API:
 
 Sometimes, for all requests, you may want to handle an error condition the same
 way. As an example, you may want to serve a 500 page on all
-`InternalServerErrors`. In this case, you can add a listener for the `InternalServer` error event that
-is always fired when this Error is encountered by Restify as part of a
-`next(error)` statement. This gives you a way to handle all errors of the same
-class identically across the server.
+`InternalServerErrors`. In this case, you can add a listener for the
+`InternalServer` error event that is always fired when this Error is
+encountered by Restify as part of a `next(error)` statement. This gives you a
+way to handle all errors of the same class identically across the server. You
+can also use a generic `restifyError` event which will catch errors of all types.
+
 
     server.get('/hello/:name', function(req, res, next) {
       // some internal unrecoverable error
@@ -536,10 +538,35 @@ class identically across the server.
       return next(err);
     });
 
-    server.on('InternalServer', function (req, res, err, cb) {
-      err.body = 'something is wrong!';
+    server.get('/hello/:foo', function(req, res, next) {
+      // resource not found error
+      var err = new restify.errors.NotFoundError('oh noes!');
+      return next(err);
+    });
+
+    server.on('NotFound', function (req, res, err, cb) {
+      // do not call res.send! you are now in an error context and are outside
+      // of the normal next chain. you can log or do metrics here, and invoke
+      // the callback when you're done. restify will automtically render the 
+      // NotFoundError as a JSON response.
       return cb();
     });
+    
+    server.on('InternalServer', function (req, res, err, cb) {
+      // if you don't want restify to automatically render the Error object
+      // as a JSON response, you can customize the response by setting the 
+      // `body` property of the error
+      err.body = '<html><body>some custom error content!</body></html>';
+      return cb();
+    });
+    
+    server.on('restifyError', function (req, res, err, cb) {
+      // this listener will fire after both events above!
+      // `err` here is the same as the error that was passed to the above
+      // error handlers.
+      return cb();
+    });
+
 
 ### HttpError
 
@@ -707,7 +734,7 @@ To use [socket.io](http://socket.io/) with restify, just treat your restify
 server as if it were a "raw" node server:
 
     var server = restify.createServer();
-    var io = socketio.listen(server);
+    var io = socketio.listen(server.server);
 
     server.get('/', function indexHTML(req, res, next) {
         fs.readFile(__dirname + '/index.html', function (err, data) {
@@ -1022,7 +1049,7 @@ Options:
   * `multipartFileHandler` - a callback to handle any multipart file.
     It will be a file if the part have a `Content-Disposition` with the
     `filename` parameter set. This typically happens when a browser sends
-    a from and there is a parameter similar to `<input type="file" />`.
+    a form and there is a parameter similar to `<input type="file" />`.
     If this is not provided, the default behaviour is to map the contents
     into `req.params`.
   * `keepExtensions` - if you want the uploaded files to include the
@@ -1223,11 +1250,15 @@ the `after` event:
       log: bunyan.createLogger({
         name: 'audit',
         stream: process.stdout
-      })
+      }),
+      server: SERVER,
+      logMetrics : logBuffer,
+      printLog : true
     }));
 
-You pass in the auditor a bunyan logger, and it will write out records at the
-`info` level.  Records will look like this:
+You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if 
+log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out 
+record lookling like this:
 
         {
           "name": "audit",
@@ -1312,6 +1343,11 @@ timing yourself by utilizing the Request
 [startHandlerTimer](#starthandlertimerhandlername) and
 [endHandlerTimer](#endhandlertimerhandlername) API.
 
+You can also listen to auditlog event and get same above log object when log event emits. For example
+SERVER.on('auditlog', function (data) {
+        //do some process with log
+    });
+Log is also accumulated in the Ringbuffer object, if user choose to pass in during auditlogger construction time.
 ## Request API
 
 Wraps all of the node
@@ -1543,22 +1579,6 @@ Short-hand for:
 ||contentType||String||short hand for the header content-type||
 ||headers||Object||response headers||
 ||id||String||A unique request id (x-request-id)||
-
-### Setting the default headers
-
-You can change what headers restify sends by default by setting the
-top-level property `defaultResponseHeaders`.  This should be a
-function that takes one argument `data`, which is the already
-serialized response body.  `data` can be either a String or Buffer (or
-null).  The `this` object will be the response itself.
-
-    var restify = require('restify');
-
-    restify.defaultResponseHeaders = function(data) {
-      this.header('Server', 'helloworld');
-    };
-
-    restify.defaultResponseHeaders = false; // disable altogether
 
 ## DTrace
 
@@ -2104,8 +2124,8 @@ connection with a server.  For example, using the
       }
     };
     client.get(options, function(err, res, socket, head) {
-      req.once('upgradeResult', function(err, res, socket, head) {
-        var shed = ws.connect(res, socket, head, wskey);
+      res.once('upgradeResult', function(err2, res2, socket2, head2) {
+        var shed = ws.connect(res2, socket2, head2, wskey);
         shed.on('text', function(msg) {
           console.log('message from server: ' + msg);
           shed.end();
