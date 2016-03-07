@@ -143,6 +143,7 @@ below (and `listen()` takes the same arguments as node's
 ||certificate||String||If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key||
 ||key||String||If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
+||ignoreUncaughtExceptions||Boolean||When true (default is false), turns off restify's uncaughtException handler||
 ||log||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required||
 ||name||String||By default, this will be set in the `Server` response header, default is `restify` ||
 ||spdy||Object||Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)||
