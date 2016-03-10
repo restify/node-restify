@@ -736,7 +736,7 @@ server as if it were a "raw" node server:
         console.log('socket.io server listening at %s', server.url);
     });
 
-## Server API
+## Node Server API
 
 ### Events
 
@@ -1050,7 +1050,7 @@ current request id filled in, along with any other parameters you define.
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
-This logger can be used normally, with [req.log](#Request-API).
+This logger can be used normally, with [req.log](#request-api).
 
 This plugin does _not_ log each individual request. Use the Audit Logging
 plugin or a custom middleware for that use.
@@ -1091,9 +1091,13 @@ The plugin will enforce that all files under `directory` are served. The
 provide a `default` parameter such as index.html for any directory that
 lacks a direct file match.
 You can specify additional restrictions by passing in a `match` parameter,
-which is just a `RegExp` to check against the requested file name. Lastly, you
-can pass in a `maxAge` numeric, which will set the `Cache-Control` header.
-Default is `3600` (1 hour).
+which is just a `RegExp` to check against the requested file name.
+Additionally, you may set the `charSet` parameter, which will append a
+character set to the content-type detected by the plugin.  For example,
+`charSet: 'utf-8'` will result in HTML being served with a Content-Type
+of `text/html; charset=utf-8`.
+Lastly, you can pass in a `maxAge` numeric, which will set the
+`Cache-Control` header. Default is `3600` (1 hour).
 
 An additional option for serving a static file is to pass `file` in to the
 serveStatic method as an option. The following will serve index.html from
@@ -1298,6 +1302,10 @@ You pass in the auditor a bunyan logger, and it will write out records at the
           "v": 0
         }
 
+||**Option**||**Type**||**Description**||
+||log||Object||Bunyan||
+||body||Boolean||Include `req.body` and `res.body` in log entries; defaults to `false`||
+
 The `timers` field shows the time each handler took to run in microseconds.
 Restify by default will record this information for every handler for each
 route. However, if you decide to include nested handlers, you can track the
@@ -1381,8 +1389,8 @@ Check if the incoming request is kept alive.
 
 ### log
 
-Note that you can piggyback on the restify logging framework, by just using
-`req.log`.  I.e.,:
+If you are using the [RequestLogger](#bundled-plugins) plugin, the child logger
+will be available on `req.log`:
 
     function myHandler(req, res, next) {
       var log = req.log;
@@ -1390,17 +1398,10 @@ Note that you can piggyback on the restify logging framework, by just using
       log.debug({params: req.params}, 'Hello there %s', 'foo');
     }
 
-The advantage to doing this is that each restify `req` instance has a new
-[bunyan](https://github.com/trentm/node-bunyan) instance `log` on it where
-the request id is automatically injected in, so you can easily correlate
-your high-throughput logs together.
-
-### getLogger(component)
-
-Shorthand to grab a new  [bunyan](https://github.com/trentm/node-bunyan)
-instance that is a child component of the one restify has:
-
-    var log = req.getLogger('MyFoo');
+The child logger will inject the request's UUID in the `req._id` attribute of
+each log statement. Since the logger lasts for the life of the request, you can
+use this to correlate statements for an individual request across any number of
+separate handlers.
 
 ### getQuery()
 
