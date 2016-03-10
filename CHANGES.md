@@ -1,5 +1,7 @@
 # restify Changelog
 ## Current
+ - #1024 Added server option: 'ignoreUncaughtExceptions' to allow disabling
+         of the uncaughtException error handling
  - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
  - #887 Bump dtrace-provider to 0.6.0 for Node 4 support, Corbin Uselton
