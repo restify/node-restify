@@ -3,6 +3,7 @@
 'use strict';
 
 var restify = require('../lib');
+var clients = require('restify-clients');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -139,4 +140,33 @@ test('render route (query string)', function (t) {
             '/countries/Australia?state=NSW%20%26%20VIC&cities%26towns=5');
 
     t.end();
+});
+
+
+test('clean up xss for 404', function (t) {
+    var server = restify.createServer();
+
+    server.listen(3000, function (listenErr) {
+        t.ifError(listenErr);
+
+        var client = clients.createStringClient({
+            url: 'http://127.0.0.1:3000/'
+        });
+
+        client.get({
+            path: '/no5_such3_file7.pl?%22%3E%3Cscript%3Ealert(73541);%3C/' +
+                   'script%3E',
+            headers: {
+                connection: 'close'
+            }
+        }, function (clientErr, req, res, data) {
+            t.ok(clientErr);
+            t.ok(data.indexOf('%22%3E%3Cscript%3Ealert(73541)') === -1,
+                 'should not reflect raw url');
+
+            server.close(function () {
+                t.end();
+            });
+        });
+    });
 });
