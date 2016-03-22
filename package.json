@@ -75,7 +75,7 @@
     "restify-errors": "^3.1.0",
     "semver": "^5.0.1",
     "spdy": "^3.2.0",
-    "vasync": "1.6.3"
+    "vasync": "1.6.4"
   },
   "optionalDependencies": {
     "dtrace-provider": "^0.6.0"
