@@ -114,7 +114,6 @@
         "key-spacing": [ 0 ],
         "new-cap": [ 0 ],
         "no-lonely-if": [ 0 ],
-        "no-multi-str": [ 0 ],
         "no-underscore-dangle": [ 0 ],
         "quotes": [ 0 ],
         "semi": [ 0 ],
