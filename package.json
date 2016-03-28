@@ -39,6 +39,7 @@
     "Shaun Berryman",
     "Steve Mason",
     "Trent Mick",
+    "Tyler Akins",
     "Yunong Xiao"
   ],
   "name": "restify",
@@ -64,6 +65,7 @@
     "bunyan": "^1.4.0",
     "csv": "^0.4.0",
     "escape-regexp-component": "^1.0.2",
+    "findhit-proxywrap": "^0.3.11",
     "formidable": "^1.0.14",
     "http-signature": "^0.11.0",
     "lru-cache": "^4.0.1",
