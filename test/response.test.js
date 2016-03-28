@@ -30,6 +30,7 @@ before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
+            handleUncaughtExceptions: true,
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });

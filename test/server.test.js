@@ -4,6 +4,7 @@
 
 var assert = require('assert-plus');
 var bunyan = require('bunyan');
+var childprocess = require('child_process');
 var http = require('http');
 
 var errors = require('restify-errors');
@@ -39,6 +40,7 @@ before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
+            handleUncaughtExceptions: true,
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
@@ -2069,4 +2071,51 @@ function (t) {
         t.equal(err.name, 'ImATeapotError');
         t.end();
     });
+});
+
+
+test('GH-1024 disable uncaughtException handler', function (t) {
+    // With uncaughtException handling disabled, the node process will abort,
+    // so testing of this feature must occur in a separate node process.
+
+    var allStderr = '';
+    var serverPath = __dirname + '/lib/server-withDisableUncaughtException.js';
+    var serverProc = childprocess.fork(serverPath, {silent: true});
+
+    // Record stderr, to check for the correct exception stack.
+    serverProc.stderr.on('data', function (data) {
+        allStderr += String(data);
+    });
+
+    // Handle serverPortResponse and then make the client request - the request
+    // should receive a connection closed error (because the server aborts).
+    serverProc.on('message', function (msg) {
+        if (msg.task !== 'serverPortResponse') {
+            serverProc.kill();
+            t.end();
+            return;
+        }
+
+        var port = msg.port;
+        var client = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + port,
+            dtrace: helper.dtrace,
+            retry: false
+        });
+
+        client.get('/', function (err, _, res) {
+            // Should get a connection closed error, but no response object.
+            t.ok(err);
+            t.equal(err.code, 'ECONNRESET');
+            t.equal(res, undefined);
+
+            serverProc.kill(); // Ensure it's dead.
+
+            t.ok(allStderr.indexOf('Error: Catch me!') > 0);
+
+            t.end();
+        });
+    });
+
+    serverProc.send({task: 'serverPortRequest'});
 });
