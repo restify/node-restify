@@ -188,6 +188,10 @@ URL-decoded before being passed to you.
        return next();
      });
 
+You can specify `RegExp` in parentheses for named parameter:
+
+     server.get('/hello/:name([a-zA-Z]+)', send);
+
 You can also pass in a [RegExp](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/RegExp)
 object and access the capture group with `req.params` (which will not
 be interpreted in any way):
