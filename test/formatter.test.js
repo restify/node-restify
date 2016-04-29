@@ -33,12 +33,12 @@ before(function (callback) {
             formatters: {
                 'text/plain': function (req, res, body, cb) {
                     if (reqCount === 0) {
-                        process.nextTick(function () {
+                        return process.nextTick(function () {
                             reqCount++;
                             cb(null, 'async fmt');
                         });
                     } else if (reqCount === 1) {
-                        process.nextTick(function () {
+                        return process.nextTick(function () {
                             reqCount++;
                             cb(new Error('foobar'), 'async fmt');
                         });
