@@ -1729,7 +1729,6 @@ test('error handler defers "after" event', function (t) {
             t.ok(res2);
             t.end();
         });
-        res.send(404, 'foo');
         return (cb());
     });
     SERVER.once('after', function () {
@@ -2118,4 +2117,28 @@ test('GH-1024 disable uncaughtException handler', function (t) {
     });
 
     serverProc.send({task: 'serverPortRequest'});
+});
+
+
+test('GH-999 Custom 404 handler does not send response', function (t) {
+
+    // make the 404 handler act like other error handlers - must modify
+    // err.body to send a custom response.
+
+    SERVER.on('NotFound', function (req, res, err, cb) {
+        err.body = {
+            message: 'my custom not found'
+        };
+        return cb();
+    });
+
+    CLIENT.get('/notfound', function (err, _, res) {
+        t.ok(err);
+        t.deepEqual(res.body, JSON.stringify({
+            message: 'my custom not found'
+        }));
+        t.end();
+    });
+
+
 });
