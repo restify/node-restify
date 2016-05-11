@@ -433,7 +433,7 @@ Error/Buffer/everything else.  You can always add more formatters
 later by just setting the formatter on `server.formatters`, but it's
 probably sane to just do it at construct time.   Also, note that if a
 content-type can't be negotiated, the default is
-`application/octet-stream`.  Of course, you can always explicitly set
+`application/json`.  Of course, you can always explicitly set
 the content-type:
 
     res.setHeader('content-type', 'application/foo');
