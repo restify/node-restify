@@ -311,7 +311,7 @@ header, the same way you specify NPM version dependencies:
 Try hitting with:
 
     $ curl -s localhost:8080/hello/mark
-    "hello: mark"
+    {"hello":"mark"}
     $ curl -s -H 'accept-version: ~1' localhost:8080/hello/mark
     "hello: mark"
     $ curl -s -H 'accept-version: ~2' localhost:8080/hello/mark
@@ -327,7 +327,8 @@ at all, so restify treats that like sending a `*`. Much as not sending
 an `Accept` header means the client gets the server's choice. Restify
 will choose this highest matching route.
 In the second case, we explicitly asked for for V1, which got
-us the same response, but then we asked for V2 and got back JSON.  Finally,
+us response a response from the version 1 handler function, 
+but then we asked for V2 and got back JSON.  Finally,
 we asked for a version that doesn't exist and got an error (notably,
 we didn't send an `Accept` header, so we got a JSON response).  Which
 segues us nicely into content negotiation.
