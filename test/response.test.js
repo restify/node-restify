@@ -287,12 +287,11 @@ test('redirect should cause InternalError when invoked without next', function (
         res.redirect();
     });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res, body) {
         t.equal(res.statusCode, 500);
 
         // json parse the response
-        var msg = JSON.parse(res.body);
-        t.equal(msg.body.code, 'Internal');
+        t.equal(body.code, 'Internal');
         t.end();
     });
 });
