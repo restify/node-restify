@@ -32,6 +32,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var FAST_CLIENT;
 var SERVER;
+var TIMEOUT = 500;
 
 
 ///--- Tests
@@ -2118,4 +2119,40 @@ test('GH-1024 disable uncaughtException handler', function (t) {
     });
 
     serverProc.send({task: 'serverPortRequest'});
+});
+
+test('always call after', function (t) {
+    var complete = false;
+    var r = SERVER.get('/foo/:id', function echoId(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
+        res.send();
+    });
+
+    var iv = setTimeout(function () {
+        if (complete) {
+            return;
+        }
+
+        complete = true;
+        t.ok(false, 'timeout after ' + TIMEOUT + 'ms');
+        t.done();
+    }, TIMEOUT);
+
+    SERVER.once('after', function (req, res, route) {
+        complete = true;
+        t.ok(req);
+        t.ok(res);
+        t.equal(r, route.name);
+
+        clearTimeout(iv);
+
+        t.end();
+    });
+
+    CLIENT.get('/foo/bar', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+    });
 });
