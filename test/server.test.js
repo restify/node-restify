@@ -6,6 +6,7 @@ var assert = require('assert-plus');
 var bunyan = require('bunyan');
 var childprocess = require('child_process');
 var http = require('http');
+var stream = require('stream');
 
 var errors = require('restify-errors');
 var filed = require('filed');
@@ -2029,7 +2030,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
         return cb();
     });
 
-    /* eslint-disable no-shadow */
+    /*eslint-disable no-shadow*/
     CLIENT.get('/1', function (err, req, res, data) {
         // should get regular error
         t.ok(err);
@@ -2048,7 +2049,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
             });
         });
     });
-    /* eslint-enable no-shadow */
+    /*eslint-enable no-shadow*/
 });
 
 
@@ -2069,6 +2070,49 @@ function (t) {
         // should still get the original error
         t.equal(err.name, 'ImATeapotError');
         t.end();
+    });
+});
+
+
+test('GH-958 RCS does not write triggering record', function (t) {
+    var passThrough = new stream.PassThrough();
+    var count = 1;
+    // we would expect to get 3 logging statements
+    passThrough.on('data', function (chunk) {
+        var obj = JSON.parse(chunk.toString());
+        t.equal(obj.msg, count.toString());
+
+        if (count === 3) {
+            t.end();
+        }
+        count++;
+    });
+
+    SERVER.log = helper.getLog(
+        'server', [{
+            level: bunyan.DEBUG,
+            type: 'raw',
+            stream: new restify.bunyan.RequestCaptureStream({
+                level: bunyan.WARN,
+                stream: passThrough
+            })}
+        ]
+    );
+
+    SERVER.use(plugins.requestLogger());
+
+    SERVER.get('/rcs', function (req, res, next) {
+        req.log.debug('1');
+        req.log.info('2');
+        req.log.error('3');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/rcs', function (err, _, res) {
+        console.log('client');
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
     });
 });
 
