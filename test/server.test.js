@@ -2110,7 +2110,6 @@ test('GH-958 RCS does not write triggering record', function (t) {
     });
 
     CLIENT.get('/rcs', function (err, _, res) {
-        console.log('client');
         t.ifError(err);
         t.equal(res.statusCode, 200);
     });
