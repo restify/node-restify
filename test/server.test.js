@@ -508,7 +508,7 @@ test('get (path and version not ok)', function (t) {
     };
     CLIENT.get(opts, function (err, _, res) {
         t.ok(err);
-        t.equal(err.message, '~2.1 is not supported by GET /foo/bar');
+        t.equal(err.body.message, '~2.1 is not supported by GET /foo/bar');
         t.equal(res.statusCode, 400);
         t.end();
     });
@@ -856,7 +856,7 @@ test('GH-180 can parse DELETE body', function (t) {
 
 test('returning error from a handler (with domains)', function (t) {
     SERVER.get('/', function (req, res, next) {
-        next(new Error('bah!'));
+        next(new errors.InternalError('bah!'));
     });
 
     CLIENT.get('/', function (err, _, res) {
@@ -1005,6 +1005,8 @@ test('next.ifError', function (t) {
 
     SERVER.get('/foo/:id', function tester(req, res, next) {
         process.nextTick(function () {
+            // this object fails to become JSON because it's picking up the
+            // arguments of the call stack which includes itself
             var e = new RestError({
                 statusCode: 400,
                 restCode: 'Foo',
@@ -1020,7 +1022,7 @@ test('next.ifError', function (t) {
     CLIENT.get('/foo/bar', function (err) {
         t.ok(err);
         t.equal(err.statusCode, 400);
-        t.equal(err.message, 'screw you client');
+        t.equal(err.body.message, 'screw you client');
         t.end();
     });
 });
@@ -2032,6 +2034,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
     /* eslint-disable no-shadow */
     CLIENT.get('/1', function (err, req, res, data) {
         // should get regular error
+        // fail here. But why?
         t.ok(err);
         t.equal(restifyErrorFired, 1);
 
