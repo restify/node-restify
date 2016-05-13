@@ -369,88 +369,6 @@ test('OPTIONS', function (t) {
     }).end();
 });
 
-test('CORS Preflight - valid origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://somesite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'],
-                'http://somesite.local');
-        t.equal(res.headers['access-control-allow-credentials'], 'true');
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
-
-test('CORS Preflight - invalid origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://othersite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'], '*');
-        t.equal(res.headers['access-control-allow-credentials'], undefined);
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
-
-test('CORS Preflight - any origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local', '*' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://anysite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'],
-            'http://anysite.local');
-        t.equal(res.headers['access-control-allow-credentials'], 'true');
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
 
 test('RegExp ok', function (t) {
     SERVER.get(/\/foo/, function tester(req, res, next) {
@@ -1128,8 +1046,6 @@ test('GH-959 matchedVersion() should return on cached routes', function (t) {
         path: '/test',
         version: '0.5.0'
     }, function (req, res, next) {
-        console.log('req.version()', req.version());
-        console.log('req.matchedVersion()', req.matchedVersion());
         res.send({
             version: req.version(),
             matchedVersion: req.matchedVersion()
@@ -2202,4 +2118,33 @@ test('GH-1084 missing toString() causes formatter to error', function (t) {
         t.equal(err.message, '');
         t.end();
     });
+});
+
+
+test('calling next(false) should early exit from pre handlers', function (t) {
+
+    var afterFired = false;
+
+    SERVER.pre(function (req, res, next) {
+        res.send('early exit');
+        return next(false);
+    });
+
+    SERVER.get('/1', function (req, res, next) {
+        res.send('hello world');
+        return next();
+    });
+
+    SERVER.on('after', function () {
+        afterFired = true;
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'early exit');
+        // ensure after event fired
+        t.ok(afterFired);
+        t.end();
+    });
+
 });
