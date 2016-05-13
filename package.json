@@ -72,7 +72,7 @@
     "node-uuid": "^1.4.7",
     "once": "^1.3.0",
     "qs": "^5.0.0",
-    "restify-errors": "^3.1.0",
+    "restify-errors": "^4.2.2",
     "semver": "^5.0.1",
     "spdy": "^3.2.0",
     "vasync": "1.6.4"
