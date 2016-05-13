@@ -260,7 +260,8 @@ test('GH-115 GET path with spaces', function (t) {
         t.ok(err);
         t.equal(err.constructor, TypeError);
         t.equal(err.message,
-            'Request path contains unescaped characters.'.substr(0, err.message.length));
+            'Request path contains unescaped ' +
+            'characters.'.substr(0, err.message.length));
         t.end();
     }
 });
