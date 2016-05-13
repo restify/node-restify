@@ -509,7 +509,7 @@ test('get (path and version not ok)', function (t) {
     };
     CLIENT.get(opts, function (err, _, res) {
         t.ok(err);
-        t.equal(err.message, '~2.1 is not supported by GET /foo/bar');
+        t.equal(err.body.message, '~2.1 is not supported by GET /foo/bar');
         t.equal(res.statusCode, 400);
         t.end();
     });
@@ -857,7 +857,7 @@ test('GH-180 can parse DELETE body', function (t) {
 
 test('returning error from a handler (with domains)', function (t) {
     SERVER.get('/', function (req, res, next) {
-        next(new Error('bah!'));
+        next(new errors.InternalError('bah!'));
     });
 
     CLIENT.get('/', function (err, _, res) {
@@ -1020,8 +1020,7 @@ test('next.ifError', function (t) {
 
     CLIENT.get('/foo/bar', function (err) {
         t.ok(err);
-        t.equal(err.statusCode, 400);
-        t.equal(err.message, 'screw you client');
+        t.equal(err.body.message, 'screw you client');
         t.end();
     });
 });
@@ -2033,6 +2032,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
     /*eslint-disable no-shadow*/
     CLIENT.get('/1', function (err, req, res, data) {
         // should get regular error
+        // fail here. But why?
         t.ok(err);
         t.equal(restifyErrorFired, 1);
 
@@ -2182,6 +2182,24 @@ test('GH-999 Custom 404 handler does not send response', function (t) {
         }));
         t.end();
     });
+});
 
 
+test('GH-1084 missing toString() causes formatter to error', function (t) {
+
+    SERVER.get('/foo', function (req, res, next) {
+        res.header('content-type', 'text/plain');
+        var obj = {
+            message: 'foo',
+            toString: null
+        };
+        res.send(200, obj);
+        return next();
+    });
+
+    CLIENT.get('/foo', function (err, req, res, body) {
+        t.ok(err);
+        t.equal(err.message, '');
+        t.end();
+    });
 });

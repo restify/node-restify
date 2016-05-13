@@ -2,6 +2,7 @@
 
 var url = require('url');
 var restifyClients = require('restify-clients');
+var errs = require('restify-errors');
 var plugins = require('restify-plugins');
 
 var restify = require('../lib');
@@ -287,12 +288,11 @@ test('redirect should cause InternalError when invoked without next', function (
         res.redirect();
     });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res, body) {
         t.equal(res.statusCode, 500);
 
         // json parse the response
-        var msg = JSON.parse(res.body);
-        t.equal(msg.code, 'Internal');
+        t.equal(body.code, 'Internal');
         t.end();
     });
 });
@@ -434,6 +434,24 @@ test('should not fail to send null as body without status code', function (t) {
     CLIENT.get(join(LOCALHOST, '/13'), function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should prefer explicit status code over error status code', function (t) {
+
+    SERVER.get('/14', function handle (req, res, next) {
+        res.send(200, new errs.InternalServerError('boom'));
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/14'), function (err, _, res, body) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        // ensure error body was still sent
+        t.equal(body.code, 'InternalServer');
+        t.equal(body.message, 'boom');
         t.end();
     });
 });
