@@ -1118,12 +1118,12 @@ test('audit logger anonymous timer test', function (t) {
         // check timers
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
-        t.ok(ringbuffer.records[0].req.timers['handler-0'] > 1000000,
-             'handler-0 should be > 1000000');
-        t.ok(ringbuffer.records[0].req.timers['handler-1'] > 1000000,
-             'handler-1 should be > 1000000');
-        t.ok(ringbuffer.records[0].req.timers['handler-1-audit-sub'] >
-             1000000, 'handler-0-audit-sub should be > 1000000');
+        t.ok(ringbuffer.records[0].req.timers['handler-0'] >= 1000000,
+             'handler-0 should be >= 1000000');
+        t.ok(ringbuffer.records[0].req.timers['handler-1'] >= 1000000,
+             'handler-1 should be >= 1000000');
+        t.ok(ringbuffer.records[0].req.timers['handler-1-audit-sub'] >=
+             1000000, 'handler-0-audit-sub should be >= 1000000');
         var handlers = Object.keys(ringbuffer.records[0].req.timers);
         t.equal(handlers[handlers.length - 2], 'handler-1-audit-sub',
                 'sub handler timer not in order');
