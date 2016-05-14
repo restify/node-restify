@@ -1,9 +1,52 @@
 # restify Changelog
 
-## Current
+## 5.0.0
+ - #1089 remove route from LRU cache on when calling `server.rm`, Luis Gómez
+ - #1086 support re-using request id headers on incoming requests, Alex Liu
+ - #1081 update documentation, default content-type is now application/json,
+   Dmitry Kirilyuk
+ - #1072 update documentation for accept-version header, Ingo Renner
+ - #1071 rev node-uuid to address advisory CVE-2015-8851, Alex Liu
+ - #1056 fix `req.absoluteUri()` to use correct protocol, David Marek
+ - #1032 fix potential xss vector, Alex Liu
  - #1024 **BREAKING** Disabled the uncaughtException handler by default, added
    server option 'handleUncaughtExceptions' to allow enabling of it again
    (restify 4.x and before used to handle exceptions by default), Todd Whiteman
+ - #1047 update documentation for spdy example, Tyler Akins
+ - #1041 add `rejectUnknown` option to restify plugin documentation, Dmitry
+   Kirilyuk
+ - #1038 capitalize header field for Location per RFC, Tommi Kyntola
+ - #1011 update documentation to remove outdated references. fix more links,
+   lukealbao
+ - #1010 update documentation to include charSet property for static plugin,
+   Greg Walker
+ - #1000 update spdy to 3.2.0, Andy Tzeng
+ - #1007 remove `defaultResponseHeaders` from documentation, lukealbao
+ - #999 server `NotFound` handler is now normalized, works like other error
+   events and no longer flushes responses automatically, Alex Liu
+ - #991 update documentation links for new plugins and errors repo, Ken Warner
+ - #987 disallow multiple values for content-type header, James O'Cull
+ - #985 CORS removed from restify core. support `next(false)` in pre handler
+   chains, Alex Liu
+ - #982 allow sending of null body, Felix Milea-Ciobanu
+ - #973 rev latest restify-errors, fix todoapp examples, Micah Ransdell
+ - #972 added shrinkwrap+nsp for security vuln checks, Alex Liu
+ - #971 Fix error creation when error message contain URI encoded characters,
+   Benjamin Urban
+ - #969 Fix incorrect usage of assert.AssertionError, Alex Liu
+ - #965 added unit test for sending null body, Michael Nisi
+ - #964 Fix cached routes not setting maxVersion, Alex Liu
+ - #963 enhancements to res.redirect. server now emits `redirect` event, James
+   Womack
+ - #960 update documentation for websocket example, Richard Kiene
+ - #958 RequestCaptureStream now writes triggering record, Gerrard Lindsay,
+   Yunong Xiao
+ - #955 update documentation for socket.io example, Thorsten Hans
+ - #952 Formatters no longer set status codes or inspect payload, Christian
+   Bongiorno, Alex Liu
+ - #951 `res.sendRaw()` allows sending of responses without use of formatters,
+   Matthew Amato, Alex Liu
+ - #947 update documentation links for readme.md & badges, ReadmeCritic
  - #944 Support generic event listener, Alex Liu
  - #943 Fix typos in documentation, azollyx
  - #939 Fix issue where missing content-type header would hang response, Alex
@@ -18,6 +61,12 @@
  - #889 Bump dependencies to latest, Micah Ransdell
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
+
+Various documentation improvements from leitsubomi,
+
+## 4.0.4
+
+- #937 Fix missing content-type header causing response to hang
 
 ## 4.0.3
 - #917 Fix: HTTP 413 status name, Micah Ransdell
