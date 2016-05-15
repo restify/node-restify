@@ -151,6 +151,8 @@ below (and `listen()` takes the same arguments as node's
 ||handleUpgrades||Boolean||Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`||
 ||httpsServerOptions||Object||Any options accepted by [node-https Server](http://nodejs.org/api/https.html#https_https). If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.||
 ||reqIdHeaders||Array||an optional array of request id header names that will be used to set the request id (i.e., the value for req.getId()) ||
+||strict||Boolean||(Default=`false`). If set, Restify will treat "/foo" and "/foo/" as different paths.||
+
 
 ## Common handlers: server.use()
 
