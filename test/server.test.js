@@ -204,6 +204,29 @@ test('rm', function (t) {
     });
 });
 
+test('rm route and clear cached route', function (t) {
+
+    t.equal(SERVER.router.cache.dump().length, 0);
+
+    var route = SERVER.get('/cached/route', function cachey(req, res, next) {
+        res.send({ foo: 'bar' });
+        next();
+    });
+
+    CLIENT.get('/cached/route', function (err, _, res) {
+        t.equal(SERVER.router.cache.dump().length, 1);
+        t.equal(SERVER.router.cache.dump()[0].v.name, route);
+        t.equal(res.statusCode, 200);
+        t.ok(SERVER.rm(route));
+        CLIENT.get('/cached/route', function (err2, _2, res2) {
+            t.ok(err2);
+            t.equal(SERVER.router.cache.dump().length, 0);
+            t.equal(res2.statusCode, 404);
+            t.end();
+        });
+    });
+});
+
 
 test('use - throws TypeError on non function as argument', function (t) {
 
