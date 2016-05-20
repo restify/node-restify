@@ -62,7 +62,7 @@
   "dependencies": {
     "assert-plus": "^0.2.0",
     "bunyan": "^1.4.0",
-    "csv": "^0.4.0",
+    "csv": "^1.1.0",
     "escape-regexp-component": "^1.0.2",
     "formidable": "^1.0.14",
     "http-signature": "^0.11.0",
