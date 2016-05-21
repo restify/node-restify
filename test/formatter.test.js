@@ -95,6 +95,7 @@ after(function (callback) {
 
 
 test('async formatter', function (t) {
+
     CLIENT.get('/tmp', function (err, req, res, data) {
         t.ifError(err);
         t.ok(req);
@@ -106,16 +107,18 @@ test('async formatter', function (t) {
 
 test('async formatter error', function (t) {
     SERVER.once('after', function (req, res, route, e) {
-        // TODO: add a test here to verify error has been emitted.
-        // Pending #845
+        t.ok(e);
+        t.ok(e instanceof Error);
+        t.equal(e.message, 'foobar');
+        t.end();
     });
+
     CLIENT.get('/tmp', function (err, req, res, data) {
         t.ok(err);
         t.equal(err.statusCode, 500);
         t.ok(req);
         t.ok(res);
         t.notOk(data);
-        t.end();
     });
 });
 
