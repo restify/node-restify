@@ -74,7 +74,7 @@
     "qs": "^5.0.0",
     "restify-errors": "^4.2.3",
     "semver": "^5.0.1",
-    "spdy": "^3.2.0",
+    "spdy": "^3.3.3",
     "vasync": "1.6.4"
   },
   "optionalDependencies": {
