@@ -1195,6 +1195,37 @@ test('versioned route matching should prefer \
 });
 
 
+test('GH-959 matchedVersion() should return on cached routes', function (t) {
+
+    SERVER.get({
+        path: '/test',
+        version: '0.5.0'
+    }, function (req, res, next) {
+        console.log('req.version()', req.version());
+        console.log('req.matchedVersion()', req.matchedVersion());
+        res.send({
+            version: req.version(),
+            matchedVersion: req.matchedVersion()
+        });
+        return next();
+    });
+
+
+    CLIENT.get('/test', function (err, _, res, body) {
+        t.ifError(err);
+        t.equal(body.version, '*');
+        t.equal(body.matchedVersion, '0.5.0');
+
+        CLIENT.get('/test', function (err2, _2, res2, body2) {
+            t.ifError(err2);
+            t.equal(body.version, '*');
+            t.equal(body.matchedVersion, '0.5.0');
+            t.end();
+        });
+    });
+});
+
+
 test('gh-329 wrong values in res.methods', function (t) {
     function route(req, res, next) {
         res.send(200);
