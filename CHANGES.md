@@ -1,5 +1,9 @@
 # restify Changelog
 
+## 4.1.0
+- Bump SPDY to latest.
+- #959: fix issue where cached routes were not setting maxVersion on the req
+
 ## 4.0.4
 - #937 Fix: hanging response when a formatter isn't defined for a specified
   content-type, Alex Liu
