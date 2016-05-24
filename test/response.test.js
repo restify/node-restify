@@ -21,6 +21,7 @@ var test = helper.test;
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
+var STRING_CLIENT;
 var SERVER;
 
 var LOCALHOST;
@@ -43,6 +44,11 @@ before(function (cb) {
                 dtrace: helper.dtrace,
                 retry: false
             });
+            STRING_CLIENT = restifyClients.createStringClient({
+                url: 'http://127.0.0.1:' + PORT,
+                dtrace: helper.dtrace,
+                retry: false
+            });
             LOCALHOST = 'http://' + '127.0.0.1:' + PORT;
             SLOCALHOST = 'https://' + '127.0.0.1:' + PORT;
 
@@ -58,6 +64,7 @@ before(function (cb) {
 after(function (cb) {
     try {
         CLIENT.close();
+        STRING_CLIENT.close();
         SERVER.close(function () {
             CLIENT = null;
             SERVER = null;
@@ -339,7 +346,6 @@ test('redirect should emit a redirect event', function (t) {
             wasEmitted = true;
             redirectLocation = payload;
         });
-        console.log('about to call next');
         next();
     }
     function redirect(req, res, next) {
@@ -454,4 +460,46 @@ test('should prefer explicit status code over error status code', function (t) {
         t.equal(body.message, 'boom');
         t.end();
     });
+});
+
+
+test('GH-951: should send without formatting', function (t) {
+
+    SERVER.get('/15', function handle (req, res, next) {
+        res.header('content-type', 'application/json');
+        res.sendRaw(200, JSON.stringify({
+            hello: 'world'
+        }));
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/15'), function (err, _, res, body) {
+        t.ifError(err);
+        t.equal(body, JSON.stringify({
+            hello: 'world'
+        }));
+        t.end();
+    });
+});
+
+
+test('GH-951: sendRaw accepts only strings or buffers', function (t) {
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'AssertionError');
+        t.equal(err.message, 'res.sendRaw() accepts only strings or buffers');
+        t.end();
+    });
+
+    SERVER.get('/16', function handle (req, res, next) {
+        res.header('content-type', 'application/json');
+        res.sendRaw(200, {
+            hello: 'world'
+        });
+        return next();
+    });
+
+    // throw away response, we don't need it.
+    STRING_CLIENT.get(join(LOCALHOST, '/16'));
 });
