@@ -172,7 +172,7 @@ test('clean up xss for 404', function (t) {
 });
 
 test('Strict routing handles root path', function (t) {
-    var server = restify.createServer({strict: true});
+    var server = restify.createServer({strictRouting: true});
     function noop () {}
     server.get('/', noop);
 
@@ -183,7 +183,7 @@ test('Strict routing handles root path', function (t) {
 });
 
 test('Strict routing distinguishes trailing slash', function (t) {
-    var server = restify.createServer({strict: true});
+    var server = restify.createServer({strictRouting: true});
     function noop () {}
 
     server.get('/trailing/', noop);
