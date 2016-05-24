@@ -259,8 +259,9 @@ test('GH-115 GET path with spaces', function (t) {
     } catch (err) {
         t.ok(err);
         t.equal(err.constructor, TypeError);
-        t.equal(err.message,
-            'Request path contains unescaped characters.');
+        // Node6's error message no longer has a period at the end.
+        t.ok(err.message === 'Request path contains unescaped characters.' ||
+             err.message === 'Request path contains unescaped characters');
         t.end();
     }
 });
