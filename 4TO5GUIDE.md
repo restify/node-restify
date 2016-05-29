@@ -85,10 +85,14 @@ SERVER.on('redirect', function (newLocation) {
 ```
 
 ### server.on('NotFound', ...)
+### server.on('MethodNotAllowed', ...)
+### server.on('VersionNotAllowed', ...)
+### server.on('UnsupportedMediaType', ...)
 
-restify's `NotFound` has now been normalized to act like other error events.
-Previously, the `NotFound` event required you to send a response, or else it
-would hang. It has now been normalized along with the error events:
+restify's error events for these four types of errors have now been normalized
+to act like other error events. Previously, listening to these events would
+require you to send a response. It has now been normalized to work like the
+other error events:
 
 ```js
 server.on('NotFound', function(req, res, err, cb) {
@@ -100,22 +104,6 @@ server.on('NotFound', function(req, res, err, cb) {
 });
 ```
 
-### domains
-
-In 4.x, restify utilized domains by default. Any errors captured by the domain
-could be handled to via the `server.on('uncaughtException', ...` event.
-However, it was not immediately obvious that this behavior was happening by
-default, and many errors often went unhandled or unnoticed by end users.
-
-With domains being deprecated, we've opted to turn domains off by default. If
-you want to use domains, you can turn them back on via the
-`handleUncaughtExceptions` option when you create the server:
-
-```js
-var server = restify.createServer({
-    handleUncaughtExceptions: true
-});
-```
 
 ### CORS
 
@@ -132,7 +120,19 @@ it out the door!
 
 ### strict routing
 
-TBD
+Strict routing is now supported via the `strictRouting` option. This allows
+differentiation of routes with trailing slashes. The default value is `false`,
+which mimics the behavior in 4.x which is to strip trailing slashes.
+
+```js
+var server = restify.createServer({
+    strictRouting: true
+});
+// these two routes are distinct with strictRouting option
+server.get('/foo/', function(req, res, next) { });
+server.get('/foo', function(req, res, next) { });
+```
+
 
 ### res.sendRaw()
 
@@ -143,3 +143,161 @@ scenarios where you have preformatted content (pre-gzipped, pre-JSON
 stringified, etc.). `sendRaw` has the same signature as `send`.
 
 
+### Removal of undocumented APIs
+
+Previous versions of restify had some undocumented exports on the main object.
+These have been removed as of 5.x. These include:
+
+* `restify.CORS` - due to removal of CORS from core
+* `restify.httpDate` - undocumented
+* `restify.realizeUrl` - undocumented
+
+
+### next(err) & res.send(err)
+
+To help reduce unintentional exposure of errors to the client, restify no
+longer does special JSON serialization for Error objects. For example:
+
+```js
+server.get('/sendErr', function(req, res, next) {
+  res.send(new Error('where is my msg?'));
+  return next();
+});
+
+server.get('/nextErr', function(req, res, next) {
+  return next(new Error('where is my msg?'));
+});
+```
+
+```sh
+$ curl -is localhost:8080/sendErr
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{}
+
+$ curl -is localhost:8080/nextErr
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{}
+```
+
+The response is an empty object because `JSON.stringify(err)` returns an empty
+object. In order to get properly serialized Errors, the preferred method is to
+use restify-errors, which will have defined `toJSON` methods. Alternatively,
+if you have custom Error classes, you can define a `toJSON` method which is
+invoked when your Error is being stringified. If you have many custom error
+types, consider using restify-errors to help you create and manage them easily.
+Lastly, you can use restify-errors to opt-in to automatic `toJSON`
+serialization:
+
+```js
+var errs = require('restify-errors');
+
+server.get('/', function(req, res, next) {
+  res.send(new errs.GoneError('gone girl'));
+  return next();
+});
+```
+
+```sh
+$ curl -is localhost:8080/
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{"code":"Gone","message":"gone girl"}
+```
+
+## sync vs async formatters
+
+Restify now supports both sync and async formatters. In 4.x, all formatters had
+an async signature despite not being async. For example, the text formatter in
+4.x might have looked like this:
+
+```js
+function formatText(req, res, body, cb) {
+    return cb(null, body.toString());
+}
+```
+
+This caused a scenario where formatting could potentially fail, but the handler
+chain would continue on. To address this gap, as of 5.x, any formatters that
+are async require a callback to be passed into `res.send()`. For example,
+imagine this async formatter:
+
+```js
+function specialFormat(req, res, body, cb) {
+    return asyncSerializer.format(body, cb);
+}
+
+server.get('/', function(req, res, next) {
+    res.send('hello world', function(err) {
+        if (err) {
+            res.end('some other backup content when formatting fails');
+        }
+        return next();
+    });
+});
+
+server.get('/', function(req, res, next) {
+    // alternatively, you can pass the error to next, which will render the
+    // error to the client.
+    res.send('hello world', next);
+});
+```
+
+This way we are able to block the handler chain from moving on when an async
+formatter fails. If you have any custom formatters, migrating from 4.x will
+require you to change the formatter to be sync. Imagine the previous text
+formatter changed to sync. Notice that the signature no longer takes a
+callback.  This hints to restify that the formatter is sync:
+
+```js
+function formatText(req, res, body) {
+    return body.toString();
+}
+```
+
+Thus, if your formatter takes 4 parameters (i.e., takes a callback),
+invocations of `res.send()` must take a callback, or else restify will throw.
+
+
+## Deprecations
+
+The following are still currently supported, but are on life support and may be
+removed in future versions. Usage of these features will cause restify to spit
+out deprecation warnings in the logs.
+
+
+### domains
+
+In 4.x, restify utilized domains by default. Any errors captured by the domain
+could be handled to via the `server.on('uncaughtException', ...)` event.
+However, it was not immediately obvious that this behavior was happening by
+default, and many errors often went unhandled or unnoticed by end users.
+
+With domains being deprecated, we've opted to turn domains off by default. If
+you want to use domains, you can turn them back on via the
+`handleUncaughtExceptions` option when you create the server:
+
+```js
+var server = restify.createServer({
+    handleUncaughtExceptions: true
+});
+```
+
+### next.ifError()
+
+The `next.ifError()` feature leveraged domains under the hood. This feature is
+also deprecated, and will only be available to you if the
+`handleUncaughtExceptions` flag is set to true.

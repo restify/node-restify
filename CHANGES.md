@@ -1,10 +1,21 @@
 # restify Changelog
 
 ## 5.0.0
+ - #1129 always invoke res.send callback if one is provided, even when the
+   selected formatter is sync, Alex Liu
+ - #1128 don't send domain errors to the client, Alex Liu
+ - #1123 add deprecation warnings for domain dependent features, Alex Liu
+ - #1119 set response status code to 0 when the request is terminated by the
+   client, Alex Liu
+ - #1118 remove undocumented exports and other unused methods, Alex Liu
+ - #1113 Fix JSDOC comments, Marc Riegel
+ - #1111 new documentation guides, Nicolas Artman
+ - #1092 support for strict routing, lukealbao
  - #1089 remove route from LRU cache on when calling `server.rm`, Luis Gómez
  - #1086 support re-using request id headers on incoming requests, Alex Liu
  - #1081 update documentation, default content-type is now application/json,
    Dmitry Kirilyuk
+ - #1078 send the server name down in the header per documentation, Alex Liu
  - #1072 update documentation for accept-version header, Ingo Renner
  - #1071 rev node-uuid to address advisory CVE-2015-8851, Alex Liu
  - #1056 fix `req.absoluteUri()` to use correct protocol, David Marek
@@ -59,6 +70,7 @@
  - #883 hypens no longer stripped from route names, Sean Wragg
  - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
+ - #845 Support sync and async formatters, Alex Liu
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
 
