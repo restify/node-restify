@@ -2,6 +2,7 @@
 
 var url = require('url');
 var restifyClients = require('restify-clients');
+var errs = require('restify-errors');
 var plugins = require('restify-plugins');
 
 var restify = require('../lib');
@@ -20,6 +21,7 @@ var test = helper.test;
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
+var STRING_CLIENT;
 var SERVER;
 
 var LOCALHOST;
@@ -30,6 +32,7 @@ before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
+            handleUncaughtExceptions: true,
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
@@ -37,6 +40,11 @@ before(function (cb) {
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                dtrace: helper.dtrace,
+                retry: false
+            });
+            STRING_CLIENT = restifyClients.createStringClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
                 retry: false
@@ -56,6 +64,7 @@ before(function (cb) {
 after(function (cb) {
     try {
         CLIENT.close();
+        STRING_CLIENT.close();
         SERVER.close(function () {
             CLIENT = null;
             SERVER = null;
@@ -286,12 +295,11 @@ test('redirect should cause InternalError when invoked without next', function (
         res.redirect();
     });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res, body) {
         t.equal(res.statusCode, 500);
 
         // json parse the response
-        var msg = JSON.parse(res.body);
-        t.equal(msg.code, 'Internal');
+        t.equal(body.code, 'Internal');
         t.end();
     });
 });
@@ -338,7 +346,6 @@ test('redirect should emit a redirect event', function (t) {
             wasEmitted = true;
             redirectLocation = payload;
         });
-        console.log('about to call next');
         next();
     }
     function redirect(req, res, next) {
@@ -435,4 +442,64 @@ test('should not fail to send null as body without status code', function (t) {
         t.equal(res.statusCode, 200);
         t.end();
     });
+});
+
+
+test('should prefer explicit status code over error status code', function (t) {
+
+    SERVER.get('/14', function handle (req, res, next) {
+        res.send(200, new errs.InternalServerError('boom'));
+        return next();
+    });
+
+    CLIENT.get(join(LOCALHOST, '/14'), function (err, _, res, body) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        // ensure error body was still sent
+        t.equal(body.code, 'InternalServer');
+        t.equal(body.message, 'boom');
+        t.end();
+    });
+});
+
+
+test('GH-951: should send without formatting', function (t) {
+
+    SERVER.get('/15', function handle (req, res, next) {
+        res.header('content-type', 'application/json');
+        res.sendRaw(200, JSON.stringify({
+            hello: 'world'
+        }));
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/15'), function (err, _, res, body) {
+        t.ifError(err);
+        t.equal(body, JSON.stringify({
+            hello: 'world'
+        }));
+        t.end();
+    });
+});
+
+
+test('GH-951: sendRaw accepts only strings or buffers', function (t) {
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'AssertionError');
+        t.equal(err.message, 'res.sendRaw() accepts only strings or buffers');
+        t.end();
+    });
+
+    SERVER.get('/16', function handle (req, res, next) {
+        res.header('content-type', 'application/json');
+        res.sendRaw(200, {
+            hello: 'world'
+        });
+        return next();
+    });
+
+    // throw away response, we don't need it.
+    STRING_CLIENT.get(join(LOCALHOST, '/16'));
 });

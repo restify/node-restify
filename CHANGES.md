@@ -1,6 +1,9 @@
 # restify Changelog
 
 ## Current
+ - #1024 **BREAKING** Disabled the uncaughtException handler by default, added
+   server option 'handleUncaughtExceptions' to allow enabling of it again
+   (restify 4.x and before used to handle exceptions by default), Todd Whiteman
  - #944 Support generic event listener, Alex Liu
  - #943 Fix typos in documentation, azollyx
  - #939 Fix issue where missing content-type header would hang response, Alex

@@ -4,13 +4,16 @@
 
 var assert = require('assert-plus');
 var bunyan = require('bunyan');
+var childprocess = require('child_process');
 var http = require('http');
+var stream = require('stream');
 
 var errors = require('restify-errors');
 var filed = require('filed');
 var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
 var uuid = require('node-uuid');
+var validator = require('validator');
 
 var RestError = errors.RestError;
 var restify = require('../lib');
@@ -39,8 +42,10 @@ before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
+            handleUncaughtExceptions: true,
             log: helper.getLog('server'),
-            version: ['2.0.0', '0.5.4', '1.4.3']
+            version: ['2.0.0', '0.5.4', '1.4.3'],
+            reqIdHeaders: ['x-req-id-a', 'x-req-id-b']
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
@@ -196,6 +201,29 @@ test('rm', function (t) {
         CLIENT.get('/bar/foo', function (err2, __, res2) {
             t.ifError(err2);
             t.equal(res2.statusCode, 200);
+            t.end();
+        });
+    });
+});
+
+test('rm route and clear cached route', function (t) {
+
+    t.equal(SERVER.router.cache.dump().length, 0);
+
+    var route = SERVER.get('/cached/route', function cachey(req, res, next) {
+        res.send({ foo: 'bar' });
+        next();
+    });
+
+    CLIENT.get('/cached/route', function (err, _, res) {
+        t.equal(SERVER.router.cache.dump().length, 1);
+        t.equal(SERVER.router.cache.dump()[0].v.name, route);
+        t.equal(res.statusCode, 200);
+        t.ok(SERVER.rm(route));
+        CLIENT.get('/cached/route', function (err2, _2, res2) {
+            t.ok(err2);
+            t.equal(SERVER.router.cache.dump().length, 0);
+            t.equal(res2.statusCode, 404);
             t.end();
         });
     });
@@ -366,88 +394,6 @@ test('OPTIONS', function (t) {
     }).end();
 });
 
-test('CORS Preflight - valid origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://somesite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'],
-                'http://somesite.local');
-        t.equal(res.headers['access-control-allow-credentials'], 'true');
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
-
-test('CORS Preflight - invalid origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://othersite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'], '*');
-        t.equal(res.headers['access-control-allow-credentials'], undefined);
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
-
-test('CORS Preflight - any origin', function (t) {
-    SERVER.use(restify.CORS({
-        credentials: true,
-        origins: [ 'http://somesite.local', '*' ]
-    }));
-    SERVER.post('/foo/:id', function tester(req, res, next) {});
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/foo/bar',
-        method: 'OPTIONS',
-        agent: false,
-        headers: {
-            'Access-Control-Request-Headers': 'accept, content-type',
-            'Access-Control-Request-Method': 'POST',
-            Origin: 'http://anysite.local'
-        }
-    };
-    http.request(opts, function (res) {
-        t.equal(res.headers['access-control-allow-origin'],
-            'http://anysite.local');
-        t.equal(res.headers['access-control-allow-credentials'], 'true');
-        t.equal(res.statusCode, 200);
-        t.end();
-    }).end();
-});
 
 test('RegExp ok', function (t) {
     SERVER.get(/\/foo/, function tester(req, res, next) {
@@ -506,7 +452,7 @@ test('get (path and version not ok)', function (t) {
     };
     CLIENT.get(opts, function (err, _, res) {
         t.ok(err);
-        t.equal(err.message, '~2.1 is not supported by GET /foo/bar');
+        t.equal(err.body.message, '~2.1 is not supported by GET /foo/bar');
         t.equal(res.statusCode, 400);
         t.end();
     });
@@ -854,7 +800,7 @@ test('GH-180 can parse DELETE body', function (t) {
 
 test('returning error from a handler (with domains)', function (t) {
     SERVER.get('/', function (req, res, next) {
-        next(new Error('bah!'));
+        next(new errors.InternalError('bah!'));
     });
 
     CLIENT.get('/', function (err, _, res) {
@@ -1017,8 +963,7 @@ test('next.ifError', function (t) {
 
     CLIENT.get('/foo/bar', function (err) {
         t.ok(err);
-        t.equal(err.statusCode, 400);
-        t.equal(err.message, 'screw you client');
+        t.equal(err.body.message, 'screw you client');
         t.end();
     });
 });
@@ -1126,8 +1071,6 @@ test('GH-959 matchedVersion() should return on cached routes', function (t) {
         path: '/test',
         version: '0.5.0'
     }, function (req, res, next) {
-        console.log('req.version()', req.version());
-        console.log('req.matchedVersion()', req.matchedVersion());
         res.send({
             version: req.version(),
             matchedVersion: req.matchedVersion()
@@ -1727,7 +1670,6 @@ test('error handler defers "after" event', function (t) {
             t.ok(res2);
             t.end();
         });
-        res.send(404, 'foo');
         return (cb());
     });
     SERVER.once('after', function () {
@@ -2028,9 +1970,10 @@ test('GH-667 emit error event for generic Errors', function (t) {
         return cb();
     });
 
-    /* eslint-disable no-shadow */
+    /*eslint-disable no-shadow*/
     CLIENT.get('/1', function (err, req, res, data) {
         // should get regular error
+        // fail here. But why?
         t.ok(err);
         t.equal(restifyErrorFired, 1);
 
@@ -2047,7 +1990,7 @@ test('GH-667 emit error event for generic Errors', function (t) {
             });
         });
     });
-    /* eslint-enable no-shadow */
+    /*eslint-enable no-shadow*/
 });
 
 
@@ -2067,6 +2010,266 @@ function (t) {
         t.ok(err);
         // should still get the original error
         t.equal(err.name, 'ImATeapotError');
+        t.end();
+    });
+});
+
+
+test('GH-958 RCS does not write triggering record', function (t) {
+    var passThrough = new stream.PassThrough();
+    var count = 1;
+    // we would expect to get 3 logging statements
+    passThrough.on('data', function (chunk) {
+        var obj = JSON.parse(chunk.toString());
+        t.equal(obj.msg, count.toString());
+
+        if (count === 3) {
+            t.end();
+        }
+        count++;
+    });
+
+    SERVER.log = helper.getLog(
+        'server', [{
+            level: bunyan.DEBUG,
+            type: 'raw',
+            stream: new restify.bunyan.RequestCaptureStream({
+                level: bunyan.WARN,
+                stream: passThrough
+            })}
+        ]
+    );
+
+    SERVER.use(plugins.requestLogger());
+
+    SERVER.get('/rcs', function (req, res, next) {
+        req.log.debug('1');
+        req.log.info('2');
+        req.log.error('3');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/rcs', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+
+test('GH-1024 disable uncaughtException handler', function (t) {
+    // With uncaughtException handling disabled, the node process will abort,
+    // so testing of this feature must occur in a separate node process.
+
+    var allStderr = '';
+    var serverPath = __dirname + '/lib/server-withDisableUncaughtException.js';
+    var serverProc = childprocess.fork(serverPath, {silent: true});
+
+    // Record stderr, to check for the correct exception stack.
+    serverProc.stderr.on('data', function (data) {
+        allStderr += String(data);
+    });
+
+    // Handle serverPortResponse and then make the client request - the request
+    // should receive a connection closed error (because the server aborts).
+    serverProc.on('message', function (msg) {
+        if (msg.task !== 'serverPortResponse') {
+            serverProc.kill();
+            t.end();
+            return;
+        }
+
+        var port = msg.port;
+        var client = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + port,
+            dtrace: helper.dtrace,
+            retry: false
+        });
+
+        client.get('/', function (err, _, res) {
+            // Should get a connection closed error, but no response object.
+            t.ok(err);
+            t.equal(err.code, 'ECONNRESET');
+            t.equal(res, undefined);
+
+            serverProc.kill(); // Ensure it's dead.
+
+            t.ok(allStderr.indexOf('Error: Catch me!') > 0);
+
+            t.end();
+        });
+    });
+
+    serverProc.send({task: 'serverPortRequest'});
+});
+
+
+test('GH-999 Custom 404 handler does not send response', function (t) {
+
+    // make the 404 handler act like other error handlers - must modify
+    // err.body to send a custom response.
+
+    SERVER.on('NotFound', function (req, res, err, cb) {
+        err.body = {
+            message: 'my custom not found'
+        };
+        return cb();
+    });
+
+    CLIENT.get('/notfound', function (err, _, res) {
+        t.ok(err);
+        t.deepEqual(res.body, JSON.stringify({
+            message: 'my custom not found'
+        }));
+        t.end();
+    });
+});
+
+
+test('GH-1084 missing toString() causes formatter to error', function (t) {
+
+    SERVER.get('/foo', function (req, res, next) {
+        res.header('content-type', 'text/plain');
+        var obj = {
+            message: 'foo',
+            toString: null
+        };
+        res.send(200, obj);
+        return next();
+    });
+
+    CLIENT.get('/foo', function (err, req, res, body) {
+        t.ok(err);
+        t.equal(err.message, '');
+        t.end();
+    });
+});
+
+
+test('calling next(false) should early exit from pre handlers', function (t) {
+
+    var afterFired = false;
+
+    SERVER.pre(function (req, res, next) {
+        res.send('early exit');
+        return next(false);
+    });
+
+    SERVER.get('/1', function (req, res, next) {
+        res.send('hello world');
+        return next();
+    });
+
+    SERVER.on('after', function () {
+        afterFired = true;
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'early exit');
+        // ensure after event fired
+        t.ok(afterFired);
+        t.end();
+    });
+
+});
+
+
+test('GH-1086: should reuse request id when available', function (t) {
+
+    SERVER.get('/1', function (req, res, next) {
+        // the 12345 value is set when the client is created.
+        t.ok(req.headers.hasOwnProperty('x-req-id-a'));
+        t.equal(req.getId(), req.headers['x-req-id-a']);
+        res.send('hello world');
+        return next();
+    });
+
+    // create new client since we new specific headers
+    CLIENT = restifyClients.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT,
+        headers:{
+            'x-req-id-a': 12345
+        }
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'hello world');
+        t.end();
+    });
+});
+
+
+test('GH-1086: should use second request id when available', function (t) {
+
+    SERVER.get('/1', function (req, res, next) {
+        t.ok(req.headers.hasOwnProperty('x-req-id-b'));
+        t.equal(req.getId(), req.headers['x-req-id-b']);
+        res.send('hello world');
+        return next();
+    });
+
+    // create new client since we new specific headers
+    CLIENT = restifyClients.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT,
+        headers:{
+            'x-req-id-b': 678910
+        }
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'hello world');
+        t.end();
+    });
+});
+
+
+test('GH-1086: should use default uuid request id if none provided',
+function (t) {
+
+    SERVER.get('/1', function (req, res, next) {
+        t.ok(req.getId());
+        t.ok(validator.isUUID(req.getId()));
+        res.send('hello world');
+        return next();
+    });
+
+    // create new client since we new specific headers
+    CLIENT = restifyClients.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'hello world');
+        t.end();
+    });
+});
+
+
+test('GH-1086: empty request id should be ignored', function (t) {
+
+    SERVER.get('/1', function (req, res, next) {
+        t.ok(req.headers.hasOwnProperty('x-req-id-b'));
+        t.equal(req.getId(), req.headers['x-req-id-b']);
+        res.send('hello world');
+        return next();
+    });
+
+    // create new client since we new specific headers
+    CLIENT = restifyClients.createJsonClient({
+        url: 'http://127.0.0.1:' + PORT,
+        headers:{
+            'x-req-id-a': '',
+            'x-req-id-b': 12345
+        }
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'hello world');
         t.end();
     });
 });

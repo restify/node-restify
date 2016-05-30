@@ -1,0 +1,12 @@
+{
+  "libs": [
+     "ecma5",
+     "chai"
+  ],
+  "plugins": {
+    "node": {},
+    "complete_strings": {},
+    "doc_comment": {},
+    "node_resolve": {}
+  }
+}
