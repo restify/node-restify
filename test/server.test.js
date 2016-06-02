@@ -2126,26 +2126,6 @@ test('GH-999 Custom 404 handler does not send response', function (t) {
 });
 
 
-test('GH-1084 missing toString() causes formatter to error', function (t) {
-
-    SERVER.get('/foo', function (req, res, next) {
-        res.header('content-type', 'text/plain');
-        var obj = {
-            message: 'foo',
-            toString: null
-        };
-        res.send(200, obj);
-        return next();
-    });
-
-    CLIENT.get('/foo', function (err, req, res, body) {
-        t.ok(err);
-        t.equal(err.message, '');
-        t.end();
-    });
-});
-
-
 test('calling next(false) should early exit from pre handlers', function (t) {
 
     var afterFired = false;
