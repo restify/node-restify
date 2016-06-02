@@ -60,29 +60,28 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "assert-plus": "^0.2.0",
-    "bunyan": "^1.4.0",
+    "assert-plus": "^1.0.0",
+    "bunyan": "^1.8.1",
     "csv": "^1.1.0",
     "escape-regexp-component": "^1.0.2",
     "formidable": "^1.0.14",
-    "http-signature": "^0.11.0",
     "lru-cache": "^4.0.1",
     "mime": "^1.2.11",
     "negotiator": "^0.6.1",
     "node-uuid": "^1.4.7",
     "once": "^1.3.0",
-    "qs": "^5.0.0",
+    "qs": "^5.2.0",
     "restify-errors": "^4.2.3",
     "semver": "^5.0.1",
-    "spdy": "^3.2.0",
-    "vasync": "1.6.4"
+    "spdy": "^3.3.3",
+    "vasync": "^1.6.4"
   },
   "optionalDependencies": {
     "dtrace-provider": "^0.6.0"
   },
   "devDependencies": {
     "cover": "^0.2.9",
-    "eslint": "^2.8.0",
+    "eslint": "^2.11.1",
     "filed": "^0.1.0",
     "jscs": "^3.0.0",
     "nodeunit": "^0.9.1",
