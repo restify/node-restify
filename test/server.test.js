@@ -2253,3 +2253,89 @@ test('GH-1086: empty request id should be ignored', function (t) {
         t.end();
     });
 });
+
+
+test('GH-1078: server name should default to restify', function (t) {
+
+    var myServer = restify.createServer();
+    var port = 3000;
+
+    myServer.get('/', function (req, res, next) {
+        res.send('hi');
+        return next();
+    });
+
+    var myClient = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + port,
+        headers: {
+            connection: 'close'
+        }
+    });
+
+    myServer.listen(port, function () {
+        myClient.get('/', function (err, req, res, data) {
+            t.ifError(err);
+            t.equal(res.headers.server, 'restify');
+            myServer.close(t.end);
+        });
+    });
+});
+
+
+test('GH-1078: server name should be customizable', function (t) {
+
+    var myServer = restify.createServer({
+        name: 'foo'
+    });
+    var port = 3000;
+
+    myServer.get('/', function (req, res, next) {
+        res.send('hi');
+        return next();
+    });
+
+    var myClient = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + port,
+        headers: {
+            connection: 'close'
+        }
+    });
+
+    myServer.listen(port, function () {
+        myClient.get('/', function (err, req, res, data) {
+            t.ifError(err);
+            t.equal(res.headers.server, 'foo');
+            myServer.close(t.end);
+        });
+    });
+});
+
+
+test('GH-1078: server name should be overridable and not sent down',
+function (t) {
+
+    var myServer = restify.createServer({
+        name: ''
+    });
+    var port = 3000;
+
+    myServer.get('/', function (req, res, next) {
+        res.send('hi');
+        return next();
+    });
+
+    var myClient = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + port,
+        headers: {
+            connection: 'close'
+        }
+    });
+
+    myServer.listen(port, function () {
+        myClient.get('/', function (err, req, res, data) {
+            t.ifError(err);
+            t.equal(res.headers.hasOwnProperty('server'), false);
+            myServer.close(t.end);
+        });
+    });
+});
