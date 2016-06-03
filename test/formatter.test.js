@@ -221,6 +221,26 @@ test('GH-845: async formatter error should emit FormatterError', function (t) {
 });
 
 
+test('GH-1129: sync formatter should invoke res.send callback', function (t) {
+
+    SERVER.on('after', function () {
+        // only end the test when server considers request complete
+        t.end();
+    });
+
+    CLIENT.get({
+        path: '/async',
+        headers: {
+            accept: 'text/sync'
+        }
+    }, function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(data, 'sync fmt');
+    });
+});
+
+
 test('GH-845: should blow up when using async formatter ' +
      'without res.send callback', function (t) {
 
