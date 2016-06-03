@@ -942,12 +942,18 @@ test('gh-278 missing router error events (415)', function (t) {
 
 
 test('next.ifError', function (t) {
-    SERVER.use(function (req, res, next) {
+
+    var port = 3000;
+    var myServer = restify.createServer({
+        handleUncaughtExceptions: true
+    });
+
+    myServer.use(function (req, res, next) {
         next.ifError(null);
         next();
     });
 
-    SERVER.get('/foo/:id', function tester(req, res, next) {
+    myServer.get('/foo/:id', function tester(req, res, next) {
         process.nextTick(function () {
             var e = new RestError({
                 statusCode: 400,
@@ -961,10 +967,53 @@ test('next.ifError', function (t) {
         });
     });
 
-    CLIENT.get('/foo/bar', function (err) {
-        t.ok(err);
-        t.equal(err.body.message, 'screw you client');
+    myServer.listen(port, function () {
+        var myClient = restifyClients.createJSONClient({
+            url: 'http://127.0.0.1:' + port,
+            headers: {
+                connection: 'close'
+            }
+        });
+
+        myClient.get('/foo/bar', function (err) {
+            t.ok(err);
+            t.equal(err.body.message, 'screw you client');
+            myServer.close(function () {
+                t.end();
+            });
+        });
+    });
+});
+
+
+test('next.ifError is not available by default', function (t) {
+
+    var port = 3000;
+    var myServer = restify.createServer();
+
+    myServer.get('/', function (req, res, next) {
+        t.throws(function () {
+            next.ifError(new Error('boom'));
+        }, 'TypeError', 'next.ifError is not a function');
+
+        res.send('hi');
         t.end();
+    });
+
+    myServer.listen(port, function () {
+        var myClient = restifyClients.createStringClient({
+            url: 'http://127.0.0.1:' + port,
+            headers: {
+                connection: 'close'
+            }
+        });
+
+        myClient.get('/', function (err) {
+            t.ifError(err);
+            myServer.close(function () {
+                t.end();
+            });
+        });
     });
 });
 
