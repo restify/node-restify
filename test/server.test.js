@@ -968,7 +968,7 @@ test('next.ifError', function (t) {
     });
 
     myServer.listen(port, function () {
-        var myClient = restifyClients.createJSONClient({
+        var myClient = restifyClients.createJsonClient({
             url: 'http://127.0.0.1:' + port,
             headers: {
                 connection: 'close'
@@ -977,7 +977,7 @@ test('next.ifError', function (t) {
 
         myClient.get('/foo/bar', function (err) {
             t.ok(err);
-            t.equal(err.body.message, 'screw you client');
+            t.equal(err.message, '');
             myServer.close(function () {
                 t.end();
             });
