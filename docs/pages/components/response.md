@@ -4,25 +4,23 @@ Wraps all of the node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
 APIs, events and properties, plus the following.
 
-## header(key, value)
 
-Get or set the response header key.
+## cache([type], [options])
 
-```js
-res.header('Content-Length');
-    // => undefined
+* `type` {String} the type, either 'public' | 'private'. defaults to 'public'
+* `options.maxAge` {Number} an options object
 
-    res.header('Content-Length', 123);
-    // => 123
+Sets the cache-control header.
 
-    res.header('Content-Length');
-    // => 123
 
-    res.header('foo', new Date());
-    // => Fri, 03 Feb 2012 20:09:58 GMT
-```
+## noCache()
+
+Turns off all cache related headers.
+
 
 ## charSet(type)
+
+* `type` {String} a charset header value
 
 Appends the provided character set to the response's `Content-Type`.
 
@@ -30,42 +28,68 @@ Appends the provided character set to the response's `Content-Type`.
 res.charSet('utf-8');
 ```
 
-Will change the normal json Content-Type to `application/json; charset=utf-8`.
 
-## cache([type], [options])
+## header([key] [, value])
 
-Sets the cache-control header.  `type` defaults to _public_, and
-options currently only takes `maxAge`.
+* `key` {String} name of the header
+* `value` {String} value of the header
 
-```js
-res.cache();
-```
+__Returns__ {String} the retrieved value or the value that was set
 
-## status(code)
-
-Sets the response statusCode.
+If only key is specified, return the value of the header. If both key and value
+are specified, set the response header.
 
 ```js
-res.status(201);
+res.header('Content-Length');
+// => undefined
+
+res.header('Content-Length', 123);
+// => 123
+
+res.header('Content-Length');
+// => 123
+
+res.header('foo', new Date());
+// => Fri, 03 Feb 2012 20:09:58 GMT
 ```
 
-## send([status], body)
-
-You can use `send()` to wrap up all the usual `writeHead()`,
-`write()`, `end()` calls on the HTTP API of node.  You can pass send
-either a code and body, or just a body.  `body` can be an Object, a
-Buffer, or an Error.  When you call `send()`, restify figures out how
-to format the response (see content-negotiation, above), and does
-that.
+`header()` can also be used to automatically chain header values when
+applicable:
 
 ```js
-res.send({hello: 'world'});
-res.send(201, {hello: 'world'});
-res.send(new BadRequestError('meh'));
+res.header('x-foo', 'a');
+res.header('x-foo', 'b');
+// => { 'x-foo': ['a', 'b'] }
 ```
 
-## redirect(status, url, next)
+Note that certain headers like set-cookie and content-type do not support
+multiple values, so calling `header()` twice for those headers will overwrite
+the existing value.
+
+
+## headers()
+
+__Returns__ {Object}
+
+Retrieves all headers off the response in an object of key/val pairs.
+
+
+## link(key, value)
+
+* `key` {String} - the link key
+* `value` {String} - the link value
+
+__Returns__ {String} the final value of the header
+
+Sets the link header.
+
+## redirect(code, url, next)
 ## redirect([url | options], next)
+
+* `code` {Number} http redirect status code
+* `url` {String} a url to redirect to
+* `next` {Function} a callback function
+* `options` {Object} an options object to configure a redirect
 
 A convenience method for 301/302 redirects. Using this method will
 tell restify to stop execution of your handler chain. You can also
@@ -87,21 +111,71 @@ res.redirect({
 }, next);  // => redirects to 301 https://www.foo.com/bar?a=1
 ```
 
-## json([status], body)
 
-Short-hand for:
+## status(code)
+
+* `code` {Number} an http status code
+
+Sets the response statusCode.
 
 ```js
-res.contentType = 'json';
-res.send({hello: 'world'});
+res.status(201);
 ```
 
-## Properties
 
-|Name|Type|Description|
-|----|----|-----------|
-|code|Number|HTTP status code|
-|contentLength|Number|short hand for the header content-length|
-|contentType|String|short hand for the header content-type|
-|headers|Object|response headers|
-|id|String|A unique request id (x-request-id)|
+## send([code] [, body] [, headers] [, callback])
+
+* `code` {Number} an http status code
+* `body` {String | Object | Array | Buffer} the payload to send
+* `[headers]` {Object} an optional object of headers (key/val pairs)
+* `[callback]` {Function} an optional callback, used in conjunction with async
+  formatters
+
+You can use `send()` to wrap up all the usual `writeHead()`, `write()`, `end()`
+calls on the HTTP API of node. You can pass send either a code and body, or
+just a body. `body` can be an Object, a Buffer, or an Error.  When you call
+`send()`, restify figures out how to format the response based on the
+content-type.
+
+```js
+res.send({hello: 'world'});
+res.send(201, {hello: 'world'});
+res.send(new BadRequestError('meh'));
+```
+
+
+## sendRaw([code] [, body] [, headers])
+
+Like `res.send()`, but skips formatting. This can be useful when the payload
+has already been preformatted.
+
+
+## set(headers)
+
+* `headers` {Object} an object of header names => header values
+
+Sets multiple header(s) on the response. Uses `header()` underneath the hood,
+enabling multi-value headers.
+
+```js
+res.header('x-foo', 'a');
+res.set({
+    'x-foo', 'b',
+    'content-type': 'application/json'
+});
+// =>
+// {
+//    'x-foo': [ 'a', 'b' ],
+//    'content-type': 'application/json'
+// }
+```
+
+
+## json([code] [, body] [, headers])
+
+Same signature as `res.send()`. Syntatic sugar for:
+
+```js
+res.header('content-type', 'json');
+res.send({hello: 'world'});
+```

@@ -1,10 +1,10 @@
-# Bundled Plugins
+# restify-plugins
 
-restify ships with several handlers you can use, specifically:
+A bundle of plugins compatible with restify can be pulled in via the
+[restify-plugins](https://github.com/restify/plugins) module.
 
 * Accept header parsing
 * Authorization header parsing
-* CORS handling plugin
 * Date header parsing
 * JSONP support
 * Gzip Response
@@ -13,6 +13,7 @@ restify ships with several handlers you can use, specifically:
 * Static file serving
 * Throttling
 * Conditional request handling
+* Request expiry
 * Audit logger
 
 Here's some example code using all the shipped plugins:
@@ -79,26 +80,6 @@ to something like:
 `req.username` will also be set, and defaults to 'anonymous'.  If the scheme
 is unrecognized, the only thing available in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
-
-## CORS
-
-```js
-server.use(restify.CORS());
-```
-
-Supports tacking [CORS](http://www.w3.org/TR/cors) headers into `actual`
-requests (as defined by the spec).  Note that preflight requests are
-automatically handled by the router, and you can override the default behavior
-on a per-URL basis with `server.opts(:url, ...)`.  To fully specify this plugin,
-a sample invocation is:
-
-```js
-server.use(restify.CORS({
-  origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-  credentials: true,                 // defaults to false
-  headers: ['x-foo']                 // sets expose-headers
-}));
-```
 
 
 ## Date Parser
@@ -398,8 +379,8 @@ server.on('after', restify.auditLogger({
 }));
 ```
 
-You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if 
-log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out 
+You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if
+log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out
 record lookling like this:
 
 ```js
