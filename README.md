@@ -1,32 +1,28 @@
 ![restify](/../gh-images/logo/png/restify_logo_black_transp_288x288.png?raw=true "restify")
 
 [![Build Status](https://travis-ci.org/restify/node-restify.svg)](https://travis-ci.org/restify/node-restify)
-[![Gitter chat](https://badges.gitter.im/mcavage/node-restify.svg)](https://gitter.im/restify/node-restify)
 [![Dependency Status](https://david-dm.org/restify/node-restify.svg)](https://david-dm.org/restify/node-restify)
 [![devDependency Status](https://david-dm.org/restify/node-restify/dev-status.svg)](https://david-dm.org/restify/node-restify#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/node-restify/badges/score.svg)](https://www.bithound.io/github/restify/node-restify/master)
 [![NSP Status](https://img.shields.io/badge/NSP%20status-no%20vulnerabilities-green.svg)](https://travis-ci.org/restify/node-restify)
 
-[restify](http://restify.com) is a smallish framework,
-similar to [express](http://expressjs.com) for building REST APIs.  For full
-details, see http://restify.com
-
-Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
-chat and support.
+[restify](http://restify.com) is a smallish framework for building REST APIs.
+For full details, see http://restify.com
 
 # Usage
 
 ## Server
 ```javascript
 var restify = require('restify');
+var plugins = require('restify-plugins');
 
 var server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.queryParser());
-server.use(restify.bodyParser());
+server.use(plugins.acceptParser(server.acceptable));
+server.use(plugins.queryParser());
+server.use(plugins.bodyParser());
 
 server.get('/echo/:name', function (req, res, next) {
   res.send(req.params);
@@ -41,9 +37,9 @@ server.listen(8080, function () {
 ## Client
 ```javascript
 var assert = require('assert');
-var restify = require('restify');
+var clients = require('restify-clients');
 
-var client = restify.createJsonClient({
+var client = clients.createJsonClient({
   url: 'http://localhost:8080',
   version: '~1.0'
 });
