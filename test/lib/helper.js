@@ -75,11 +75,11 @@ module.exports = {
         };
     },
 
-    getLog: function (name, stream, level) {
+    getLog: function (name, streams, level) {
         return (bunyan.createLogger({
             level: (process.env.LOG_LEVEL || level || 'fatal'),
             name: name || process.argv[1],
-            stream: stream || process.stdout,
+            streams: streams || [{stream: process.stdout}],
             src: true,
             serializers: restify.bunyan.serializers
         }));
