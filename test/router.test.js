@@ -220,3 +220,25 @@ test('Default non-strict routing ignores trailing slash(es)', function (t) {
 
     t.end();
 });
+
+test('Find existing route with path', function (t) {
+    var server = restify.createServer();
+    function noop () {}
+
+    var routePath = '/route/:withParam';
+    server.get(routePath, noop);
+
+    var foundRoute = server.router.findByPath(
+      '/route/:withADifferentParamName',
+      { method: 'GET' }
+    );
+    t.equal(foundRoute.spec.path, routePath);
+
+    var notFoundRoute = server.router.findByPath(
+      '/route/:withADifferentParamName([A-Z]{2,3})',
+      { method: 'GET' }
+    );
+    t.notOk(notFoundRoute);
+
+    t.end();
+});
