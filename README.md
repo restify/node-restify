@@ -1,3 +1,29 @@
+<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+
+<!-- display the social media buttons in your README -->
+
+[![alt text][1.1]][1]
+
+
+<!-- links to social media icons -->
+<!-- no need to change these -->
+
+<!-- icons with padding -->
+
+[1.1]: http://i.imgur.com/tXSoThF.png (twitter icon with padding)
+
+<!-- icons without padding -->
+
+[1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
+
+
+<!-- links to your social media accounts -->
+<!-- update these accordingly -->
+
+[1]: http://www.twitter.com/restifyjs
+
+<!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
+
 ![restify](/../gh-images/logo/png/restify_logo_black_transp_288x288.png?raw=true "restify")
 
 [![Build Status](https://travis-ci.org/restify/node-restify.svg)](https://travis-ci.org/restify/node-restify)
@@ -7,9 +33,11 @@
 [![bitHound Score](https://www.bithound.io/github/restify/node-restify/badges/score.svg)](https://www.bithound.io/github/restify/node-restify/master)
 [![NSP Status](https://img.shields.io/badge/NSP%20status-no%20vulnerabilities-green.svg)](https://travis-ci.org/restify/node-restify)
 
-[restify](http://restify.com) is a smallish framework,
-similar to [express](http://expressjs.com) for building REST APIs.  For full
-details, see http://restify.com
+[restify](http://restify.com) is a framework, utilizing
+[connect](https://github.com/senchalabs/connect) style middleware for building
+REST APIs.  For full details, see http://restify.com
+
+Follow restify on [![alt text][1.2]][1]
 
 Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
 chat and support.
@@ -61,7 +89,7 @@ client.get('/echo/mark', function (err, req, res, obj) {
 ## License
 
 The MIT License (MIT)
-Copyright (c) 2012 Mark Cavage
+Copyright (c) 2016 restify
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
