@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "cover": "^0.2.9",
-    "eslint": "^2.11.1",
+    "eslint": "^3.0.0",
     "filed": "^0.1.0",
     "jscs": "^3.0.0",
     "nodeunit": "^0.9.1",
