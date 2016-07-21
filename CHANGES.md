@@ -1,5 +1,8 @@
 # restify Changelog
 
+## 4.1.1
+- update negotiator (NSP advisory #106) and lru-cache (bug fix).
+
 ## 4.1.0
 - Bump SPDY to latest.
 - #959: fix issue where cached routes were not setting maxVersion on the req
