@@ -72,6 +72,8 @@
 var restify = require('../../lib');
 var Logger = require('bunyan');
 
+var plugins = require('restify-plugins');
+
 
 ///--- Globals
 
@@ -121,11 +123,11 @@ var server = restify.createServer({
     }
 });
 
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.urlEncodedBodyParser());
+server.use(plugins.acceptParser(server.acceptable));
+server.use(plugins.authorizationParser());
+server.use(plugins.dateParser());
+server.use(plugins.queryParser());
+server.use(plugins.urlEncodedBodyParser());
 
 server.use(function slowHandler(req, res, next) {
     setTimeout(function () {
