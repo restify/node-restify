@@ -93,7 +93,7 @@ var server = restify.createServer({
     name: NAME,
     Logger: log,
     formatters: {
-        'application/foo': function (req, res, body, cb) {
+        'application/foo': function (req, res, body) {
             if (body instanceof Error) {
                 body = body.stack;
             } else if (Buffer.isBuffer(body)) {
@@ -118,7 +118,7 @@ var server = restify.createServer({
                 }
 
             }
-            return cb(null, body);
+            return body;
         }
     }
 });
