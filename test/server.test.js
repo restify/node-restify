@@ -229,6 +229,33 @@ test('rm route and clear cached route', function (t) {
     });
 });
 
+test('rm one version of the routes, other versions should still work',
+    function (t) {
+        SERVER.get({ path: '/hello/:name', version: '1.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+        SERVER.get({ path: '/hello/:name', version: '2.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+
+        var routeThree = SERVER.get({ path: '/hello/:name', version: '3.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+
+        t.ok(SERVER.rm(routeThree));
+
+        CLIENT.get('/hello/whatever', function (err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    });
 
 test('use - throws TypeError on non function as argument', function (t) {
 
