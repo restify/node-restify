@@ -46,46 +46,47 @@ chat and support.
 
 ## Server
 ```javascript
-var restify = require('restify');
+const restify = require('restify');
 
-var server = restify.createServer({
+const server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
+
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.get('/echo/:name', function (req, res, next) {
+server.get('/echo/:name', (req, res, next) => {
   res.send(req.params);
   return next();
 });
 
-server.listen(8080, function () {
+server.listen(8080, () => {
   console.log('%s listening at %s', server.name, server.url);
 });
 ```
 
 ## Client
 ```javascript
-var assert = require('assert');
-var restify = require('restify');
+const assert = require('assert');
+const restify = require('restify');
 
-var client = restify.createJsonClient({
+const client = restify.createJsonClient({
   url: 'http://localhost:8080',
   version: '~1.0'
 });
 
-client.get('/echo/mark', function (err, req, res, obj) {
+client.get('/echo/mark', (err, req, res, obj) => {
   assert.ifError(err);
   console.log('Server returned: %j', obj);
 });
 ```
 
 # Installation
-
-    $ npm install restify
-
+```bash
+$ npm install restify
+```
 ## License
 
 The MIT License (MIT)
