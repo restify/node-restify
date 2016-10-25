@@ -77,7 +77,7 @@
     "vasync": "^1.6.4"
   },
   "optionalDependencies": {
-    "dtrace-provider": "^0.6.0"
+    "dtrace-provider": "^0.8.0"
   },
   "devDependencies": {
     "cover": "^0.2.9",
