@@ -929,14 +929,41 @@ interpreted in seconds, to allow for clock skew.
 
 ### QueryParser
 
-    server.use(restify.queryParser());
+    server.use(restify.queryParser([OPTIONS]));
 
-Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`).  If you use this,
-the parsed content will always be available in `req.query`, additionally params
-are merged into `req.params`.  You can disable by passing in `mapParams: false`
-in the options object:
+Parses the HTTP query string (e.g., `/foo?id=bar&name=mark`) to an object on
+`req.query`, e.g. `{id: 'bar', name: 'mark'}`.
 
-    server.use(restify.queryParser({ mapParams: false }));
+By default, query params are merged into `req.params` (which may include
+parameters from `restify.bodyParser`). This can be disabled by the `mapParams`
+option:
+
+    server.use(restify.queryParser({mapParams: false}));
+
+QueryParser options are as follows. All but `mapParams` are directly passed to
+the underlying ["qs" module](https://github.com/ljharb/qs#readme).
+
+|| **Option**         || **Type** || **Default** || **Description** ||
+|| mapParams          || bool || true    || Whether to merge req.query into req.params. ||
+|| allowDots          || bool || true \* || Transform `?foo.bar=baz` to a nested object: `{foo: {bar: 'baz'}}`. ||
+|| arrayLimit         || num  || 20      || Only transform `?a[$index]=b` to an array if `$index` is less than `arrayLimit`. ||
+|| depth              || num  || 5       || The depth limit for parsing nested objects, e.g. `?a[b][c][d][e][f][g][h][i]=j`. ||
+|| parameterLimit     || num  || 1000    || Maximum number of query params parsed. Additional params are silently dropped. ||
+|| parseArrays        || bool || true    || Whether to parse `?a[]=b&a[1]=c` to an array, e.g. `{a: ['b', 'c']}`. ||
+|| plainObjects       || bool || true \* || Whether `req.query` is a "plain" object -- does not inherit from `Object`. This can be used to allow query params whose names collide with Object methods, e.g. `?hasOwnProperty=blah`. ||
+|| strictNullHandling || bool || false   || If true, `?a&b=` results in `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`. ||
+
+\*: The `allowDots` and `plainObjects` options are `true` by default in restify
+4.x because of an accident. Restify 4.0 updated from qs@2 to qs@3, which changed
+default behavior to this. Subsequent qs major versions reverted that behaviour.
+The restify 4.x stream will maintain this default, but all other major versions
+of restify (those before v4) and the `queryParser` plugin in restify-plugins@1.x
+and later (restify 5.x no longer bundles the plugins) default to
+`allowDots=false` and `plainObjects=false`. The recommended usage (for new
+code or to maintain compat across restify major versions is):
+
+    server.use(restify.queryParser({allowDots: false, plainObjects: false}));
+
 
 ### JSONP
 

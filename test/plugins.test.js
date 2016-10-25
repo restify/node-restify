@@ -147,57 +147,6 @@ test('authorization basic invalid', function (t) {
 });
 
 
-test('query ok', function (t) {
-    SERVER.get('/query/:id', function (req, res, next) {
-        t.equal(req.params.id, 'foo');
-        t.equal(req.params.name, 'markc');
-        t.equal(req.params.name, 'markc');
-        res.send();
-        next();
-    });
-
-    CLIENT.get('/query/foo?id=bar&name=markc', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-
-test('GH-124 query ok no query string', function (t) {
-    SERVER.get('/query/:id', function (req, res, next) {
-        t.equal(req.getQuery(), '');
-        res.send();
-        next();
-    });
-
-    CLIENT.get('/query/foo', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-
-test('query object', function (t) {
-    SERVER.get('/query/:id', function (req, res, next) {
-        t.equal(req.params.id, 'foo');
-        t.ok(req.params.name);
-        t.equal(req.params.name.first, 'mark');
-        t.equal(req.query.name.last, 'cavage');
-        res.send();
-        next();
-    });
-
-    var p = '/query/foo?name[first]=mark&name[last]=cavage';
-    CLIENT.get(p, function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-
 test('body url-encoded ok', function (t) {
     SERVER.post('/bodyurl/:id',
         restify.bodyParser(),
