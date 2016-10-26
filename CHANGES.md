@@ -1,5 +1,7 @@
 # restify Changelog
 
+## not yet released
+
 ## 4.2.0
 
 - #925 Support passing (most) [qs](https://github.com/ljharb/qs#readme) options
