@@ -159,7 +159,7 @@ Options:
 * `mapFiles` - if `req.params` should be filled with the contents of files sent through a multipart request. [formidable](https://github.com/felixge/node-formidable) is used internally for parsing, and a file is denoted as a multipart part with the `filename` option set in its `Content-Disposition`. This will only be performed if `mapParams` is true.
 * `overrideParams` - if an entry in `req.params` should be overwritten by the value in the body if the names are the same. For instance, if you have the route `/:someval`, and someone posts an `x-www-form-urlencoded` Content-Type with the body `someval=happy` to `/sad`, the value will be `happy` if `overrideParams` is `true`, `sad` otherwise.
 * `multipartHandler` - a callback to handle any multipart part which is not a file. If this is omitted, the default handler is invoked which may or may not map the parts into `req.params`, depending on the `mapParams`-option.
-* `multipartFileHandler` - a callback to handle any multipart file. It will be a file if the part have a `Content-Disposition` with the `filename` parameter set. This typically happens when a browser sends a form and there is a parameter similar to `<input type="file" />`. If this is not provided, the default behaviour is to map the contents into `req.params`.
+* `multipartFileHandler` - a callback to handle any multipart file. It will be a file if the part has a `Content-Disposition` with the `filename` parameter set. This typically happens when a browser sends a form and there is a parameter similar to `<input type="file" />`. If this is not provided, the default behaviour is to map the contents into `req.params`.
 * `keepExtensions` - if you want the uploaded files to include the extensions of the original files (multipart uploads only). Does nothing if `multipartFileHandler` is defined.
 * `uploadDir` - Where uploaded files are intermediately stored during transfer before the contents is mapped into `req.params`. Does nothing if `multipartFileHandler` is defined.
 * `multiples` - if you want to support html5 multiple attribute in upload fields.
@@ -451,7 +451,7 @@ record lookling like this:
   },
   "secure": false,
   "level": 30,
-  "msg": GetFoo handled: 200",
+  "msg": "GetFoo handled: 200",
   "time": "2012-02-07T20:30:31.896Z",
   "v": 0
 }
@@ -473,8 +473,3 @@ SERVER.on('auditlog', function (data) {
 ```
 
 Log is also accumulated in the Ringbuffer object, if user choose to pass in during auditlogger construction time.
-
-
-
-
-
