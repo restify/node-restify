@@ -57,12 +57,12 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
-server.get('/echo/:name', (req, res, next) => {
+server.get('/echo/:name', function (req, res, next) {
   res.send(req.params);
   return next();
 });
 
-server.listen(8080, () => {
+server.listen(8080, function () {
   console.log('%s listening at %s', server.name, server.url);
 });
 ```
@@ -77,7 +77,7 @@ const client = restify.createJsonClient({
   version: '~1.0'
 });
 
-client.get('/echo/mark', (err, req, res, obj) => {
+client.get('/echo/mark', function (err, req, res, obj) {
   assert.ifError(err);
   console.log('Server returned: %j', obj);
 });
