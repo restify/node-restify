@@ -1,5 +1,12 @@
 # restify Changelog
 
+## 4.2.0
+
+- #925 Support passing (most) [qs](https://github.com/ljharb/qs#readme) options
+  to the `restify.queryParser` plugin. Update the "qs" dependency to latest (v6)
+  while maintaining backward compatibility (see notes in the API doc and
+  "test/query.test.js" on `allowDots` and `plainObjects`).
+
 ## 4.1.1
 - update negotiator (NSP advisory #106) and lru-cache (bug fix).
 
