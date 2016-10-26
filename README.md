@@ -46,12 +46,13 @@ chat and support.
 
 ## Server
 ```javascript
-var restify = require('restify');
+const restify = require('restify');
 
-var server = restify.createServer({
+const server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
+
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
@@ -68,10 +69,10 @@ server.listen(8080, function () {
 
 ## Client
 ```javascript
-var assert = require('assert');
-var restify = require('restify');
+const assert = require('assert');
+const restify = require('restify');
 
-var client = restify.createJsonClient({
+const client = restify.createJsonClient({
   url: 'http://localhost:8080',
   version: '~1.0'
 });
@@ -83,9 +84,9 @@ client.get('/echo/mark', function (err, req, res, obj) {
 ```
 
 # Installation
-
-    $ npm install restify
-
+```bash
+$ npm install restify
+```
 ## License
 
 The MIT License (MIT)
