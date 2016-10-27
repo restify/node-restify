@@ -944,7 +944,8 @@ QueryParser options are as follows. All but `mapParams` are directly passed to
 the underlying ["qs" module](https://github.com/ljharb/qs#readme).
 
 || **Option**         || **Type** || **Default** || **Description** ||
-|| mapParams          || bool || true    || Whether to merge req.query into req.params. ||
+|| mapParams          || bool || true\** || Whether to merge req.query into req.params. ||
+|| overrideParams     || bool || false   || If mapParams=true, this determines if a field in the query params will override an existing value in `req.params`. ||
 || allowDots          || bool || true \* || Transform `?foo.bar=baz` to a nested object: `{foo: {bar: 'baz'}}`. ||
 || arrayLimit         || num  || 20      || Only transform `?a[$index]=b` to an array if `$index` is less than `arrayLimit`. ||
 || depth              || num  || 5       || The depth limit for parsing nested objects, e.g. `?a[b][c][d][e][f][g][h][i]=j`. ||
@@ -963,6 +964,9 @@ and later (restify 5.x no longer bundles the plugins) default to
 code or to maintain compat across restify major versions is):
 
     server.use(restify.queryParser({allowDots: false, plainObjects: false}));
+
+\**: Note that `mapParams` will default to *false* in restify-plugins (the
+module for plugins in restify 5.x).
 
 
 ### JSONP
