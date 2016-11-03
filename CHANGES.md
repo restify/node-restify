@@ -2,6 +2,8 @@
 
 ## not yet released
 
+ - #1024 Add server option to disable the uncaughtException handler.
+
 ## 4.2.0
 
 - #925 Support passing (most) [qs](https://github.com/ljharb/qs#readme) options
