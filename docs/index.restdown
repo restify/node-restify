@@ -142,6 +142,7 @@ below (and `listen()` takes the same arguments as node's
 ||certificate||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||key||String||If you want to create an HTTPS server, pass in the PEM-encoded certificate and key||
 ||formatters||Object||Custom response formatters for `res.send()`||
+||handleUncaughtExceptions||Boolean||When true (the default) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack||
 ||log||Object||You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required||
 ||name||String||By default, this will be set in the `Server` response header, default is `restify` ||
 ||spdy||Object||Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)||
@@ -774,10 +775,11 @@ them.
 
 `function (request, response, route, error) {}`
 
-Emitted when some handler throws an uncaughtException somewhere in the chain.
-The default behavior is to just call `res.send(error)`, and let the built-ins
-in restify handle transforming, but you can override to whatever you want
-here.
+Emitted when some handler throws an uncaughtException somewhere in the chain and
+only when 'handleUncaughtExceptions' is set to true on the restify server. The
+restify server has a default handler for this event - which is to just call
+`res.send(error)`, and lets the built-ins in restify handle transforming, but
+you can override the default handler to do whatever you want.
 
 
 ### Properties
