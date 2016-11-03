@@ -24,7 +24,12 @@ before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
-            log: helper.getLog('server')
+            log: helper.getLog('server'),
+			formatters: {
+				"application/vnd.restify.extension+json;q=0.1;ext=hola": function( req, res, body, cb ){
+					return res.formatters["application/json"]( req, res, body, cb );
+				}
+			}
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
@@ -87,5 +92,28 @@ test('query should return raw query string string', function (t) {
         t.equal(res.statusCode, 200);
         t.end();
     });
+});
+
+
+test('query should return raw query string string', function (t) {
+	SERVER.get('/accepts', function (req, res, next) {
+		var result = req.accepts( res.acceptable );
+		res.send({ acceptable: result });
+		next();
+	});
+
+	var req = {
+		path: '/accepts',
+		headers: {
+			'accept': 'application/vnd.restify.extension+json;ext=uhoh'
+		}
+	};
+	
+	CLIENT.get( req, function (err, _, res) {
+		t.ifError(err);
+		t.equal(res.statusCode, 200);
+		t.equal(res.body, '{"acceptable":"application/vnd.restify.extension+json"}');
+		t.end();
+	});
 });
 
