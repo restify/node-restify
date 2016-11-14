@@ -2,7 +2,12 @@
 
 ## not yet released
 
- - #1024 Add server option to disable the uncaughtException handler.
+(nothing yet)
+
+## 4.3.0
+
+- #1024 Add `handleUncaughtExceptions` server option to supporting disabling
+  the uncaughtException handler.
 
 ## 4.2.0
 
