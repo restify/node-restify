@@ -12,7 +12,7 @@ var errors = require('restify-errors');
 var filed = require('filed');
 var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var validator = require('validator');
 
 var RestError = errors.RestError;
@@ -1782,7 +1782,7 @@ test('error handler defers "after" event', function (t) {
         // do not fire prematurely
         t.notOk(true);
     });
-    CLIENT.get('/' + uuid(), function (err, _, res) {
+    CLIENT.get('/' + uuid.v4(), function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
         t.end();
