@@ -45,6 +45,7 @@ before(function (callback) {
         SERVER.use(restify.authorizationParser());
         SERVER.use(restify.dateParser());
         SERVER.use(restify.queryParser());
+        SERVER.use(restify.jsonp());
 
         SERVER.get('/foo/:id', function respond(req, res, next) {
             res.send();
@@ -1340,6 +1341,20 @@ test('tests the requestLoggers extra header properties', function (t) {
     CLIENT.get(obj, function (err, _, res) {
         t.equal(res.statusCode, 200);
         t.ifError(err);
+        t.end();
+    });
+});
+
+
+test('jsonp plugin with res.json()', function (t) {
+    SERVER.get('/jsonp', function (req, res, next) {
+        res.json({x: 'w00t!'});
+    });
+
+    CLIENT.get('/jsonp?callback=c._0', function (err, _, res) {
+        t.equal(res.statusCode, 200);
+        t.equal(res.headers['content-type'], 'application/json');
+        t.equal(res.body, '{"x":"w00t!"}');
         t.end();
     });
 });
