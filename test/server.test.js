@@ -2044,3 +2044,69 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
     });
 });
 
+
+test('GH-667 emit error event for generic Errors', function (t) {
+
+    var restifyError = 0;
+    var notFoundFired = false;
+
+    SERVER.get('/1', function (req, res, next) {
+        return next(new Error('foobar'));
+    });
+
+    SERVER.get('/2', function (req, res, next) {
+        return next(new errors.NotFoundError('foobar'));
+    });
+
+    SERVER.get('/3', function (req, res, next) {
+        SERVER.on('NotFound', function (req2, res2, err, cb) {
+            notFoundFired = true;
+            t.ok(err);
+            t.equal(err instanceof errors.NotFoundError, true);
+            t.equal(restifyError, 2);
+            t.end();
+            return cb();
+        });
+        return next(new errors.NotFoundError('foobar'));
+    });
+
+    SERVER.on('restifyError', function (req, res, err, cb) {
+        restifyError++;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+        return cb();
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        // should get regular error
+        t.ok(err);
+    });
+    CLIENT.get('/2', function (err, req, res, data) {
+        // should get not found error
+        t.ok(err);
+    });
+    CLIENT.get('/3', function (err, req, res, data) {
+        // should get notfounderror
+        t.ok(err);
+        t.equal(notFoundFired, true);
+    });
+});
+
+
+test('GH-667 error handler to return another error', function (t) {
+
+    SERVER.on('ImATeapot', function (req, res, err, cb) {
+        return cb(new errors.LockedError('oh noes'));
+    });
+
+    SERVER.get('/1', function (req, res, next) {
+        return next(new errors.ImATeapotError('foobar'));
+    });
+
+    CLIENT.get('/1', function (err, req, res, data) {
+        t.ok(err);
+        t.equal(err.name, 'LockedError');
+        t.end();
+    });
+});
+
