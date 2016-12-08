@@ -84,7 +84,7 @@
     "eslint": "^2.11.1",
     "filed": "^0.1.0",
     "jscs": "^3.0.0",
-    "nodeunit": "^0.9.1",
+    "nodeunit": "^0.10.1",
     "nsp": "^2.2.0",
     "restify-clients": "^1.2.1",
     "restify-plugins": "^1.0.3",
