@@ -21,6 +21,12 @@ lot more flexibility to make progress in both repos independently. All the
 existing plugins are available in the repo, minus CORS. We'll touch on CORS a
 little more below.
 
+#### queryParser() and bodyParser()
+
+By default, queryParser and bodyParser no longer map req.query and req.body to
+req.params. To get the old behavior, please enable the `mapParams` behavior
+with these plugins.
+
 
 ### restify-errors
 

@@ -220,7 +220,10 @@ server.get(/\/docs\/current\/?.*/, restify.serveStatic({
 
 The above `route` and `directory` combination will serve a file located in
 `./documentation/v1/docs/current/index.html` when you attempt to hit
-`http://localhost:8080/docs/current/`.
+`http://localhost:8080/docs/current/`. If you want the serveStatic module to serve files
+directly from the `/documentation/v1` directory (and not append the request path `/docs/current/`), 
+you can set the `appendRequestPath` option to `false`, and the served file would be 
+`./documentation/v1/index.html`, in the previous example.
 
 The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
