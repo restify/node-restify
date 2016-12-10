@@ -12,7 +12,7 @@ var errors = require('restify-errors');
 var filed = require('filed');
 var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var validator = require('validator');
 
 var RestError = errors.RestError;
@@ -229,6 +229,63 @@ test('rm route and clear cached route', function (t) {
     });
 });
 
+test('GH-1171: rm one version of the routes, other versions should still work',
+    function (t) {
+        var routeOne = SERVER.get({ path: '/hello/:name', version: '1.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+        var routeTwo = SERVER.get({ path: '/hello/:name', version: '2.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+
+        var routeThree = SERVER.get({ path: '/hello/:name', version: '3.0.0'},
+            function (req, res, next) {
+                res.send('hello ' + req.params.name);
+                next();
+            });
+
+        t.ok(SERVER.rm(routeThree));
+
+        var opts = {
+            path: '/hello/friend',
+            headers: {
+                'accept-version': '3.0.0'
+            }
+        };
+        CLIENT.get(opts, function (err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 400);
+
+            opts.headers = {
+                'accept-version': '1.0.0'
+            };
+            CLIENT.get(opts, function (err2, _2, res2) {
+                t.ifError(err2);
+                t.equal(res2.statusCode, 200);
+
+                opts.headers = {
+                    'accept-version': '2.0.0'
+                };
+                CLIENT.get(opts, function (err3, _3, res3) {
+                    t.ifError(err3);
+                    t.equal(res3.statusCode, 200);
+
+                    t.ok(SERVER.rm(routeOne));
+                    t.ok(SERVER.rm(routeTwo));
+
+                    CLIENT.get('/hello/friend', function (err4, _4, res4) {
+                        t.ok(err4);
+                        t.equal(res4.statusCode, 404);
+                        t.end();
+                    });
+                });
+            });
+        });
+    });
 
 test('use - throws TypeError on non function as argument', function (t) {
 
@@ -1725,7 +1782,7 @@ test('error handler defers "after" event', function (t) {
         // do not fire prematurely
         t.notOk(true);
     });
-    CLIENT.get('/' + uuid(), function (err, _, res) {
+    CLIENT.get('/' + uuid.v4(), function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
         t.end();
