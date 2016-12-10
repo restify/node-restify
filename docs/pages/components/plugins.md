@@ -146,7 +146,7 @@ server.use(restify.bodyParser({
     },
     keepExtensions: false,
     uploadDir: os.tmpdir(),
-    multiples: true
+    multiples: true,
     hash: 'sha1',
     rejectUnknown: true
  }));
