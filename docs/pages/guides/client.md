@@ -21,7 +21,7 @@ field, which is use *on each retry*.  The default is not to set a
 `connectTimeout`, so you end up with the node.js socket defaults.
 
 Here's an example of hitting the
-[Joyent CloudAPI](https://api.us-east-1.joyent.com):
+[Joyent CloudAPI](https://apidocs.joyent.com/cloudapi/):
 
 ```js
 var restify = require('restify');
