@@ -2486,6 +2486,50 @@ test('should emit \'after\' on errored request', function (t) {
 });
 
 
+test('should emit \'after\' on uncaughtException', function (t) {
+
+    SERVER.on('after', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'UncaughtExceptionError');
+    });
+
+    SERVER.get('/foobar', function (req, res, next) {
+        throw new Error('oh noes');
+    });
+
+    CLIENT.get('/foobar', function (err, _, res) {
+        t.ok(err);
+        t.equal(err.name, 'InternalError');
+        t.end();
+    });
+});
+
+
+test('should emit \'after\' when sending res on uncaughtException',
+function (t) {
+
+    SERVER.on('after', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'UncaughtExceptionError');
+    });
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        res.send(504, 'boom');
+    });
+
+
+    SERVER.get('/foobar', function (req, res, next) {
+        throw new Error('oh noes');
+    });
+
+    CLIENT.get('/foobar', function (err, _, res) {
+        t.ok(err);
+        t.equal(err.name, 'GatewayTimeoutError');
+        t.end();
+    });
+});
+
+
 test('should emit \'after\' on client closed request ' +
 '(req._connectionState: \'close\')', function (t) {
 
