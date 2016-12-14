@@ -2490,7 +2490,7 @@ test('should emit \'after\' on uncaughtException', function (t) {
 
     SERVER.on('after', function (req, res, route, err) {
         t.ok(err);
-        t.equal(err.name, 'UncaughtExceptionError');
+        t.equal(err.message, 'oh noes');
     });
 
     SERVER.get('/foobar', function (req, res, next) {
@@ -2510,7 +2510,7 @@ function (t) {
 
     SERVER.on('after', function (req, res, route, err) {
         t.ok(err);
-        t.equal(err.name, 'UncaughtExceptionError');
+        t.equal(err.message, 'oh noes');
     });
 
     SERVER.on('uncaughtException', function (req, res, route, err) {
