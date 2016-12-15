@@ -2019,7 +2019,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
                 t.equal(ringbuffer.records.length, 1,
                         'should only have 1 log record');
                 // TODO: fix this after plugin is fixed to use
-                // req._connectionState
+                // req.connectionState()
                 // t.equal(ringbuffer.records[0].req.clientClosed, true);
 
                 // check timers
@@ -2531,11 +2531,11 @@ function (t) {
 
 
 test('should emit \'after\' on client closed request ' +
-'(req._connectionState: \'close\')', function (t) {
+'(req.connectionState(): \'close\')', function (t) {
 
     SERVER.on('after', function (req, res, route, err) {
         t.ok(err);
-        t.equal(req._connectionState, 'close');
+        t.equal(req.connectionState(), 'close');
         t.equal(err.name, 'RequestCloseError');
         t.end();
     });
@@ -2556,11 +2556,11 @@ test('should emit \'after\' on client closed request ' +
 
 
 test('should \'emit\' after on aborted request ' +
-'(req._connectionState: \'aborted\')', function (t) {
+'(req.connectionState(): \'aborted\')', function (t) {
 
     SERVER.on('after', function (req, res, route, err) {
         t.ok(err);
-        t.equal(req._connectionState, 'aborted');
+        t.equal(req.connectionState(), 'aborted');
         t.equal(err.name, 'RequestAbortedError');
     });
 

@@ -269,6 +269,14 @@ End the timer for a request handler. You must invoke this function if you
 called `startRequestHandler` on a handler. Otherwise the time recorded will be
 incorrect.
 
+## connectionState()
+
+Returns the current connection state of the request. Current possible values
+are:
+
+* `close` - when the request has been closed by the client
+* `aborted` - when the socket was closed unexpectedly
+
 
 ## version()
 
