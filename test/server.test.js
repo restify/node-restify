@@ -2580,3 +2580,131 @@ test('should \'emit\' after on aborted request ' +
         t.end();
     });
 });
+
+
+test('should increment/decrement request queue depth', function (t) {
+
+    SERVER.get('/foo', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 1);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/foo', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.unfinishedRequests(), 0);
+        t.end();
+    });
+});
+
+
+test('should increment/decrement request queue depth for concurrent reqs',
+function (t) {
+
+    SERVER.get('/foo1', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 1);
+        setTimeout(function () {
+            res.send();
+            return next();
+        }, 250);
+    });
+
+    SERVER.get('/foo2', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 2);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/foo1', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.unfinishedRequests(), 0);
+        t.end();
+    });
+
+    CLIENT.get('/foo2', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.unfinishedRequests(), 1);
+    });
+});
+
+
+test('should cleanup queue for 404s', function (t) {
+
+    SERVER.get('/foo1', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 1);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/foo1', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.unfinishedRequests(), 0);
+
+        CLIENT.get('/doesnotexist', function (err2, _2, res2) {
+            t.ok(err2);
+            t.equal(res2.statusCode, 404);
+            t.equal(SERVER.unfinishedRequests(), 0);
+            t.end();
+        });
+    });
+});
+
+
+test('should cleanup queue for time outs', function (t) {
+
+    SERVER.get('/foo1', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 1);
+        setTimeout(function () {
+            res.send();
+            return next();
+        }, 1000);
+    });
+
+    SERVER.get('/foo2', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 2);
+        res.send();
+        return next();
+    });
+
+    FAST_CLIENT.get('/foo1', function (err, _, res) {
+        t.ok(err);
+        t.equal(SERVER.unfinishedRequests(), 1);
+
+        setTimeout(function () {
+            // wait for server to flush response, 600 extra plus the already
+            // 500ms we waited should be enough to cover the 1000 response time
+            // of server.
+            t.equal(SERVER.unfinishedRequests(), 0);
+            t.end();
+        }, 600);
+    });
+
+    CLIENT.get('/foo2', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.unfinishedRequests(), 1);
+    });
+});
+
+
+test('should cleanup queue on uncaughtExceptions', function (t) {
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        res.send(500, 'asplode');
+    });
+
+    SERVER.get('/foo1', function (req, res, next) {
+        t.equal(SERVER.unfinishedRequests(), 1);
+        throw new Error('oh noes');
+    });
+
+    CLIENT.get('/foo1', function (err, _, res) {
+        t.ok(err);
+        t.equal(SERVER.unfinishedRequests(), 0);
+        t.end();
+    });
+});
