@@ -1,6 +1,20 @@
 # restify Changelog
 
 ## 5.0.0
+ - #1251 add `req.connectionState()` method, Alex Liu
+ - #1250 add `server.unfinishedRequests()` method, Alex Liu
+ - #1247 Update jyoent cloud API link in README, Devinsuit
+ - #1246 Fix syntax error in plugins.md example, Aria Stewart
+ - #1241 Rev formidable to remove Node6+ warnings, Alex Liu
+ - #1234 Update uuid to version 3.0.0, Marc Bachmann
+ - #1212 Fix typos in plugins.md, Greg Walden
+ - #1199 Update examples to use ES6, Amila Welihinda
+ - #1190 Fix minor typo, The-Alchemist
+ - #1179 Fix typo in comment, Niklas Ingholt
+ - Fix dtrace demo to not use async formatter, Yunong Xiao
+ - #1171 Router unmount now works for versioned routes, gcssabbagh
+ - #1143 add docs about serveStatic plugin, Michael Burguet
+ - #1135 ability to find a route by a path, Jacob Quatier
  - #1129 always invoke res.send callback if one is provided, even when the
    selected formatter is sync, Alex Liu
  - #1128 don't send domain errors to the client, Alex Liu
