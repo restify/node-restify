@@ -1,6 +1,7 @@
 'use strict';
 
 var restifyClients = require('restify-clients');
+var validator = require('validator');
 
 var restify = require('../lib');
 
@@ -84,6 +85,85 @@ test('query should return raw query string string', function (t) {
     });
 
     CLIENT.get('/qs?a=1&b=2', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should generate request id on first req.id() call', function (t) {
+
+    SERVER.get('/ping', function (req, res, next) {
+        t.equal(typeof req.id(), 'string');
+        t.equal(validator.isUUID(req.id(), 4), true);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/ping', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should set request id', function (t) {
+
+    SERVER.pre(function setId(req, res, next) {
+        var newId = req.id('lagavulin');
+        t.equal(newId, 'lagavulin');
+        return next();
+    });
+
+    SERVER.get('/ping', function (req, res, next) {
+        t.equal(typeof req.id(), 'string');
+        t.equal(req.id(), 'lagavulin');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/ping', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should throw when setting request id after autogeneration', function (t) {
+
+    SERVER.get('/ping', function (req, res, next) {
+        t.equal(typeof req.id(), 'string');
+        t.equal(validator.isUUID(req.id(), 4), true);
+        t.throws(function () {
+            req.id('blowup');
+        }, Error, 'request id is immutable, cannot be set again!');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/ping', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('should throw when setting request id twice', function (t) {
+
+    SERVER.get('/ping', function (req, res, next) {
+        req.id('lagavulin');
+        t.throws(function () {
+            req.id('blowup');
+        }, Error, 'request id is immutable, cannot be set again!');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/ping', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
