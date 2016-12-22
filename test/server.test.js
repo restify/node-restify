@@ -2363,6 +2363,48 @@ test('GH-1086: empty request id should be ignored', function (t) {
 });
 
 
+test('GH-XYZ: should support custom function to resolve request id',
+function (t) {
+
+    var port = 1337;
+    var header = 'lagavulin';
+    var server = restify.createServer({
+        log: helper.getLog('server'),
+        reqId: function resolveReqId(req, res) {
+            t.ok(req);
+            t.equal(typeof req.id, 'function');
+            t.ok(res);
+            t.equal(typeof res.send, 'function');
+            return header;
+        }
+    });
+
+    server.get('/1', function (req, res, next) {
+        t.equal(req.getId(), header);
+        res.header('connection', 'close');
+        res.send('hello world');
+        return next();
+    });
+
+    server.listen(port, function (err) {
+
+        t.ifError(err);
+
+        // create new client since we new specific headers
+        CLIENT = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + port
+        });
+
+        CLIENT.get('/1', function (err2, req, res, data) {
+            t.ifError(err2);
+            t.equal(data, 'hello world');
+            server.close(t.end);
+        });
+
+    });
+});
+
+
 test('GH-1078: server name should default to restify', function (t) {
 
     var myServer = restify.createServer();
