@@ -13,7 +13,6 @@ var filed = require('filed');
 var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
 var uuid = require('uuid');
-var validator = require('validator');
 
 var RestError = errors.RestError;
 var restify = require('../lib');
@@ -44,8 +43,7 @@ before(function (cb) {
             dtrace: helper.dtrace,
             handleUncaughtExceptions: true,
             log: helper.getLog('server'),
-            version: ['2.0.0', '0.5.4', '1.4.3'],
-            reqIdHeaders: ['x-req-id-a', 'x-req-id-b']
+            version: ['2.0.0', '0.5.4', '1.4.3']
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
@@ -2260,106 +2258,6 @@ test('calling next(false) should early exit from pre handlers', function (t) {
         t.end();
     });
 
-});
-
-
-test('GH-1086: should reuse request id when available', function (t) {
-
-    SERVER.get('/1', function (req, res, next) {
-        // the 12345 value is set when the client is created.
-        t.ok(req.headers.hasOwnProperty('x-req-id-a'));
-        t.equal(req.getId(), req.headers['x-req-id-a']);
-        res.send('hello world');
-        return next();
-    });
-
-    // create new client since we new specific headers
-    CLIENT = restifyClients.createJsonClient({
-        url: 'http://127.0.0.1:' + PORT,
-        headers:{
-            'x-req-id-a': 12345
-        }
-    });
-
-    CLIENT.get('/1', function (err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'hello world');
-        t.end();
-    });
-});
-
-
-test('GH-1086: should use second request id when available', function (t) {
-
-    SERVER.get('/1', function (req, res, next) {
-        t.ok(req.headers.hasOwnProperty('x-req-id-b'));
-        t.equal(req.getId(), req.headers['x-req-id-b']);
-        res.send('hello world');
-        return next();
-    });
-
-    // create new client since we new specific headers
-    CLIENT = restifyClients.createJsonClient({
-        url: 'http://127.0.0.1:' + PORT,
-        headers:{
-            'x-req-id-b': 678910
-        }
-    });
-
-    CLIENT.get('/1', function (err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'hello world');
-        t.end();
-    });
-});
-
-
-test('GH-1086: should use default uuid request id if none provided',
-function (t) {
-
-    SERVER.get('/1', function (req, res, next) {
-        t.ok(req.getId());
-        t.ok(validator.isUUID(req.getId()));
-        res.send('hello world');
-        return next();
-    });
-
-    // create new client since we new specific headers
-    CLIENT = restifyClients.createJsonClient({
-        url: 'http://127.0.0.1:' + PORT
-    });
-
-    CLIENT.get('/1', function (err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'hello world');
-        t.end();
-    });
-});
-
-
-test('GH-1086: empty request id should be ignored', function (t) {
-
-    SERVER.get('/1', function (req, res, next) {
-        t.ok(req.headers.hasOwnProperty('x-req-id-b'));
-        t.equal(req.getId(), req.headers['x-req-id-b']);
-        res.send('hello world');
-        return next();
-    });
-
-    // create new client since we new specific headers
-    CLIENT = restifyClients.createJsonClient({
-        url: 'http://127.0.0.1:' + PORT,
-        headers:{
-            'x-req-id-a': '',
-            'x-req-id-b': 12345
-        }
-    });
-
-    CLIENT.get('/1', function (err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'hello world');
-        t.end();
-    });
 });
 
 

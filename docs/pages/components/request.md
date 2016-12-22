@@ -119,12 +119,16 @@ server.get('/:x/bar', function(req, res, next) {
 ```
 
 
-## id()
+## id([reqId])
+
+* `[reqId]` {String}
 
 __Returns__ {String}
 
-Returns the request id. If a request id header was not specified for incoming
-requests, this will return a UUID.
+Returns the request id. If a `reqId` value is passed in, this will
+become the request's new id. The request id is immutable, and can only be
+set once. Attempting to set the request id more than once will cause
+restify to throw.
 
 
 ## path()
