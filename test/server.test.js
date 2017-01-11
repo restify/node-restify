@@ -2617,3 +2617,80 @@ test('should cleanup queue on uncaughtExceptions', function (t) {
         t.end();
     });
 });
+
+
+test('should show debug information', function (t) {
+
+    SERVER.get('/foo', function foo(req, res, next) {
+        res.end();
+        return next();
+    });
+
+    SERVER.get('/bar/:a/:b', function bar(req, res, next) {
+        res.end();
+        return next();
+    });
+
+    SERVER.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/,
+    function freeform(req, res, next) {
+        res.end();
+        return next();
+    });
+
+    var debugInfo = SERVER.debugInfo();
+
+    t.ok(debugInfo);
+    t.ok(debugInfo.routes);
+
+    debugInfo.routes.forEach(function (route) {
+        t.ok(route);
+        t.equal(typeof route.name, 'string');
+        t.equal(typeof route.method, 'string');
+        t.ok(
+            typeof route.input === 'string' ||
+            route.input instanceof RegExp === true
+        );
+        t.equal(typeof route.compiledRegex, 'object');
+
+        t.equal(route.versions instanceof Array, true);
+        route.versions.forEach(function (v) {
+            t.equal(typeof v, 'string');
+        });
+
+        t.equal(route.handlers instanceof Array, true);
+        route.handlers.forEach(function (handlerFn) {
+            t.equal(typeof handlerFn, 'function');
+        });
+    });
+
+    // detailed test for compiled regex
+    // verify url parameter regex
+    t.deepEqual(debugInfo.routes[1].name, 'getbarab054143200');
+    t.deepEqual(debugInfo.routes[1].method, 'get');
+    t.deepEqual(debugInfo.routes[1].input, '/bar/:a/:b');
+    t.ok(debugInfo.routes[1].compiledRegex instanceof RegExp);
+    t.deepEqual(debugInfo.routes[1].compiledUrlParams, {
+        0: 'a',
+        1: 'b'
+    });
+    // verify freeform regex
+    t.deepEqual(debugInfo.routes[2].name, 'getazaz09_054143200');
+    t.deepEqual(debugInfo.routes[2].method, 'get');
+    t.ok(debugInfo.routes[2].input instanceof RegExp);
+    t.ok(debugInfo.routes[2].compiledRegex instanceof RegExp);
+    // freeform regex input should equal output
+    t.equal(debugInfo.routes[2].input.toString(),
+            debugInfo.routes[2].compiledRegex.toString());
+    t.deepEqual(debugInfo.routes[2].compiledUrlParams, null);
+
+    // verify other server details
+    t.deepEqual(Object.keys(debugInfo.server.formatters), [
+        'application/javascript',
+        'application/json',
+        'text/plain',
+        'application/octet-stream'
+    ]);
+    t.equal(debugInfo.server.address, '127.0.0.1');
+    t.equal(typeof debugInfo.server.port, 'number');
+    t.end();
+});

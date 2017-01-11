@@ -19,10 +19,10 @@
 #
 ESLINT		:= ./node_modules/.bin/eslint
 JSCS		:= ./node_modules/.bin/jscs
-NSP         := ./node_modules/.bin/nsp
+NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 NODECOVER	:= ./node_modules/.bin/cover
-NSP_BADGE   := ./tools/nspBadge.js
+NSP_BADGE	:= ./tools/nspBadge.js
 NPM		:= npm
 
 #
