@@ -1268,7 +1268,6 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
     });
 });
 
-
 test('<url>/?<queryString> broken', function (t) {
     SERVER.pre(restify.pre.sanitizePath());
     SERVER.use(restify.queryParser());
@@ -1285,6 +1284,21 @@ test('<url>/?<queryString> broken', function (t) {
     });
 });
 
+test('<url>/?<queryString> filters the queryString', function (t) {
+    SERVER.pre(restify.pre.sanitizePath());
+    SERVER.use(restify.queryParser());
+    SERVER.get('/foo', function (req, res, next) {
+        res.send(req.params);
+    });
+
+    SERVER.listen(8080, function () {
+        CLIENT.get('/foo?bar=http://example.com', function (err, _, __, obj) {
+            t.ifError(err);
+            t.deepEqual(obj, {bar: 'http://example.com'});
+            t.end();
+        });
+    });
+});
 
 test('GH #704: Route with a valid RegExp params', function (t) {
 
