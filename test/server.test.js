@@ -2528,6 +2528,17 @@ function (t) {
     });
 });
 
+test('should emit \'close\' on server close', function (t) {
+    var server = restify.createServer();
+
+    server.listen(PORT + 1, '127.0.0.1', function () {
+        server.on('close', function () {
+            t.end();
+        });
+        server.close();
+    });
+});
+
 
 test('should cleanup queue for 404s', function (t) {
 
