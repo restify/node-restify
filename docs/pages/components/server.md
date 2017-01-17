@@ -326,3 +326,7 @@ function(req, res, route, error) { }
 * res - the response object
 * route - the route object that serviced the request
 * error - the error passed to `next()`, if applicable
+
+## close
+
+Emitted when the server closes.
