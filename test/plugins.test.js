@@ -6,18 +6,21 @@ var fs = require('fs');
 var http = require('http');
 var net = require('net');
 var path = require('path');
+var util = require('util');
 
+var assert = require('chai').assert;
 var bunyan = require('bunyan');
 var restifyClients = require('restify-clients');
+var vasync = require('vasync');
 
 var restify = require('../lib');
+
 
 
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
 }
 var helper = require('./lib/helper.js');
-
 
 ///--- Globals
 
@@ -76,17 +79,13 @@ after(function (callback) {
         for (i = 0; i < FILES_TO_DELETE.length; ++i) {
             try {
                 fs.unlinkSync(FILES_TO_DELETE[i]);
-            }
-            catch (err) { /* normal */
-            }
+            } catch (err) { /* normal */ }
         }
 
         for (i = 0; i < DIRS_TO_DELETE.length; ++i) {
             try {
                 fs.rmdirSync(DIRS_TO_DELETE[i]);
-            }
-            catch (err) { /* normal */
-            }
+            } catch (err) { /* normal */ }
         }
         SERVER.close(callback);
     } catch (e) {
@@ -232,7 +231,9 @@ test('body url-encoded ok', function (t) {
 
 test('body url-encoded ok (no params)', function (t) {
     SERVER.post('/bodyurl2/:id',
-        restify.bodyParser({ mapParams: false }),
+        restify.bodyParser({
+            mapParams: false
+        }),
         function (req, res, next) {
             t.equal(req.params.id, 'foo');
             t.equal(req.params.name, 'markc');
@@ -288,7 +289,7 @@ test('body multipart ok', function (t) {
     });
 
     client.write('--huff\r\nContent-Disposition: form-data; ' +
-                 'name="endorphins"\r\n\r\n9000\r\n--huff--');
+        'name="endorphins"\r\n\r\n9000\r\n--huff--');
     client.end();
 });
 
@@ -327,7 +328,7 @@ test('gh-847 body multipart no files ok', function (t) {
 
     // don't actually upload a file
     client.write('--huff\r\nContent-Disposition: form-data; ' +
-                 'name="endorphins"\r\n\r\n9000\r\n--huff--');
+        'name="endorphins"\r\n\r\n9000\r\n--huff--');
     client.end();
 });
 
@@ -382,13 +383,13 @@ test('gh-847 body multipart files ok', function (t) {
     client.write('--huff\r\n');
 
     client.write('Content-Disposition: form-data; name="shine"; ' +
-                 'filename="shine.txt"\r\n');
+        'filename="shine.txt"\r\n');
     client.write('Content-Type: text/plain\r\n\r\n');
     client.write(shine + '\r\n');
     client.write('--huff\r\n');
 
     client.write('Content-Disposition: form-data; name="echoes"; ' +
-                 'filename="echoes.txt"\r\n');
+        'filename="echoes.txt"\r\n');
     client.write('Content-Type: text/plain\r\n\r\n');
     client.write(echoes + '\r\n');
     client.write('--huff--');
@@ -404,7 +405,7 @@ test('body multipart ok custom handling', function (t) {
             multipartHandler: function (part) {
                 var buffer = new Buffer(0);
                 part.on('data', function (data) {
-                    buffer = Buffer.concat([ data ]);
+                    buffer = Buffer.concat([data]);
                 });
 
                 part.on('end', function () {
@@ -415,7 +416,7 @@ test('body multipart ok custom handling', function (t) {
             multipartFileHandler: function (part) {
                 var buffer = new Buffer(0);
                 part.on('data', function (data) {
-                    buffer = Buffer.concat([ data ]);
+                    buffer = Buffer.concat([data]);
                 });
 
                 part.on('end', function () {
@@ -468,7 +469,9 @@ test('GH-694 pass hash option through to Formidable', function (t) {
     var content = 'Hello World!';
     var hash = '2ef7bde608ce5404e97d5f042f95f89f1c232871';
     SERVER.post('/multipart',
-        restify.bodyParser({hash: 'sha1'}),
+        restify.bodyParser({
+            hash: 'sha1'
+        }),
         function (req, res, next) {
             t.equal(req.files.details.hash, hash);
             res.send();
@@ -529,7 +532,9 @@ test('body json ok', function (t) {
 
 test('body json ok (no params)', function (t) {
     SERVER.post('/body/:id',
-        restify.bodyParser({ mapParams: false }),
+        restify.bodyParser({
+            mapParams: false
+        }),
         function (req, res, next) {
             t.equal(req.params.id, 'foo');
             t.equal(req.params.name, 'markc');
@@ -578,7 +583,9 @@ test('body json ok (null params)', function (t) {
 
 test('GH-318 get request with body (default)', function (t) {
     SERVER.get('/getWithoutBody',
-        restify.bodyParser({ mapParams: true }),
+        restify.bodyParser({
+            mapParams: true
+        }),
         function (req, res, next) {
             t.notEqual(req.params.foo, 'bar');
             res.send();
@@ -591,7 +598,10 @@ test('GH-318 get request with body (default)', function (t) {
         '\r\n' +
         '{"foo":"bar"}';
 
-    var client = net.connect({host: '127.0.0.1', port: PORT}, function () {
+    var client = net.connect({
+        host: '127.0.0.1',
+        port: PORT
+    }, function () {
         client.write(request);
     });
     client.once('data', function (data) {
@@ -607,7 +617,8 @@ test('GH-318 get request with body (requestBodyOnGet=true)', function (t) {
         restify.bodyParser({
             mapParams: true,
             requestBodyOnGet: true
-        }), function (req, res, next) {
+        }),
+        function (req, res, next) {
             t.equal(req.params.foo, 'bar');
             res.send();
             next();
@@ -618,7 +629,10 @@ test('GH-318 get request with body (requestBodyOnGet=true)', function (t) {
         'Content-Length: 13\r\n' +
         '\r\n' +
         '{"foo":"bar"}';
-    var client = net.connect({host: '127.0.0.1', port: PORT}, function () {
+    var client = net.connect({
+        host: '127.0.0.1',
+        port: PORT
+    }, function () {
         client.write(request);
     });
 
@@ -664,16 +678,13 @@ test('GH-279 more JSON Arrays', function (t) {
 
     SERVER.post('/gh279', restify.jsonBodyParser(), respond);
 
-    var obj = [
-        {
-            id: '123654',
-            name: 'mimi'
-        },
-        {
-            id: '987654',
-            name: 'pijama'
-        }
-    ];
+    var obj = [{
+        id: '123654',
+        name: 'mimi'
+    }, {
+        id: '987654',
+        name: 'pijama'
+    }];
     CLIENT.post('/gh279', obj, function (err, _, res) {
         t.ifError(err);
         t.end();
@@ -902,7 +913,9 @@ test('gzip response', function (t) {
     };
     CLIENT.get(opts, function (err, _, res, obj) {
         t.ifError(err);
-        t.deepEqual({hello: 'world'}, obj);
+        t.deepEqual({
+            hello: 'world'
+        }, obj);
         t.end();
     });
 });
@@ -1037,14 +1050,127 @@ test('GH-719 serve a specific static file', function (t) {
 });
 
 
+
+test('test audit logger buffer', function (t) {
+    var logBuffer = new restify.logMetrics({bufSize: 1000});
+    var fooRequest, barRequest, collectLog;
+    SERVER.on('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams: [{
+                level: 'info',
+                stream: process.stdout
+            }]
+        }),
+        server: SERVER,
+        logMetrics : logBuffer
+    }));
+
+    var self = this;
+    SERVER.get('/foo',
+        function (req, res, next) {
+            res.send(200, {testdata : 'foo'});
+            next();
+        }
+    );
+    SERVER.get('/bar',
+        function (req, res, next) {
+            res.send(200, {testdata : 'bar'});
+            next();
+        }
+    );
+    SERVER.get('/auditrecords',
+        function (req, res, next) {
+            var data = logBuffer.getLog().records;
+            res.send(200, data);
+            next();
+        }
+    );
+
+
+    fooRequest = function (_, callback) {
+        CLIENT.get('/foo', function (err, req, res) {
+            t.ifError(err);
+            t.equal(JSON.parse(res.body).testdata, 'foo');
+            return callback(err);
+        });
+    };
+
+    barRequest = function (_, callback) {
+        CLIENT.get('/bar', function (err, req, res) {
+            t.ifError(err);
+            t.equal(JSON.parse(res.body).testdata, 'bar');
+            return callback(err);
+        });
+    };
+    collectLog = function (_, callback) {
+        CLIENT.get('/auditrecords', function (err, req, res) {
+            t.ifError(err);
+            var data = JSON.parse(res.body);
+            t.ok(data);
+            data.forEach(function (d) {
+                assert.isNumber(d.latency);
+            });
+            return callback(err);
+        });
+    };
+    vasync.pipeline({
+        funcs: [
+            fooRequest,
+            barRequest,
+            collectLog
+        ],
+        args: self
+    }, function (err, results) {
+        t.ifError(err);
+        console.log('results: %s', util.inspect(results, null, 3));
+        t.end();
+    });
+});
+
+test('test audit logger emit', function (t) {
+    SERVER.once('after', restify.auditLogger({
+        log: bunyan.createLogger({
+            name: 'audit',
+            streams: [{
+                level: 'info',
+                stream: process.stdout
+            }]
+        }),
+        server: SERVER
+    }));
+
+    SERVER.get('/audit', [
+        restify.queryParser(),
+        function (req, res, next) {
+            res.send();
+            next();
+        }
+    ]);
+    CLIENT.get('/audit', function (err, req, res) {
+        t.ifError(err);
+    });
+    SERVER.on('auditlog', function (data) {
+        t.ok(data);
+        t.ok(data.req_id);
+        t.equal(data.req.url, '/audit', 'request url should be /audit');
+        assert.isNumber(data.latency);
+
+        t.end();
+    });
+
+});
+
 test('audit logger timer test', function (t) {
     // Dirty hack to capture the log record using a ring buffer.
-    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+    var ringbuffer = new bunyan.RingBuffer({
+        limit: 1
+    });
 
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
             name: 'audit',
-            streams:[ {
+            streams: [{
                 level: 'info',
                 type: 'raw',
                 stream: ringbuffer
@@ -1071,14 +1197,14 @@ test('audit logger timer test', function (t) {
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
         t.ok(ringbuffer.records[0].req.timers.aTestHandler > 1000000,
-             'atestHandler should be > 1000000');
+            'atestHandler should be > 1000000');
         t.ok(ringbuffer.records[0].req.timers['aTestHandler-audit-sub'] >
-             1000000, 'aTestHandler-audit-sub should be > 1000000');
+            1000000, 'aTestHandler-audit-sub should be > 1000000');
         var handlers = Object.keys(ringbuffer.records[0].req.timers);
         t.equal(handlers[handlers.length - 2], 'aTestHandler-audit-sub',
-                'sub handler timer not in order');
+            'sub handler timer not in order');
         t.equal(handlers[handlers.length - 1], 'aTestHandler',
-                'aTestHandler not last');
+            'aTestHandler not last');
         t.end();
     });
 });
@@ -1086,12 +1212,14 @@ test('audit logger timer test', function (t) {
 
 test('audit logger anonymous timer test', function (t) {
     // Dirty hack to capture the log record using a ring buffer.
-    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+    var ringbuffer = new bunyan.RingBuffer({
+        limit: 1
+    });
 
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
             name: 'audit',
-            streams:[ {
+            streams: [{
                 level: 'info',
                 type: 'raw',
                 stream: ringbuffer
@@ -1120,16 +1248,16 @@ test('audit logger anonymous timer test', function (t) {
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
         t.ok(ringbuffer.records[0].req.timers['handler-0'] > 1000000,
-             'handler-0 should be > 1000000');
+            'handler-0 should be > 1000000');
         t.ok(ringbuffer.records[0].req.timers['handler-1'] > 1000000,
-             'handler-1 should be > 1000000');
+            'handler-1 should be > 1000000');
         t.ok(ringbuffer.records[0].req.timers['handler-1-audit-sub'] >
-             1000000, 'handler-0-audit-sub should be > 1000000');
+            1000000, 'handler-0-audit-sub should be > 1000000');
         var handlers = Object.keys(ringbuffer.records[0].req.timers);
         t.equal(handlers[handlers.length - 2], 'handler-1-audit-sub',
-                'sub handler timer not in order');
+            'sub handler timer not in order');
         t.equal(handlers[handlers.length - 1], 'handler-1',
-                'handler-1 not last');
+            'handler-1 not last');
         t.end();
     });
 });
@@ -1138,12 +1266,14 @@ test('audit logger anonymous timer test', function (t) {
 test('GH-812 audit logger has query params string', function (t) {
 
     // Dirty hack to capture the log record using a ring buffer.
-    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+    var ringbuffer = new bunyan.RingBuffer({
+        limit: 1
+    });
 
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
             name: 'audit',
-            streams:[ {
+            streams: [{
                 level: 'info',
                 type: 'raw',
                 stream: ringbuffer
@@ -1168,15 +1298,18 @@ test('GH-812 audit logger has query params string', function (t) {
 });
 
 
+
 test('GH-812 audit logger has query params obj', function (t) {
 
     // Dirty hack to capture the log record using a ring buffer.
-    var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+    var ringbuffer = new bunyan.RingBuffer({
+        limit: 1
+    });
 
     SERVER.once('after', restify.auditLogger({
         log: bunyan.createLogger({
             name: 'audit',
-            streams:[ {
+            streams: [{
                 level: 'info',
                 type: 'raw',
                 stream: ringbuffer
@@ -1198,21 +1331,27 @@ test('GH-812 audit logger has query params obj', function (t) {
         // check timers
         t.ok(ringbuffer.records[0], 'no log records');
         t.equal(ringbuffer.records.length, 1, 'should only have 1 log record');
-        t.deepEqual(ringbuffer.records[0].req.query, { a: 1, b: 2});
+        t.deepEqual(ringbuffer.records[0].req.query, {
+            a: 1,
+            b: 2
+        });
         t.end();
     });
 });
-
 
 test('GH-774 utf8 corruption in body parser', function (t) {
     var slen = 100000;
 
     SERVER.post('/utf8',
-        restify.bodyParser({ mapParams: false }),
+        restify.bodyParser({
+            mapParams: false
+        }),
         function (req, res, next) {
             t.notOk(/\ufffd/.test(req.body.text));
             t.equal(req.body.text.length, slen);
-            res.send({ len: req.body.text.length });
+            res.send({
+                len: req.body.text.length
+            });
             next();
         });
 
@@ -1223,7 +1362,9 @@ test('GH-774 utf8 corruption in body parser', function (t) {
         tx += '\u2661';
     }
 
-    CLIENT.post('/utf8', { text: tx }, function (err, _, res) {
+    CLIENT.post('/utf8', {
+        text: tx
+    }, function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
@@ -1232,90 +1373,99 @@ test('GH-774 utf8 corruption in body parser', function (t) {
 
 
 test('request expiry testing to ensure that invalid ' +
-     'requests will error.', function (t) {
-    var key = 'x-request-expiry';
-    var getPath = '/request/expiry';
-    var called = false;
-    var expires = restify.requestExpiry({ header: key });
-    SERVER.get(
-        getPath,
-        expires,
-        function (req, res, next) {
-            called = true;
-            res.send();
-            next();
+    'requests will error.',
+    function (t) {
+        var key = 'x-request-expiry';
+        var getPath = '/request/expiry';
+        var called = false;
+        var expires = restify.requestExpiry({
+            header: key
         });
+        SERVER.get(
+            getPath,
+            expires,
+            function (req, res, next) {
+                called = true;
+                res.send();
+                next();
+            });
 
-    var obj = {
-        path: getPath,
-        headers: {
-            'x-request-expiry': Date.now() - 100
-        }
-    };
-    CLIENT.get(obj, function (err, _, res) {
-        t.equal(res.statusCode, 504);
-        t.equal(called, false);
-        t.end();
+        var obj = {
+            path: getPath,
+            headers: {
+                'x-request-expiry': Date.now() - 100
+            }
+        };
+        CLIENT.get(obj, function (err, _, res) {
+            t.equal(res.statusCode, 504);
+            t.equal(called, false);
+            t.end();
+        });
     });
-});
 
 
 test('request expiry testing to ensure that valid ' +
-     'requests will succeed.', function (t) {
-    var key = 'x-request-expiry';
-    var getPath = '/request/expiry';
-    var called = false;
-    var expires = restify.requestExpiry({ header: key });
-    SERVER.get(
-        getPath,
-        expires,
-        function (req, res, next) {
-            called = true;
-            res.send();
-            next();
+    'requests will succeed.',
+    function (t) {
+        var key = 'x-request-expiry';
+        var getPath = '/request/expiry';
+        var called = false;
+        var expires = restify.requestExpiry({
+            header: key
         });
+        SERVER.get(
+            getPath,
+            expires,
+            function (req, res, next) {
+                called = true;
+                res.send();
+                next();
+            });
 
-    var obj = {
-        path: getPath,
-        headers: {
-            'x-request-expiry': Date.now() + 100
-        }
-    };
-    CLIENT.get(obj, function (err, _, res) {
-        t.equal(res.statusCode, 200);
-        t.equal(called, true);
-        t.ifError(err);
-        t.end();
+        var obj = {
+            path: getPath,
+            headers: {
+                'x-request-expiry': Date.now() + 100
+            }
+        };
+        CLIENT.get(obj, function (err, _, res) {
+            t.equal(res.statusCode, 200);
+            t.equal(called, true);
+            t.ifError(err);
+            t.end();
+        });
     });
-});
 
 
 test('request expiry testing to ensure that valid ' +
-     'requests without headers will succeed.', function (t) {
-    var key = 'x-request-expiry';
-    var getPath = '/request/expiry';
-    var called = false;
-    var expires = restify.requestExpiry({ header: key });
-    SERVER.get(
-        getPath,
-        expires,
-        function (req, res, next) {
-            called = true;
-            res.send();
-            next();
+    'requests without headers will succeed.',
+    function (t) {
+        var key = 'x-request-expiry';
+        var getPath = '/request/expiry';
+        var called = false;
+        var expires = restify.requestExpiry({
+            header: key
         });
+        SERVER.get(
+            getPath,
+            expires,
+            function (req, res, next) {
+                called = true;
+                res.send();
+                next();
+            });
 
-    var obj = {
-        path: getPath,
-        headers: { }
-    };
-    CLIENT.get(obj, function (err, _, res) {
-        t.equal(res.statusCode, 200);
-        t.equal(called, true);
-        t.ifError(err);
-        t.end();
+        var obj = {
+            path: getPath,
+            headers: {}
+        };
+        CLIENT.get(obj, function (err, _, res) {
+            t.equal(res.statusCode, 200);
+            t.equal(called, true);
+            t.ifError(err);
+            t.end();
+        });
     });
-});
 
 test('tests the requestLoggers extra header properties', function (t) {
     var key = 'x-request-uuid';
@@ -1324,7 +1474,9 @@ test('tests the requestLoggers extra header properties', function (t) {
     var headers = [key, badKey];
     SERVER.get(
         getPath,
-        restify.requestLogger({headers: headers}),
+        restify.requestLogger({
+            headers: headers
+        }),
         function (req, res, next) {
             t.equal(req.log.fields[key], 'foo-for-eva');
             t.equal(req.log.fields.hasOwnProperty(badKey), false);
@@ -1334,7 +1486,7 @@ test('tests the requestLoggers extra header properties', function (t) {
 
     var obj = {
         path: getPath,
-        headers: { }
+        headers: {}
     };
     obj.headers[key] = 'foo-for-eva';
     CLIENT.get(obj, function (err, _, res) {
@@ -1367,7 +1519,9 @@ function serveStaticTest(t, testDefault, tmpDir, regex, staticFile) {
                 t.ifError(err3);
                 FILES_TO_DELETE.push(file);
                 var p = '/' + testDir + '/' + testFileName;
-                var opts = { directory: tmpPath };
+                var opts = {
+                    directory: tmpPath
+                };
 
                 if (staticFile) {
                     opts.file = p;

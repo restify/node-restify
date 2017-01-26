@@ -174,6 +174,51 @@ test('use + get (path only)', function (t) {
     });
 });
 
+test('use + get duplicate path', function (t) {
+    SERVER.use(function (req, res, next) {
+        next();
+    });
+    SERVER.get({
+        url: '/foo/something',
+        version: '1.1.1'
+    }, function tester(req, res, next) {
+        res.send(200, {
+            testdata: 1
+        });
+        next();
+    });
+
+    SERVER.get({
+        url: '/foo/something',
+        version: '1.1.1'
+    }, function tester(req, res, next) {
+        res.contentType = 'json';
+        res.send(200, {
+            testdata: 2
+        });
+        next();
+    });
+    //when route path and version are exactly duplicated, the first one registered handles it
+    CLIENT.get({
+        path: '/foo/something',
+        headers: {
+            'accept-version': '1.1.1'
+        }
+    }, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var body = res.body;
+
+        try {
+            t.equal(JSON.parse(body).testdata, 1);
+        } catch (e) {
+            console.log(e);
+        }
+
+        t.end();
+
+    });
+});
 
 test('rm', function (t) {
     var route = SERVER.get('/foo/:id', function foosy(req, res, next) {
@@ -209,7 +254,9 @@ test('use - throws TypeError on non function as argument', function (t) {
     }, err);
 
     t.throws(function () {
-        SERVER.use({an: 'object'});
+        SERVER.use({
+            an: 'object'
+        });
     }, err);
 
     t.throws(function () {
@@ -217,8 +264,7 @@ test('use - throws TypeError on non function as argument', function (t) {
             function good(req, res, next) {
                 next();
             },
-            '/bad',
-            {
+            '/bad', {
                 really: 'bad'
             });
     }, err);
@@ -367,7 +413,7 @@ test('OPTIONS', function (t) {
 test('CORS Preflight - valid origin', function (t) {
     SERVER.use(restify.CORS({
         credentials: true,
-        origins: [ 'http://somesite.local' ]
+        origins: ['http://somesite.local']
     }));
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
@@ -385,7 +431,7 @@ test('CORS Preflight - valid origin', function (t) {
     };
     http.request(opts, function (res) {
         t.equal(res.headers['access-control-allow-origin'],
-                'http://somesite.local');
+            'http://somesite.local');
         t.equal(res.headers['access-control-allow-credentials'], 'true');
         t.equal(res.statusCode, 200);
         t.end();
@@ -395,7 +441,7 @@ test('CORS Preflight - valid origin', function (t) {
 test('CORS Preflight - invalid origin', function (t) {
     SERVER.use(restify.CORS({
         credentials: true,
-        origins: [ 'http://somesite.local' ]
+        origins: ['http://somesite.local']
     }));
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
@@ -422,7 +468,7 @@ test('CORS Preflight - invalid origin', function (t) {
 test('CORS Preflight - any origin', function (t) {
     SERVER.use(restify.CORS({
         credentials: true,
-        origins: [ 'http://somesite.local', '*' ]
+        origins: ['http://somesite.local', '*']
     }));
     SERVER.post('/foo/:id', function tester(req, res, next) {});
 
@@ -493,8 +539,14 @@ test('get (path and version not ok)', function (t) {
         next();
     }
 
-    SERVER.get({ url: '/foo/:id', version: '1.2.3' }, respond);
-    SERVER.get({ url: '/foo/:id', version: '3.2.1' }, respond);
+    SERVER.get({
+        url: '/foo/:id',
+        version: '1.2.3'
+    }, respond);
+    SERVER.get({
+        url: '/foo/:id',
+        version: '3.2.1'
+    }, respond);
 
     var opts = {
         path: '/foo/bar',
@@ -646,8 +698,8 @@ test('GH-64 prerouting chain with error', function (t) {
 test('GH-67 extend access-control headers', function (t) {
     SERVER.get('/hello/:name', function tester(req, res, next) {
         res.header('Access-Control-Allow-Headers',
-            (res.header('Access-Control-Allow-Headers') +
-                ', If-Match, If-None-Match'));
+                   (res.header('Access-Control-Allow-Headers') +
+                    ', If-Match, If-None-Match'));
 
         res.send(req.params.name);
         next();
@@ -731,7 +783,9 @@ test('upload routing based on content-type ok', function (t) {
         next();
     });
 
-    CLIENT.put('/', {foo: 'foo'}, function (err, _, res) {
+    CLIENT.put('/', {
+        foo: 'foo'
+    }, function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 204);
         t.end();
@@ -749,7 +803,9 @@ test('upload routing based on content-type fail', function (t) {
         next();
     });
 
-    CLIENT.put('/', {foo: 'foo'}, function (err, _, res) {
+    CLIENT.put('/', {
+        foo: 'foo'
+    }, function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 415);
         t.end();
@@ -791,10 +847,14 @@ test('full response', function (t) {
 
 
 test('GH-149 limit request body size', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+    SERVER.use(restify.bodyParser({
+        maxBodySize: 1024
+    }));
 
     SERVER.post('/', function (req, res, next) {
-        res.send(200, {length: req.body.length});
+        res.send(200, {
+            length: req.body.length
+        });
         next();
     });
 
@@ -821,10 +881,14 @@ test('GH-149 limit request body size', function (t) {
 
 
 test('GH-149 limit request body size (json)', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+    SERVER.use(restify.bodyParser({
+        maxBodySize: 1024
+    }));
 
     SERVER.post('/', function (req, res, next) {
-        res.send(200, {length: req.body.length});
+        res.send(200, {
+            length: req.body.length
+        });
         next();
     });
 
@@ -851,7 +915,10 @@ test('GH-149 limit request body size (json)', function (t) {
 
 
 test('path+flags ok', function (t) {
-    SERVER.get({path: '/foo', flags: 'i'}, function (req, res, next) {
+    SERVER.get({
+        path: '/foo',
+        flags: 'i'
+    }, function (req, res, next) {
         res.send('hi');
         next();
     });
@@ -886,8 +953,7 @@ test('test matches params with custom regex', function (t) {
         var obj = {
             headers: {},
             method: 'GET',
-            contentType: function () {
-            },
+            contentType: function () {},
             path: function () {
                 return (p);
             },
@@ -903,7 +969,9 @@ test('test matches params with custom regex', function (t) {
                     t.ifError(err);
                     t.ok(r);
                     t.ok(ctx);
-                    t.deepEqual(ctx, {bar: exp});
+                    t.deepEqual(ctx, {
+                        bar: exp
+                    });
                 } else {
                     t.ok(err);
                 }
@@ -924,7 +992,9 @@ test('test matches params with custom regex', function (t) {
 
 
 test('GH-180 can parse DELETE body', function (t) {
-    SERVER.use(restify.bodyParser({mapParams: false}));
+    SERVER.use(restify.bodyParser({
+        mapParams: false
+    }));
 
     SERVER.del('/', function (req, res, next) {
         res.send(200, req.body);
@@ -1122,7 +1192,9 @@ test('gh-283 maximum available versioned route matching', function (t) {
             path: p,
             version: v
         }, function (req, res, next) {
-            res.json(200, {version: v});
+            res.json(200, {
+                version: v
+            });
             next();
         });
     }
@@ -1182,7 +1254,9 @@ test('versioned route matching should prefer \
         path: p,
         version: ['1.1.0', '1.2.0']
     }, function (req, res, next) {
-        res.json(200, {route: p});
+        res.json(200, {
+            route: p
+        });
         next();
     });
 
@@ -1190,7 +1264,9 @@ test('versioned route matching should prefer \
         path: '/:id',
         version: ['1.1.0', '1.2.0']
     }, function (req, res, next) {
-        res.json(200, {route: 'id'});
+        res.json(200, {
+            route: 'id'
+        });
         next();
     });
 
@@ -1243,7 +1319,10 @@ test('GH-323: <url>/<path>/?<queryString> broken', function (t) {
     SERVER.listen(8080, function () {
         CLIENT.get('/hello/foo/?bar=baz', function (err, _, __, obj) {
             t.ifError(err);
-            t.deepEqual(obj, {name: 'foo', bar: 'baz'});
+            t.deepEqual(obj, {
+                name: 'foo',
+                bar: 'baz'
+            });
             t.end();
         });
     });
@@ -1260,7 +1339,9 @@ test('<url>/?<queryString> broken', function (t) {
     SERVER.listen(8080, function () {
         CLIENT.get('/?bar=baz', function (err, _, __, obj) {
             t.ifError(err);
-            t.deepEqual(obj, {bar: 'baz'});
+            t.deepEqual(obj, {
+                bar: 'baz'
+            });
             t.end();
         });
     });
@@ -1678,7 +1759,9 @@ test('res.charSet', function (t) {
     SERVER.get('/foo', function getFoo(req, res, next) {
         res.charSet('ISO-8859-1');
         res.set('Content-Type', 'text/plain');
-        res.send(200, {foo: 'bar'});
+        res.send(200, {
+            foo: 'bar'
+        });
         next();
     });
 
@@ -1696,7 +1779,9 @@ test('res.charSet override', function (t) {
     SERVER.get('/foo', function getFoo(req, res, next) {
         res.charSet('ISO-8859-1');
         res.set('Content-Type', 'text/plain;charset=utf-8');
-        res.send(200, {foo: 'bar'});
+        res.send(200, {
+            foo: 'bar'
+        });
         next();
     });
 
@@ -1712,7 +1797,9 @@ test('res.charSet override', function (t) {
 
 test('GH-384 res.json(200, {}) broken', function (t) {
     SERVER.get('/foo', function (req, res, next) {
-        res.json(200, {foo: 'bar'});
+        res.json(200, {
+            foo: 'bar'
+        });
         next();
     });
 
@@ -1751,8 +1838,7 @@ test('GH-401 regex routing broken', function (t) {
 });
 
 test('explicitly sending a 403 with custom error', function (t) {
-    function MyCustomError() {
-    }
+    function MyCustomError() {}
 
     MyCustomError.prototype = Object.create(Error.prototype);
 
@@ -1834,25 +1920,25 @@ test('error handler defers "after" event', function (t) {
 
 
 test('gh-757 req.absoluteUri() defaults path segment to req.path()',
-     function (t) {
-    SERVER.get('/the-original-path', function (req, res, next) {
-        var prefix = 'http://127.0.0.1:' + PORT;
-        t.equal(req.absoluteUri('?key=value'),
+    function (t) {
+        SERVER.get('/the-original-path', function (req, res, next) {
+            var prefix = 'http://127.0.0.1:' + PORT;
+            t.equal(req.absoluteUri('?key=value'),
                 prefix + '/the-original-path/?key=value');
-        t.equal(req.absoluteUri('#fragment'),
+            t.equal(req.absoluteUri('#fragment'),
                 prefix + '/the-original-path/#fragment');
-        t.equal(req.absoluteUri('?key=value#fragment'),
+            t.equal(req.absoluteUri('?key=value#fragment'),
                 prefix + '/the-original-path/?key=value#fragment');
-        res.send();
-        next();
-    });
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/the-original-path', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
+        CLIENT.get('/the-original-path', function (err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
     });
-});
 
 
 test('GH-693 sending multiple response header values', function (t) {
@@ -1879,7 +1965,7 @@ test('gh-762 res.noCache()', function (t) {
 
     CLIENT.get('/some-path', function (err, _, res) {
         t.equal(res.headers['cache-control'],
-          'no-cache, no-store, must-revalidate');
+            'no-cache, no-store, must-revalidate');
         t.equal(res.headers.pragma, 'no-cache');
         t.equal(res.headers.expires, '0');
         t.end();
@@ -1897,7 +1983,7 @@ test('gh-779 set-cookie fields should never have commas', function (t) {
     CLIENT.get('/set-cookie', function (err, _, res) {
         t.ifError(err);
         t.equal(res.headers['set-cookie'].length, 1,
-                'set-cookie header should only have 1 element');
+            'set-cookie header should only have 1 element');
         t.equal(res.headers['set-cookie'], 'bar');
         t.end();
     });
@@ -1913,7 +1999,9 @@ test('gh-630 handle server versions as an array or string', function (t) {
 
 
 test('GH-877 content-type should be case insensitive', function (t) {
-    SERVER.use(restify.bodyParser({maxBodySize: 1024}));
+    SERVER.use(restify.bodyParser({
+        maxBodySize: 1024
+    }));
 
     SERVER.get('/cl', function (req, res, next) {
         t.equal(req.getContentType(), 'application/json');
@@ -1940,13 +2028,14 @@ test('GH-877 content-type should be case insensitive', function (t) {
     client.end();
 });
 
-
 test('GH-882: route name is same as specified', function (t) {
     SERVER.get({
         name: 'my-r$-%-x',
         path: '/m1'
     }, function (req, res, next) {
-        res.send({name: req.route.name});
+        res.send({
+            name: req.route.name
+        });
     });
 
     CLIENT.get('/m1', function (err, _, res) {
