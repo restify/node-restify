@@ -2481,10 +2481,10 @@ test('should \'emit\' after on aborted request ' +
 });
 
 
-test('should increment/decrement request queue depth', function (t) {
+test('should increment/decrement inflight request count', function (t) {
 
     SERVER.get('/foo', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         res.send();
         return next();
     });
@@ -2492,17 +2492,17 @@ test('should increment/decrement request queue depth', function (t) {
     CLIENT.get('/foo', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 });
 
 
-test('should increment/decrement request queue depth for concurrent reqs',
+test('should increment/decrement inflight request count for concurrent reqs',
 function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         setTimeout(function () {
             res.send();
             return next();
@@ -2510,7 +2510,7 @@ function (t) {
     });
 
     SERVER.get('/foo2', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 2);
         res.send();
         return next();
     });
@@ -2518,14 +2518,14 @@ function (t) {
     CLIENT.get('/foo1', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 
     CLIENT.get('/foo2', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2541,10 +2541,10 @@ test('should emit \'close\' on server close', function (t) {
 });
 
 
-test('should cleanup queue for 404s', function (t) {
+test('should cleanup inflight requests count for 404s', function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         res.send();
         return next();
     });
@@ -2552,22 +2552,22 @@ test('should cleanup queue for 404s', function (t) {
     CLIENT.get('/foo1', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
 
         CLIENT.get('/doesnotexist', function (err2, _2, res2) {
             t.ok(err2);
             t.equal(res2.statusCode, 404);
-            t.equal(SERVER.unfinishedRequests(), 0);
+            t.equal(SERVER.inflightRequests(), 0);
             t.end();
         });
     });
 });
 
 
-test('should cleanup queue for time outs', function (t) {
+test('should cleanup inflight requests count for timeouts', function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         setTimeout(function () {
             res.send();
             return next();
@@ -2575,20 +2575,20 @@ test('should cleanup queue for time outs', function (t) {
     });
 
     SERVER.get('/foo2', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 2);
         res.send();
         return next();
     });
 
     FAST_CLIENT.get('/foo1', function (err, _, res) {
         t.ok(err);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
 
         setTimeout(function () {
             // wait for server to flush response, 600 extra plus the already
             // 500ms we waited should be enough to cover the 1000 response time
             // of server.
-            t.equal(SERVER.unfinishedRequests(), 0);
+            t.equal(SERVER.inflightRequests(), 0);
             t.end();
         }, 600);
     });
@@ -2596,25 +2596,26 @@ test('should cleanup queue for time outs', function (t) {
     CLIENT.get('/foo2', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
 
-test('should cleanup queue on uncaughtExceptions', function (t) {
+test('should cleanup inflight requests count on uncaughtExceptions',
+    function (t) {
 
     SERVER.on('uncaughtException', function (req, res, route, err) {
         res.send(500, 'asplode');
     });
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         throw new Error('oh noes');
     });
 
     CLIENT.get('/foo1', function (err, _, res) {
         t.ok(err);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 });
@@ -2622,10 +2623,18 @@ test('should cleanup queue on uncaughtExceptions', function (t) {
 
 test('should show debug information', function (t) {
 
-    SERVER.pre(function pre (req, res, next) {return next();});
-    SERVER.pre(function pre2 (req, res, next) {return next();});
-    SERVER.use(function use (req, res, next) {return next();});
-    SERVER.use(function use2 (req, res, next) {return next();});
+    SERVER.pre(function pre (req, res, next) {
+        return next();
+    });
+    SERVER.pre(function pre2 (req, res, next) {
+        return next();
+    });
+    SERVER.use(function use (req, res, next) {
+        return next();
+    });
+    SERVER.use(function use2 (req, res, next) {
+        return next();
+    });
     SERVER.on('after', function aft () {});
     SERVER.on('after', function aft2 () {});
 
@@ -2677,8 +2686,6 @@ test('should show debug information', function (t) {
     });
 
     // check /foo
-    console.log('XXX', debugInfo.routes[0]);
-    console.log('XXX', debugInfo);
     t.equal(debugInfo.routes[0].handlers[0], 'use');
     t.equal(debugInfo.routes[0].handlers[1], 'use2');
     t.equal(debugInfo.routes[0].handlers[2], 'anonymous');
@@ -2731,6 +2738,7 @@ test('should show debug information', function (t) {
     ]);
     t.equal(debugInfo.server.address, '127.0.0.1');
     t.equal(typeof debugInfo.server.port, 'number');
+    t.equal(typeof debugInfo.server.inflightRequests, 'number');
 
     t.end();
 });
