@@ -68,9 +68,11 @@
   "dependencies": {
     "assert-plus": "^1.0.0",
     "bunyan": "^1.8.1",
+    "clone-regexp": "^1.0.0",
     "csv": "^1.1.0",
     "escape-regexp-component": "^1.0.2",
     "formidable": "^1.0.17",
+    "lodash": "^4.17.4",
     "lru-cache": "^4.0.1",
     "mime": "^1.2.11",
     "negotiator": "^0.6.1",
