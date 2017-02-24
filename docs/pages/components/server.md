@@ -93,6 +93,10 @@ of functions.
 
 Returns the number of inflight requests currently being handled by the server.
 
+## debugInfo()
+
+Returns debugging information about the current state of the server.
+
 # Events
 
 In additional to emitting all the events from node's
