@@ -171,6 +171,7 @@ test('use + get (path only)', function (t) {
         next();
     });
 
+
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
@@ -2480,10 +2481,10 @@ test('should \'emit\' after on aborted request ' +
 });
 
 
-test('should increment/decrement request queue depth', function (t) {
+test('should increment/decrement inflight request count', function (t) {
 
     SERVER.get('/foo', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         res.send();
         return next();
     });
@@ -2491,17 +2492,17 @@ test('should increment/decrement request queue depth', function (t) {
     CLIENT.get('/foo', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 });
 
 
-test('should increment/decrement request queue depth for concurrent reqs',
+test('should increment/decrement inflight request count for concurrent reqs',
 function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         setTimeout(function () {
             res.send();
             return next();
@@ -2509,7 +2510,7 @@ function (t) {
     });
 
     SERVER.get('/foo2', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 2);
         res.send();
         return next();
     });
@@ -2517,14 +2518,14 @@ function (t) {
     CLIENT.get('/foo1', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 
     CLIENT.get('/foo2', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2540,10 +2541,10 @@ test('should emit \'close\' on server close', function (t) {
 });
 
 
-test('should cleanup queue for 404s', function (t) {
+test('should cleanup inflight requests count for 404s', function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         res.send();
         return next();
     });
@@ -2551,22 +2552,22 @@ test('should cleanup queue for 404s', function (t) {
     CLIENT.get('/foo1', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
 
         CLIENT.get('/doesnotexist', function (err2, _2, res2) {
             t.ok(err2);
             t.equal(res2.statusCode, 404);
-            t.equal(SERVER.unfinishedRequests(), 0);
+            t.equal(SERVER.inflightRequests(), 0);
             t.end();
         });
     });
 });
 
 
-test('should cleanup queue for time outs', function (t) {
+test('should cleanup inflight requests count for timeouts', function (t) {
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         setTimeout(function () {
             res.send();
             return next();
@@ -2574,20 +2575,20 @@ test('should cleanup queue for time outs', function (t) {
     });
 
     SERVER.get('/foo2', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 2);
         res.send();
         return next();
     });
 
     FAST_CLIENT.get('/foo1', function (err, _, res) {
         t.ok(err);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
 
         setTimeout(function () {
             // wait for server to flush response, 600 extra plus the already
             // 500ms we waited should be enough to cover the 1000 response time
             // of server.
-            t.equal(SERVER.unfinishedRequests(), 0);
+            t.equal(SERVER.inflightRequests(), 0);
             t.end();
         }, 600);
     });
@@ -2595,25 +2596,149 @@ test('should cleanup queue for time outs', function (t) {
     CLIENT.get('/foo2', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
 
-test('should cleanup queue on uncaughtExceptions', function (t) {
+test('should cleanup inflight requests count on uncaughtExceptions',
+    function (t) {
 
     SERVER.on('uncaughtException', function (req, res, route, err) {
         res.send(500, 'asplode');
     });
 
     SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.unfinishedRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 1);
         throw new Error('oh noes');
     });
 
     CLIENT.get('/foo1', function (err, _, res) {
         t.ok(err);
-        t.equal(SERVER.unfinishedRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
+});
+
+
+test('should show debug information', function (t) {
+
+    SERVER.pre(function pre (req, res, next) {
+        return next();
+    });
+    SERVER.pre(function pre2 (req, res, next) {
+        return next();
+    });
+    SERVER.use(function use (req, res, next) {
+        return next();
+    });
+    SERVER.use(function use2 (req, res, next) {
+        return next();
+    });
+    SERVER.on('after', function aft () {});
+    SERVER.on('after', function aft2 () {});
+
+    SERVER.get('/foo',
+        function (req, res, next) {
+            return next();
+        },
+        function foo(req, res, next) {
+            res.end();
+            return next();
+        }
+    );
+
+    SERVER.get('/bar/:a/:b', function bar(req, res, next) {
+        res.end();
+        return next();
+    });
+
+    SERVER.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/,
+    function freeform(req, res, next) {
+        res.end();
+        return next();
+    });
+
+    var debugInfo = SERVER.debugInfo();
+
+    t.ok(debugInfo);
+    t.ok(debugInfo.routes);
+
+    debugInfo.routes.forEach(function (route) {
+        t.ok(route);
+        t.equal(typeof route.name, 'string');
+        t.equal(typeof route.method, 'string');
+        t.ok(
+            typeof route.input === 'string' ||
+            route.input instanceof RegExp === true
+        );
+        t.equal(typeof route.compiledRegex, 'object');
+
+        t.equal(route.versions instanceof Array, true);
+        route.versions.forEach(function (v) {
+            t.equal(typeof v, 'string');
+        });
+
+        t.equal(route.handlers instanceof Array, true);
+        route.handlers.forEach(function (handlerFn) {
+            t.equal(typeof handlerFn, 'string');
+        });
+    });
+
+    // check /foo
+    t.equal(debugInfo.routes[0].handlers[0], 'use');
+    t.equal(debugInfo.routes[0].handlers[1], 'use2');
+    t.equal(debugInfo.routes[0].handlers[2], 'anonymous');
+    t.equal(debugInfo.routes[0].handlers[3], 'foo');
+
+    // check /bar
+    t.equal(debugInfo.routes[0].handlers[0], 'use');
+    t.equal(debugInfo.routes[0].handlers[1], 'use2');
+    t.equal(debugInfo.routes[1].handlers[2], 'bar');
+
+    // check use, pre, and after handlers
+    t.ok(debugInfo.server.use);
+    t.equal(debugInfo.server.use[0], 'use');
+    t.equal(debugInfo.server.use[1], 'use2');
+
+    t.ok(debugInfo.server.pre);
+    t.equal(debugInfo.server.pre[0], 'pre');
+    t.equal(debugInfo.server.pre[1], 'pre2');
+
+    t.ok(debugInfo.server.after);
+    t.equal(debugInfo.server.after[0], 'aft');
+    t.equal(debugInfo.server.after[1], 'aft2');
+
+    // detailed test for compiled regex
+    // verify url parameter regex
+    t.deepEqual(debugInfo.routes[1].name, 'getbarab054143200');
+    t.deepEqual(debugInfo.routes[1].method, 'get');
+    t.deepEqual(debugInfo.routes[1].input, '/bar/:a/:b');
+    t.ok(debugInfo.routes[1].compiledRegex instanceof RegExp);
+    t.deepEqual(debugInfo.routes[1].compiledUrlParams, {
+        0: 'a',
+        1: 'b'
+    });
+    // verify freeform regex
+    t.deepEqual(debugInfo.routes[2].name, 'getazaz09_054143200');
+    t.deepEqual(debugInfo.routes[2].method, 'get');
+    t.ok(debugInfo.routes[2].input instanceof RegExp);
+    t.ok(debugInfo.routes[2].compiledRegex instanceof RegExp);
+    // freeform regex input should equal output
+    t.equal(debugInfo.routes[2].input.toString(),
+            debugInfo.routes[2].compiledRegex.toString());
+    t.deepEqual(debugInfo.routes[2].compiledUrlParams, null);
+
+    // verify other server details
+    t.deepEqual(Object.keys(debugInfo.server.formatters), [
+        'application/javascript',
+        'application/json',
+        'text/plain',
+        'application/octet-stream'
+    ]);
+    t.equal(debugInfo.server.address, '127.0.0.1');
+    t.equal(typeof debugInfo.server.port, 'number');
+    t.equal(typeof debugInfo.server.inflightRequests, 'number');
+
+    t.end();
 });

@@ -89,9 +89,13 @@ via `use()` will run only after the router has found a matching route. If no
 match is found, these handlers will never run. Takes a function, or an array
 of functions.
 
-## unfinishedRequests()
+## inflightRequests()
 
-Returns the number of unfinished requests currently being handled by the server.
+Returns the number of inflight requests currently being handled by the server.
+
+## debugInfo()
+
+Returns debugging information about the current state of the server.
 
 # Events
 
