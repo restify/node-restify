@@ -2659,7 +2659,7 @@ test('should show debug information', function (t) {
         return next();
     });
 
-    var debugInfo = SERVER.debugInfo();
+    var debugInfo = SERVER.getDebugInfo();
 
     t.ok(debugInfo);
     t.ok(debugInfo.routes);

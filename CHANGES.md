@@ -1,7 +1,7 @@
 # restify Changelog
 
 ## 5.0.0
- - #1281 Add `server.debugInfo` method, Yunong Xiao, Alex Liu
+ - #1281 Add `server.getDebugInfo()` method, Yunong Xiao, Alex Liu
  - #1281 `server.unfinishedRequests()` to `server.inflightRequests()`, Yunong Xiao
  - #1256 add `req.id()` method, Alex Liu
  - #1251 add `req.connectionState()` method, Alex Liu
