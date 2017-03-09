@@ -301,7 +301,7 @@ hooked into handle audit logs and other metrics. Since this event fires
 *before* routing has occured, it will fire regardless of whether the route is
 supported or not, e.g. requests that result in a `404`.
 
-The singature for the `pre` event is as follows:
+The signature for the `pre` event is as follows:
 
 ```js
 function(req, res) {}
@@ -318,7 +318,7 @@ NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
 A `routed` event is fired after a request has been routed by the router, but
 before handlers specific to that route has run.
 
-The sginature for the `routed` event is as follows:
+The signature for the `routed` event is as follows:
 
 ```js
 function(req, res, route) {}
