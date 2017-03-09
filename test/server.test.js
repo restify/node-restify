@@ -2804,7 +2804,7 @@ test('should emit \'pre\' event on 404', function (t) {
 });
 
 
-test('should emit \'run\' event on a 200', function (t) {
+test('should emit \'routed\' event on a 200', function (t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2814,7 +2814,7 @@ test('should emit \'run\' event on a 200', function (t) {
     });
 
     var count = 0;
-    SERVER.once('run', function (req, res, route) {
+    SERVER.once('routed', function (req, res, route) {
         t.ok(req);
         t.ok(res);
         t.ok(route);
@@ -2835,7 +2835,7 @@ test('should emit \'run\' event on a 200', function (t) {
 });
 
 
-test('should not \'run\' event on 404', function (t) {
+test('should not emit \'routed\' event on 404', function (t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2844,7 +2844,7 @@ test('should not \'run\' event on 404', function (t) {
         next();
     });
 
-    SERVER.once('run', function (req, res, route) {
+    SERVER.once('routed', function (req, res, route) {
         t.fail();
     });
 
