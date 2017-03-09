@@ -298,7 +298,7 @@ NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
 
 Before each request has been routed, a `pre` event is fired. This event can be
 hooked into handle audit logs and other metrics. Since this event fires
-*before* routing has occured, it will firing regardless of whether the route is
+*before* routing has occured, it will fire regardless of whether the route is
 supported or not, e.g. requests that result in a `404`.
 
 The singature for the `pre` event is as follows:
