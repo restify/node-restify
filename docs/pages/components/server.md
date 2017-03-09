@@ -294,6 +294,46 @@ Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
 
 
+## pre
+
+Before each request has been routed, a `pre` event is fired. This event can be
+hooked into handle audit logs and other metrics. Since this event fires
+*before* routing has occured, it will firing regardless of whether the route is
+supported or not, e.g. requests that result in a `404`.
+
+The singature for the `pre` event is as follows:
+
+```js
+function(req, res) {}
+```
+* req - the request object
+* res - the response object
+
+Note that when the server automatically responds with a
+NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
+
+
+## routed
+
+A `routed` event is fired after a request has been routed by the router, but
+before handlers specific to that route has run.
+
+The sginature for the `routed` event is as follows:
+
+```js
+function(req, res, route) {}
+```
+
+* req - the request object
+* res - the response object
+* route - the route object that serviced the request
+
+Note that this event will *not* fire if a requests comes in that are not
+routable, i.e. one that would result in a `404`.
+
+
+##
+
 ## uncaughtException
 
 If the restify server was created with `handleUncaughtExceptions: true`,
