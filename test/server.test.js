@@ -2742,3 +2742,116 @@ test('should show debug information', function (t) {
 
     t.end();
 });
+
+
+test('should emit \'pre\' event on a 200', function (t) {
+    SERVER.get('/foo/:id', function echoId(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
+        res.send();
+        next();
+    });
+
+    var count = 0;
+    SERVER.once('pre', function (req, res) {
+        t.ok(req);
+        t.ok(res);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+
+test('should emit \'pre\' event on 404', function (t) {
+    SERVER.get('/foo/:id', function echoId(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
+        res.send();
+        next();
+    });
+
+    var count = 0;
+    SERVER.once('pre', function (req, res) {
+        t.ok(req);
+        t.ok(res);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/badroute', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+
+test('should emit \'run\' event on a 200', function (t) {
+    SERVER.get('/foo/:id', function echoId(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
+        res.send();
+        next();
+    });
+
+    var count = 0;
+    SERVER.once('run', function (req, res, route) {
+        t.ok(req);
+        t.ok(res);
+        t.ok(route);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+
+test('should not \'run\' event on 404', function (t) {
+    SERVER.get('/foo/:id', function echoId(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        t.equal(req.isUpload(), false);
+        res.send();
+        next();
+    });
+
+    SERVER.once('run', function (req, res, route) {
+        t.fail();
+    });
+
+    CLIENT.get('/badroute', function (err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+
+        t.end();
+    });
+});
