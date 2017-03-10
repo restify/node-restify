@@ -2753,23 +2753,15 @@ test('should emit \'pre\' event on a 200', function (t) {
         next();
     });
 
-    var count = 0;
     SERVER.once('pre', function (req, res) {
         t.ok(req);
         t.ok(res);
-
-        if (++count === 2) {
-            t.end();
-        }
     });
 
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-
-        if (++count === 2) {
-            t.end();
-        }
+        t.end();
     });
 });
 
@@ -2783,23 +2775,15 @@ test('should emit \'pre\' event on 404', function (t) {
         next();
     });
 
-    var count = 0;
     SERVER.once('pre', function (req, res) {
         t.ok(req);
         t.ok(res);
-
-        if (++count === 2) {
-            t.end();
-        }
     });
 
     CLIENT.get('/badroute', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
-
-        if (++count === 2) {
-            t.end();
-        }
+        t.end();
     });
 });
 
@@ -2813,24 +2797,16 @@ test('should emit \'routed\' event on a 200', function (t) {
         next();
     });
 
-    var count = 0;
     SERVER.once('routed', function (req, res, route) {
         t.ok(req);
         t.ok(res);
         t.ok(route);
-
-        if (++count === 2) {
-            t.end();
-        }
     });
 
     CLIENT.get('/foo/bar', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-
-        if (++count === 2) {
-            t.end();
-        }
+        t.end();
     });
 });
 
@@ -2851,7 +2827,6 @@ test('should not emit \'routed\' event on 404', function (t) {
     CLIENT.get('/badroute', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
-
         t.end();
     });
 });
