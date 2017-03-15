@@ -91,8 +91,28 @@
  - #845 Support sync and async formatters, Alex Liu
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
+ - Various documentation improvements from leitsubomi
 
-Various documentation improvements from leitsubomi,
+## 4.3.0
+
+- #1024 Add `handleUncaughtExceptions` server option to supporting disabling
+  the uncaughtException handler.
+
+## 4.2.0
+
+- #925 Support passing (most) [qs](https://github.com/ljharb/qs#readme) options
+  to the `restify.queryParser` plugin. Update the "qs" dependency to latest (v6)
+  while maintaining backward compatibility (see notes in the API doc and
+  "test/query.test.js" on `allowDots` and `plainObjects`).
+
+## 4.1.1
+
+- update negotiator (NSP advisory #106) and lru-cache (bug fix).
+
+## 4.1.0
+
+- Bump SPDY to latest.
+- #959: fix issue where cached routes were not setting maxVersion on the req
 
 ## 4.0.4
 
