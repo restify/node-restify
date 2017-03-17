@@ -13,8 +13,8 @@ The `createServer()` method takes the following options:
 
 |Option|Type|Description|
 |----------|--------|---------------|
-|certificate|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
-|key|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
+|certificate|String|Buffer|If you want to create an HTTPS server, pass in a PEM-encoded certificate and key|
+|key|String|Buffer|If you want to create an HTTPS server, pass in a PEM-encoded certificate and key|
 |formatters|Object|Custom response formatters for `res.send()`|
 |handleUncaughtExceptions|Boolean|When true (default is false) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack|
 |log|Object|You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required|
