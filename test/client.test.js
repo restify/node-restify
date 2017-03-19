@@ -6,7 +6,7 @@ var http = require('http');
 
 var crypto = require('crypto');
 
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var restify = require('../lib');
 
