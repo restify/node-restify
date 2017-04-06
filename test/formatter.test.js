@@ -87,6 +87,12 @@ before(function (callback) {
                 res.send('dummy response');
                 return next();
             });
+            SERVER.get('/jsonpSeparators', function (req, res, next) {
+                res.setHeader('content-type', 'application/javascript');
+                res.send(String.fromCharCode(0x2028)
+                         + String.fromCharCode(0x2029));
+                return next();
+            });
             process.nextTick(callback);
         });
     } catch (e) {
@@ -341,6 +347,27 @@ test('GH-937 should return 500 when no default formatter found ' +
         t.ok(req);
         t.ok(res);
         t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+
+test('default jsonp formatter should escape ' +
+     'line and paragraph separators', function (t) {
+
+    // ensure client accepts only a type not specified by server
+    var opts = {
+        path: '/jsonpSeparators',
+        headers: {
+            accept: 'application/javascript'
+        }
+    };
+
+    CLIENT.get(opts, function (err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(data, '"\\u2028\\u2029"');
         t.end();
     });
 });
