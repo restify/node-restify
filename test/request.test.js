@@ -170,3 +170,31 @@ test('should throw when setting request id twice', function (t) {
     });
 });
 
+test('should provide route info', function (t) {
+
+    SERVER.get('/ping/:name', function (req, res, next) {
+        /*
+         req.getRoute() should return something like this :
+             {
+                path: '/ping/:name',
+                method: 'GET',
+                versions: [],
+                name: 'getpingname'
+             }
+         */
+        var routeInfo = req.getRoute();
+        t.equal(routeInfo.path, '/ping/:name');
+        t.equal(routeInfo.method, 'GET');
+        res.send({name:req.params.name});
+        return next();
+    });
+
+    CLIENT.get('/ping/lagavulin', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        // the response.body is a JSON string
+        t.deepEqual(JSON.parse(res.body), {name:'lagavulin'});
+        t.end();
+    });
+});
+
