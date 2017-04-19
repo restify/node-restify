@@ -170,7 +170,7 @@ test('should throw when setting request id twice', function (t) {
     });
 });
 
-test('should provide route info', function (t) {
+test('should provide route object', function (t) {
 
     SERVER.get('/ping/:name', function (req, res, next) {
         /*
@@ -189,11 +189,10 @@ test('should provide route info', function (t) {
         return next();
     });
 
-    CLIENT.get('/ping/lagavulin', function (err, _, res) {
+    CLIENT.get('/ping/lagavulin', function (err, _, res, parsedBody) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        // the response.body is a JSON string
-        t.deepEqual(JSON.parse(res.body), {name:'lagavulin'});
+        t.deepEqual(parsedBody, {name:'lagavulin'});
         t.end();
     });
 });
