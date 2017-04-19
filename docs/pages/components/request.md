@@ -293,7 +293,7 @@ Returns the accept-version header.
 
 __Returns__ {Object}
 
-Returns the route information to which the current request was matched to.
+Returns the route object to which the current request was matched to.
 The following json represents the JSON object returned by getRoute():
 
 ```js

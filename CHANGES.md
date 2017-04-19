@@ -1,7 +1,7 @@
 # restify Changelog
 
 ## 5.0.0
- - #1309 Add `getRoute()` to Request to get the route information. Rajat Kumar
+ - #1309 Add `getRoute()` to Request to get the route object. Rajat Kumar
  - #1288 add `pre` and `routed` events. Yunong Xiao
  - #1281 Add `server.getDebugInfo()` method, Yunong Xiao, Alex Liu
  - #1281 `server.unfinishedRequests()` to `server.inflightRequests()`, Yunong Xiao
