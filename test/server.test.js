@@ -7,7 +7,7 @@ var childprocess = require('child_process');
 var http = require('http');
 
 var filed = require('filed');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 var RestError = require('../lib/errors').RestError;
 var restify = require('../lib');
