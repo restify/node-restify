@@ -13,15 +13,15 @@ The `createServer()` method takes the following options:
 
 |Option|Type|Description|
 |----------|--------|---------------|
-|certificate|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
-|key|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
-|formatters|Object|Custom response formatters for `res.send()`|
-|handleUncaughtExceptions|Boolean|When true (default is false) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack|
-|log|Object|You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required|
-|name|String|By default, this will be set in the `Server` response header, default is `restify`. Pass empty string to unset the header. |
-|spdy|Object|Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)|
-|version|String|Array|A default version to set for all routes|
-|handleUpgrades|Boolean|Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`|
+|certificate|String or Buffer|If you want to create an HTTPS server, pass in a PEM-encoded certificate and key.|
+|key|String or Buffer|If you want to create an HTTPS server, pass in a PEM-encoded certificate and key.|
+|formatters|Object|Custom response formatters for `res.send()`.|
+|handleUncaughtExceptions|Boolean|When true (default is false) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack.|
+|log|Object|You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required.|
+|name|String|By default, this will be set in the `Server` response header, default is `restify`. Pass empty string to unset the header.|
+|spdy|Object|Any options accepted by [node-spdy](https://github.com/indutny/node-spdy).|
+|version|String or Array(String)|Default version(s) to set for all routes.|
+|handleUpgrades|Boolean|Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`.|
 |httpsServerOptions|Object|Any options accepted by [node-https Server](http://nodejs.org/api/https.html#https_https). If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.|
 |strictRouting|Boolean|(Default=`false`). If set, Restify will treat "/foo" and "/foo/" as different paths.|
 
@@ -32,11 +32,11 @@ A restify server has the following properties on it:
 
 |Name|Type|Description|
 |--------|--------|---------------|
-|name|String|name of the server|
-|version|String|Array|default version(s) to use in all routes|
-|log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance|
-|acceptable|Array(String)|list of content-types this server can respond with|
-|url|String|Once listen() is called, this will be filled in with where the server is running|
+|name|String|Name of the server.|
+|version|String or Array(String)|Default version(s) to use in all routes.|
+|log|Object|[bunyan](https://github.com/trentm/node-bunyan) instance.|
+|acceptable|Array(String)|List of content-types this server can respond with.|
+|url|String|Once listen() is called, this will be filled in with where the server is running.|
 
 # Methods
 
