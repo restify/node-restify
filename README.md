@@ -39,10 +39,6 @@ REST APIs.  For full details, see http://restify.com
 
 Follow restify on [![alt text][1.2]][1]
 
-Join us on IRC at `irc.freenode.net` in the `#restify` channel for real-time
-chat and support.
-
-
 # Usage
 
 ## Server
