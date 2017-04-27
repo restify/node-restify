@@ -60,10 +60,6 @@ observability into the latency and characteristics of my
 applications.  If you don't need that, or don't care about those
 aspect(s), then it's probably not for you.
 
-For real time chat, discussion and support, join the `#restify` IRC channel on
-`irc.freenode.net`.
-
-
 ## About this guide - FIXUP
 
 This guide provides comprehensive documentation on writing a REST api (server)

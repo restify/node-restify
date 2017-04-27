@@ -287,3 +287,20 @@ are:
 __Returns__ {String}
 
 Returns the accept-version header.
+
+
+## getRoute()
+
+__Returns__ {Object}
+
+Returns the route object to which the current request was matched to.
+The following json represents the JSON object returned by getRoute():
+
+```js
+{
+    path: '/ping/:name',
+    method: 'GET',
+    versions: [],
+    name: 'getpingname'
+}
+```

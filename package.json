@@ -50,7 +50,7 @@
     "express",
     "DTrace"
   ],
-  "version": "5.0.0-beta-7.0",
+  "version": "5.0.0-beta-8.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/restify/node-restify.git"
@@ -85,7 +85,7 @@
     "vasync": "^1.6.4"
   },
   "optionalDependencies": {
-    "dtrace-provider": "^0.6.0"
+    "dtrace-provider": "^0.8.1"
   },
   "devDependencies": {
     "cover": "^0.2.9",
@@ -96,7 +96,7 @@
     "nsp": "^2.2.0",
     "restify-clients": "^1.2.1",
     "restify-plugins": "^1.0.3",
-    "validator": "^6.2.0",
+    "validator": "^7.0.0",
     "watershed": "^0.3.0"
   },
   "license": "MIT",
