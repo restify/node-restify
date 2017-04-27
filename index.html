@@ -1336,7 +1336,13 @@ server.get('/hello/:name', function(req, res, next) {
 });
 </code></pre>
 
-The above example sets <code>res.etag</code> which is compared against the request's headers by <code>restify.conditionalRequest()</code> to determine if a <code>304</code> should be returned. It also sets the <code>Etag</code> header in the response, so that the client can include it in future requests. Finally, it sets the <code>Last Modified</code> header so <code>restify.conditionalRequest()</code> can determine if the client's copy of the request needs to be updated.
+The above example sets <code>res.etag</code> which is compared against the
+request's headers by <code>restify.conditionalRequest()</code> to determine if
+a <code>304</code> should be returned. It also sets the <code>Etag</code>
+header in the response, so that the client can include it in future requests.
+Finally, it sets the <code>Last Modified</code> header so
+<code>restify.conditionalRequest()</code> can determine if the client's copy of
+the request needs to be updated.
 
 <h3 id="audit-logging">Audit Logging</h3>
 
