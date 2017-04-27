@@ -660,6 +660,10 @@ test('GH-77 uncaughtException (default behavior)', function (t) {
     CLIENT.get('/', function (err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 500);
+
+        if (res.headers) {
+            t.equal(res.headers.connection, 'close', 'close connection');
+        }
         t.end();
     });
 });
@@ -676,6 +680,12 @@ test('GH-77 uncaughtException (with custom handler)', function (t) {
     CLIENT.get('/', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 204);
+
+        // We don't close the connection for our user if they specify their own
+        // handler
+        if (res.headers) {
+            t.equal(res.headers.connection, 'keep-alive');
+        }
         t.end();
     });
 });
