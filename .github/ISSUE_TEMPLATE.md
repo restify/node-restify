@@ -22,6 +22,10 @@ to problems accordingly, ensuring you get the fastest response possible!  -->
 
 # Bug Report
 
+## Restify Version
+
+## Node.js Version
+
 ## Expected behaviour
 
 > This section details what you expected restify to do based on the code that you wrote
