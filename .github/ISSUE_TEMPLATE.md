@@ -34,7 +34,7 @@ to problems accordingly, ensuring you get the fastest response possible!  -->
 
 > This section details what restify actually did when you ran your code
 
-## Rerpo case
+## Repro case
 
 > Please include a simple and concise example reproducing this bug. Please _do
 > not_ just dump your application here. By either not providing a repro case or
