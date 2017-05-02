@@ -59,6 +59,7 @@ start!
 * [Multiple route handlers][1183]
 * [Update new `HttpError` codes][1206]
 * [v4 res.headers][1286]
+* [Document RegExp DSL for routing][1065]
 
 [289]: https://github.com/restify/node-restify/issues/289
 [381]: https://github.com/restify/node-restify/issues/381
@@ -101,3 +102,4 @@ start!
 [1286]: https://github.com/restify/node-restify/issues/1286
 [1323]: https://github.com/restify/node-restify/issues/1323
 [1292]: https://github.com/restify/node-restify/issues/1292
+[1065]: https://github.com/restify/node-restify/pull/1065
