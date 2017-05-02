@@ -37,6 +37,7 @@ start!
 * [Support multiple apps on the same port][1035]
 * [Multiple versions for routes][1134]
 * [sysdig support][1323]
+* [Migrate routing DSL to `path-to-regexp][1292]
 
 ## Documentation
 
@@ -99,3 +100,4 @@ start!
 [1206]: https://github.com/restify/node-restify/issues/1206
 [1286]: https://github.com/restify/node-restify/issues/1286
 [1323]: https://github.com/restify/node-restify/issues/1323
+[1292]: https://github.com/restify/node-restify/issues/1292
