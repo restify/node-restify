@@ -19,12 +19,20 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
+var customFormatter = function ( req, res, body, formatterCb ) {
+    return res.formatters['application/json']( req, res, body, formatterCb );
+};
+
+var customerFormatters = {
+    'application/vnd.restify.extension+json;q=0.1;ext=hola': customFormatter
+};
 
 before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
-            log: helper.getLog('server')
+            log: helper.getLog('server'),
+            formatters: customerFormatters
         });
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
@@ -85,6 +93,30 @@ test('query should return raw query string string', function (t) {
     CLIENT.get('/qs?a=1&b=2', function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+
+test('CH-1219 accept parameters allow customer formatters', function (t) {
+    SERVER.get('/accepts', function (req, res, next) {
+        var result = req.accepts( res.acceptable );
+        res.send({ acceptable: result });
+        next();
+    });
+
+    var req = {
+        path: '/accepts',
+        headers: {
+            accept: 'application/vnd.restify.extension+json;ext=uhoh'
+        }
+    };
+
+    CLIENT.get( req, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var e = '{"acceptable":"application/vnd.restify.extension+json"}';
+        t.equal(res.body, e);
         t.end();
     });
 });

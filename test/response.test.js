@@ -23,13 +23,35 @@ var SERVER;
 var LOCALHOST;
 var SLOCALHOST;
 
+var simpleFormatter = function ( req, res, body, formatterCb ) {
+    var data = JSON.stringify({ customFormatterUsed: 'simple' });
+    return formatterCb( null, data );
+};
+
+var overrideFormatter = function ( req, res, body, formatterCb ) {
+    var data = JSON.stringify({ customFormatterUsed: 'override' });
+    res.setHeader('Content-Type', 'application/json' );
+    return formatterCb( null, data );
+};
+
+var extensionFormatter = function ( req, res, body, cb ) {
+    var data = JSON.stringify({ customFormatterUsed: 'extension' });
+    return cb( null, data );
+};
+
+var customFormatters = {
+    'application/vnd.restify.simple+json': simpleFormatter,
+    'application/vnd.restify.override+json': overrideFormatter,
+    'application/vnd.restify.extension+json;q=0.1;ext=hola': extensionFormatter
+};
 
 before(function (cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server'),
-            version: ['2.0.0', '0.5.4', '1.4.3']
+            version: ['2.0.0', '0.5.4', '1.4.3'],
+            formatters: customFormatters
         });
         SERVER.use(restify.queryParser());
         SERVER.listen(PORT, '127.0.0.1', function () {
@@ -342,6 +364,105 @@ test('should fail to set header due to missing formatter', function (t) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(res.headers['content-type'], 'application/octet-stream');
+        t.end();
+    });
+});
+
+
+test('GH-1219 right formatter based on accept header', function (t) {
+
+    SERVER.get('/12', function handle(req, res, next) {
+        res.send( 200, JSON.stringify({ hello: 'world' }));
+        return next();
+    });
+
+    var req = {
+        path: '/12',
+        headers: {
+            accept: 'application/vnd.restify.simple+json'
+        }
+    };
+
+    CLIENT.get( req, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var expected = 'application/vnd.restify.simple+json';
+        t.equal(res.headers['content-type'], expected);
+        t.equal(res.body, '{"customFormatterUsed":"simple"}');
+        t.end();
+    });
+});
+
+
+test('GH-1219 right formatter when the accept includes quality', function (t) {
+
+    SERVER.get('/13', function handle(req, res, next) {
+        res.send( 200, JSON.stringify({ hello: 'world' }));
+        return next();
+    });
+
+    var req = {
+        path: '/13',
+        headers: {
+            accept: 'application/vnd.restify.simple+json;q=1'
+        }
+    };
+
+    CLIENT.get( req, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var expected = 'application/vnd.restify.simple+json';
+        t.equal(res.headers['content-type'], expected);
+        t.equal(res.body, '{"customFormatterUsed":"simple"}');
+        t.end();
+    });
+});
+
+
+test('GH-1219 right formatter when using an known extension', function (t) {
+
+    SERVER.get('/14', function handle(req, res, next) {
+        res.send( 200, JSON.stringify({ hello: 'world' }));
+        return next();
+    });
+
+    var req = {
+        path: '/14',
+        headers: {
+            accept: 'application/vnd.restify.extension+json;ext=known'
+        }
+    };
+
+    CLIENT.get( req, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var expected = 'application/vnd.restify.extension+json';
+        t.equal(res.headers['content-type'], expected);
+        t.equal(res.body, '{"customFormatterUsed":"extension"}');
+        t.end();
+    });
+});
+
+test('GH-1219 right formatter when using an unknown extension', function (t) {
+
+    SERVER.get('/15', function handle(req, res, next) {
+        res.send( 200, JSON.stringify({ hello: 'world' }));
+        return next();
+    });
+
+    var req = {
+        path: '/15',
+        headers: {
+            accept: 'application/vnd.restify.extension+json;ext=unknown'
+        }
+    };
+
+    CLIENT.get( req, function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        var expected = 'application/vnd.restify.extension+json';
+        t.equal(res.headers['content-type'], expected);
+        t.equal(res.body, '{"customFormatterUsed":"extension"}');
         t.end();
     });
 });
