@@ -98,7 +98,7 @@ the parsed query string:
 
 ```js
 // incoming request is /foo?a=1
-server.use(plugins.queryParser());
+server.use(restify.plugins.queryParser());
 req.getQuery();
 // => { a: 1 }
 ```

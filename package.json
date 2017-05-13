@@ -129,7 +129,6 @@
     "nodeunit": "^0.11.0",
     "nsp": "^2.2.0",
     "restify-clients": "^1.2.1",
-    "restify-plugins": "^1.0.3",
     "rimraf": "^2.4.3",
     "validator": "^7.0.0",
     "watershed": "^0.3.0"

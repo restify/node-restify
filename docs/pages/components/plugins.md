@@ -1,7 +1,7 @@
 # restify-plugins
 
-A bundle of plugins compatible with restify can be pulled in via the
-[restify-plugins](https://github.com/restify/plugins) module.
+Restify comes bundled with a selection of useful plugins. These are accessible
+off of `restify.plugins`.
 
 * Accept header parsing
 * Authorization header parsing
@@ -20,15 +20,15 @@ Here's some example code using all the shipped plugins:
 
 ```js
 var server = restify.createServer();
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.jsonp());
-server.use(restify.gzipResponse());
-server.use(restify.bodyParser());
-server.use(restify.requestExpiry());
-server.use(restify.throttle({
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.authorizationParser());
+server.use(restify.plugins.dateParser());
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.jsonp());
+server.use(restify.plugins.gzipResponse());
+server.use(restify.plugins.bodyParser());
+server.use(restify.plugins.requestExpiry());
+server.use(restify.plugins.throttle({
   burst: 100,
   rate: 50,
   ip: true,
@@ -39,7 +39,7 @@ server.use(restify.throttle({
     }
   }
 }));
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 ```
 
 ## Accept Parser
@@ -51,7 +51,7 @@ how to respond to (with the formatters you've registered).  If the request is
 for a non-handled type, this plugin will return an error of `406`.
 
 ```js
-server.use(restify.acceptParser(server.acceptable));
+server.use(restify.plugins.acceptParser(server.acceptable));
 ```
 
 ## Authorization Parser
@@ -85,7 +85,7 @@ is unrecognized, the only thing available in `req.authorization` will be
 ## Date Parser
 
 ```js
-server.use(restify.dateParser());
+server.use(restify.plugins.dateParser());
 ```
 
 Parses out the HTTP Date header (if present) and checks for clock skew (default
@@ -94,13 +94,13 @@ interpreted in seconds, to allow for clock skew.
 
 ```js
 // Allows clock skew of 1m
-server.use(restify.dateParser(60));
+server.use(restify.plugins.dateParser(60));
 ```
 
 ## QueryParser
 
 ```js
-server.use(restify.queryParser());
+server.use(restify.plugins.queryParser());
 ```
 
 Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`).  If you use this,
@@ -109,7 +109,7 @@ are merged into `req.params`.  You can disable by passing in `mapParams: false`
 in the options object:
 
 ```js
-server.use(restify.queryParser({ mapParams: false }));
+server.use(restify.plugins.queryParser({ mapParams: false }));
 ```
 
 ## JSONP
@@ -129,7 +129,7 @@ Blocks your chain on reading and parsing the HTTP request body.  Switches on
 supported.
 
 ```js
-server.use(restify.bodyParser({
+server.use(restify.plugins.bodyParser({
     maxBodySize: 0,
     mapParams: true,
     mapFiles: false,
@@ -172,7 +172,7 @@ Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with the
 current request id filled in, along with any other parameters you define.
 
 ```js
-server.use(restify.requestLogger({
+server.use(restify.plugins.requestLogger({
     properties: {
         foo: 'bar'
     },
@@ -194,7 +194,7 @@ Options:
 ## GzipResponse
 
 ```js
-server.use(restify.gzipResponse());
+server.use(restify.plugins.gzipResponse());
 ```
 
 If the client sends an `accept-encoding: gzip` header (or one with an
@@ -212,7 +212,7 @@ The serveStatic module is different than most of the other plugins, in that it
 is expected that you are going to map it to a route, as below:
 
 ```js
-server.get(/\/docs\/current\/?.*/, restify.serveStatic({
+server.get(/\/docs\/current\/?.*/, restify.plugins.serveStatic({
   directory: './documentation/v1',
   default: 'index.html'
 }));
@@ -243,7 +243,7 @@ serveStatic method as an option. The following will serve index.html from
 the documentation/v1/ directory anytime a client requests `/home/`.
 
 ```js
-server.get(/\/home\//, restify.serveStatic({
+server.get(/\/home\//, restify.plugins.serveStatic({
   directory: './documentation/v1',
   file: 'index.html'
 }));
@@ -261,7 +261,7 @@ different request rates to different resources (if for example, one route, like
 `/my/slow/database` is much easier to overwhlem than `/my/fast/memcache`).
 
 ```js
-server.use(restify.throttle({
+server.use(restify.plugins.throttle({
   burst: 100,
   rate: 50,
   ip: true,
@@ -307,7 +307,7 @@ already been timed out by the client. This prevents the server from
 processing unnecessary requests.
 
 ```js
-server.use(restify.requestExpiry({
+server.use(restify.plugins.requestExpiry({
     header: 'x-request-expiry-time'
 });
 ```
@@ -331,7 +331,7 @@ with a `String` key, and an `Object` value.
 ## Conditional Request Handler
 
 ```js
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 ```
 
 You can use this handler to let clients do nice HTTP semantics with the
@@ -358,7 +358,7 @@ server.use(function setETag(req, res, next) {
   res.header('Last-Modified', new Date());
 });
 
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 
 server.get('/hello/:name', function(req, res, next) {
   res.send('hello ' + req.params.name);
@@ -371,7 +371,7 @@ Audit logging is a special plugin, as you don't use it with `.use()`, but with
 the `after` event:
 
 ```js
-server.on('after', restify.auditLogger({
+server.on('after', restify.plugins.auditLogger({
   log: bunyan.createLogger({
     name: 'audit',
     stream: process.stdout
