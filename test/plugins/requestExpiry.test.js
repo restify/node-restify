@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -47,7 +46,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({ absoluteHeader: key }));
+            SERVER.use(restify.plugins.requestExpiry({ absoluteHeader: key }));
             SERVER.get(getPath, function (req, res, next) {
                 called = true;
                 res.send();
@@ -75,7 +74,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({ absoluteHeader: key }));
+            SERVER.use(restify.plugins.requestExpiry({ absoluteHeader: key }));
             SERVER.get(getPath, function (req, res, next) {
                 called = true;
                 res.send();
@@ -103,7 +102,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({ absoluteHeader: key }));
+            SERVER.use(restify.plugins.requestExpiry({ absoluteHeader: key }));
             SERVER.get(getPath, function (req, res, next) {
                 called = true;
                 res.send();
@@ -133,7 +132,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({
+            SERVER.use(restify.plugins.requestExpiry({
                 startHeader: startKey,
                 timeoutHeader: timeoutKey
             }));
@@ -166,7 +165,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({
+            SERVER.use(restify.plugins.requestExpiry({
                 startHeader: startKey,
                 timeoutHeader: timeoutKey
             }));
@@ -199,7 +198,7 @@ describe('request expiry parser', function () {
             var getPath = '/request/expiry';
             var called = false;
 
-            SERVER.use(plugins.requestExpiry({
+            SERVER.use(restify.plugins.requestExpiry({
                 startHeader: startKey,
                 timeoutHeader: timeoutKey
             }));

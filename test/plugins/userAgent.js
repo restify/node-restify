@@ -10,7 +10,6 @@ var restify = require('../../lib/index.js');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -32,7 +31,7 @@ describe('userAgent pre-route handler', function () {
 
         // Enable the user agent pre-route handler, since this is the component
         // under test.
-        SERVER.use(plugins.pre.userAgentConnection());
+        SERVER.use(restify.plugins.pre.userAgentConnection());
 
         SERVER.head('/test/:name', function (req, res, next) {
             // Explicitly set Content-Length response header so that we can test

@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -42,7 +41,7 @@ describe('query parser', function () {
 
 
     it('restify-GH-124 should return empty query', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/:id', function (req, res, next) {
             assert.equal(req.getQuery(), '');
@@ -59,7 +58,7 @@ describe('query parser', function () {
     });
 
     it('should parse req.query and req.params independently', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/:id', function (req, res, next) {
             assert.equal(req.query.id, 'bar');
@@ -78,7 +77,7 @@ describe('query parser', function () {
     });
 
     it('should map req.query onto req.params', function (done) {
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
 
@@ -97,7 +96,7 @@ describe('query parser', function () {
     });
 
     it('should take req.query and stomp on req.params', function (done) {
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -118,7 +117,7 @@ describe('query parser', function () {
     });
 
     it('should parse associative array syntax', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/:id', function (req, res, next) {
             assert.equal(req.params.id, 'foo');
@@ -138,7 +137,7 @@ describe('query parser', function () {
     });
 
     it('should parse array syntax', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/:id', function (req, res, next) {
             assert.equal(req.params.id, 'foo');
@@ -157,7 +156,7 @@ describe('query parser', function () {
     });
 
     it('should parse nested array syntax', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/:id', function (req, res, next) {
             assert.equal(req.params.id, 'foo');
@@ -180,7 +179,7 @@ describe('query parser', function () {
     });
 
     it('restify-GH-59 Query params with / result in a 404', function (done) {
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/', function tester(req, res, next) {
             res.send('hello world');
@@ -196,8 +195,8 @@ describe('query parser', function () {
     });
 
     it('restify-GH-323: <url>/<path>/?<queryString> broken', function (done) {
-        SERVER.pre(plugins.pre.sanitizePath());
-        SERVER.use(plugins.queryParser({
+        SERVER.pre(restify.plugins.pre.sanitizePath());
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
         SERVER.get('/hello/:name', function (req, res, next) {
@@ -214,8 +213,8 @@ describe('query parser', function () {
     });
 
     it('<url>/?<queryString> broken', function (done) {
-        SERVER.pre(plugins.pre.sanitizePath());
-        SERVER.use(plugins.queryParser({
+        SERVER.pre(restify.plugins.pre.sanitizePath());
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
         SERVER.get(/\/.*/, function (req, res, next) {

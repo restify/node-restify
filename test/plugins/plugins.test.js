@@ -8,7 +8,6 @@ var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
 // local files
-var plugins = require('../../lib').plugins;
 var helper = require('../lib/helper');
 
 // local globals
@@ -48,7 +47,7 @@ describe('all other plugins', function () {
     describe('date parser', function () {
 
         it('should reject expired request', function (done) {
-            SERVER.use(plugins.dateParser());
+            SERVER.use(restify.plugins.dateParser());
 
             SERVER.get('/', function respond(req, res, next) {
                 res.send();
@@ -79,7 +78,7 @@ describe('all other plugins', function () {
             var getPath = '/requestLogger/extraHeaders';
             var headers = [key, badKey];
 
-            SERVER.use(plugins.requestLogger({headers: headers}));
+            SERVER.use(restify.plugins.requestLogger({headers: headers}));
             SERVER.get(getPath, function (req, res, next) {
                 assert.equal(req.log.fields[key], 'foo-for-eva');
                 assert.equal(req.log.fields.hasOwnProperty(badKey), false);
@@ -104,7 +103,7 @@ describe('all other plugins', function () {
     describe('full response', function () {
 
         it('full response', function (done) {
-            SERVER.use(plugins.fullResponse());
+            SERVER.use(restify.plugins.fullResponse());
             SERVER.get('/bar/:id', function tester2(req, res, next) {
                 assert.ok(req.params);
                 assert.equal(req.params.id, 'bar');
@@ -131,7 +130,7 @@ describe('all other plugins', function () {
 
     describe('context', function () {
         it('set and get request context', function (done) {
-            SERVER.pre(plugins.pre.context());
+            SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
             var expectedData = {
@@ -160,7 +159,7 @@ describe('all other plugins', function () {
         });
 
         it('should throw if set key is not string', function (done) {
-            SERVER.pre(plugins.pre.context());
+            SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
@@ -185,7 +184,7 @@ describe('all other plugins', function () {
         });
 
         it('should throw if set key is empty string', function (done) {
-            SERVER.pre(plugins.pre.context());
+            SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
@@ -210,7 +209,7 @@ describe('all other plugins', function () {
         });
 
         it('should throw if get key is not string', function (done) {
-            SERVER.pre(plugins.pre.context());
+            SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
@@ -235,7 +234,7 @@ describe('all other plugins', function () {
         });
 
         it('should throw if get key is empty string', function (done) {
-            SERVER.pre(plugins.pre.context());
+            SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 

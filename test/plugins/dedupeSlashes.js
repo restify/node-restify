@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -25,7 +24,7 @@ describe('dedupe forward slashes in URL', function () {
                 log: helper.getLog('server')
             });
 
-            SERVER.pre(plugins.pre.dedupeSlashes());
+            SERVER.pre(restify.plugins.pre.dedupeSlashes());
 
             SERVER.get('/foo/bar', function respond(req, res, next) {
                 res.send(req.url);
@@ -99,7 +98,7 @@ describe('dedupe forward slashes in URL', function () {
                 log: helper.getLog('server')
             });
 
-            SERVER.pre(plugins.pre.dedupeSlashes());
+            SERVER.pre(restify.plugins.pre.dedupeSlashes());
 
             SERVER.get('/foo/bar/', function respond(req, res, next) {
                 res.send(req.url);

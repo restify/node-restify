@@ -8,7 +8,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -43,7 +42,7 @@ describe('strictQueryParams', function () {
 
     it('should respond 200 without plugin', function (done) {
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -71,11 +70,11 @@ describe('strictQueryParams', function () {
     it('should respond 400 to non-strict key/val query param', function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams({
+        SERVER.pre(restify.plugins.pre.strictQueryParams({
             message: MESSAGE
         }));
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -101,9 +100,9 @@ describe('strictQueryParams', function () {
     it('should respond 400 without message opt', function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams());
+        SERVER.pre(restify.plugins.pre.strictQueryParams());
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -129,11 +128,11 @@ describe('strictQueryParams', function () {
     it('should respond 400 to query param with amp and plus', function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams({
+        SERVER.pre(restify.plugins.pre.strictQueryParams({
             message: MESSAGE
         }));
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -165,11 +164,11 @@ describe('strictQueryParams', function () {
         function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams({
+        SERVER.pre(restify.plugins.pre.strictQueryParams({
             message: MESSAGE
         }));
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -196,11 +195,11 @@ describe('strictQueryParams', function () {
     it('should respond to valid query param value with 200', function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams({
+        SERVER.pre(restify.plugins.pre.strictQueryParams({
             message: MESSAGE
         }));
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -227,11 +226,11 @@ describe('strictQueryParams', function () {
     it('should respond 200 with scaped amp and \s', function (done) {
 
 
-        SERVER.pre(plugins.pre.strictQueryParams({
+        SERVER.pre(restify.plugins.pre.strictQueryParams({
             message: MESSAGE
         }));
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true,
             overrideParams: true
         }));

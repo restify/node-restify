@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -22,7 +21,7 @@ describe('authorization parser', function () {
             log: helper.getLog('server')
         });
 
-        SERVER.use(plugins.authorizationParser());
+        SERVER.use(restify.plugins.authorizationParser());
 
         SERVER.get('/', function respond(req, res, next) {
             res.send();

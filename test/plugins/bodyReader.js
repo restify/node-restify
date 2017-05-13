@@ -9,7 +9,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -40,7 +39,7 @@ describe('body reader', function () {
         });
 
         it('should parse gzip encoded content', function (done) {
-            SERVER.use(plugins.bodyParser());
+            SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -64,7 +63,7 @@ describe('body reader', function () {
         });
 
         it('should not accept unsupported content encoding', function (done) {
-            SERVER.use(plugins.bodyParser());
+            SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -91,7 +90,7 @@ describe('body reader', function () {
         });
 
         it('should parse unencoded content', function (done) {
-            SERVER.use(plugins.bodyParser());
+            SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,

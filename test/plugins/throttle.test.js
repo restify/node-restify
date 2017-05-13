@@ -9,7 +9,6 @@ var restifyClients = require('restify-clients');
 ///--- Globals
 
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
@@ -34,7 +33,7 @@ describe('throttle plugin', function () {
             next();
         });
 
-        SERVER.use(plugins.throttle({
+        SERVER.use(restify.plugins.throttle({
             burst: 1,
             rate: 0.5,
             username: true,

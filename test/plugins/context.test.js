@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -22,7 +21,7 @@ describe('accept parser', function () {
             log: helper.getLog('server')
         });
 
-        SERVER.use(plugins.pre.context());
+        SERVER.use(restify.plugins.pre.context());
 
         SERVER.listen(0, '127.0.0.1', function () {
             PORT = SERVER.address().port;

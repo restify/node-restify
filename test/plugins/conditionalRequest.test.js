@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -48,7 +47,7 @@ describe('conditional request', function () {
                 res.etag = 'testETag';
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.body = 'testing 304';
                 res.send();
@@ -76,7 +75,7 @@ describe('conditional request', function () {
                 res.etag = 'testEtag';
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function respond(req, res, next) {
                 res.send();
                 next();
@@ -104,7 +103,7 @@ describe('conditional request', function () {
                 res.header('Last-Modified', yesterday);
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.send('testing 304');
                 next();
@@ -132,7 +131,7 @@ describe('conditional request', function () {
                 res.header('Last-Modified', new Date());
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.send('testing 412');
                 next();
@@ -160,7 +159,7 @@ describe('conditional request', function () {
                 res.header('Last-Modified', now);
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.send();
                 next();
@@ -189,7 +188,7 @@ describe('conditional request', function () {
                 res.header('Last-Modified', now);
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.send();
                 next();
@@ -215,7 +214,7 @@ describe('conditional request', function () {
                 res.etag = 'testETag';
                 next();
             },
-            plugins.conditionalRequest(),
+            restify.plugins.conditionalRequest(),
             function (req, res, next) {
                 res.send();
                 next();

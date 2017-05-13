@@ -14,7 +14,6 @@ var rimraf = require('rimraf');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -111,7 +110,7 @@ describe('static resource plugin', function () {
                     SERVER.get({
                         path: re,
                         name: routeName
-                    }, plugins.serveStatic(opts));
+                    }, restify.plugins.serveStatic(opts));
 
                     CLIENT.get(p, function (err4, req, res, obj) {
                         assert.ifError(err4);
@@ -166,7 +165,7 @@ describe('static resource plugin', function () {
                     SERVER.get({
                         path: re,
                         name: routeName
-                    }, plugins.serveStatic(opts));
+                    }, restify.plugins.serveStatic(opts));
 
                     CLIENT.get(p, function (err4, req, res, obj) {
                         assert.ifError(err4);
@@ -273,7 +272,7 @@ describe('static resource plugin', function () {
             DIRS_TO_DELETE.push(TMP_PATH);
             fs.writeFileSync(path.join(TMP_PATH, 'index.html'), 'Hello world!');
 
-            var serve = plugins.serveStatic({
+            var serve = restify.plugins.serveStatic({
                 directory: TMP_PATH
             });
 
@@ -305,7 +304,7 @@ describe('static resource plugin', function () {
             DIRS_TO_DELETE.push(TMP_PATH);
             fs.writeFileSync(path.join(TMP_PATH, 'index.html'), 'Hello world!');
 
-            var serve = plugins.serveStatic({
+            var serve = restify.plugins.serveStatic({
                 directory: TMP_PATH
             });
 

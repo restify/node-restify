@@ -8,8 +8,6 @@ var validator = require('validator');
 
 // internal files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
-
 
 describe('request id headers', function () {
 
@@ -23,7 +21,7 @@ describe('request id headers', function () {
             log: helper.getLog('server')
         });
 
-        SERVER.pre(plugins.pre.reqIdHeaders({
+        SERVER.pre(restify.plugins.pre.reqIdHeaders({
             headers: ['x-req-id-a', 'x-req-id-b']
         }));
 

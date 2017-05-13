@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -46,7 +45,7 @@ describe('request metrics plugin', function () {
 
     it('should return metrics for a given request', function (done) {
 
-        SERVER.on('after', plugins.metrics({
+        SERVER.on('after', restify.plugins.metrics({
             server: SERVER
         }, function (err, metrics, req, res, route) {
             assert.ifError(err);
@@ -85,7 +84,7 @@ describe('request metrics plugin', function () {
         // flushes request responsibly but connectionState should indicate it
         // was closed by the server.
 
-        SERVER.on('after', plugins.metrics({
+        SERVER.on('after', restify.plugins.metrics({
             server: SERVER
         }, function (err, metrics, req, res, route) {
             assert.ok(err);
@@ -122,7 +121,7 @@ describe('request metrics plugin', function () {
         // flushes request responsibly but connectionState should indicate it
         // was closed by the server.
 
-        SERVER.on('after', plugins.metrics({
+        SERVER.on('after', restify.plugins.metrics({
             server: SERVER
         }, function (err, metrics, req, res, route) {
             assert.ok(err);
@@ -157,7 +156,7 @@ describe('request metrics plugin', function () {
         // flushes request responsibly but connectionState should indicate it
         // was closed by the server.
 
-        SERVER.on('after', plugins.metrics({
+        SERVER.on('after', restify.plugins.metrics({
             server: SERVER
         }, function (err, metrics, req, res, route) {
             assert.ok(err);

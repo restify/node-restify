@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -22,7 +21,7 @@ describe('accept parser', function () {
             log: helper.getLog('server')
         });
 
-        SERVER.use(plugins.acceptParser(SERVER.acceptable));
+        SERVER.use(restify.plugins.acceptParser(SERVER.acceptable));
 
         SERVER.get('/', function respond(req, res, next) {
             res.send();

@@ -7,7 +7,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -41,7 +40,7 @@ describe('gzip parser', function () {
 
 
     it('should gzip response', function (done) {
-        SERVER.use(plugins.gzipResponse());
+        SERVER.use(restify.plugins.gzipResponse());
 
         SERVER.get('/gzip/:id', function (req, res, next) {
             res.send({
@@ -101,7 +100,7 @@ describe('gzip parser', function () {
 
         var bodyStream = new TestStream();
 
-        SERVER.use(plugins.gzipResponse());
+        SERVER.use(restify.plugins.gzipResponse());
         SERVER.get('/gzip/:id', function (req, res, next) {
             bodyStream.resume();
             res.write('{"foo":"');
@@ -127,11 +126,11 @@ describe('gzip parser', function () {
 
 
     it('gzip body json ok', function (done) {
-        SERVER.use(plugins.gzipResponse());
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.gzipResponse());
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapParams: true
         }));
         SERVER.post('/body/:id', function (req, res, next) {

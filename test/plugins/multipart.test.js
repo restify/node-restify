@@ -9,7 +9,6 @@ var restify = require('../../lib/index.js');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -40,10 +39,10 @@ describe('multipart parser', function () {
 
 
     it('body multipart ok', function (done) {
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapParams: true
         }));
 
@@ -78,10 +77,10 @@ describe('multipart parser', function () {
     });
 
     it('gh-847 body multipart no files ok', function (done) {
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapFiles: true,
             mapParams: true,
             keepExtensions: true,
@@ -127,10 +126,10 @@ describe('multipart parser', function () {
             'And deep beneath the rolling waves in labyrinths of coral ' +
             'caves The echo of a distant tide Comes willowing across the ' +
             'sand And everything is green and submarine';
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapFiles: true,
             mapParams: true,
             keepExtensions: true,
@@ -192,7 +191,7 @@ describe('multipart parser', function () {
         var detailsString = 'High endorphin levels make you happy. ' +
             'Mostly... I guess. Whatever.';
         SERVER.post('/multipart/:id',
-            plugins.bodyParser({
+            restify.plugins.bodyParser({
                 multipartHandler: function (part) {
                     var buffer = new Buffer(0);
                     part.on('data', function (data) {
@@ -264,7 +263,7 @@ describe('multipart parser', function () {
         var content = 'Hello World!';
         var hash = '2ef7bde608ce5404e97d5f042f95f89f1c232871';
         SERVER.post('/multipart',
-            plugins.bodyParser({hash: 'sha1'}),
+            restify.plugins.bodyParser({hash: 'sha1'}),
             function (req, res, next) {
                 assert.equal(req.files.details.hash, hash);
                 res.send();

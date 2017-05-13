@@ -10,7 +10,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -26,8 +25,8 @@ describe('oauth2 token parser', function () {
             log: helper.getLog('server')
         });
 
-        SERVER.use(plugins.bodyParser());
-        SERVER.use(plugins.oauth2TokenParser());
+        SERVER.use(restify.plugins.bodyParser());
+        SERVER.use(restify.plugins.oauth2TokenParser());
 
         SERVER.get('/', function respond(req, res, next) {
 

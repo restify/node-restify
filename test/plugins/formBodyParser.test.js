@@ -9,7 +9,6 @@ var restify = require('../../lib/index.js');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 
 // local globals
 var SERVER;
@@ -35,8 +34,8 @@ describe('form body parser', function () {
 
 
     it('should parse req.body, req.query, req.params', function (done) {
-        SERVER.use(plugins.queryParser());
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.queryParser());
+        SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id',
             function (req, res, next) {
@@ -68,10 +67,10 @@ describe('form body parser', function () {
 
 
     it('should map req.body & req.query onto req.params', function (done) {
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapParams: true
         }));
 
@@ -111,10 +110,10 @@ describe('form body parser', function () {
     it('should take req.body and stomp on req.params',
     function (done) {
 
-        SERVER.use(plugins.queryParser({
+        SERVER.use(restify.plugins.queryParser({
             mapParams: true
         }));
-        SERVER.use(plugins.bodyParser({
+        SERVER.use(restify.plugins.bodyParser({
             mapParams: true,
             overrideParams: true
         }));
@@ -154,7 +153,7 @@ describe('form body parser', function () {
 
     it('should parse associative array syntax', function (done) {
 
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id',
             function (req, res, next) {
@@ -185,7 +184,7 @@ describe('form body parser', function () {
 
     it('should parse array syntax', function (done) {
 
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id',
             function (req, res, next) {
@@ -215,7 +214,7 @@ describe('form body parser', function () {
 
     it('should parse nested array syntax', function (done) {
 
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id',
             function (req, res, next) {
@@ -252,7 +251,7 @@ describe('form body parser', function () {
 
         var input = 'name[first]=alex&name[last]=liu';
 
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id', function (req, res, next) {
             assert.equal(req.rawBody, input);

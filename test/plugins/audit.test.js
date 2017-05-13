@@ -12,7 +12,6 @@ var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
-var plugins = require('../../lib').plugins;
 var vasync = require('vasync');
 
 // local globals
@@ -52,7 +51,7 @@ describe('audit logger', function () {
             limit: 1000
         });
         var collectLog;
-        SERVER.on('after', plugins.auditLogger({
+        SERVER.on('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams: [{
@@ -114,7 +113,7 @@ describe('audit logger', function () {
 
 
     it('test audit logger emit', function (done) {
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams: [{
@@ -136,7 +135,7 @@ describe('audit logger', function () {
         });
 
         SERVER.get('/audit', [
-            plugins.queryParser(),
+            restify.plugins.queryParser(),
             function (req, res, next) {
                 res.send();
                 next();
@@ -153,7 +152,7 @@ describe('audit logger', function () {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
 
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -219,7 +218,7 @@ describe('audit logger', function () {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
 
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -283,7 +282,7 @@ describe('audit logger', function () {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
 
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -320,7 +319,7 @@ describe('audit logger', function () {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
 
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -333,7 +332,7 @@ describe('audit logger', function () {
         }));
 
         SERVER.get('/audit', [
-            plugins.queryParser(),
+            restify.plugins.queryParser(),
             function (req, res, next) {
                 res.send();
                 next();
@@ -361,7 +360,7 @@ describe('audit logger', function () {
 
         var ptStream = new PassThrough();
 
-        SERVER.once('pre', plugins.auditLogger({
+        SERVER.once('pre', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -373,7 +372,7 @@ describe('audit logger', function () {
         }));
 
         SERVER.get('/audit', [
-            plugins.queryParser(),
+            restify.plugins.queryParser(),
             function (req, res, next) {
                 res.send();
                 next();
@@ -398,7 +397,7 @@ describe('audit logger', function () {
 
         var ptStream = new PassThrough();
 
-        SERVER.once('routed', plugins.auditLogger({
+        SERVER.once('routed', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -410,7 +409,7 @@ describe('audit logger', function () {
         }));
 
         SERVER.get('/audit', [
-            plugins.queryParser(),
+            restify.plugins.queryParser(),
             function (req, res, next) {
                 res.send();
                 next();

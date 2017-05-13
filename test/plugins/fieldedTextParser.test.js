@@ -10,7 +10,6 @@ var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
 // local files
-var plugins = require('../../lib').plugins;
 var helper = require('../lib/helper');
 
 var fsOptions = { encoding: 'utf8' };
@@ -39,7 +38,7 @@ describe('fielded text parser', function () {
             dtrace: helper.dtrace,
             log: helper.getLog('server')
         });
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
         SERVER.listen(PORT, '127.0.0.1', function () {
             CLIENT = restifyClients.createClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -95,7 +94,7 @@ describe('fielded text parser', function () {
 
     it('#100 should parse CSV body even if bodyparser declared twice',
         function (done) {
-        SERVER.use(plugins.bodyParser());
+        SERVER.use(restify.plugins.bodyParser());
         var options = {
             path: '/data',
             headers: {
