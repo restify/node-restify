@@ -44,16 +44,15 @@ Follow restify on [![alt text][1.2]][1]
 ## Server
 ```javascript
 var restify = require('restify');
-var plugins = require('restify-plugins');
 
 
 const server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
-server.use(plugins.acceptParser(server.acceptable));
-server.use(plugins.queryParser());
-server.use(plugins.bodyParser());
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.bodyParser());
 
 
 server.get('/echo/:name', function (req, res, next) {
@@ -115,12 +114,8 @@ SOFTWARE.
 
 See <https://github.com/restify/node-restify/issues>.
 
-## Contributing
+## Other repositories
 
-restify has been broken out into a couple of different repositories. The repo
-here here contains only the core functionality of the server.
-
-- For plugins, please go [here](https://github.com/restify/plugins).
 - For the errors module, please go [here](https://github.com/restify/errors).
 
 

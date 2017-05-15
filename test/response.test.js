@@ -3,7 +3,6 @@
 var url = require('url');
 var restifyClients = require('restify-clients');
 var errs = require('restify-errors');
-var plugins = require('restify-plugins');
 
 var restify = require('../lib');
 
@@ -36,7 +35,7 @@ before(function (cb) {
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
-        SERVER.use(plugins.queryParser());
+        SERVER.use(restify.plugins.queryParser());
         SERVER.listen(PORT, '127.0.0.1', function () {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({

@@ -1,7 +1,6 @@
 var fs = require('fs');
 var bunyan = require('bunyan');
 var restify = require('../../lib');
-var restifyPlugins = require('restify-plugins');
 
 var srv = restify.createServer({
     spdy: {
@@ -16,7 +15,7 @@ srv.get('/', function (req, res, next) {
     next();
 });
 
-srv.on('after', restifyPlugins.auditLogger({
+srv.on('after', restify.plugins.auditLogger({
     body: true,
     log: bunyan.createLogger({
         name: 'audit',

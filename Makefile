@@ -21,6 +21,7 @@ ESLINT		:= ./node_modules/.bin/eslint
 JSCS		:= ./node_modules/.bin/jscs
 NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
+MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
 NSP_BADGE	:= ./tools/nspBadge.js
 NPM		:= npm
@@ -52,7 +53,7 @@ $(NODECOVER): | $(NPM_EXEC)
 .PHONY: cover
 cover: $(NODECOVER)
 	@rm -fr ./.coverage_data
-	$(NODECOVER) run $(NODEUNIT) test/*.test.js
+	$(NODECOVER) run $(NODEUNIT) ./test/*.js
 	$(NODECOVER) report html
 
 CLEAN_FILES += $(TAP) ./node_modules/nodeunit
@@ -60,6 +61,7 @@ CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 .PHONY: test
 test: $(NODEUNIT)
 	$(NODEUNIT) test/*.test.js
+	$(MOCHA) test/plugins/*.test.js
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
