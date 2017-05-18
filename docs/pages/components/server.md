@@ -72,12 +72,10 @@ server.pre(function(req, res, next) {
 });
 ```
 
-For example, `pre()` can be used to deduplicate slashes in URLs:
-[plugin](https://github.com/restify/plugins):
+For example, `pre()` can be used to deduplicate slashes in URLs
 
 ```js
-var plugins = require('restify-plugins');
-server.pre(plugins.dedupeSlashes());
+server.pre(restify.pre.dedupeSlashes());
 ```
 
 ## use(handler)
