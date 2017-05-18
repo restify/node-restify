@@ -11,16 +11,6 @@ that have happened since the last 4.x release. A more detailed change log can
 be found in CHANGES.md.
 
 
-### restify-plugins
-
-Plugins, which used to available on the `restify.plugins` namespace and the
-`restify.pre` namespace, now live in their own
-[repository](https://github.com/restify/plugins) and are published
-[independently on npm](https://www.npmjs.com/restify-plugins). This gives us a
-lot more flexibility to make progress in both repos independently. All the
-existing plugins are available in the repo, minus CORS. We'll touch on CORS a
-little more below.
-
 #### queryParser() and bodyParser()
 
 By default, queryParser and bodyParser no longer map req.query and req.body to
@@ -113,16 +103,8 @@ server.on('NotFound', function(req, res, err, cb) {
 
 ### CORS
 
-CORS has been removed from restify core. That means the existing CORS plugin is
-no longer compatible with 5.x. A [new CORS
-plugin](https://github.com/restify/plugins/pull/10) is currently in development
-in the restify-plugins repo. It's a brand new rewrite of CORS and aims to
-address all the shortcomings of the previous plugin. All that's left is to get
-some tests in to verify the behavior.
-
-If you're using CORS, we'd love to get your help testing this thing and getting
-it out the door!
-
+CORS has been removed from restify core. For CORS support, please use
+[TabDigital's](https://github.com/TabDigital/restify-cors-middleware) plugin.
 
 ### strict routing
 

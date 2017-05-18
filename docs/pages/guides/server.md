@@ -54,13 +54,13 @@ Connection: close
 Note that by default, curl uses `Connection: keep-alive`. In order to make the
 HEAD method return right away, you'll need to pass `Connection: close`.
 
-Since curl is often used with REST APIs, restify-plugins includes a plugin to
+Since curl is often used with REST APIs, restify's plugins include a plugin to
 work around this idiosyncrasy in curl. The plugin checks whether the user agent
 is curl. If it is, it sets the Connection header to "close" and removes the
 "Content-Length" header.
 
 ```js
-server.pre(plugins.pre.userAgentConnection());
+server.pre(restify.plugins.pre.userAgentConnection());
 ```
 
 ## Sinatra style handler chains
@@ -105,7 +105,8 @@ register. This can be useful for logging metrics or for cleaning up the
 incoming request before routing it.
 
 ```js
-server.pre(plugins.dedupeSlashes()); // dedupe slashes in URL before routing
+// dedupe slashes in URL before routing
+server.pre(restify.plugins.dedupeSlashes());
 ```
 
 
