@@ -116,7 +116,7 @@
     "dtrace-provider": "^0.8.1"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
+    "chai": "^4.0.0",
     "cover": "^0.2.9",
     "coveralls": "^2.13.0",
     "eslint": "^3.11.1",
