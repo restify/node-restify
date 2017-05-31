@@ -287,6 +287,43 @@ test('redirect using options.url', function (t) {
 });
 
 
+test('redirect using opts.port', function (t) {
+    SERVER.get('/9', function (req, res, next) {
+        res.redirect({
+            port: 3000
+        }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var parsedUrl = url.parse(res.headers.location, true);
+        t.equal(parsedUrl.port, 3000);
+        t.end();
+    });
+});
+
+
+test('redirect using external url and custom port', function (t) {
+    SERVER.get('/9', function (req, res, next) {
+        res.redirect({
+            hostname: 'www.foo.com',
+            pathname: '/99',
+            port: 3000
+        }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var parsedUrl = url.parse(res.headers.location, true);
+        t.equal(parsedUrl.port, 3000);
+        t.equal(parsedUrl.hostname, 'www.foo.com');
+        t.equal(parsedUrl.pathname, '/99');
+        t.end();
+    });
+});
+
 // jscs:disable maximumLineLength
 test('redirect should cause InternalError when invoked without next', function (t) {
 
