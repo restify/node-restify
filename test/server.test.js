@@ -10,7 +10,6 @@ var stream = require('stream');
 
 var errors = require('restify-errors');
 var filed = require('filed');
-var plugins = require('restify-plugins');
 var restifyClients = require('restify-clients');
 var uuid = require('uuid');
 
@@ -820,7 +819,7 @@ test('test matches params with custom regex', function (t) {
 
 
 test('GH-180 can parse DELETE body', function (t) {
-    SERVER.use(plugins.bodyParser({mapParams: false}));
+    SERVER.use(restify.plugins.bodyParser({mapParams: false}));
 
     SERVER.del('/', function (req, res, next) {
         res.send(200, req.body);
@@ -1907,7 +1906,7 @@ test('gh-630 handle server versions as an array or string', function (t) {
 
 
 test('GH-877 content-type should be case insensitive', function (t) {
-    SERVER.use(plugins.bodyParser({maxBodySize: 1024}));
+    SERVER.use(restify.plugins.bodyParser({maxBodySize: 1024}));
 
     SERVER.get('/cl', function (req, res, next) {
         t.equal(req.getContentType(), 'application/json');
@@ -1994,7 +1993,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
 
         // set up audit logs
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
-        SERVER.once('after', plugins.auditLogger({
+        SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
                 streams:[ {
@@ -2002,7 +2001,8 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
                     type: 'raw',
                     stream: ringbuffer
                 }]
-            })
+            }),
+            event: 'after'
         }));
 
 
@@ -2147,7 +2147,7 @@ test('GH-958 RCS does not write triggering record', function (t) {
         ]
     );
 
-    SERVER.use(plugins.requestLogger());
+    SERVER.use(restify.plugins.requestLogger());
 
     SERVER.get('/rcs', function (req, res, next) {
         req.log.debug('1');

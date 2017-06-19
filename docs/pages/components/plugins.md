@@ -1,34 +1,21 @@
 # restify-plugins
 
-A bundle of plugins compatible with restify can be pulled in via the
-[restify-plugins](https://github.com/restify/plugins) module.
+Restify comes bundled with a selection of useful plugins. These are accessible
+off of `restify.plugins` and `restify.pre`.
 
-* Accept header parsing
-* Authorization header parsing
-* Date header parsing
-* JSONP support
-* Gzip Response
-* Query string parsing
-* Body parsing (JSON/URL-encoded/multipart form)
-* Static file serving
-* Throttling
-* Conditional request handling
-* Request expiry
-* Audit logger
-
-Here's some example code using all the shipped plugins:
+## Usage
 
 ```js
 var server = restify.createServer();
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.jsonp());
-server.use(restify.gzipResponse());
-server.use(restify.bodyParser());
-server.use(restify.requestExpiry());
-server.use(restify.throttle({
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.authorizationParser());
+server.use(restify.plugins.dateParser());
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.jsonp());
+server.use(restify.plugins.gzipResponse());
+server.use(restify.plugins.bodyParser());
+server.use(restify.plugins.requestExpiry());
+server.use(restify.plugins.throttle({
   burst: 100,
   rate: 50,
   ip: true,
@@ -39,8 +26,129 @@ server.use(restify.throttle({
     }
   }
 }));
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 ```
+
+## Available Plugins
+
+* `sanitizePath()` - cleans up duplicate or trailing / on the URL
+* `context()` - Provide req.set(key, val) and req.get(key) methods for setting and retrieving context to a specific request.
+* `userAgent(options)` - used to support edge cases for HEAD requests when using curl
+  * `options.userAgentRegExp` {RegExp} regexp to capture curl user-agents
+* `strictQueryParams()` - checks req.urls query params with strict key/val format and rejects non-strict requests with status code 400.
+  * `options.message` {String} response body message string
+
+This module includes the following header parser plugins:
+
+* `acceptParser(accepts)` - Accept header
+  * `accepts` {Array} an array of acceptable types
+* `authorizationParser(options)` - Authorization header
+  * `options` {Object} options object passed to http-signature module
+* `conditionalRequest()` - Conditional headers (If-\*)
+* `fullResponse()` - handles disappeared CORS headers
+
+This module includes the following data parsing plugins:
+
+* `bodyParser(options)` - parses POST bodies to `req.body`. automatically uses one of the following parsers based on content type:
+  * `urlEncodedBodyParser(options)` - parses url encoded form bodies
+  * `jsonBodyParser(options)` - parses JSON POST bodies
+  * `multipartBodyParser(options)` - parses multipart form bodies
+  * All bodyParsers support the following options:
+    * `options.mapParams` - default false. copies parsed post body values onto req.params
+    * `options.overrideParams` - default false. only applies when if mapParams true. when true, will stomp on req.params value when existing value is found.
+* `jsonp()` - parses JSONP callback
+* `queryParser()` - Parses URL query paramters into `req.query`. Many options
+  correspond directly to option defined for the underlying
+  [`qs.parse`](https://github.com/ljharb/qs).
+  * `options.mapParams` - Default false. Copies parsed query parameters into
+    `req.params`.
+  * `options.overrideParams` - Default false. Only applies when if mapParams
+    true. When true, will stomp on req.params field when existing value is
+    found.
+  * `options.allowDots` - Default false. Transform `?foo.bar=baz` to a nested
+    object: `{foo: {bar: 'baz'}}`.
+  * `options.arrayLimit` - Default 20. Only transform `?a[$index]=b` to an array
+    if `$index` is less than `arrayLimit`.
+  * `options.depth` - Default 5. The depth limit for parsing nested objects,
+    e.g. `?a[b][c][d][e][f][g][h][i]=j`.
+  * `options.parameterLimit` - Default 1000. Maximum number of query params
+    parsed. Additional params are silently dropped.
+  * `options.parseArrays` - Default true. Whether to parse `?a[]=b&a[1]=c` to an
+    array, e.g. `{a: ['b', 'c']}`.
+  * `options.plainObjects` - Default false. Whether `req.query` is a "plain"
+    object -- does not inherit from `Object`. This can be used to allow query
+    params whose names collide with Object methods, e.g. `?hasOwnProperty=blah`.
+  * `options.strictNullHandling` - Default false. If true, `?a&b=` results in
+    `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`.
+* `requestLogger(options)` - adds timers for each handler in your request chain
+  * `options.properties` {Object} properties to pass to bunyan's `log.child()` method
+
+The module includes the following request plugins:
+
+* `reqIdHeaders(options)` - a plugin that lets you use incoming request header
+  values to set the request id (5.x compatible only)
+  * `options.headers` {Array} an array of header names to use. lookup
+    precedence is left to right (lowest index first)
+
+The module includes the following response plugins:
+
+* `dateParser(delta)` - expires requests based on current time + delta
+  * `delta` {Number} age in seconds
+* `gzip(options)` - gzips the response if client accepts it
+  * `options` {Object} options to pass to zlib
+* `serveStatic()` - used to serve static files
+* `throttle(options)` - throttles responses
+  * `options.burst` {Number}
+  * `options.rate` {Number}
+  * `options.ip` {Boolean}
+  * `options.username` {Boolean}
+  * `options.xff` {Boolean}
+  * `options.overrides` {Object}
+* `requestExpiry(options)` - A request expiry will use headers to tell if the incoming request has expired or not. There are two options for this plugin:
+  1. Absolute Time
+     * Time in Milliseconds since the Epoch when this request should be
+       considered expired
+  2. Timeout
+     * The request start time is supplied
+     * A timeout, in milliseconds, is given
+     * The timeout is added to the request start time to arrive at the
+       absolute time in which the request is considered expires
+
+  * `options.absoluteHeader` {String} header name of the absolute time for request expiration
+  * `options.startHeader` {String} header name for the start time of the request
+  * `options.timeoutHeader` {String}  The header name for the time in milliseconds that should ellapse before the request is considered expired.
+
+The module includes the following plugins to be used with restify's `pre`, `routed`, and `after`
+event, e.g., `server.on('after', plugins.auditLogger());`:
+
+* `auditLogger(options)` - an audit logger for recording all handled requests
+  * `options.event` {String} The name of the event, one of `pre`, `routed`, or `after`
+  * `options.log` {Object} bunyan logger
+  * `[options.server]` {Object} restify server. if passed in, causes server to
+     emit 'auditlog' event after audit logs are flushed
+  * `[options.printLog]` {Boolean} when true, prints audit logs. defaults to true.
+
+The module includes the following plugins to be used with restify's `after`
+event, e.g., `server.on('after', plugins.metrics());`:
+* `metrics(callback)` - a metrics plugin which will invoke callback with the
+  the following parameters (5.x compatible only):
+  * `err` {Object} an error if the request had an error
+  * `metrics` {Object} - metrics about the request
+  * `metrics.statusCode` {Number} status code of the response. can be undefined
+    in the case of an uncaughtException
+  * `metrics.method` {String} http request verb
+  * `metrics.latency` {Number} request latency
+  * `metrics.path` {String} req.path() value
+  * `metrics.inflightRequests` {Number} Number of inflight requests pending in restify.
+  * `metrics.unifinishedRequests` {Number} Same as `inflightRequests`
+  * `metrics.connectionState` {String} can be either 'close', 'aborted', or
+    undefined. If this value is set, err will be a corresponding
+    `RequestCloseError` or `RequestAbortedError`. If connectionState is either
+    'close' or 'aborted', then the statusCode is not applicable since the
+    connection was severed before a response was written.
+  * `req` {Object} the request obj
+  * `res` {Object} the response obj
+  * `route` {Object} the route obj that serviced the request
 
 ## Accept Parser
 
@@ -51,7 +159,7 @@ how to respond to (with the formatters you've registered).  If the request is
 for a non-handled type, this plugin will return an error of `406`.
 
 ```js
-server.use(restify.acceptParser(server.acceptable));
+server.use(restify.plugins.acceptParser(server.acceptable));
 ```
 
 ## Authorization Parser
@@ -85,7 +193,7 @@ is unrecognized, the only thing available in `req.authorization` will be
 ## Date Parser
 
 ```js
-server.use(restify.dateParser());
+server.use(restify.plugins.dateParser());
 ```
 
 Parses out the HTTP Date header (if present) and checks for clock skew (default
@@ -94,13 +202,13 @@ interpreted in seconds, to allow for clock skew.
 
 ```js
 // Allows clock skew of 1m
-server.use(restify.dateParser(60));
+server.use(restify.plugins.dateParser(60));
 ```
 
 ## QueryParser
 
 ```js
-server.use(restify.queryParser());
+server.use(restify.plugins.queryParser());
 ```
 
 Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`).  If you use this,
@@ -109,7 +217,7 @@ are merged into `req.params`.  You can disable by passing in `mapParams: false`
 in the options object:
 
 ```js
-server.use(restify.queryParser({ mapParams: false }));
+server.use(restify.plugins.queryParser({ mapParams: false }));
 ```
 
 ## JSONP
@@ -129,7 +237,7 @@ Blocks your chain on reading and parsing the HTTP request body.  Switches on
 supported.
 
 ```js
-server.use(restify.bodyParser({
+server.use(restify.plugins.bodyParser({
     maxBodySize: 0,
     mapParams: true,
     mapFiles: false,
@@ -172,7 +280,7 @@ Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with the
 current request id filled in, along with any other parameters you define.
 
 ```js
-server.use(restify.requestLogger({
+server.use(restify.plugins.requestLogger({
     properties: {
         foo: 'bar'
     },
@@ -194,7 +302,7 @@ Options:
 ## GzipResponse
 
 ```js
-server.use(restify.gzipResponse());
+server.use(restify.plugins.gzipResponse());
 ```
 
 If the client sends an `accept-encoding: gzip` header (or one with an
@@ -212,7 +320,7 @@ The serveStatic module is different than most of the other plugins, in that it
 is expected that you are going to map it to a route, as below:
 
 ```js
-server.get(/\/docs\/current\/?.*/, restify.serveStatic({
+server.get(/\/docs\/current\/?.*/, restify.plugins.serveStatic({
   directory: './documentation/v1',
   default: 'index.html'
 }));
@@ -243,7 +351,7 @@ serveStatic method as an option. The following will serve index.html from
 the documentation/v1/ directory anytime a client requests `/home/`.
 
 ```js
-server.get(/\/home\//, restify.serveStatic({
+server.get(/\/home\//, restify.plugins.serveStatic({
   directory: './documentation/v1',
   file: 'index.html'
 }));
@@ -261,7 +369,7 @@ different request rates to different resources (if for example, one route, like
 `/my/slow/database` is much easier to overwhlem than `/my/fast/memcache`).
 
 ```js
-server.use(restify.throttle({
+server.use(restify.plugins.throttle({
   burst: 100,
   rate: 50,
   ip: true,
@@ -302,12 +410,12 @@ header, e.g. 'x-request-expiry-time', which gives in absolute ms since epoch,
 when this request will be timed out by the client.
 
 This plugin will throttle all incoming requests via a 504 where
-'x-request-expiry-time' < Date.now() -- since these incoming requests have
-already been timed out by the client. This prevents the server from
+'x-request-expiry-time' less than Date.now() -- since these incoming requests
+have already been timed out by the client. This prevents the server from
 processing unnecessary requests.
 
 ```js
-server.use(restify.requestExpiry({
+server.use(restify.plugins.requestExpiry({
     header: 'x-request-expiry-time'
 });
 ```
@@ -331,7 +439,7 @@ with a `String` key, and an `Object` value.
 ## Conditional Request Handler
 
 ```js
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 ```
 
 You can use this handler to let clients do nice HTTP semantics with the
@@ -358,7 +466,7 @@ server.use(function setETag(req, res, next) {
   res.header('Last-Modified', new Date());
 });
 
-server.use(restify.conditionalRequest());
+server.use(restify.plugins.conditionalRequest());
 
 server.get('/hello/:name', function(req, res, next) {
   res.send('hello ' + req.params.name);
@@ -371,7 +479,7 @@ Audit logging is a special plugin, as you don't use it with `.use()`, but with
 the `after` event:
 
 ```js
-server.on('after', restify.auditLogger({
+server.on('after', restify.plugins.auditLogger({
   log: bunyan.createLogger({
     name: 'audit',
     stream: process.stdout
