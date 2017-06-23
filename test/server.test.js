@@ -1169,6 +1169,41 @@ test('versioned route matching should prefer \
 });
 
 
+test('versioned route matching should not throw TypeError' , function (t) {
+    var p = '/path/' + uuid.v4();
+
+    SERVER.post({
+        path: p,
+        version: ['1.1.0', '1.2.0'],
+        contentType: 'application/json'
+    }, function (req, res, next) {
+        res.json(200, {route: p});
+        next();
+    });
+
+    SERVER.post({
+        path: '/path/:id',
+        version: ['1.1.0', '1.2.0']
+    }, function (req, res, next) {
+        res.json(200, {route: 'id'});
+        next();
+    });
+
+    var opts = {
+        path: p,
+        headers: {
+            'accept-version': '~1'
+        }
+    };
+
+    CLIENT.post(opts, function (err, _, res, obj) {
+        t.equal(obj.route, p);
+        t.end();
+    });
+
+});
+
+
 test('GH-959 matchedVersion() should return on cached routes', function (t) {
 
     SERVER.get({
