@@ -484,7 +484,7 @@ want:
 ```js
 restify.createServer({
   formatters: {
-    'application/foo; q=0.9': function formatFoo(req, res, body, cb) {
+    'application/foo; q=0.9': function formatFoo(req, res, body) {
       if (body instanceof Error)
         return body.stack;
 
@@ -510,53 +510,6 @@ res.writeHead(200, {
 res.write(body);
 res.end();
 ```
-
-Formatters can also be async, in which case a callback is available to you as
-the fourth parameter. If you choose to use an async formatter for a particular
-content-type, it is required to pass a callback parameter to `res.send()`. If a
-callback is not provided, then restify will throw an error:
-
-```js
-var server = restify.createServer({
-  formatters: {
-    'application/foo-async': function formatFoo(req, res, body, cb) {
-
-      someAsyncMethod(body, function(err, formattedBody) {
-        if (err) {
-          return cb(err);
-        }
-        return cb(null, formattedBody);
-      });
-    }
-  }
-});
-
-server.get('/fooAsync', function(req, res, next) {
-  res.send(fooData, next); // => callback required!
-});
-```
-
-In the event of an error with your async formatter, ensure that the error is
-passed to the callback. The default behavior in this scenario is for restify to
-send an empty 500 response to the client, since restify can make no assumptions
-about the correct format for your data. Alternatively, you can listen to a
-`FormatterError` event on the server. This event is fired whenever an async
-formatter returns an error, allowing you to write a custom response if
-necessary.  response if necessary. If you listen to this event, you _must_
-flush a response, or else the request will hang. It is highly recommended to
-avoid using `res.send()` within this handler to avoid any issues that might
-have caused the async formatter to fail to begin with. Instead, use the native
-node response methods:
-
-
-```js
-server.on('FormatterError', function(req, res, route, err) {
-  // the original body that caused formatting failure is available provided
-  // on the error object - err.context.rawBody
-  res.end('boom! could not format body!');
-});
-```
-
 
 ## Error handling
 
