@@ -999,10 +999,8 @@ test('static responds 404 for missing file', function (t) {
     });
 });
 
-// Earlier versons would throw:
-//      > new restify.ResourceNotFoundError('/%22s not found')
-//      Error: too few args to sprintf
-test('static responds 404 for missing file with percent-codes', function (t) {
+test('GH-1382 static responds 404 for missing file with percent-codes',
+        function (t) {
     var p = '/public/no-%22such-file.json';
     var tmpPath = path.join(process.cwd(), '.tmp');
 
