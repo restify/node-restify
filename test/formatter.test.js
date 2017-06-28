@@ -104,8 +104,9 @@ test('async formatter', function (t) {
 
 test('async formatter error', function (t) {
     SERVER.once('after', function (req, res, route, e) {
-        // TODO: add a test here to verify error has been emitted.
-        // Pending #845
+        // Dev Note: It would be good to add a test here to verify error has
+        // been emitted. See https://github.com/restify/node-restify/issues/845
+        // which I think is only in restify@5.x.
     });
     CLIENT.get('/tmp', function (err, req, res, data) {
         t.ok(err);
