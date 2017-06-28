@@ -984,6 +984,37 @@ test('GH-719 serve a specific static file', function (t) {
     serveStaticTest(t, false, '.tmp', null, true);
 });
 
+test('static responds 404 for missing file', function (t) {
+    var p = '/public/no-such-file.json';
+    var tmpPath = path.join(process.cwd(), '.tmp');
+
+    SERVER.get(new RegExp('/public/.*'),
+        restify.serveStatic({directory: tmpPath}));
+
+    CLIENT.get(p, function (err, req, res, obj) {
+        t.ok(err);
+        t.equal(err.statusCode, 404);
+        t.equal(err.restCode, 'ResourceNotFound');
+        t.end();
+    });
+});
+
+test('GH-1382 static responds 404 for missing file with percent-codes',
+        function (t) {
+    var p = '/public/no-%22such-file.json';
+    var tmpPath = path.join(process.cwd(), '.tmp');
+
+    SERVER.get(new RegExp('/public/.*'),
+        restify.serveStatic({directory: tmpPath}));
+
+    CLIENT.get(p, function (err, req, res, obj) {
+        t.ok(err);
+        t.equal(err.statusCode, 404);
+        t.equal(err.restCode, 'ResourceNotFound');
+        t.end();
+    });
+});
+
 
 test('audit logger timer test', function (t) {
     // Dirty hack to capture the log record using a ring buffer.

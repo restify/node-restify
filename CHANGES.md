@@ -2,7 +2,8 @@
 
 ## not yet released
 
-(nothing yet)
+- #1382 Fix "static" plugin to not throw on a 404 for a path with sprintf-like
+  percent escape codes.
 
 ## 4.3.0
 
