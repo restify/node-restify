@@ -1,6 +1,12 @@
 # restify Changelog
 
 ## 5.0.0
+ - #1377 Remove async formatters
+ - #1363 Honor port for `Response.prototype.redirect`
+ - #1369 Use public APIs for accessing response headers
+ - #1353 Deprecate `next.ifError`
+ - #1346 Return plugins to repo
+ - #1322 Remove duplicate `close` event from `Server`
  - #1309 Add `getRoute()` to Request to get the route object. Rajat Kumar
  - #1288 add `pre` and `routed` events. Yunong Xiao
  - #1281 Add `server.getDebugInfo()` method, Yunong Xiao, Alex Liu

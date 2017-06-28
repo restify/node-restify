@@ -232,6 +232,37 @@ describe('static resource plugin', function () {
         testNoAppendPath(done, false, '.tmp', null, true);
     });
 
+    it('static responds 404 for missing file', function (done) {
+        var p = '/public/no-such-file.json';
+        var tmpPath = path.join(process.cwd(), '.tmp');
+
+        SERVER.get(new RegExp('/public/.*'),
+            restify.plugins.serveStatic({directory: tmpPath}));
+
+        CLIENT.get(p, function (err, req, res, obj) {
+            assert.ok(err);
+            assert.strictEqual(err.statusCode, 404);
+            assert.strictEqual(err.restCode, 'ResourceNotFound');
+            done();
+        });
+    });
+
+    it('GH-1382 static responds 404 for missing file with percent-codes',
+            function (done) {
+        var p = '/public/no-%22such-file.json';
+        var tmpPath = path.join(process.cwd(), '.tmp');
+
+        SERVER.get(new RegExp('/public/.*'),
+            restify.plugins.serveStatic({directory: tmpPath}));
+
+        CLIENT.get(p, function (err, req, res, obj) {
+            assert.ok(err);
+            assert.equal(err.statusCode, 404);
+            assert.equal(err.restCode, 'ResourceNotFound');
+            done();
+        });
+    });
+
     // To ensure this will always get properly restored (even in case of a test
     // failure) we do it here.
     var originalCreateReadStream = fs.createReadStream;
