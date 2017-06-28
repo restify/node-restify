@@ -149,6 +149,7 @@ before(function (callback) {
         SERVER.get('/json/false', sendJsonFalse);
         SERVER.get('/json/null', sendJsonNull);
 
+        SERVER.copy('/json/:name', sendJson);
         SERVER.get('/json/:name', sendJson);
         SERVER.head('/json/:name', sendJson);
         SERVER.put('/json/:name', sendJson);
@@ -277,6 +278,16 @@ test('Check error (404)', function (t) {
         t.ok(obj);
         t.equal(obj.code, 'ResourceNotFound');
         t.ok(obj.message);
+        t.end();
+    });
+});
+
+
+test('COPY json', function (t) {
+    JSON_CLIENT.copy('/json/mcavage', function (err, req, res) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
         t.end();
     });
 });

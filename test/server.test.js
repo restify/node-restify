@@ -233,6 +233,29 @@ test('405', function (t) {
 });
 
 
+test('COPY ok', function (t) {
+    SERVER.copy('/foo/:id', function tester(req, res, next) {
+        t.ok(req.params);
+        t.equal(req.params.id, 'bar');
+        res.send();
+        next();
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/foo/bar',
+        method: 'COPY',
+        agent: false
+    };
+
+    http.request(opts, function (res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
+});
+
+
 test('PUT ok', function (t) {
     SERVER.put('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
