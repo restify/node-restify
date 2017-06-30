@@ -1,4 +1,7 @@
-# Creating a server
+---
+title: Server API
+permalink: /docs/server-api/
+---
 
 A restify server object is the main interface through which you will register
 routes and handlers for incoming requests. A server object will be returned

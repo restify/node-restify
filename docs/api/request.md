@@ -1,4 +1,7 @@
-# Request API
+---
+title: Request API
+permalink: /docs/request-api/
+---
 
 Wraps all of the node
 [http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage)
