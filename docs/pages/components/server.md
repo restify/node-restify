@@ -241,12 +241,12 @@ server.get('/', function(req, res, next) {
 
 server.on('InternalServer', function(req, res, err, callback) {
   // this will get fired first, as it's the most relevant listener
-  return next();
+  return callback();
 });
 
 server.on('restifyError', function(req, res, err, callback) {
   // this is fired second.
-  return next();
+  return callback();
 });
 ```
 
