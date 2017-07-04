@@ -1,4 +1,8 @@
-# Server Guide
+---
+title: Quick Start
+permalink: /docs/home/
+redirect_from: /docs/
+---
 
 Setting up a server is quick and easy. Here is a barebones echo server:
 
