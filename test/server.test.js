@@ -2830,3 +2830,25 @@ test('should not emit \'routed\' event on 404', function (t) {
         t.end();
     });
 });
+
+test('should allow creation of additional HTTP verbs', function (t) {
+    var called = false;
+    SERVER.addVerb('COPY');
+
+    if (typeof SERVER.copy !== 'function') {
+        t.fail('Expected SERVER.copy === function');
+        return t.end();
+    }
+
+    SERVER.copy('/foo/:id', function (req, res, next) {
+        called = true;
+        res.send();
+        next();
+    });
+
+    return CLIENT.read(CLIENT._options('COPY', '/foo/27'), function (err) {
+        t.ok(err === undefined || err === null);
+        t.ok(called);
+        t.end();
+    });
+});
