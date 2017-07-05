@@ -1,4 +1,7 @@
-# Response API
+---
+title: Response API
+permalink: /docs/response-api/
+---
 
 Wraps all of the node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)

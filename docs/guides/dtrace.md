@@ -1,4 +1,7 @@
-# DTrace
+---
+title: Dtrace
+permalink: /docs/dtrace/
+---
 
 One of the coolest features of restify is that it automatically
 creates DTrace probes for you whenever you add a new route/handler.
