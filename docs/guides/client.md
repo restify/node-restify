@@ -1,4 +1,7 @@
-# Client Guide
+---
+title: Client Guide
+permalink: /docs/client-guide/
+---
 
 There are actually three separate clients shipped in restify:
 

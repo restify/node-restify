@@ -1,5 +1,7 @@
-
-# restify 4.x to 5.x migration guide
+---
+title: restify 4.x to 5.x migration guide
+permalink: /docs/4to5/
+---
 
 
 ## Introduction
