@@ -15,25 +15,45 @@ var SERVER;
 
 var errorMessage = 'Error message should include rate 0.5 r/s. Received: ';
 
+function setupClientServer(ip, throttleOptions, done) {
+    var server = restify.createServer({
+        dtrace: helper.dtrace,
+        log: helper.getLog('server')
+    });
+
+    server.use(function ghettoAuthenticate(req, res, next) {
+        if (req.params.name) {
+            req.username = req.params.name;
+        }
+
+        next();
+    });
+
+    server.use(restify.plugins.throttle(throttleOptions));
+
+    server.get('/test/:name', function (req, res, next) {
+        res.send();
+        next();
+    });
+
+    server.listen(PORT, ip, function () {
+        PORT = server.address().port;
+        var client = restifyClients.createJsonClient({
+            url: 'http://' + ip + ':' + PORT,
+            dtrace: helper.dtrace,
+            retry: false
+        });
+
+        done(client, server);
+    });
+}
+
 ///--- Tests
 
 describe('throttle plugin', function () {
 
     before(function setup(done) {
-        SERVER = restify.createServer({
-            dtrace: helper.dtrace,
-            log: helper.getLog('server')
-        });
-
-        SERVER.use(function ghettoAuthenticate(req, res, next) {
-            if (req.params.name) {
-                req.username = req.params.name;
-            }
-
-            next();
-        });
-
-        SERVER.use(restify.plugins.throttle({
+        setupClientServer('127.0.0.1', {
             burst: 1,
             rate: 0.5,
             username: true,
@@ -47,21 +67,9 @@ describe('throttle plugin', function () {
                     rate: 1
                 }
             }
-        }));
-
-        SERVER.get('/test/:name', function (req, res, next) {
-            res.send();
-            next();
-        });
-
-        SERVER.listen(PORT, '127.0.0.1', function () {
-            PORT = SERVER.address().port;
-            CLIENT = restifyClients.createJsonClient({
-                url: 'http://127.0.0.1:' + PORT,
-                dtrace: helper.dtrace,
-                retry: false
-            });
-
+        }, function setupGlobal(client, server) {
+            CLIENT = client;
+            SERVER = server;
             done();
         });
     });
@@ -167,6 +175,52 @@ describe('throttle plugin', function () {
                     err.message.indexOf('0.5 r/s') !== -1,
                     errorMessage + (err && err.message));
                 done();
+            });
+        });
+    });
+
+    it('should not expose rate limit headers per default', function (done) {
+        CLIENT.get('/test/throttleMe', function (err, _, res) {
+            assert.isUndefined(res.headers['x-ratelimit-limit']);
+            assert.isUndefined(res.headers['x-ratelimit-rate']);
+            assert.isUndefined(res.headers['x-ratelimit-rate']);
+
+            done();
+        });
+    });
+
+    it('should expose headers on options set', function (done) {
+        // setup a new server with headers set to true since we cant
+        // change throttle options after init
+        setupClientServer('127.0.0.2', {
+            burst: 17,
+            rate: 0.1,
+            username: true,
+            setHeaders: true
+        }, function setupWithHeaders (client, server) {
+            client.get('/test/throttleMe', function (err, req, res) {
+                assert.equal(res.headers['x-ratelimit-limit'], '17');
+                assert.equal(res.headers['x-ratelimit-rate'], '0.1');
+                assert.equal(res.headers['x-ratelimit-remaining'], '16');
+
+                // it should count down
+                client.get(
+                    '/test/throttleMe',
+                    function (nextErr, nextReq, nextRes) {
+                        assert.equal(
+                            nextRes.headers['x-ratelimit-limit'], '17'
+                        );
+                        assert.equal(
+                            nextRes.headers['x-ratelimit-rate'], '0.1'
+                        );
+                        assert.equal(
+                            nextRes.headers['x-ratelimit-remaining'], '15'
+                        );
+
+                        client.close();
+                        server.close(done);
+                    }
+                );
             });
         });
     });
