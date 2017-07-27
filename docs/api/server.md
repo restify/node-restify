@@ -266,21 +266,6 @@ server.on('restifyError', function(req, res, err, callback) {
 });
 ```
 
-### FormatterError
-
-This event is fired when an async formatter returns an error as a result of
-calling `res.send()`. Unlike other error events, if you listen this event, it
-is expected that you flush a response. Once a formatter has returned an error,
-restify cannot make any assumptions about how to format the content. It is up
-to you to figure out how to best do that.
-
-```js
-server.on('FormatterError', function(req, res, route, err) {
-  // err is a formatter error - can't sa
-  res.end('unsafe to call res.send, in case formatter blows up again!');
-});
-```
-
 
 ## after
 
