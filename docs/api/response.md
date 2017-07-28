@@ -1,4 +1,7 @@
-# Response API
+---
+title: Response API
+permalink: /docs/response-api/
+---
 
 Wraps all of the node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
@@ -128,7 +131,6 @@ res.status(201);
 * `code` {Number} an http status code
 * `body` {String | Object | Array | Buffer} the payload to send
 * `[headers]` {Object} an optional object of headers (key/val pairs)
-* `[callback]` {Function} an optional callback, used in conjunction with async
   formatters
 
 You can use `send()` to wrap up all the usual `writeHead()`, `write()`, `end()`
