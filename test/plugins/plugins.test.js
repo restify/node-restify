@@ -6,6 +6,7 @@
 var assert = require('chai').assert;
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
+var sanitizePath = require('../../lib/plugins/pre/prePath.js');
 
 // local files
 var helper = require('../lib/helper');
@@ -257,5 +258,48 @@ describe('all other plugins', function () {
                 done();
             });
         });
+    });
+
+    describe('sanitizePath', function () {
+        // Ensure it santizies potential edge cases correctly
+        var tests = {
+            input: [
+                '////foo////', //excess padding on both ends
+                'bar/foo/', // trailing slash
+                'bar/foo/////', // multiple trailing slashes
+                'foo////bar', // multiple slashes inbetween
+                '////foo', // multiple at beginning
+                '/foo/bar' // don't mutate
+            ],
+            output: [
+                '/foo',
+                'bar/foo',
+                'bar/foo',
+                'foo/bar',
+                '/foo',
+                '/foo/bar'
+            ],
+            description: [
+                'should clean excess padding on both ends',
+                'should clean trailing slash',
+                'should clean multiple trailing slashes',
+                'should clean multiple slashes inbetween',
+                'should clean multiple at beginning',
+                'dont mutate correct urls'
+            ]
+        };
+
+        for (var i = 0; i < tests.input.length; i++) {
+            (function () {
+                var index = i;
+                it(tests.description[index], function (done) {
+                    var req = { url: tests.input[index] };
+                    sanitizePath()(req, null, function () {
+                        assert.equal(req.url, tests.output[index]);
+                        done();
+                    });
+                });
+            }());
+        }
     });
 });
