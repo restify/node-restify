@@ -1,5 +1,7 @@
-
-# restify 4.x to 5.x migration guide
+---
+title: restify 4.x to 5.x migration guide
+permalink: /docs/4to5/
+---
 
 
 ## Introduction
@@ -205,60 +207,6 @@ Connection: keep-alive
 
 {"code":"Gone","message":"gone girl"}
 ```
-
-## sync vs async formatters
-
-Restify now supports both sync and async formatters. In 4.x, all formatters had
-an async signature despite not being async. For example, the text formatter in
-4.x might have looked like this:
-
-```js
-function formatText(req, res, body, cb) {
-    return cb(null, body.toString());
-}
-```
-
-This caused a scenario where formatting could potentially fail, but the handler
-chain would continue on. To address this gap, as of 5.x, any formatters that
-are async require a callback to be passed into `res.send()`. For example,
-imagine this async formatter:
-
-```js
-function specialFormat(req, res, body, cb) {
-    return asyncSerializer.format(body, cb);
-}
-
-server.get('/', function(req, res, next) {
-    res.send('hello world', function(err) {
-        if (err) {
-            res.end('some other backup content when formatting fails');
-        }
-        return next();
-    });
-});
-
-server.get('/', function(req, res, next) {
-    // alternatively, you can pass the error to next, which will render the
-    // error to the client.
-    res.send('hello world', next);
-});
-```
-
-This way we are able to block the handler chain from moving on when an async
-formatter fails. If you have any custom formatters, migrating from 4.x will
-require you to change the formatter to be sync. Imagine the previous text
-formatter changed to sync. Notice that the signature no longer takes a
-callback.  This hints to restify that the formatter is sync:
-
-```js
-function formatText(req, res, body) {
-    return body.toString();
-}
-```
-
-Thus, if your formatter takes 4 parameters (i.e., takes a callback),
-invocations of `res.send()` must take a callback, or else restify will throw.
-
 
 ## Deprecations
 

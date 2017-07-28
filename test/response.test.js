@@ -287,6 +287,62 @@ test('redirect using options.url', function (t) {
 });
 
 
+test('redirect using opts.port', function (t) {
+    SERVER.get('/9', function (req, res, next) {
+        res.redirect({
+            port: 3000
+        }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var parsedUrl = url.parse(res.headers.location, true);
+        t.equal(parsedUrl.port, 3000);
+        t.end();
+    });
+});
+
+
+test('redirect using external url and custom port', function (t) {
+    SERVER.get('/9', function (req, res, next) {
+        res.redirect({
+            hostname: 'www.foo.com',
+            pathname: '/99',
+            port: 3000
+        }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var parsedUrl = url.parse(res.headers.location, true);
+        t.equal(parsedUrl.port, 3000);
+        t.equal(parsedUrl.hostname, 'www.foo.com');
+        t.equal(parsedUrl.pathname, '/99');
+        t.end();
+    });
+});
+
+test('redirect using default hostname with custom port', function (t) {
+    SERVER.get('/9', function (req, res, next) {
+        res.redirect({
+            pathname: '/99',
+            port: 3000
+        }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var parsedUrl = url.parse(res.headers.location, true);
+        t.equal(parsedUrl.port, 3000);
+        t.equal(parsedUrl.pathname, '/99');
+        t.equal(res.headers.location, 'http://127.0.0.1:3000/99');
+        t.end();
+    });
+});
+
 // jscs:disable maximumLineLength
 test('redirect should cause InternalError when invoked without next', function (t) {
 
@@ -486,7 +542,11 @@ test('GH-951: sendRaw accepts only strings or buffers', function (t) {
 
     SERVER.on('uncaughtException', function (req, res, route, err) {
         t.ok(err);
-        t.equal(err.name, 'AssertionError');
+        // Node v8 uses static error codes
+        // and `name` includes the error name and error code as well which
+        // caused this test to break. Just changing the logic to check for
+        // string instead
+        t.equal((err.name.indexOf('AssertionError') >= 0), true);
         t.equal(err.message, 'res.sendRaw() accepts only strings or buffers');
         t.end();
     });
