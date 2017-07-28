@@ -1,4 +1,7 @@
-# restify-plugins
+---
+title: Plugins API
+permalink: /docs/plugins-api/
+---
 
 Restify comes bundled with a selection of useful plugins. These are accessible
 off of `restify.plugins` and `restify.pre`.
