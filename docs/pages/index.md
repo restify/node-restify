@@ -50,7 +50,7 @@ lot of functionality, such as templating and rendering, to support that.
 Restify does not.
 
 Restify exists to let you build "strict" API
-services that are maintanable and observable. Restify comes with automatic
+services that are maintainable and observable. Restify comes with automatic
 [DTrace](http://en.wikipedia.org/wiki/DTrace) support for all your
 handlers, if you're running on a platform that supports DTrace.
 

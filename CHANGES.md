@@ -1,9 +1,78 @@
 # restify Changelog
 
-## Current
+## 5.0.0
+ - #1256 add `req.id()` method, Alex Liu
+ - #1251 add `req.connectionState()` method, Alex Liu
+ - #1250 add `server.unfinishedRequests()` method, Alex Liu
+ - #1247 Update jyoent cloud API link in README, Devinsuit
+ - #1246 Fix syntax error in plugins.md example, Aria Stewart
+ - #1241 Rev formidable to remove Node6+ warnings, Alex Liu
+ - #1234 Update uuid to version 3.0.0, Marc Bachmann
+ - #1212 Fix typos in plugins.md, Greg Walden
+ - #1199 Update examples to use ES6, Amila Welihinda
+ - #1190 Fix minor typo, The-Alchemist
+ - #1179 Fix typo in comment, Niklas Ingholt
+ - Fix dtrace demo to not use async formatter, Yunong Xiao
+ - #1171 Router unmount now works for versioned routes, gcssabbagh
+ - #1143 add docs about serveStatic plugin, Michael Burguet
+ - #1135 ability to find a route by a path, Jacob Quatier
+ - #1129 always invoke res.send callback if one is provided, even when the
+   selected formatter is sync, Alex Liu
+ - #1128 don't send domain errors to the client, Alex Liu
+ - #1123 add deprecation warnings for domain dependent features, Alex Liu
+ - #1119 set response status code to 0 when the request is terminated by the
+   client, Alex Liu
+ - #1118 remove undocumented exports and other unused methods, Alex Liu
+ - #1113 Fix JSDOC comments, Marc Riegel
+ - #1111 new documentation guides, Nicolas Artman
+ - #1092 support for strict routing, lukealbao
+ - #1089 remove route from LRU cache on when calling `server.rm`, Luis Gómez
+ - #1086 support re-using request id headers on incoming requests, Alex Liu
+ - #1081 update documentation, default content-type is now application/json,
+   Dmitry Kirilyuk
+ - #1078 send the server name down in the header per documentation, Alex Liu
+ - #1072 update documentation for accept-version header, Ingo Renner
+ - #1071 rev node-uuid to address advisory CVE-2015-8851, Alex Liu
+ - #1056 fix `req.absoluteUri()` to use correct protocol, David Marek
+ - #1032 fix potential xss vector, Alex Liu
  - #1024 **BREAKING** Disabled the uncaughtException handler by default, added
    server option 'handleUncaughtExceptions' to allow enabling of it again
    (restify 4.x and before used to handle exceptions by default), Todd Whiteman
+ - #1047 update documentation for spdy example, Tyler Akins
+ - #1041 add `rejectUnknown` option to restify plugin documentation, Dmitry
+   Kirilyuk
+ - #1038 capitalize header field for Location per RFC, Tommi Kyntola
+ - #1011 update documentation to remove outdated references. fix more links,
+   lukealbao
+ - #1010 update documentation to include charSet property for static plugin,
+   Greg Walker
+ - #1000 update spdy to 3.2.0, Andy Tzeng
+ - #1007 remove `defaultResponseHeaders` from documentation, lukealbao
+ - #999 server `NotFound` handler is now normalized, works like other error
+   events and no longer flushes responses automatically, Alex Liu
+ - #991 update documentation links for new plugins and errors repo, Ken Warner
+ - #987 disallow multiple values for content-type header, James O'Cull
+ - #985 CORS removed from restify core. support `next(false)` in pre handler
+   chains, Alex Liu
+ - #982 allow sending of null body, Felix Milea-Ciobanu
+ - #973 rev latest restify-errors, fix todoapp examples, Micah Ransdell
+ - #972 added shrinkwrap+nsp for security vuln checks, Alex Liu
+ - #971 Fix error creation when error message contain URI encoded characters,
+   Benjamin Urban
+ - #969 Fix incorrect usage of assert.AssertionError, Alex Liu
+ - #965 added unit test for sending null body, Michael Nisi
+ - #964 Fix cached routes not setting maxVersion, Alex Liu
+ - #963 enhancements to res.redirect. server now emits `redirect` event, James
+   Womack
+ - #960 update documentation for websocket example, Richard Kiene
+ - #958 RequestCaptureStream now writes triggering record, Gerrard Lindsay,
+   Yunong Xiao
+ - #955 update documentation for socket.io example, Thorsten Hans
+ - #952 Formatters no longer set status codes or inspect payload, Christian
+   Bongiorno, Alex Liu
+ - #951 `res.sendRaw()` allows sending of responses without use of formatters,
+   Matthew Amato, Alex Liu
+ - #947 update documentation links for readme.md & badges, ReadmeCritic
  - #944 Support generic event listener, Alex Liu
  - #943 Fix typos in documentation, azollyx
  - #939 Fix issue where missing content-type header would hang response, Alex
@@ -16,8 +85,15 @@
  - #883 hypens no longer stripped from route names, Sean Wragg
  - #903 Update docs to reflect new error handling, Jacob Quatier
  - #889 Bump dependencies to latest, Micah Ransdell
+ - #845 Support sync and async formatters, Alex Liu
  - #844 Move Errors to their own module, Alex Liu
  - #855 Clients now live in its own repo and npm module, Alex Liu
+
+Various documentation improvements from leitsubomi,
+
+## 4.0.4
+
+- #937 Fix missing content-type header causing response to hang
 
 ## 4.0.3
 - #917 Fix: HTTP 413 status name, Micah Ransdell

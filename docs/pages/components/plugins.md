@@ -1,10 +1,10 @@
-# Bundled Plugins
+# restify-plugins
 
-restify ships with several handlers you can use, specifically:
+A bundle of plugins compatible with restify can be pulled in via the
+[restify-plugins](https://github.com/restify/plugins) module.
 
 * Accept header parsing
 * Authorization header parsing
-* CORS handling plugin
 * Date header parsing
 * JSONP support
 * Gzip Response
@@ -13,6 +13,7 @@ restify ships with several handlers you can use, specifically:
 * Static file serving
 * Throttling
 * Conditional request handling
+* Request expiry
 * Audit logger
 
 Here's some example code using all the shipped plugins:
@@ -80,26 +81,6 @@ to something like:
 is unrecognized, the only thing available in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
 
-## CORS
-
-```js
-server.use(restify.CORS());
-```
-
-Supports tacking [CORS](http://www.w3.org/TR/cors) headers into `actual`
-requests (as defined by the spec).  Note that preflight requests are
-automatically handled by the router, and you can override the default behavior
-on a per-URL basis with `server.opts(:url, ...)`.  To fully specify this plugin,
-a sample invocation is:
-
-```js
-server.use(restify.CORS({
-  origins: ['https://foo.com', 'http://bar.com', 'http://baz.com:8081'],   // defaults to ['*']
-  credentials: true,                 // defaults to false
-  headers: ['x-foo']                 // sets expose-headers
-}));
-```
-
 
 ## Date Parser
 
@@ -165,7 +146,7 @@ server.use(restify.bodyParser({
     },
     keepExtensions: false,
     uploadDir: os.tmpdir(),
-    multiples: true
+    multiples: true,
     hash: 'sha1',
     rejectUnknown: true
  }));
@@ -178,7 +159,7 @@ Options:
 * `mapFiles` - if `req.params` should be filled with the contents of files sent through a multipart request. [formidable](https://github.com/felixge/node-formidable) is used internally for parsing, and a file is denoted as a multipart part with the `filename` option set in its `Content-Disposition`. This will only be performed if `mapParams` is true.
 * `overrideParams` - if an entry in `req.params` should be overwritten by the value in the body if the names are the same. For instance, if you have the route `/:someval`, and someone posts an `x-www-form-urlencoded` Content-Type with the body `someval=happy` to `/sad`, the value will be `happy` if `overrideParams` is `true`, `sad` otherwise.
 * `multipartHandler` - a callback to handle any multipart part which is not a file. If this is omitted, the default handler is invoked which may or may not map the parts into `req.params`, depending on the `mapParams`-option.
-* `multipartFileHandler` - a callback to handle any multipart file. It will be a file if the part have a `Content-Disposition` with the `filename` parameter set. This typically happens when a browser sends a form and there is a parameter similar to `<input type="file" />`. If this is not provided, the default behaviour is to map the contents into `req.params`.
+* `multipartFileHandler` - a callback to handle any multipart file. It will be a file if the part has a `Content-Disposition` with the `filename` parameter set. This typically happens when a browser sends a form and there is a parameter similar to `<input type="file" />`. If this is not provided, the default behaviour is to map the contents into `req.params`.
 * `keepExtensions` - if you want the uploaded files to include the extensions of the original files (multipart uploads only). Does nothing if `multipartFileHandler` is defined.
 * `uploadDir` - Where uploaded files are intermediately stored during transfer before the contents is mapped into `req.params`. Does nothing if `multipartFileHandler` is defined.
 * `multiples` - if you want to support html5 multiple attribute in upload fields.
@@ -239,7 +220,10 @@ server.get(/\/docs\/current\/?.*/, restify.serveStatic({
 
 The above `route` and `directory` combination will serve a file located in
 `./documentation/v1/docs/current/index.html` when you attempt to hit
-`http://localhost:8080/docs/current/`.
+`http://localhost:8080/docs/current/`. If you want the serveStatic module to serve files
+directly from the `/documentation/v1` directory (and not append the request path `/docs/current/`), 
+you can set the `appendRequestPath` option to `false`, and the served file would be 
+`./documentation/v1/index.html`, in the previous example.
 
 The plugin will enforce that all files under `directory` are served. The
 `directory` served is relative to the process working directory. You can also
@@ -398,8 +382,8 @@ server.on('after', restify.auditLogger({
 }));
 ```
 
-You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if 
-log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out 
+You pass in the auditor a bunyan logger, optionally server object, Ringbuffer and a flag printLog indicate if
+log needs to be print out at info level or not.  By default, without specify printLog flag, it will write out
 record lookling like this:
 
 ```js
@@ -470,7 +454,7 @@ record lookling like this:
   },
   "secure": false,
   "level": 30,
-  "msg": GetFoo handled: 200",
+  "msg": "GetFoo handled: 200",
   "time": "2012-02-07T20:30:31.896Z",
   "v": 0
 }
@@ -492,8 +476,3 @@ SERVER.on('auditlog', function (data) {
 ```
 
 Log is also accumulated in the Ringbuffer object, if user choose to pass in during auditlogger construction time.
-
-
-
-
-

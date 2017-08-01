@@ -22,35 +22,36 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-var reqCount = 0;
-
 
 ///--- Tests
 
 before(function (callback) {
     try {
         SERVER = restify.createServer({
+            handleUncaughtExceptions: true,
             formatters: {
-                'text/plain': function (req, res, body, cb) {
-                    if (reqCount === 0) {
-                        return process.nextTick(function () {
-                            reqCount++;
-                            cb(null, 'async fmt');
-                        });
-                    } else if (reqCount === 1) {
-                        return process.nextTick(function () {
-                            reqCount++;
-                            cb(new Error('foobar'), 'async fmt');
-                        });
-                    } else {
-                        return cb(null, 'sync fmt');
-                    }
+                'text/sync': function (req, res, body) {
+                    return 'sync fmt';
                 },
-                'application/foo; q=0.9': function (req, res, body, cb) {
-                    return cb(null, 'foo!');
+                'text/syncerror': function (req, res, body) {
+                    // this is a bad formatter, on purpose.
+                    return x.toString(); // eslint-disable-line no-undef
                 },
-                'application/bar; q=0.1': function (req, res, body, cb) {
-                    return cb(null, 'bar!');
+                'text/async': function (req, res, body, cb) {
+                    return process.nextTick(function () {
+                        cb(null, 'async fmt');
+                    });
+                },
+                'text/asyncerror': function (req, res, body, cb) {
+                    return process.nextTick(function () {
+                        cb(new Error('foobar'));
+                    });
+                },
+                'application/foo; q=0.9': function (req, res, body) {
+                    return 'foo!';
+                },
+                'application/bar; q=0.1': function (req, res, body) {
+                    return 'bar!';
                 }
             },
             dtrace: helper.dtrace,
@@ -65,11 +66,22 @@ before(function (callback) {
                 retry: false,
                 agent: false
             });
-            SERVER.get('/tmp', function (req, res, next) {
+            SERVER.get('/sync', function (req, res, next) {
                 res.send('dummy response');
                 return next();
             });
-            SERVER.get('/tmp2', function (req, res, next) {
+            SERVER.get('/async', function (req, res, next) {
+                res.send('dummy response', next);
+            });
+            SERVER.get('/asyncHandle', function (req, res, next) {
+                res.send('dummy resposne', function (err) {
+                    res.writeHead(201);
+                    res.write('panda');
+                    res.end();
+                    return next();
+                });
+            });
+            SERVER.get('/missingFormatter', function (req, res, next) {
                 delete res.formatters['application/octet-stream'];
                 res.setHeader('content-type', 'text/html');
                 res.send('dummy response');
@@ -94,33 +106,14 @@ after(function (callback) {
 });
 
 
-test('async formatter', function (t) {
-    CLIENT.get('/tmp', function (err, req, res, data) {
-        t.ifError(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(data, 'async fmt');
-        t.end();
-    });
-});
+test('GH-845: sync formatter', function (t) {
 
-test('async formatter error', function (t) {
-    SERVER.once('after', function (req, res, route, e) {
-        // TODO: add a test here to verify error has been emitted.
-        // Pending #845
-    });
-    CLIENT.get('/tmp', function (err, req, res, data) {
-        t.ok(err);
-        t.equal(err.statusCode, 500);
-        t.ok(req);
-        t.ok(res);
-        t.notOk(data);
-        t.end();
-    });
-});
-
-test('sync formatter', function (t) {
-    CLIENT.get('/tmp', function (err, req, res, data) {
+    CLIENT.get({
+        path: '/sync',
+        headers: {
+            accept: 'text/sync'
+        }
+    }, function (err, req, res, data) {
         t.ifError(err);
         t.ok(req);
         t.ok(res);
@@ -129,9 +122,152 @@ test('sync formatter', function (t) {
     });
 });
 
+
+test('GH-845: sync formatter should blow up', function (t) {
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'ReferenceError');
+        t.equal(err.message, 'x is not defined');
+        res.write('uncaughtException');
+        res.end();
+    });
+
+    CLIENT.get({
+        path: '/sync',
+        headers: {
+            accept: 'text/syncerror'
+        }
+    }, function (err, req, res, data) {
+        t.equal(data, 'uncaughtException');
+        t.end();
+    });
+});
+
+
+test('GH-845: async formatter', function (t) {
+
+    CLIENT.get({
+        path: '/async',
+        headers: {
+            accept: 'text/async'
+        }
+    }, function (err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(data, 'async fmt');
+        t.end();
+    });
+});
+
+
+test('GH-845: async formatter error should invoke res.send() callback with err',
+function (t) {
+
+    CLIENT.get({
+        path: '/asyncHandle',
+        headers: {
+            accept: 'text/asyncerror'
+        }
+    }, function (err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.statusCode, 201);
+        t.equal(data, 'panda');
+        t.end();
+    });
+
+});
+
+
+test('GH-845: async formatter error should send empty string if passed to next',
+function (t) {
+
+    CLIENT.get({
+        path: '/async',
+        headers: {
+            accept: 'text/asyncerror'
+        }
+    }, function (err, req, res, data) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.equal(data, '');
+        t.end();
+    });
+});
+
+
+test('GH-845: async formatter error should emit FormatterError', function (t) {
+
+    SERVER.on('FormatterError', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.code, 'Formatter');
+        res.end('custom formatter error');
+    });
+
+    CLIENT.get({
+        path: '/async',
+        headers: {
+            accept: 'text/asyncerror'
+        }
+    }, function (err, req, res, data) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.equal(data, 'custom formatter error');
+        t.end();
+    });
+});
+
+
+test('GH-1129: sync formatter should invoke res.send callback', function (t) {
+
+    SERVER.on('after', function () {
+        // only end the test when server considers request complete
+        t.end();
+    });
+
+    CLIENT.get({
+        path: '/async',
+        headers: {
+            accept: 'text/sync'
+        }
+    }, function (err, req, res, data) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(data, 'sync fmt');
+    });
+});
+
+
+test('GH-845: should blow up when using async formatter ' +
+     'without res.send callback', function (t) {
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.name, 'AssertionError');
+        t.equal(err.message, 'async formatter for text/async requires ' +
+                'callback to res.send() (func) is required');
+        res.write('uncaughtException');
+        res.end();
+    });
+
+    CLIENT.get({
+        path: '/sync',
+        headers: {
+            accept: 'text/async'
+        }
+    }, function (err, req, res, data) {
+        t.equal(data, 'uncaughtException');
+        t.end();
+    });
+});
+
+
 test('q-val priority', function (t) {
     var opts = {
-        path: '/tmp',
+        path: '/sync',
         headers: {
             accept: 'application/*'
         }
@@ -145,13 +281,19 @@ test('q-val priority', function (t) {
     });
 });
 
+
 test('GH-771 q-val priority on */*', function (t) {
     var opts = {
-        path: '/tmp',
+        path: '/sync',
         headers: {
             accept: '*/*'
         }
     };
+
+
+    // this test is a little flaky - it will look for first formatter that
+    // satisfies q-val but in this test we have a bunch of bad formatters.
+    // it appears V8 will use the first found formatter (this case, text/sync).
     CLIENT.get(opts, function (err, req, res, data) {
         t.ifError(err);
         t.ok(req);
@@ -161,12 +303,13 @@ test('GH-771 q-val priority on */*', function (t) {
     });
 });
 
+
 test('GH-937 should return 406 when no content-type header set on response ' +
 'matching an acceptable type found by matching client', function (t) {
 
     // ensure client accepts only a type not specified by server
     var opts = {
-        path: '/tmp',
+        path: '/sync',
         headers: {
             accept: 'text/html'
         }
@@ -181,12 +324,13 @@ test('GH-937 should return 406 when no content-type header set on response ' +
     });
 });
 
+
 test('GH-937 should return 500 when no default formatter found ' +
 'and octet-stream is not available', function (t) {
 
     // ensure client accepts only a type not specified by server
     var opts = {
-        path: '/tmp2',
+        path: '/missingFormatter',
         headers: {
             accept: 'text/html'
         }

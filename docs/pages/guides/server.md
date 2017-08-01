@@ -1,6 +1,6 @@
 # Server Guide
 
-The most barebones echo server:
+Setting up a server is quick and easy. Here is a barebones echo server:
 
 ```js
 var restify = require('restify');
@@ -19,8 +19,8 @@ server.listen(8080, function() {
 });
 ```
 
-Try hitting that with the following curl commands to get a feel for
-what restify is going to turn that into:
+Try hitting that with the following curl commands to get a feel for what
+restify is going to turn that into:
 
 ```sh
 $ curl -is http://localhost:8080/hello/mark -H 'accept: text/plain'
@@ -51,73 +51,160 @@ Date: Mon, 31 Dec 2012 01:42:07 GMT
 Connection: close
 ```
 
-Note that by default, curl uses `Connection: keep-alive`. In order to make the HEAD
-method return right away, you'll need to pass `Connection: close`.
+Note that by default, curl uses `Connection: keep-alive`. In order to make the
+HEAD method return right away, you'll need to pass `Connection: close`.
 
-Since curl is often used with REST APIs, restify provides a plugin to work around
-this idiosyncrasy in curl. The plugin checks whether the user agent is curl. If it
-is, it sets the Connection header to "close" and removes the "Content-Length" header.
+Since curl is often used with REST APIs, restify-plugins includes a plugin to
+work around this idiosyncrasy in curl. The plugin checks whether the user agent
+is curl. If it is, it sets the Connection header to "close" and removes the
+"Content-Length" header.
 
 ```js
-server.pre(restify.pre.userAgentConnection());
+server.pre(plugins.pre.userAgentConnection());
 ```
 
-See the [pre](#pre) method for more information.
+## Sinatra style handler chains
 
-## Creating a Server
-
-Creating a server is straightforward, as you simply invoke the
-`createServer` API, which takes an options object with the options listed
-below (and `listen()` takes the same arguments as node's
-[http.Server.listen](http://nodejs.org/docs/latest/api/http.html#http_server_listen_port_hostname_backlog_callback)):
+Like many other Node.js based REST frameworks, restify leverages a Sinatra
+style syntax for defining routes and the function handlers that service those
+routes:
 
 ```js
-var restify = require('restify'),
-fs = require('fs');
-
-var server = restify.createServer({
-  certificate: fs.readFileSync('path/to/server/certificate'),
-  key: fs.readFileSync('path/to/server/key'),
-  name: 'MyApp',
+server.get('/', function(req, res, next) {
+  res.send('home')
+  return next();
 });
 
-server.listen(8080);
+server.post('/foo',
+  function(req, res, next) {
+    req.someData = 'foo';
+    return next();
+  },
+  function(req, res, next) {
+    res.send(req.someData);
+    return next();
+  }
+);
 ```
 
-|Option|Type|Description|
-|----------|--------|---------------|
-|certificate|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
-|key|String|If you want to create an HTTPS server, pass in the path to PEM-encoded certificate and key|
-|formatters|Object|Custom response formatters for `res.send()`|
-|handleUncaughtExceptions|Boolean|When true (default is false) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack|
-|log|Object|You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required|
-|name|String|By default, this will be set in the `Server` response header, default is `restify` |
-|spdy|Object|Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)|
-|version|String|Array|A default version to set for all routes|
-|handleUpgrades|Boolean|Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`|
-|httpsServerOptions|Object|Any options accepted by [node-https Server](http://nodejs.org/api/https.html#https_https). If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.|
-|reqIdHeaders|Array|an optional array of request id header names that will be used to set the request id (i.e., the value for req.getId())|
-|strictRouting|Boolean|(Default=`false`). If set, Restify will treat "/foo" and "/foo/" as different paths.|
+In a restify server, there are three distinct handler chains:
 
-## Common handlers: server.use()
+* `pre` - a handler chain executed prior to routing
+* `use` - a handler chain executed post routing
+* `{httpVerb}` - a handler chain executed specific to a route
 
-A restify server has a `use()` method that takes handlers of
-the form `function (req, res, next)`.   Note that restify runs
-handlers in the order they are registered on a server, so if you want
-some common handlers to run before any of your routes, issue calls to
-`use()` before defining routes.
+All three handler chains accept either a single function, multiple functions,
+or an array of functions.
 
-Note that in all calls to `use()` and the routes below, you can pass
-in any combination of direct functions (`function(res, res, next)`) and
-arrays of functions (`[function(req, res, next)]`).
+
+## Universal pre-handlers: server.pre()
+
+The `pre` handler chain is executed before routing. That means these handlers
+will execute for an incoming request even if it's for a route that you did not
+register. This can be useful for logging metrics or for cleaning up the
+incoming request before routing it.
+
+```js
+server.pre(plugins.dedupeSlashes()); // dedupe slashes in URL before routing
+```
+
+
+## Universal handlers: server.use()
+
+The `use` handler chains is executed after a route has been chosen to service
+the request. Function handlers that are attached via the `use()` method will be
+run for all routes. Since restify runs handlers in the order they are
+registered, make sure that all your `use()` calls happen before defining any
+routes.
+
+```js
+server.use(function(req, res, next) {
+    console.warn('run for all routes!');
+    return next();
+});
+```
+
+
+## Using next()
+
+Upon completion of each function in the handler chain, you are responsible for
+calling `next()`. Calling `next()` will move to the next function in the chain.
+
+Unlike other REST frameworks, calling `res.send()` does not trigger `next()`
+automatically. In many applications, work can continue to happen after
+`res.send()`, so flushing the response is not synonmyous with completion of a
+request.
+
+In the normal case, `next()` does not typically take any parameters. If for
+some reason you want to stop processing the request, you can call `next(false)`
+to stop processing the request:
+
+```js
+server.use([
+  function(req, res, next) {
+    if (someCondition) {
+      res.send('done!');
+      return next(false);
+    }
+    return next();
+  },
+  function(req, res, next) {
+    // if someCondition is true, this handler is never executed
+  }
+]);
+```
+
+`next()` also accepts any object for which `instanceof Error` is true, which
+will cause restify to send that Error object as a response to the client. The
+status code for the response will be inferred from the Error object's
+`statusCode` property. If no `statusCode` is found, it will default to 500.
+So the snippet below will send a serialized error to the client with an http
+500:
+
+```js
+server.use(function(req, res, next) {
+  return next(new Error('boom!'));
+});
+```
+
+And this will send a 404, since the `NotFoundError` constructor provides a
+value of 404 for `statusCode`:
+
+```js
+server.use(function(req, res, next) {
+  return next(new NotFoundError('not here!'));
+});
+```
+
+Calling `res.send()` with an Error object produces similar results, with this
+snippet sending an http 500 with a serialized error the client:
+
+```js
+server.use(function(req, res, next) {
+  res.send(new Error('boom!'));
+  return next();
+});
+```
+
+The difference between the two is that invoking `next()` with an Error object
+allows you to leverage the server's [event
+emitter](/components/server.md#errors). This enables you to handle all
+occurrences of an error type using a common handler. See the [error
+handling](#error handling) section for more details.
+
+
+Lastly, you can call `next.ifError(err)` with an Error object to cause restify
+to throw, bringing down the process. This can be useful if you an Error is
+surfaced that cannot be handled, requiring you to kill the process.
+
 
 ## Routing
 
 restify routing, in 'basic' mode, is pretty much identical to express/sinatra,
-in that HTTP verbs are used with a parameterized resource to determine
-what chain of handlers to run.  Values associated with named
-placeholders are available in `req.params`. Note that values will be
-URL-decoded before being passed to you.
+in that HTTP verbs are used with a parameterized resource to determine what
+chain of handlers to run. Values associated with named placeholders are
+available in `req.params`. That values will be URL-decoded before being
+passed to you.
 
 ```js
 function send(req, res, next) {
@@ -158,53 +245,12 @@ $ curl localhost:8080/foo/my/cats/name/is/gandalf
 ```
 
 Would result in `req.params[0]` being `foo` and `req.params[1]` being
-`my/cats/name/is/gandalf`.  Basically, you can do whatever you want.
+`my/cats/name/is/gandalf`.
 
-Note the use of `next()`.  You are responsible for calling `next()` in
-order to run the next handler in the chain.  As below, you can pass an
-Error object in to have restify automatically return responses to the client.
 
-You can pass in  `false` to not error, but to stop the handler
-chain.  This is useful if you had a `res.send` in an early filter, which is
-not an error, and you possibly have one later you want to short-circuit.
+Routes can be specified by any of the following http verbs - `del`, `get`,
+`head`, `opts`, `post`, `put`, and `patch`.
 
-Lastly, you can pass in a string `name` to `next()`, and restify will lookup
-that route, and assuming it exists will run the chain *from where you left
-off*.  So for example:
-
-```js
-var count = 0;
-
-server.use(function foo(req, res, next) {
-    count++;
-    next();
-});
-
-server.get('/foo/:id', function (req, res, next) {
-   next('foo2');
-});
-
-server.get({
-    name: 'foo2',
-    path: '/foo/:id'
-}, function (req, res, next) {
-   assert.equal(count, 1);
-   res.send(200);
-   next();
-});
-```
-
-Note that `foo` only gets run once in that example.  A few caveats:
-
-- If you provide a name that doesn't exist, restify will 500 that request.
-- Don't be silly and call this in cycles.  restify won't check that.
-- Lastly, you cannot "chain" `next('route')` calls; you can only delegate the
-  routing chain once (this is a limitation of the way routes are stored
-  internally, and may be revisited someday).
-
-### Chaining Handlers
-
-Routes can also accept more than one handler function. For instance:
 
 ```js
 server.get(
@@ -222,7 +268,12 @@ server.get(
 
 ### Hypermedia
 
-If a parameterized route was defined with a string (not a regex), you can render it from other places in the server. This is useful to have HTTP responses that link to other resources, without having to hardcode URLs throughout the codebase. Both path and query strings parameters get URL encoded appropriately.
+If a parameterized route was defined with a string (not a regex), you can
+render it from other places in the server. This is useful to have HTTP
+responses that link to other resources, without having to hardcode URLs
+throughout the codebase. Both path and query strings parameters get URL encoded
+appropriately.
+
 
 ```js
 server.get({name: 'city', path: '/cities/:slug'}, /* ... */);
@@ -284,45 +335,45 @@ $ curl -s -H 'accept-version: ~2' localhost:8080/hello/mark
 $ curl -s -H 'accept-version: ~3' localhost:8080/hello/mark | json
 {
   "code": "InvalidVersion",
-  "message": "GET /hello/mark supports versions: 1.1.3, 2.0.0"
+  "message": "~3 is not supported by GET /hello/mark"
 }
 ```
 
-In the first case, we didn't specify an `Accept-Version` header
-at all, so restify treats that like sending a `*`. Much as not sending
-an `Accept` header means the client gets the server's choice. Restify
-will choose this highest matching route.
-In the second case, we explicitly asked for for V1, which got
-us response a response from the version 1 handler function, 
-but then we asked for V2 and got back JSON.  Finally,
-we asked for a version that doesn't exist and got an error (notably,
-we didn't send an `Accept` header, so we got a JSON response).  Which
-segues us nicely into content negotiation.
+In the first case, we didn't specify an `Accept-Version` header at all, so
+restify treats that like sending a `*`. Much as not sending an `Accept` header
+means the client gets the server's choice. Restify will choose this highest
+matching route. In the second case, we explicitly asked for for V1, which got
+us response a response from the version 1 handler function, but then we asked
+for V2 and got back JSON. Finally, we asked for a version that doesn't exist
+and got an error.
 
-You can default the versions on routes by passing in a version field at
-server creation time.  Lastly, you can support multiple versions in the API
-by using an array:
+You can default the versions on routes by passing in a version field at server
+creation time.  Lastly, you can support multiple versions in the API by using
+an array:
 
 ```js
 server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, sendV2);
 ```
 
-In this case you may need to know more information such as what the
-original requested version string was, and what the matching
-version from the routes supported version array was. Two methods make
-this info available:
+In this case you may need to know more information such as what the original
+requested version string was, and what the matching version from the routes
+supported version array was. Two methods make this info available:
 
 ```js
 var PATH = '/version/test';
-server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, function (req) {
+server.get({
+  path: PATH,
+  version: ['2.0.0', '2.1.0', '2.2.0']
+}, function (req, res, next) {
   res.send(200, {
     requestedVersion: req.version(),
     matchedVersion: req.matchedVersion()
   });
+  return next();
 });
 ```
 
-Hitting this route:
+Hitting this route will respond as below:
 
 ```sh
 $ curl -s -H 'accept-version: <2.2.0' localhost:8080/version/test | json
@@ -332,7 +383,6 @@ $ curl -s -H 'accept-version: <2.2.0' localhost:8080/version/test | json
 }
 ```
 
-In response to the above
 
 ## Upgrade Requests
 
@@ -378,68 +428,75 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 
 ## Content Negotiation
 
-If you're using `res.send()` restify will automatically select the
-content-type to respond with, by finding the first registered
-`formatter` defined.  Note in the examples above we've not defined any
-formatters, so we've been leveraging the fact that restify ships with
-`application/json`,  `text/plain` and `application/octet-stream`
-formatters.  You can add additional formatters to restify by passing
-in a hash of content-type -> parser at server creation time:
+If you're using `res.send()` restify will automatically select the content-type
+to respond with, by finding the first registered `formatter` defined.  Note in
+the examples above we've not defined any formatters, so we've been leveraging
+the fact that restify ships with `application/json`, `text/plain` and
+`application/octet-stream` formatters. You can add additional formatters to
+restify by passing in a hash of content-type -> parser at server creation time:
 
 ```js
 var server = restify.createServer({
   formatters: {
-    'application/foo': function formatFoo(req, res, body, cb) {
+    'application/foo': function formatFoo(req, res, body) {
       if (body instanceof Error)
         return body.stack;
 
       if (Buffer.isBuffer(body))
-        return cb(null, body.toString('base64'));
+        return body.toString('base64');
 
-      return cb(null, util.inspect(body));
+      return util.inspect(body);
     }
   }
 });
 ```
 
-You can do whatever you want, but you probably want to check the type
-of `body` to figure out what type it is, notably for
-Error/Buffer/everything else.  You can always add more formatters
-later by just setting the formatter on `server.formatters`, but it's
-probably sane to just do it at construct time.   Also, note that if a
-content-type can't be negotiated, the default is
-`application/json`.  Of course, you can always explicitly set
-the content-type:
+If a content-type can't be negotiated, then restify will default to using the
+`application/octet-stream` formatter. For example, attempting to send a
+content-type that does not have a defined formatter:
 
 ```js
-res.setHeader('content-type', 'application/foo');
-res.send({hello: 'world'});
+server.get('/foo', function(req, res, next) {
+  res.setHeader('content-type', 'text/css');
+  res.send('hi');
+  return next();
+});
 ```
 
-Note that there are typically at least three content-types supported by
-restify: json, text and binary.  When you override or append to this, the
-"priority" might change; to ensure that the priority is set to what you
-want, you should set a `q-value` on your formatter definitions, which will
-ensure sorting happens the way you want:
+Will result in a response with a content-type of `application/octet-stream`:
+
+```sh
+$ curl -i localhost:3000/
+HTTP/1.1 200 OK
+Content-Type: application/octet-stream
+Content-Length: 2
+Date: Thu, 02 Jun 2016 06:50:54 GMT
+Connection: keep-alive
+```
+
+As previously noted, restify ships with built-in formatters for json, text,
+and binary. When you override or append to this, the "priority" might change;
+to ensure that the priority is set to what you want, you should set a `q-value`
+on your formatter definitions, which will ensure sorting happens the way you
+want:
 
 ```js
 restify.createServer({
   formatters: {
     'application/foo; q=0.9': function formatFoo(req, res, body, cb) {
       if (body instanceof Error)
-        return cb(body);
+        return body.stack;
 
       if (Buffer.isBuffer(body))
-        return cb(null, body.toString('base64'));
+        return body.toString('base64');
 
-      return cb(null, util.inspect(body));
+      return util.inspect(body);
     }
   }
 });
 ```
 
-Lastly, you don't have to use any of this magic, as a restify response
-object has all the "raw" methods of a node
+The restify response object retains has all the "raw" methods of a node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
  on it as well.
 
@@ -453,47 +510,62 @@ res.write(body);
 res.end();
 ```
 
+Formatters can also be async, in which case a callback is available to you as
+the fourth parameter. If you choose to use an async formatter for a particular
+content-type, it is required to pass a callback parameter to `res.send()`. If a
+callback is not provided, then restify will throw an error:
+
+```js
+var server = restify.createServer({
+  formatters: {
+    'application/foo-async': function formatFoo(req, res, body, cb) {
+
+      someAsyncMethod(body, function(err, formattedBody) {
+        if (err) {
+          return cb(err);
+        }
+        return cb(null, formattedBody);
+      });
+    }
+  }
+});
+
+server.get('/fooAsync', function(req, res, next) {
+  res.send(fooData, next); // => callback required!
+});
+```
+
+In the event of an error with your async formatter, ensure that the error is
+passed to the callback. The default behavior in this scenario is for restify to
+send an empty 500 response to the client, since restify can make no assumptions
+about the correct format for your data. Alternatively, you can listen to a
+`FormatterError` event on the server. This event is fired whenever an async
+formatter returns an error, allowing you to write a custom response if
+necessary.  response if necessary. If you listen to this event, you _must_
+flush a response, or else the request will hang. It is highly recommended to
+avoid using `res.send()` within this handler to avoid any issues that might
+have caused the async formatter to fail to begin with. Instead, use the native
+node response methods:
+
+
+```js
+server.on('FormatterError', function(req, res, route, err) {
+  // the original body that caused formatting failure is available provided
+  // on the error object - err.context.rawBody
+  res.end('boom! could not format body!');
+});
+```
+
+
 ## Error handling
 
-You can handle errors in restify a few different ways.  First, you can
-always just call `res.send(err)`.  You can also shorthand this in a
-route by doing:
-
-```js
-server.get('/hello/:name', function(req, res, next) {
-  return database.get(req.params.name, function(err, user) {
-    if (err)
-      return next(err);
-
-    res.send(user);
-    return next();
-  });
-});
-```
-
-If you invoke `res.send()` with an error that has a `statusCode`
-attribute, that will be used, otherwise a default of 500 will be used
-(unless you're using `res.send(4xx, new Error('blah'))`).
-
-Alternatively, restify 2.1 supports a `next.ifError` API:
-
-```js
-server.get('/hello/:name', function(req, res, next) {
-  return database.get(req.params.name, function(err, user) {
-    next.ifError(err);
-    res.send(user);
-    next();
-  });
-});
-```
-
-Sometimes, for all requests, you may want to handle an error condition the same
-way. As an example, you may want to serve a 500 page on all
-`InternalServerErrors`. In this case, you can add a listener for the
-`InternalServer` error event that is always fired when this Error is
-encountered by Restify as part of a `next(error)` statement. This gives you a
-way to handle all errors of the same class identically across the server. You
-can also use a generic `restifyError` event which will catch errors of all types.
+It is common to want to handle an error conditions the same way. As an example,
+you may want to serve a 500 page on all `InternalServerErrors`. In this case,
+you can add a listener for the `InternalServer` error event that is always
+fired when this Error is encountered by restify as part of a `next(error)`
+statement. This gives you a way to handle all errors of the same class
+identically across the server. You can also use a generic `restifyError` event
+which will catch errors of all types.
 
 
 ```js
@@ -512,14 +584,14 @@ server.get('/hello/:foo', function(req, res, next) {
 server.on('NotFound', function (req, res, err, cb) {
   // do not call res.send! you are now in an error context and are outside
   // of the normal next chain. you can log or do metrics here, and invoke
-  // the callback when you're done. restify will automtically render the 
+  // the callback when you're done. restify will automtically render the
   // NotFoundError as a JSON response.
   return cb();
 });
 
 server.on('InternalServer', function (req, res, err, cb) {
   // if you don't want restify to automatically render the Error object
-  // as a JSON response, you can customize the response by setting the 
+  // as a JSON response, you can customize the response by setting the
   // `body` property of the error
   err.body = '<html><body>some custom error content!</body></html>';
   return cb();
@@ -533,60 +605,119 @@ server.on('restifyError', function (req, res, err, cb) {
 });
 ```
 
-### HttpError
 
-Now the obvious question is what that exactly does (in either case).
-restify tries to be programmer-friendly with errors by exposing all
-HTTP status codes as a subclass of `HttpError`.  So, for example, you can
-do this:
+### restify-errors
+
+A module called restify-errors exposes a suite of error constructors for many
+common http and REST related errors. These constructors can be used in
+conjunction with the `next(err)` pattern to easily leverage the server's event
+emitter. The full list of constructors can be viewed over at the
+[restify-errors](https://github.com/restify/errors) repository. Here are some
+examples:
+
 
 ```js
-server.get('/hello/:name', function(req, res, next) {
-  return next(new restify.ConflictError("I just don't like you"));
-});
+var errs = require('restify-errors');
 
-$ curl -is -H 'accept: text/*' localhost:8080/hello/mark
+server.get('/', function(req, res, next) {
+  return next(new errs.ConflictError("I just don't like you"));
+});
+```
+
+```sh
+$ curl -is localhost:3000
 HTTP/1.1 409 Conflict
-Content-Type: text/plain
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: GET
-Access-Control-Allow-Headers: Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, Api-Version
-Access-Control-Expose-Headers: Api-Version, Request-Id, Response-Time
-Connection: close
-Content-Length: 21
-Content-MD5: up6uNh2ejV/C6JUbLlvsiw==
-Date: Tue, 03 Jan 2012 00:24:48 GMT
-Server: restify
-Request-Id: 1685313e-e801-4d90-9537-7ca20a27acfc
-Response-Time: 1
+Content-Type: application/json
+Content-Length: 53
+Date: Fri, 03 Jun 2016 20:29:45 GMT
+Connection: keep-alive
 
-I just don't like you
+{"code":"Conflict","message":"I just don't like you"}
 ```
 
-Alternatively, you can access the error classes via `restify.errors`. We can do this with a simple change to the previous example:
+When using restify-errors, you can also directly call `res.send(err)`, and
+restify will automatically serialize your error for you:
 
 ```js
-server.get('/hello/:name', function(req, res, next) {
-  return next(new restify.errors.ConflictError("I just don't like you"));
+var errs = require('restify-errors');
+
+server.get('/', function(req, res, next) {
+  res.send(new errs.GoneError('gone girl'));
+  return next();
 });
 ```
 
-The core thing to note about an `HttpError` is that it has a numeric
-code (statusCode) and a `body`.  The statusCode will automatically
-set the HTTP response status code, and the body attribute by default
-will be the message.
+```sh
+$ curl -is localhost:8080/
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{"code":"Gone","message":"gone girl"}
+```
+
+This automatic serialization happens because the JSON formatter will call
+`JSON.stringify()` on the Error object, and all restify-errors have a `toJSON`
+method defined. Compare this to a standard Error object which does not have
+`toJSON` defined:
+
+```js
+server.get('/sendErr', function(req, res, next) {
+  res.send(new Error('where is my msg?'));
+  return next();
+});
+
+server.get('/nextErr', function(req, res, next) {
+  return next(new Error('where is my msg?'));
+});
+```
+
+```sh
+$ curl -is localhost:8080/sendErr
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{}
+
+$ curl -is localhost:8080/nextErr
+HTTP/1.1 410 Gone
+Content-Type: application/json
+Content-Length: 37
+Date: Fri, 03 Jun 2016 20:17:48 GMT
+Connection: keep-alive
+
+{}
+```
+
+If you want to use custom errors, make sure you have `toJSON` defined, or use
+restify-error's `makeConstructor()` method to automatically create Errors that
+are supported with with `toJSON`.
+
+
+#### HttpError
+
+restify-errors provides constructors that inherit from either HttpError or
+RestError. All HttpErrors have a numeric http `statusCode` and `body`
+properties. The statusCode will automatically set the HTTP response status
+code, and the body attribute by default will be the message.
 
 All status codes between 400 and 5xx are automatically converted into
 an HttpError with the name being 'PascalCase' and spaces removed.  For
 the complete list, take a look at the
-[node source](https://github.com/joyent/node/blob/v0.6/lib/http.js#L152-205).
+[node source](https://github.com/nodejs/node/blob/master/lib/_http_server.js#L17).
 
 From that code above `418: I'm a teapot` would be `ImATeapotError`, as
 an example.
 
-### RestError
 
-Now, a common problem with REST APIs and HTTP is that they often end
+#### RestError
+
+A common problem with REST APIs and HTTP is that they often end
 up needing to overload 400 and 409 to mean a bunch of different
 things.  There's no real standard on what to do in these cases, but in
 general you want machines to be able to (safely) parse these things
@@ -595,10 +726,13 @@ out, and so restify defines a convention of a `RestError`.  A
 and additionally sets the body attribute to be a JS object with the
 attributes `code` and `message`.  For example, here's a built-in RestError:
 
+
 ```js
+var errs = require('restify-errors');
 var server = restify.createServer();
+
 server.get('/hello/:name', function(req, res, next) {
-  return next(new restify.InvalidArgumentError("I just don't like you"));
+  return next(new errs.InvalidArgumentError("I just don't like you"));
 });
 
 $ curl -is localhost:8080/hello/mark | json
@@ -622,7 +756,7 @@ Response-Time: 3
 }
 ```
 
-The built-in restify errors are:
+The built-in HttpErrors are:
 
 * BadRequestError (400 Bad Request)
 * UnauthorizedError (401 Unauthorized)
@@ -677,29 +811,38 @@ The built-in restify errors are:
 * ResourceNotFoundError (404 Not Found)
 * WrongAcceptError (406 Not Acceptable)
 
-You can always add your own by subclassing `restify.RestError` like:
+And the built in RestErrors are:
+
+* 400 BadDigestError
+* 405 BadMethodError
+* 500 InternalError
+* 409 InvalidArgumentError
+* 400 InvalidContentError
+* 401 InvalidCredentialsError
+* 400 InvalidHeaderError
+* 400 InvalidVersionError
+* 409 MissingParameterError
+* 403 NotAuthorizedError
+* 412 PreconditionFailedError
+* 400 RequestExpiredError
+* 429 RequestThrottledError
+* 404 ResourceNotFoundError
+* 406 WrongAcceptError
+
+You can also create your own subclasses using the `makeConstructor` method:
 
 ```js
+var errs = require('restify-errors');
 var restify = require('restify');
-var util = require('util');
 
-function MyError(message) {
-  restify.RestError.call(this, {
-    restCode: 'MyError',
-    statusCode: 418,
-    message: message,
-    constructorOpt: MyError
-  });
-  this.name = 'MyError';
-};
-util.inherits(MyError, restify.RestError);
+errs.makeConstructor('ZombieApocalypseError');
+
+var myErr = new errs.ZombieApocalypseError('zomg!');
 ```
 
-Basically, a `RestError` takes a statusCode, a restCode, a message,
-and a "constructorOpt" so that V8 correctly omits your code
-from the stack trace (you don't *have* to do that, but you probably
-want it).  In the example above, we also set the name property so
-`console.log(new MyError());` looks correct.
+The constructor takes `message`, `statusCode`, `restCode`, and `context`
+options. Please check out the restify-errors repo for more information.
+
 
 ## Socket.IO
 
