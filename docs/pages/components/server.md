@@ -19,6 +19,7 @@ The `createServer()` method takes the following options:
 |handleUncaughtExceptions|Boolean|When true (default is false) restify will use a domain to catch and respond to any uncaught exceptions that occur in it's handler stack|
 |log|Object|You can optionally pass in a [bunyan](https://github.com/trentm/node-bunyan) instance; not required|
 |name|String|By default, this will be set in the `Server` response header, default is `restify`. Pass empty string to unset the header. |
+|proxyProtocol|Boolean or Object|Enables [Proxy Protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt) wrapped TCP streams. When set to an object, the options are passed to [findhit-proxywrap](https://github.com/findhit/proxywrap).|
 |spdy|Object|Any options accepted by [node-spdy](https://github.com/indutny/node-spdy)|
 |version|String|Array|A default version to set for all routes|
 |handleUpgrades|Boolean|Hook the `upgrade` event from the node HTTP server, pushing `Connection: Upgrade` requests through the regular request handling chain; defaults to `false`|
