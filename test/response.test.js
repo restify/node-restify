@@ -562,3 +562,15 @@ test('GH-951: sendRaw accepts only strings or buffers', function (t) {
     // throw away response, we don't need it.
     STRING_CLIENT.get(join(LOCALHOST, '/16'));
 });
+
+test('GH-1429: setting code with res.status not respected', function (t) {
+    SERVER.get('/404', function (req, res, next) {
+        res.status(404);
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/404'), function (err, _, res) {
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
