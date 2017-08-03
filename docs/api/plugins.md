@@ -153,6 +153,13 @@ event, e.g., `server.on('after', plugins.metrics());`:
   * `res` {Object} the response obj
   * `route` {Object} the route obj that serviced the request
 
+The module includes the following plugins to be used with restify's `pre` event:
+* `inflightRequestThrottle(options)` - limits the max number of inflight requests
+  * `options.limit` {Number} the maximum number of simultaneous connections the server will handle before returning an error
+  * `opts.resp` {Error} An error that will be passed to `res.send` when the limit is reached.
+  * `opts.resp.statusCode` {Number} The status code to return when the limit is reached.
+  * `opts.server.inflightReuqests` {Function} Should return the number of active connections to the server
+
 ## Accept Parser
 
 Parses out the `Accept` header, and ensures that the server can respond to what
@@ -438,6 +445,23 @@ Redis, if you have a fleet of API servers and you're not getting steady and/or
 uniform request distribution.  To enable this, you can pass in
 `options.tokensTable`, which is simply any Object that supports `put` and `get`
 with a `String` key, and an `Object` value.
+
+## Inflight Request Throttling
+
+```js
+const opts = { limit: 600, server: server };
+opts.error = new Error('Resource Exhausted');
+error.statuscode = 420;
+server.pre(restify.plugins.inflightRequestThrottle(opts));
+```
+
+The `inflightRequestThrottle` module allows you to specify an upper limit to
+the maximum number of inflight requests your server is able to handle. This
+is a simple heuristic for protecting against event loop contention between
+requests causing unacceptable latencies.
+
+The custom error is optional, and allows you to specify your own response and status code when rejecting incoming requests due to too many inflight requests.
+
 
 ## Conditional Request Handler
 
