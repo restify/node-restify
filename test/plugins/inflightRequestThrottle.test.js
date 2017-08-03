@@ -38,10 +38,10 @@ describe('inlfightRequestThrottle', function () {
 
     it('Unit: Should support custom response', function (done) {
         var server = fakeServer(10);
-        var resp = new Error('foo');
-        var p = P({ server: server, limit: 1, resp: resp });
+        var res = new Error('foo');
+        var p = P({ server: server, limit: 1, res: res });
         function send (body) {
-            assert.equal(body, resp, 'Overrides body');
+            assert.equal(body, res, 'Overrides body');
             done();
         }
         function next () {
@@ -84,15 +84,15 @@ describe('inlfightRequestThrottle', function () {
             return done();
         }
         to = setTimeout(finish, 2000);
-        var resp = new Error('foo');
-        resp.statusCode = 555;
-        server.pre(P({ server: server, limit: 1, resp: resp }));
-        var RESP;
+        var err = new Error('foo');
+        err.statusCode = 555;
+        server.pre(P({ server: server, limit: 1, res: err }));
+        var RES;
         server.get('/foo', function (req, res) {
-            if (RESP) {
+            if (RES) {
                 res.send(999);
             } else {
-                RESP = res;
+                RES = res;
             }
         });
         server.listen(0, '127.0.0.1', function () {
@@ -112,7 +112,7 @@ describe('inlfightRequestThrottle', function () {
                     'InternalServerError', 'Default err returned');
                 assert.equal(res.statusCode, 555,
                     'Default shed status code returned');
-                RESP.send(200);
+                RES.send(200);
             });
         });
     });

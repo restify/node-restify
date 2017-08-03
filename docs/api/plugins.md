@@ -155,10 +155,10 @@ event, e.g., `server.on('after', plugins.metrics());`:
 
 The module includes the following plugins to be used with restify's `pre` event:
 * `inflightRequestThrottle(options)` - limits the max number of inflight requests
-  * `options.limit` {Number} the maximum number of simultaneous connections the server will handle before returning an error
-  * `options.resp` {Error} An error that will be passed to `res.send` when the limit is reached.
-  * `options.resp.statusCode` {Number} The status code to return when the limit is reached.
-  * `options.server.inflightReuqests` {Function} Should return the number of active connections to the server
+  * `options.limit` {Number} the maximum number of inflight requests the server will handle before returning an error
+  * `options.res` {Error} An error that will be passed to `res.send` when the limit is reached.
+  * `options.res.statusCode` {Number} The status code to return when the limit is reached.
+  * `options.server` {Object} The restify server that this module will throttle
 
 ## Accept Parser
 
@@ -449,8 +449,12 @@ with a `String` key, and an `Object` value.
 ## Inflight Request Throttling
 
 ```js
+var errors = require('restify-errors');
+var restify = require('restify');
+
+var server = restify.createServer();
 const options = { limit: 600, server: server };
-options.resp = new require('restify-errors').InternalServerError();
+options.res = new errors.InternalServerError();
 server.pre(restify.plugins.inflightRequestThrottle(options));
 ```
 
