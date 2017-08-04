@@ -466,6 +466,9 @@ The custom error is optional, and allows you to specify your own response
 and status code when rejecting incoming requests due to too many inflight
 requests. It defaults to `503 ServiceUnavailableError`.
 
+This plugin should be registered as early as possibly in the middleware stack
+using `pre` to avoid performing unnecessary work.
+
 
 ## Conditional Request Handler
 
