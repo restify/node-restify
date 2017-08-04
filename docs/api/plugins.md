@@ -156,8 +156,7 @@ event, e.g., `server.on('after', plugins.metrics());`:
 The module includes the following plugins to be used with restify's `pre` event:
 * `inflightRequestThrottle(options)` - limits the max number of inflight requests
   * `options.limit` {Number} the maximum number of inflight requests the server will handle before returning an error
-  * `options.res` {Error} An error that will be passed to `res.send` when the limit is reached.
-  * `options.res.statusCode` {Number} The status code to return when the limit is reached.
+  * `options.err` {Error} opts.err A restify error used as a response when the inflight request limit is exceeded
   * `options.server` {Object} The restify server that this module will throttle
 
 ## Accept Parser
@@ -463,7 +462,7 @@ the maximum number of inflight requests your server is able to handle. This
 is a simple heuristic for protecting against event loop contention between
 requests causing unacceptable latencies.
 
-The custom response is optional, and allows you to specify your own response
+The custom error is optional, and allows you to specify your own response
 and status code when rejecting incoming requests due to too many inflight
 requests. It defaults to `503 ServiceUnavailableError`.
 

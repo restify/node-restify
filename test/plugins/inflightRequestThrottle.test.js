@@ -3,7 +3,7 @@
 var assert = require('chai').assert;
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
-var P = restify.plugins.inflightRequestThrottle;
+var inflightRequestThrottle = restify.plugins.inflightRequestThrottle;
 
 function fakeServer(count) {
     return {
@@ -17,7 +17,8 @@ describe('inlfightRequestThrottle', function () {
 
     it('Unit: Should shed load', function (done) {
         var logged = false;
-        var p = P({ server: fakeServer(10), limit: 1 });
+        var opts = { server: fakeServer(10), limit: 1 };
+        var plugin = inflightRequestThrottle(opts);
         function send (body) {
             assert(logged, 'Should have emitted a log');
             assert.equal(body.statusCode, 503, 'Defaults to 503 status');
@@ -33,15 +34,16 @@ describe('inlfightRequestThrottle', function () {
         }
         var log = { trace: trace };
         var fakeReq = { log: log };
-        p(fakeReq, { send: send }, next);
+        plugin(fakeReq, { send: send }, next);
     });
 
     it('Unit: Should support custom response', function (done) {
         var server = fakeServer(10);
-        var res = new Error('foo');
-        var p = P({ server: server, limit: 1, res: res });
+        var err = new Error('foo');
+        var opts = { server: server, limit: 1, err: err };
+        var plugin = inflightRequestThrottle(opts);
         function send (body) {
-            assert.equal(body, res, 'Overrides body');
+            assert.equal(body, err, 'Overrides body');
             done();
         }
         function next () {
@@ -49,11 +51,12 @@ describe('inlfightRequestThrottle', function () {
             done();
         }
         var fakeReq = { log : { trace: function () {} } };
-        p(fakeReq, { send: send }, next);
+        plugin(fakeReq, { send: send }, next);
     });
 
     it('Unit: Should let request through when not under load', function (done) {
-        var p = P({ server: fakeServer(1), limit: 2 });
+        var opts = { server: fakeServer(1), limit: 2 };
+        var plugin = inflightRequestThrottle(opts);
         function send () {
             assert(false, 'Should not call send');
             done();
@@ -63,7 +66,7 @@ describe('inlfightRequestThrottle', function () {
             done();
         }
         var fakeReq = { log : { trace: function () {} } };
-        p(fakeReq, { send: send }, next);
+        plugin(fakeReq, { send: send }, next);
     });
 
     it('Integration: Should shed load', function (done) {
@@ -86,7 +89,8 @@ describe('inlfightRequestThrottle', function () {
         to = setTimeout(finish, 2000);
         var err = new Error('foo');
         err.statusCode = 555;
-        server.pre(P({ server: server, limit: 1, res: err }));
+        var opts = { server: server, limit: 1, err: err };
+        server.pre(inflightRequestThrottle(opts));
         var RES;
         server.get('/foo', function (req, res) {
             if (RES) {
