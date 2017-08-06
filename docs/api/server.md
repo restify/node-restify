@@ -134,15 +134,28 @@ server.on('InternalServer', function(req, res, err, callback) {
 ```
 
 Inside the error event listener, it is also possible to change the payload
-if so desired. To do so, simply set your custom response on the `body` property
-of the error. For example, it is common to send a custom 500 response:
+if so desired. To do so, simply implement a custom `toString()` or `toJSON()`.
+Depending on the content-type and formatter being used for the response, one
+of the two serializers will be used. For example, given the folllwing example:
 
 ```js
-server.on('InternalServer', function(req, res, err, callback) {
-    err.body = 'Sorry, an error occurred!';
+server.on('restifyError', function(req, res, err, callback) {
+    err.toJSON = function customToJSON() {
+        return {
+            name: err.name,
+            message: err.message
+        };
+    };
+    err.toString = function customToString() {
+        return 'i just want a string';
+    };
     return callback();
 });
 ```
+
+A request with an `accept: application/json` will trigger the `toJSON()`
+serializer, while a request with `accept: text/plain` will trigger the
+`toString()` serializer.
 
 Note that the signature is identical for all error events emitted. The listener
 is invoked with the following signature:
