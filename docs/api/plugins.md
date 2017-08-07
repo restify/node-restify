@@ -153,6 +153,12 @@ event, e.g., `server.on('after', plugins.metrics());`:
   * `res` {Object} the response obj
   * `route` {Object} the route obj that serviced the request
 
+The module includes the following plugins to be used with restify's `pre` event:
+* `inflightRequestThrottle(options)` - limits the max number of inflight requests
+  * `options.limit` {Number} the maximum number of inflight requests the server will handle before returning an error
+  * `options.err` {Error} opts.err A restify error used as a response when the inflight request limit is exceeded
+  * `options.server` {Object} The restify server that this module will throttle
+
 ## Accept Parser
 
 Parses out the `Accept` header, and ensures that the server can respond to what
@@ -438,6 +444,31 @@ Redis, if you have a fleet of API servers and you're not getting steady and/or
 uniform request distribution.  To enable this, you can pass in
 `options.tokensTable`, which is simply any Object that supports `put` and `get`
 with a `String` key, and an `Object` value.
+
+## Inflight Request Throttling
+
+```js
+var errors = require('restify-errors');
+var restify = require('restify');
+
+var server = restify.createServer();
+const options = { limit: 600, server: server };
+options.res = new errors.InternalServerError();
+server.pre(restify.plugins.inflightRequestThrottle(options));
+```
+
+The `inflightRequestThrottle` module allows you to specify an upper limit to
+the maximum number of inflight requests your server is able to handle. This
+is a simple heuristic for protecting against event loop contention between
+requests causing unacceptable latencies.
+
+The custom error is optional, and allows you to specify your own response
+and status code when rejecting incoming requests due to too many inflight
+requests. It defaults to `503 ServiceUnavailableError`.
+
+This plugin should be registered as early as possibly in the middleware stack
+using `pre` to avoid performing unnecessary work.
+
 
 ## Conditional Request Handler
 
