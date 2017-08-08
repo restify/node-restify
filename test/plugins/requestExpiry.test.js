@@ -1,17 +1,18 @@
 'use strict';
 
-// external requires
+// external modules
 var assert = require('chai').assert;
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
-// local files
+// local modules
 var helper = require('../lib/helper');
 
-// local globals
+// globals
 var SERVER;
 var CLIENT;
 var PORT;
+
 
 describe('request expiry parser', function () {
 
@@ -38,6 +39,7 @@ describe('request expiry parser', function () {
         CLIENT.close();
         SERVER.close(done);
     });
+
 
     describe('absolute header', function () {
 
@@ -76,6 +78,7 @@ describe('request expiry parser', function () {
 
             SERVER.use(restify.plugins.requestExpiry({ absoluteHeader: key }));
             SERVER.get(getPath, function (req, res, next) {
+                assert.isFalse(req.isExpired());
                 called = true;
                 res.send();
                 next();
@@ -97,13 +100,15 @@ describe('request expiry parser', function () {
         });
 
 
-        it('should be ok even with request expiry header', function (done) {
+        it('should be ok without request expiry header', function (done) {
             var key = 'x-request-expiry';
             var getPath = '/request/expiry';
             var called = false;
 
             SERVER.use(restify.plugins.requestExpiry({ absoluteHeader: key }));
             SERVER.get(getPath, function (req, res, next) {
+                // requests never expire if the header is not set
+                assert.isFalse(req.isExpired());
                 called = true;
                 res.send();
                 next();
@@ -137,6 +142,7 @@ describe('request expiry parser', function () {
                 timeoutHeader: timeoutKey
             }));
             SERVER.get(getPath, function (req, res, next) {
+                assert.isFalse(req.isExpired());
                 called = true;
                 res.send();
                 next();
@@ -192,7 +198,7 @@ describe('request expiry parser', function () {
         });
 
 
-        it('should be ok even with request expiry header', function (done) {
+        it('should be ok without request expiry header', function (done) {
             var startKey = 'x-request-starttime';
             var timeoutKey = 'x-request-timeout';
             var getPath = '/request/expiry';
@@ -203,6 +209,8 @@ describe('request expiry parser', function () {
                 timeoutHeader: timeoutKey
             }));
             SERVER.get(getPath, function (req, res, next) {
+                // requests never expire if the header is not set
+                assert.isFalse(req.isExpired());
                 called = true;
                 res.send();
                 next();
@@ -221,5 +229,4 @@ describe('request expiry parser', function () {
             });
         });
     });
-
 });
