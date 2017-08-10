@@ -107,19 +107,12 @@ The module includes the following response plugins:
   * `options.username` {Boolean}
   * `options.xff` {Boolean}
   * `options.overrides` {Object}
-* `requestExpiry(options)` - A request expiry will use headers to tell if the incoming request has expired or not. There are two options for this plugin:
+* `requestExpiry(options)` - Sends back a `GatewayTimeoutError` if a request has expired. This is a throttling plugin which lets you throttle requests if they've exceeded some timeout, which can be defined by incoming headers. It's entirely safe to decorate your handler chain with multiple instances of this plugin, to check in between various middleware. Additionally, the plugin exposes `req.isExpired()` which returns whether the request has expired. This function can be used by endusers to explicitly check whether a request has expired. There are two modes for this plugin:
   1. Absolute Time
-     * Time in Milliseconds since the Epoch when this request should be
-       considered expired
-  2. Timeout
-     * The request start time is supplied
-     * A timeout, in milliseconds, is given
-     * The timeout is added to the request start time to arrive at the
-       absolute time in which the request is considered expires
-
-  * `options.absoluteHeader` {String} header name of the absolute time for request expiration
-  * `options.startHeader` {String} header name for the start time of the request
-  * `options.timeoutHeader` {String}  The header name for the time in milliseconds that should ellapse before the request is considered expired.
+     * `options.absoluteHeader` {String} which is the header that specifies milliseconds since epoch when a request should expire.
+  2. Relative Time
+     * `options.startHeader` {String} The start time of the request in milliseconds since epoch
+     * `options.timeoutHeader` {String} The relative time in milliseconds from `options.startHeader` that the request should expire.
 
 The module includes the following plugins to be used with restify's `pre`, `routed`, and `after`
 event, e.g., `server.on('after', plugins.auditLogger());`:
@@ -338,8 +331,8 @@ server.get(/\/docs\/current\/?.*/, restify.plugins.serveStatic({
 The above `route` and `directory` combination will serve a file located in
 `./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`. If you want the serveStatic module to serve files
-directly from the `/documentation/v1` directory (and not append the request path `/docs/current/`), 
-you can set the `appendRequestPath` option to `false`, and the served file would be 
+directly from the `/documentation/v1` directory (and not append the request path `/docs/current/`),
+you can set the `appendRequestPath` option to `false`, and the served file would be
 `./documentation/v1/index.html`, in the previous example.
 
 The plugin will enforce that all files under `directory` are served. The
