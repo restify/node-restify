@@ -27,7 +27,7 @@ Here's an example of hitting the
 [Joyent CloudAPI](https://apidocs.joyent.com/cloudapi/):
 
 ```js
-var restify = require('restify');
+var restify = require('restify-clients');
 
 // Creates a JSON client
 var client = restify.createJsonClient({
@@ -47,7 +47,7 @@ As a short-hand, a client can be initialized with a string-URL rather than
 an options object:
 
 ```js
-var restify = require('restify');
+var restify = require('restify-clients');
 
 var client = restify.createJsonClient('https://us-east-1.api.joyent.com');
 ```
@@ -82,7 +82,7 @@ provided, this callback will be invoked with a single parameter: the outgoing
 
 ## JsonClient
 
-The JSON Client is the highest-level client bundled with restify; it
+The JSON Client is the highest-level client bundled with restify-clients; it
 exports a set of methods that map directly to HTTP verbs.  All
 callbacks look like `function(err, req, res, [obj])`, where `obj` is
 optional, depending on if content was returned. HTTP status codes are
