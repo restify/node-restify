@@ -113,8 +113,10 @@ error object will be serialized and sent to the client. An error object is any
 object that passes an `instanceof Error` check.
 
 Before the error object is sent to the client, the server will fire an event
-using the name of the error. This creates opportunities to do logging, metrics,
-or payload mutation based on the type of error. For example:
+using the name of the error, without the `Error` part of the name. For example,
+given an `InternalServerError`, the server will emit an `InternalServer` event.
+This creates opportunities to do logging, metrics, or payload mutation based on
+the type of error. For example:
 
 ```js
 var errs = require('restify-errors');
