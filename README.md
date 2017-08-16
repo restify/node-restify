@@ -45,15 +45,14 @@ Follow restify on [![alt text][1.2]][1]
 ```javascript
 var restify = require('restify');
 
-
 const server = restify.createServer({
   name: 'myapp',
   version: '1.0.0'
 });
+
 server.use(restify.plugins.acceptParser(server.acceptable));
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser());
-
 
 server.get('/echo/:name', function (req, res, next) {
   res.send(req.params);
@@ -71,7 +70,6 @@ var assert = require('assert');
 var clients = require('restify-clients');
 
 var client = clients.createJsonClient({
-
   url: 'http://localhost:8080',
   version: '~1.0'
 });
