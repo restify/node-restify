@@ -1,4 +1,8 @@
-# Server Guide
+---
+title: Quick Start
+permalink: /docs/home/
+redirect_from: /docs/
+---
 
 Setting up a server is quick and easy. Here is a barebones echo server:
 
@@ -133,7 +137,7 @@ calling `next()`. Calling `next()` will move to the next function in the chain.
 
 Unlike other REST frameworks, calling `res.send()` does not trigger `next()`
 automatically. In many applications, work can continue to happen after
-`res.send()`, so flushing the response is not synonmyous with completion of a
+`res.send()`, so flushing the response is not synonymous with completion of a
 request.
 
 In the normal case, `next()` does not typically take any parameters. If for

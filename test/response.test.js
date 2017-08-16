@@ -542,7 +542,11 @@ test('GH-951: sendRaw accepts only strings or buffers', function (t) {
 
     SERVER.on('uncaughtException', function (req, res, route, err) {
         t.ok(err);
-        t.equal(err.name, 'AssertionError');
+        // Node v8 uses static error codes
+        // and `name` includes the error name and error code as well which
+        // caused this test to break. Just changing the logic to check for
+        // string instead
+        t.equal((err.name.indexOf('AssertionError') >= 0), true);
         t.equal(err.message, 'res.sendRaw() accepts only strings or buffers');
         t.end();
     });
@@ -557,4 +561,16 @@ test('GH-951: sendRaw accepts only strings or buffers', function (t) {
 
     // throw away response, we don't need it.
     STRING_CLIENT.get(join(LOCALHOST, '/16'));
+});
+
+test('GH-1429: setting code with res.status not respected', function (t) {
+    SERVER.get('/404', function (req, res, next) {
+        res.status(404);
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/404'), function (err, _, res) {
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
 });

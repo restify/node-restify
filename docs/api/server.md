@@ -1,4 +1,7 @@
-# Creating a server
+---
+title: Server API
+permalink: /docs/server-api/
+---
 
 A restify server object is the main interface through which you will register
 routes and handlers for incoming requests. A server object will be returned
@@ -110,8 +113,10 @@ error object will be serialized and sent to the client. An error object is any
 object that passes an `instanceof Error` check.
 
 Before the error object is sent to the client, the server will fire an event
-using the name of the error. This creates opportunities to do logging, metrics,
-or payload mutation based on the type of error. For example:
+using the name of the error, without the `Error` part of the name. For example,
+given an `InternalServerError`, the server will emit an `InternalServer` event.
+This creates opportunities to do logging, metrics, or payload mutation based on
+the type of error. For example:
 
 ```js
 var errs = require('restify-errors');
@@ -131,15 +136,28 @@ server.on('InternalServer', function(req, res, err, callback) {
 ```
 
 Inside the error event listener, it is also possible to change the payload
-if so desired. To do so, simply set your custom response on the `body` property
-of the error. For example, it is common to send a custom 500 response:
+if so desired. To do so, simply implement a custom `toString()` or `toJSON()`.
+Depending on the content-type and formatter being used for the response, one
+of the two serializers will be used. For example, given the folllwing example:
 
 ```js
-server.on('InternalServer', function(req, res, err, callback) {
-    err.body = 'Sorry, an error occurred!';
+server.on('restifyError', function(req, res, err, callback) {
+    err.toJSON = function customToJSON() {
+        return {
+            name: err.name,
+            message: err.message
+        };
+    };
+    err.toString = function customToString() {
+        return 'i just want a string';
+    };
     return callback();
 });
 ```
+
+A request with an `accept: application/json` will trigger the `toJSON()`
+serializer, while a request with `accept: text/plain` will trigger the
+`toString()` serializer.
 
 Note that the signature is identical for all error events emitted. The listener
 is invoked with the following signature:
@@ -241,27 +259,12 @@ server.get('/', function(req, res, next) {
 
 server.on('InternalServer', function(req, res, err, callback) {
   // this will get fired first, as it's the most relevant listener
-  return next();
+  return callback();
 });
 
 server.on('restifyError', function(req, res, err, callback) {
   // this is fired second.
-  return next();
-});
-```
-
-### FormatterError
-
-This event is fired when an async formatter returns an error as a result of
-calling `res.send()`. Unlike other error events, if you listen this event, it
-is expected that you flush a response. Once a formatter has returned an error,
-restify cannot make any assumptions about how to format the content. It is up
-to you to figure out how to best do that.
-
-```js
-server.on('FormatterError', function(req, res, route, err) {
-  // err is a formatter error - can't sa
-  res.end('unsafe to call res.send, in case formatter blows up again!');
+  return callback();
 });
 ```
 
