@@ -2865,3 +2865,35 @@ test('should not emit \'routed\' event on 404', function (t) {
         t.end();
     });
 });
+
+
+test('should emit restifyError even for router errors', function (t) {
+
+    var notFoundFired = false;
+    var restifyErrFired = false;
+
+    SERVER.once('NotFound', function (req, res, err, cb) {
+        notFoundFired = true;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+        t.equal(err.name, 'ResourceNotFoundError');
+        return cb();
+    });
+
+    SERVER.once('restifyError', function (req, res, err, cb) {
+        restifyErrFired = true;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+        t.equal(err.name, 'ResourceNotFoundError');
+        return cb();
+    });
+
+    /*eslint-disable no-shadow*/
+    CLIENT.get('/dne', function (err, req, res, data) {
+        t.ok(err);
+        t.equal(err.name, 'ResourceNotFoundError');
+        t.equal(notFoundFired, true);
+        t.equal(restifyErrFired, true);
+        t.done();
+    });
+});
