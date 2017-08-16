@@ -1169,6 +1169,41 @@ test('versioned route matching should prefer \
 });
 
 
+test('versioned route matching should not throw TypeError' , function (t) {
+    var p = '/path/' + uuid.v4();
+
+    SERVER.post({
+        path: p,
+        version: ['1.1.0', '1.2.0'],
+        contentType: 'application/json'
+    }, function (req, res, next) {
+        res.json(200, {route: p});
+        next();
+    });
+
+    SERVER.post({
+        path: '/path/:id',
+        version: ['1.1.0', '1.2.0']
+    }, function (req, res, next) {
+        res.json(200, {route: 'id'});
+        next();
+    });
+
+    var opts = {
+        path: p,
+        headers: {
+            'accept-version': '~1'
+        }
+    };
+
+    CLIENT.post(opts, function (err, _, res, obj) {
+        t.equal(obj.route, p);
+        t.end();
+    });
+
+});
+
+
 test('GH-959 matchedVersion() should return on cached routes', function (t) {
 
     SERVER.get({
@@ -2828,5 +2863,37 @@ test('should not emit \'routed\' event on 404', function (t) {
         t.ok(err);
         t.equal(res.statusCode, 404);
         t.end();
+    });
+});
+
+
+test('should emit restifyError even for router errors', function (t) {
+
+    var notFoundFired = false;
+    var restifyErrFired = false;
+
+    SERVER.once('NotFound', function (req, res, err, cb) {
+        notFoundFired = true;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+        t.equal(err.name, 'ResourceNotFoundError');
+        return cb();
+    });
+
+    SERVER.once('restifyError', function (req, res, err, cb) {
+        restifyErrFired = true;
+        t.ok(err);
+        t.equal(err instanceof Error, true);
+        t.equal(err.name, 'ResourceNotFoundError');
+        return cb();
+    });
+
+    /*eslint-disable no-shadow*/
+    CLIENT.get('/dne', function (err, req, res, data) {
+        t.ok(err);
+        t.equal(err.name, 'ResourceNotFoundError');
+        t.equal(notFoundFired, true);
+        t.equal(restifyErrFired, true);
+        t.done();
     });
 });

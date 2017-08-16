@@ -39,6 +39,7 @@ start!
 * [sysdig support][1323]
 * [Migrate routing DSL to `path-to-regexp`][1292]
 * [JQuery Style Query Expansion][895]
+* [Support Proxy Protocol][1046]
 
 ## Documentation
 
@@ -105,3 +106,4 @@ start!
 [1292]: https://github.com/restify/node-restify/issues/1292
 [1065]: https://github.com/restify/node-restify/pull/1065
 [895]: https://github.com/restify/node-restify/issues/895
+[1046]: https://github.com/restify/node-restify/pull/1046

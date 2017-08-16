@@ -277,6 +277,61 @@ describe('audit logger', function () {
     });
 
 
+    it('restify-GH-1435 should accumulate log handler timers', function (done) {
+        // Dirty hack to capture the log record using a ring buffer.
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+        SERVER.once('after', restify.plugins.auditLogger({
+            log: bunyan.createLogger({
+                name: 'audit',
+                streams:[ {
+                    level: 'info',
+                    type: 'raw',
+                    stream: ringbuffer
+                }]
+            }),
+            event: 'after'
+        }));
+
+        SERVER.get('/audit', function aTestHandler(req, res, next) {
+            req.startHandlerTimer('audit-acc');
+
+            setTimeout(function () {
+                req.endHandlerTimer('audit-acc');
+                // Very brief timing for same name
+                req.startHandlerTimer('audit-acc');
+                req.endHandlerTimer('audit-acc');
+                res.send('');
+                return (next());
+            }, 1100);
+            // this really should be 1000 but make it 1100 so that the tests
+            // don't sporadically fail due to timing issues.
+        });
+
+        CLIENT.get('/audit', function (err, req, res) {
+            assert.ifError(err);
+
+            var record = ringbuffer.records && ringbuffer.records[0];
+
+            // check timers
+            assert.ok(record, 'no log records');
+            assert.equal(
+                ringbuffer.records.length, 1,
+                'should only have 1 log record'
+            );
+            assert.ok(
+                record.req.timers.aTestHandler > 1000000,
+                'atestHandler should be > 1000000'
+            );
+            assert.ok(
+                record.req.timers['aTestHandler-audit-acc'] > 1000000,
+                'aTestHandler-audit-acc should be > 1000000'
+            );
+            done();
+        });
+    });
+
+
     it('restify-GH-812 audit logger has query params string', function (done) {
 
         // Dirty hack to capture the log record using a ring buffer.
