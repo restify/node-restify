@@ -1,3 +1,16 @@
+<a name="5.2.0"></a>
+## 5.2.0 (2017-08-16)
+
+
+#### Bug Fixes
+
+* package.json version now matches npm ([9944dbd5](git://github.com/restify/node-restify.git/commit/9944dbd5))
+* create unit tests for sanitizePath plugin (#1352) ([12714cfc](git://github.com/restify/node-restify.git/commit/12714cfc))
+* audit timers of same name should accumulate (#1435) (#1443) ([a2d34aaa](git://github.com/restify/node-restify.git/commit/a2d34aaa))
+* respect when status code is set with res.status (GH-1429) (#1440) ([5abc0677](git://github.com/restify/node-restify.git/commit/5abc0677))
+* versioned route matching should not throw TypeError (#1381) ([25d10f00](git://github.com/restify/node-restify.git/commit/25d10f00))
+
+
 <a name="5.0.1"></a>
 ### 5.0.1 (2017-07-17)
 
