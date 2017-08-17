@@ -33,3 +33,14 @@ The website will automatically deploy itself with the new changes.
 ### Adding a documentation page
 
 To add a new page, simply give it a [permalink](https://github.com/restify/node-restify/blob/94fe715173ffcebd8814bed7e17a22a24fac4ae8/docs/index.md) and then update [docs.yml](https://github.com/restify/restify.github.io/blob/master/_data/docs.yml) with the new permalink.
+
+## Cutting a release
+
+Cutting a release is currently a manual process. We use a [Conventional Changelog](http://conventionalcommits.org/) to simplify the process of managing semver on this project. Generally, the following series of commands will cut a release from the `master` branch:
+
+```
+$ git fetch
+$ git pull origin master # ensure you have the latest changes
+$ unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
+$ unleash [-p for patch, -m for minor, -M for major]
+```
