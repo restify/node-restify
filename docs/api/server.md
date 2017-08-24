@@ -74,7 +74,7 @@ server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {});
 // an options object
 server.get({
     path: '/foo',
-    version: ['1.0.0', '2.0.0]
+    version: ['1.0.0', '2.0.0']
 }, function(req, res, next) {});
 ```
 
