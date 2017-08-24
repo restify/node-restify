@@ -12,6 +12,8 @@ var restify = require('restify');
 var server = restify.createServer();
 ```
 
+## createServer()
+
 The `createServer()` method takes the following options:
 
 |Option|Type|Description|
@@ -29,7 +31,7 @@ The `createServer()` method takes the following options:
 |strictRouting|Boolean|(Default=`false`). If set, Restify will treat "/foo" and "/foo/" as different paths.|
 
 
-# Properties
+## Properties
 
 A restify server has the following properties on it:
 
@@ -41,25 +43,58 @@ A restify server has the following properties on it:
 |acceptable|Array(String)|List of content-types this server can respond with.|
 |url|String|Once listen() is called, this will be filled in with where the server is running.|
 
-# Methods
+## Methods
 
-## address()
+### del(opts, handler)
+### get(opts, handler)
+### head(opts, handler)
+### opts(opts, handler)
+### post(opts, handler)
+### put(opts, handler)
+### patch(opts, handler)
+
+Install a route into the restify server to handle a specific http verb.
+
+* `opts` {String | Regex | Object}
+* `opts.name` {String} a name for the route
+* `opts.path` {String | Regex} a string or regex matching the route
+* `opts.version` {String | ArrayOfString} versions supported by this route
+* `handler` {Function | ArrayOfFunctions} a function or array of functions to
+handle this route
+
+Some examples:
+
+```js
+// a static route
+server.get('/foo', function(req, res, next) {});
+// a parameterized route
+server.get('/foo/:bar', function(req, res, next) {});
+// a regular expression
+server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {});
+// an options object
+server.get({
+    path: '/foo',
+    version: ['1.0.0', '2.0.0]
+}, function(req, res, next) {});
+```
+
+### address()
 
 Wraps node's [address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
 
-## listen(port, [host], [callback])
+### listen(port, [host], [callback])
 
 Wraps node's [listen()](http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback).
 
-## listen(path, [callback])
+### listen(path, [callback])
 
 Wraps node's [listen()](http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback).
 
-## close()
+### close()
 
 Wraps node's [close()](http://nodejs.org/docs/latest/api/net.html#net_event_close).
 
-## pre(handler)
+### pre(handler)
 
 * `handler` {Function | Array}
 
@@ -81,7 +116,7 @@ For example, `pre()` can be used to deduplicate slashes in URLs
 server.pre(restify.pre.dedupeSlashes());
 ```
 
-## use(handler)
+### use(handler)
 
 * `handler` {Function | Array}
 
@@ -90,22 +125,22 @@ via `use()` will run only after the router has found a matching route. If no
 match is found, these handlers will never run. Takes a function, or an array
 of functions.
 
-## inflightRequests()
+### inflightRequests()
 
 Returns the number of inflight requests currently being handled by the server.
 
-## debugInfo()
+### debugInfo()
 
 Returns debugging information about the current state of the server.
 
-# Events
+## Events
 
 In additional to emitting all the events from node's
 [http.Server](http://nodejs.org/docs/latest/api/http.html#http_class_http_server),
 restify servers also emit a number of additional events that make building REST
 and web applications much easier.
 
-## Errors
+### Errors
 
 Restify handles errors as first class citizens. When an error object is passed
 to the `next()` function, an event is emitted on the server object, and the
@@ -135,10 +170,11 @@ server.on('InternalServer', function(req, res, err, callback) {
 });
 ```
 
-Inside the error event listener, it is also possible to change the payload
-if so desired. To do so, simply implement a custom `toString()` or `toJSON()`.
-Depending on the content-type and formatter being used for the response, one
-of the two serializers will be used. For example, given the folllwing example:
+Inside the error event listener, it is also possible to change the serialization
+method of the error if desired. To do so, simply implement a custom
+`toString()` or `toJSON()`. Depending on the content-type and formatter being
+used for the response, one of the two serializers will be used. For example,
+given the folllwing example:
 
 ```js
 server.on('restifyError', function(req, res, err, callback) {
@@ -159,8 +195,8 @@ A request with an `accept: application/json` will trigger the `toJSON()`
 serializer, while a request with `accept: text/plain` will trigger the
 `toString()` serializer.
 
-Note that the signature is identical for all error events emitted. The listener
-is invoked with the following signature:
+Note that the function signature for the error listener is identical for all
+emitted error events. The signature is as follows:
 
 ```js
 function(req, res, err, callback) { }
@@ -269,7 +305,7 @@ server.on('restifyError', function(req, res, err, callback) {
 ```
 
 
-## after
+### after
 
 After each request has been fully serviced, an `after` event is fired. This
 event can be hooked into to handle audit logs and other metrics. Note that
@@ -295,7 +331,7 @@ Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
 
 
-## pre
+### pre
 
 Before each request has been routed, a `pre` event is fired. This event can be
 hooked into handle audit logs and other metrics. Since this event fires
@@ -314,7 +350,7 @@ Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
 
 
-## routed
+### routed
 
 A `routed` event is fired after a request has been routed by the router, but
 before handlers specific to that route has run.
@@ -333,9 +369,7 @@ Note that this event will *not* fire if a requests comes in that are not
 routable, i.e. one that would result in a `404`.
 
 
-##
-
-## uncaughtException
+### uncaughtException
 
 If the restify server was created with `handleUncaughtExceptions: true`,
 restify will leverage [domains](https://nodejs.org/api/domain.html) to handle
@@ -372,6 +406,6 @@ function(req, res, route, error) { }
 * route - the route object that serviced the request
 * error - the error passed to `next()`, if applicable
 
-## close
+### close
 
 Emitted when the server closes.
