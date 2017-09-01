@@ -25,9 +25,8 @@ describe('inlfightRequestThrottle', function () {
             assert(body instanceof Error, 'Defaults to error body');
             done();
         }
-        function next () {
-            assert(false, 'Should not call next');
-            done();
+        function next (cont) {
+            assert.isFalse(cont, 'Should call next with false');
         }
         function trace () {
             logged = true;
@@ -48,7 +47,6 @@ describe('inlfightRequestThrottle', function () {
         }
         function next () {
             assert(false, 'Should not call next');
-            done();
         }
         var fakeReq = { log : { trace: function () {} } };
         plugin(fakeReq, { send: send }, next);
@@ -59,10 +57,9 @@ describe('inlfightRequestThrottle', function () {
         var plugin = inflightRequestThrottle(opts);
         function send () {
             assert(false, 'Should not call send');
-            done();
         }
-        function next () {
-            assert(true, 'Should call next');
+        function next (cont) {
+            assert.isUndefined(cont, 'Should call next');
             done();
         }
         var fakeReq = { log : { trace: function () {} } };
@@ -116,7 +113,10 @@ describe('inlfightRequestThrottle', function () {
                     'InternalServerError', 'Default err returned');
                 assert.equal(res.statusCode, 555,
                     'Default shed status code returned');
-                RES.send(200);
+
+                if (RES) {
+                    RES.send(200);
+                }
             });
         });
     });
