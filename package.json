@@ -129,6 +129,7 @@
     "mocha": "^3.2.0",
     "nodeunit": "^0.11.0",
     "nsp": "^2.2.0",
+    "proxyquire": "^1.8.0",
     "restify-clients": "^1.2.1",
     "rimraf": "^2.4.3",
     "validator": "^7.0.0",
