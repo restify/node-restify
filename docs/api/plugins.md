@@ -32,21 +32,141 @@ server.use(restify.plugins.throttle({
 server.use(restify.plugins.conditionalRequest());
 ```
 
-## Available Plugins
+## `server.pre()` plugins
 
-* `sanitizePath()` - cleans up duplicate or trailing / on the URL
-* `context()` - Provide req.set(key, val) and req.get(key) methods for setting and retrieving context to a specific request.
-* `userAgent(options)` - used to support edge cases for HEAD requests when using curl
-  * `options.userAgentRegExp` {RegExp} regexp to capture curl user-agents
-* `strictQueryParams()` - checks req.urls query params with strict key/val format and rejects non-strict requests with status code 400.
-  * `options.message` {String} response body message string
+This module includes various pre plugins, which are intended to be used prior
+to routing of the URL. To use a plugin before routing, use the `server.pre()`
+method.
+
+### `restify.plugins.pre.context()`
+
+This plugin creates `req.set(key, val)` and `req.get(key)` methods for setting
+and retrieving request specific data.
+
+Example:
+
+```js
+server.pre(restify.plugins.pre.context());
+server.get('/', [
+    function(req, res, next) {
+        req.set(myMessage, 'hello world');
+        return next();
+    },
+    function two(req, res, next) {
+        res.send(req.get(myMessage)); // => sends 'hello world'
+        return next();
+    }
+]);
+```
+
+### `restify.plugins.pre.dedupeSlashes()`
+
+This plugin deduplicates extra slashes found in the URL. This can help with
+malformed URLs that might otherwise get misrouted.
+
+Exmaple:
+
+```js
+server.pre(restify.plugins.pre.dedupeSlashes());
+server.get('/hello/:one', function(req, res, next) {
+    res.send(200);
+    return next();
+});
+
+// the server will will now convert requests to /hello//jake => /hello/jake
+```
+
+### `restify.plugins.pre.reqIdHeaders(opts)`
+
+This plugin pulls the value from an incoming request header and uses it as the
+value of the request id. Subsequent calls to `req.id()` will return the header
+values.
+
+* `opts` {Object} an options object
+* `options.headers` {Array} an array of header names to use. lookup precedence
+  is left to right (lowest index first)
+
+### `restify.plugins.pre.strictQueryParams(opts)`
+
+This plugins disallows sloppy query params. `?key=value&value2` would
+normally result in a value of `{ key: value, value2: '' }`, but with this plugin
+enabled the request is rejected with a `BadRequestError` (400).
+
+* `opts` {Object} an options object
+* `opts.message` {String} a custom error message
+
+### `restify.plugins.pre.userAgentConnection(opts)`
+
+For curl user-agents, this plugin sets a `connection: close` header, and
+removes the content-length header for HEAD requests. A custom regexp can be
+crafted to target other user-agents. Note that passing in `userAgentRegExp`
+overriddes the default regexp matching curl agents.
+
+* `opts` {Object} an options object
+* `opts.userAgentRegExp` {RegExp} regexp matching any user-agents applicable
+
+
+
+## `server.use()` plugins
+
+### `restify.plugins.acceptParser(accepts)`
+
+Parses the `Accept` header, and ensures that the server can respond to what
+the client asked for. In almost all cases passing in `server.acceptable` is
+all that's required, as that's an array of content types the server knows
+how to respond to (with the formatters you've registered). If the request is
+for a non-handled type, this plugin will return a `NotAcceptableError` (406).
+
+* `accepts` {Array} an array of acceptable types
+
+Example:
+
+```js
+server.use(restify.plugins.acceptParser(server.acceptable));
+```
+
+### `restify.plugins.authorizationParser(opts)`
+Parses out the `Authorization` header as best restify can. Currently only HTTP
+Basic Auth and [HTTP Signature](https://github.com/joyent/node-http-signature)
+schemes are supported.
+
+* `opts` {Object} an optional options object that is passed to http-signature
+
+If successfully parsed, `req.authorization` will be set:
+
+```js
+{
+  scheme: <Basic|Signature|...>,
+  credentials: <Undecoded value of header>,
+  basic: {
+    username: $user
+    password: $password
+  }
+}
+```
+
+`req.username` will also be set, and defaults to 'anonymous'.  If the scheme
+is unrecognized, the only thing available in `req.authorization` will be
+`scheme` and `credentials` - it will be up to you to parse out the rest.
+
+
+### `restify.plugins.dateParser(sec)
+
+Parses out the HTTP Date header (if present) and checks for clock skew.  If the
+header is invalid, a `InvalidHeaderError` (400) is returned. If the clock skew
+exceeds the specified value, a `RequestExpiredError` (400) is returned.
+
+* `sec` {Number} allowed clock skew in seconds. defaults to 300s, like Kerberos
+
+```js
+// Allows clock skew of 1m
+server.use(restify.plugins.dateParser(60));
+```
+
+## TBD to be organized
 
 This module includes the following header parser plugins:
 
-* `acceptParser(accepts)` - Accept header
-  * `accepts` {Array} an array of acceptable types
-* `authorizationParser(options)` - Authorization header
-  * `options` {Object} options object passed to http-signature module
 * `conditionalRequest()` - Conditional headers (If-\*)
 * `fullResponse()` - handles disappeared CORS headers
 
@@ -86,17 +206,8 @@ This module includes the following data parsing plugins:
 * `requestLogger(options)` - adds timers for each handler in your request chain
   * `options.properties` {Object} properties to pass to bunyan's `log.child()` method
 
-The module includes the following request plugins:
-
-* `reqIdHeaders(options)` - a plugin that lets you use incoming request header
-  values to set the request id (5.x compatible only)
-  * `options.headers` {Array} an array of header names to use. lookup
-    precedence is left to right (lowest index first)
-
 The module includes the following response plugins:
 
-* `dateParser(delta)` - expires requests based on current time + delta
-  * `delta` {Number} age in seconds
 * `gzip(options)` - gzips the response if client accepts it
   * `options` {Object} options to pass to zlib
 * `serveStatic()` - used to serve static files
@@ -152,60 +263,6 @@ The module includes the following plugins to be used with restify's `pre` event:
   * `options.err` {Error} opts.err A restify error used as a response when the inflight request limit is exceeded
   * `options.server` {Object} The restify server that this module will throttle
 
-## Accept Parser
-
-Parses out the `Accept` header, and ensures that the server can respond to what
-the client asked for.  You almost always want to just pass in
-`server.acceptable` here, as that's an array of content types the server knows
-how to respond to (with the formatters you've registered).  If the request is
-for a non-handled type, this plugin will return an error of `406`.
-
-```js
-server.use(restify.plugins.acceptParser(server.acceptable));
-```
-
-## Authorization Parser
-
-```js
-server.use(restify.authorizationParser());
-```
-
-Parses out the `Authorization` header as best restify can.  Currently only
-HTTP Basic Auth and
-[HTTP Signature](https://github.com/joyent/node-http-signature)
-schemes are supported.   When this is used, `req.authorization` will be set
-to something like:
-
-```js
-{
-  scheme: <Basic|Signature|...>,
-  credentials: <Undecoded value of header>,
-  basic: {
-    username: $user
-    password: $password
-  }
-}
-```
-
-`req.username` will also be set, and defaults to 'anonymous'.  If the scheme
-is unrecognized, the only thing available in `req.authorization` will be
-`scheme` and `credentials` - it will be up to you to parse out the rest.
-
-
-## Date Parser
-
-```js
-server.use(restify.plugins.dateParser());
-```
-
-Parses out the HTTP Date header (if present) and checks for clock skew (default
-allowed clock skew is 300s, like Kerberos).  You can pass in a number, which is
-interpreted in seconds, to allow for clock skew.
-
-```js
-// Allows clock skew of 1m
-server.use(restify.plugins.dateParser(60));
-```
 
 ## QueryParser
 
