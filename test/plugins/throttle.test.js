@@ -189,38 +189,46 @@ describe('throttle plugin', function () {
         });
     });
 
-    it('should expose headers on options set', function (done) {
-        // setup a new server with headers set to true since we cant
-        // change throttle options after init
-        setupClientServer('127.0.0.2', {
-            burst: 17,
-            rate: 0.1,
-            username: true,
-            setHeaders: true
-        }, function setupWithHeaders (client, server) {
-            client.get('/test/throttleMe', function (err, req, res) {
-                assert.equal(res.headers['x-ratelimit-limit'], '17');
-                assert.equal(res.headers['x-ratelimit-rate'], '0.1');
-                assert.equal(res.headers['x-ratelimit-remaining'], '16');
+    describe('expose headers', function () {
+        before(function (done) {
+            // close global server before creating a new to avoid port conflicts
+            CLIENT.close();
+            SERVER.close(done);
+        });
 
-                // it should count down
-                client.get(
-                    '/test/throttleMe',
-                    function (nextErr, nextReq, nextRes) {
-                        assert.equal(
-                            nextRes.headers['x-ratelimit-limit'], '17'
-                        );
-                        assert.equal(
-                            nextRes.headers['x-ratelimit-rate'], '0.1'
-                        );
-                        assert.equal(
-                            nextRes.headers['x-ratelimit-remaining'], '15'
-                        );
+        it('should expose headers on options set', function (done) {
+            // setup a new server with headers set to true since we cant
+            // change throttle options after init
+            setupClientServer('127.0.0.1', {
+                burst: 17,
+                rate: 0.1,
+                username: true,
+                setHeaders: true
+            }, function setupWithHeaders (client, server) {
+                client.get('/test/throttleMe', function (err, req, res) {
+                    assert.equal(res.headers['x-ratelimit-limit'], '17');
+                    assert.equal(res.headers['x-ratelimit-rate'], '0.1');
+                    assert.equal(res.headers['x-ratelimit-remaining'], '16');
 
-                        client.close();
-                        server.close(done);
-                    }
-                );
+                    // it should count down
+                    client.get(
+                        '/test/throttleMe',
+                        function (nextErr, nextReq, nextRes) {
+                            assert.equal(
+                                nextRes.headers['x-ratelimit-limit'], '17'
+                            );
+                            assert.equal(
+                                nextRes.headers['x-ratelimit-rate'], '0.1'
+                            );
+                            assert.equal(
+                                nextRes.headers['x-ratelimit-remaining'], '15'
+                            );
+
+                            client.close();
+                            server.close(done);
+                        }
+                    );
+                });
             });
         });
     });

@@ -143,7 +143,7 @@ Returns the cleaned up requested URL.
 ```js
 // incoming request is http://localhost:3000/foo/bar?a=1
 server.get('/:x/bar', function(req, res, next) {
-    console.warn(req.href());
+    console.warn(req.path());
     // => /foo/bar
 });
 ```
