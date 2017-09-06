@@ -97,6 +97,7 @@
     "clone-regexp": "^1.0.0",
     "csv": "^1.1.0",
     "escape-regexp-component": "^1.0.2",
+    "ewma": "^1.0.0",
     "formidable": "^1.0.17",
     "http-signature": "^1.0.0",
     "lodash": "^4.17.4",
