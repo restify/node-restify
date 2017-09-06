@@ -258,7 +258,10 @@ server.use(restify.plugins.bodyParser({
     uploadDir: os.tmpdir(),
     multiples: true,
     hash: 'sha1',
-    rejectUnknown: true
+    rejectUnknown: true,
+    requestBodyOnGet: false,
+    reviver: undefined,
+    maxFieldsSize: 2 * 1024 * 1024
  }));
 ```
 
@@ -275,6 +278,9 @@ Options:
 * `multiples` - if you want to support html5 multiple attribute in upload fields.
 * `hash` - If you want checksums calculated for incoming files, set this to either `sha1` or `md5`.
 * `rejectUnknown` - Set to `true` if you want to end the request with a `UnsupportedMediaTypeError` when none of the supported content types was given.
+* `requestBodyOnGet` -  Parse body of a GET request. The default is `false`.
+* `reviver` - `jsonParser` only. If a function, this prescribes how the value originally produced by parsing is transformed, before being returned. For more information check out [JSON.parse(text[, reviver])](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse). Optional.
+* `maxFieldsSize` - `multipartParser` only. Limits the amount of memory all fields together (except files) can allocate in bytes. The default size is `2 * 1024 * 1024` bytes *(2MB)*.
 
 ## RequestLogger
 
