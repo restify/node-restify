@@ -20,7 +20,7 @@ var cpuUsageThrottle = proxyquire('../../lib/plugins/cpuUsageThrottle.js', {
 var MR = Math.random;
 describe('cpuUsageThrottle', function () {
 
-    it('Setup: stub math.random', function (done) {
+    before('Setup: stub math.random', function (done) {
         Math.random = function () {
             return 0;
         };
@@ -125,7 +125,7 @@ describe('cpuUsageThrottle', function () {
         });
     });
 
-    it('Teardown: Reset Math.random', function (done) {
+    after('Teardown: Reset Math.random', function (done) {
         Math.random = MR;
         done();
     });
