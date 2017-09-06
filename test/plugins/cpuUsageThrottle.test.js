@@ -31,14 +31,11 @@ describe('cpuUsageThrottle', function () {
         var logged = false;
         var opts = { limit: 0, interval: 500 };
         var plugin = cpuUsageThrottle(opts);
-        function send (body) {
-            assert(logged, 'Should have emitted a log');
-            assert.equal(body.statusCode, 503, 'Defaults to 503 status');
-            assert(body instanceof Error, 'Defaults to error body');
-        }
         function next (cont) {
-            assert.isFalse(cont, 'Should call next with false');
             clearTimeout(plugin._timeout);
+            assert(cont instanceof Error, 'Should call next with error');
+            assert.equal(cont.statusCode, 503, 'Defaults to 503 status');
+            assert(logged, 'Should have emitted a log');
             done();
         }
         function trace () {
@@ -46,40 +43,32 @@ describe('cpuUsageThrottle', function () {
         }
         var log = { trace: trace };
         var fakeReq = { log: log };
-        plugin(fakeReq, { send: send }, next);
+        plugin(fakeReq, {}, next);
     });
 
     it('Unit: Should support custom response', function (done) {
         var err = new Error('foo');
         var opts = { limit: 0, interval:500, err: err };
         var plugin = cpuUsageThrottle(opts);
-        function send (body) {
-            assert.equal(body, err, 'Overrides body');
-        }
         function next (cont) {
-            assert.isFalse(cont, 'Should call next with false');
             clearTimeout(plugin._timeout);
+            assert.equal(cont, err, 'Overrides body');
             done();
         }
         var fakeReq = { log : { trace: function () {} } };
-        plugin(fakeReq, { send: send }, next);
+        plugin(fakeReq, {}, next);
     });
 
     it('Unit: Should let request through when not under load', function (done) {
         var opts = { interval: 500, limit: 0.9 };
         var plugin = cpuUsageThrottle(opts);
-        function send () {
-            assert(false, 'Should not call send');
-            clearTimeout(plugin._timeout);
-            done();
-        }
         function next (cont) {
             assert.isUndefined(cont, 'Should call next');
             clearTimeout(plugin._timeout);
             done();
         }
         var fakeReq = { log : { trace: function () {} } };
-        plugin(fakeReq, { send: send }, next);
+        plugin(fakeReq, {}, next);
     });
 
     it('Integration: Should shed load', function (done) {
