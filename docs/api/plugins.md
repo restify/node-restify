@@ -260,8 +260,14 @@ event, e.g., `server.on('after', plugins.metrics());`:
 The module includes the following plugins to be used with restify's `pre` event:
 * `inflightRequestThrottle(options)` - limits the max number of inflight requests
   * `options.limit` {Number} the maximum number of inflight requests the server will handle before returning an error
-  * `options.err` {Error} opts.err A restify error used as a response when the inflight request limit is exceeded
+  * `options.err` {Error} A restify error used as a response when the inflight request limit is exceeded
   * `options.server` {Object} The restify server that this module will throttle
+* `cpuUsageThrottle(options)`- Reject requests based on the server's current CPU usage
+  * `options.limit` - {Number} The point at which restify will begin rejecting a % of all requests at the front door.
+  * `options.max` - {Number} The point at which restify will reject 100% of all requests at the front door.
+  * `options.interval` - {Number} How frequently to recalculate the % of traffic to be rejecting.
+  * `options.halfLife` - {Number} How responsive your application will be to spikes in CPU usage, for more details read the cpuUsageThrottle section below.
+  * `options.err` - {Error} A restify error used as a response when the cpu usage limit is exceeded
 
 
 ## QueryParser
@@ -525,6 +531,31 @@ requests. It defaults to `503 ServiceUnavailableError`.
 This plugin should be registered as early as possibly in the middleware stack
 using `pre` to avoid performing unnecessary work.
 
+## CPU Usage Throttling
+
+```js
+var restify = require('restify');
+var errors = require('restify-errors');
+
+var server = restify.createServer();
+const options = {
+  limit: .75,
+  max: 1,
+  interval: 250,
+  halfLife: 500,
+  err: new errors.InternalServerError()
+}
+
+server.pre(restify.plugins.cpuUsageThrottle(options));
+```
+
+Have restify reject a variable number of requests at the front door based on the process' current CPU usage. This plugin works by keeping a running average of the CPU usage over time and rejecting a percentage of requests based on the user specified CPU limit, maximum CPU limit, and the current value. This module will reject between 0% and 100% of all incomming requests when attempting to bring CPU usage back to a reasonable level. The method we use for calculating the CPU usage will work across platforms. This is an effective module for preventing high latencies caused by an over saturated restify server. This module is most effective when paired with an auto-scale policy at an orechestration layer.
+
+Params:
+  * `max` - The point at which restify will reject 100% of all requests at the front door. This is used in conjunction with limit to determine what % of traffic restify needs to reject when attempting to bring the average load back within tolerable thresholds. Since Node.js is single threaded, the default for this is 1. In some rare cases, a Node.js process can exceed 100% CPU usage and you will want to update this value.
+  * `interval` - How frequently to check if we should be rejecting/accepting connections. It's best to keep this value as low as possible without creating a significant impact on perfomance in order to keep your server as responsive to change as possible.
+  * `halfLife` - When we sample the CPU usage on an interval, we create a series of data points. We take these points and calculate a moving average. The halfLife indicates how quickly a point "decays" to half it's value in the moving average. The lower the halfLife, the more impact newer data points have on the average. If you want to be extremely responsive to spikes in CPU usage, set this to a lower value. If you want your process to put more emphasis on recent historical CPU usage when determininng whether it should shed load, set this to a higher value. The unit is in ms. The default is to set this to the same value as interval.
+  * `err` - A restify error used as a response when the cpu usage limit is exceeded
 
 ## Conditional Request Handler
 
