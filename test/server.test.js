@@ -2897,3 +2897,22 @@ test('should emit restifyError even for router errors', function (t) {
         t.done();
     });
 });
+
+
+test('calling next twice should throw', function (t) {
+    SERVER.get('/', function (req, res, next) {
+        res.send(200);
+        next();
+        next();
+    });
+
+    SERVER.on('uncaughtException', function (req, res, route, err) {
+        t.ok(err);
+        t.equal(err.message, 'next shouldn\'t be called more than once');
+        t.end();
+    });
+
+    CLIENT.get('/', function (err, req, res, data) {
+        t.ifError(err);
+    });
+});
