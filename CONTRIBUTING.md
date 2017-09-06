@@ -23,7 +23,7 @@ The website templates are maintained at https://github.com/restify/restify.githu
 To update the documentaiton on the website to reflect the latest version of 5.x simply:
 
 ```
-git clone git@github.com:restify/restify.github.io
+git clone --recursive git@github.com:restify/restify.github.io
 cd restify.github.io
 git submodule update --remote && git add _docs && git commit -m 'bump' && git push origin master
 ```
