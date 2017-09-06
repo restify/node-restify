@@ -17,12 +17,14 @@ var cpuUsageThrottle = proxyquire('../../lib/plugins/cpuUsageThrottle.js', {
     }
 });
 
-var MR = Math.random
+var MR = Math.random;
 describe('cpuUsageThrottle', function () {
 
-    it('Setup: stub math.random', function(done) {
-      Math.random = () => 0;
-      done();
+    it('Setup: stub math.random', function (done) {
+        Math.random = function () {
+            return 0;
+        };
+        done();
     });
 
     it('Unit: Should shed load', function (done) {
@@ -64,7 +66,7 @@ describe('cpuUsageThrottle', function () {
     });
 
     it('Unit: Should let request through when not under load', function (done) {
-        var opts = { interval: 500, limit: .9 };
+        var opts = { interval: 500, limit: 0.9 };
         var plugin = cpuUsageThrottle(opts);
         function send () {
             assert(false, 'Should not call send');
@@ -123,7 +125,7 @@ describe('cpuUsageThrottle', function () {
         });
     });
 
-    it('Teardown: Reset Math.random', function(done) {
+    it('Teardown: Reset Math.random', function (done) {
         Math.random = MR;
         done();
     });
