@@ -84,13 +84,14 @@ describe('cpuUsageThrottle', function () {
             interval: 1000
         };
         plugin.update(opts);
-        assert.equal(plugin.state._limit, opts.limit, 'opts.limit');
-        assert.equal(plugin.state._max, opts.max, 'opts.max');
-        assert.equal(plugin.state._halfLife, opts.halfLife, 'opts.halfLife');
-        assert.equal(plugin.state._interval, opts.interval, 'opts.interval');
+        assert.equal(plugin.state.limit, opts.limit, 'opts.limit');
+        assert.equal(plugin.state.max, opts.max, 'opts.max');
+        assert.equal(plugin.state.halfLife, opts.halfLife, 'opts.halfLife');
+        assert.equal(plugin.state.interval, opts.interval, 'opts.interval');
         plugin.close();
         done();
     });
+
 
     it('Integration: Should shed load', function (done) {
         var server = restify.createServer();
