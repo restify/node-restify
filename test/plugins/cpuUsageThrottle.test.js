@@ -4,15 +4,6 @@ var assert = require('chai').assert;
 var proxyquire = require('proxyquire');
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
-var errors = require('restify-errors');
-
-// Create a custom error for this test using a key that is unlikely to collide
-var errorName = 'CPUTHROTTLE' + (Math.random() * 1e16);
-var errorStatus = 503;
-errors.makeConstructor(errorName, {
-    statusCode: errorStatus
-});
-var restifyError = errors[errorName];
 
 // Allow tests to set the CPU usage returned by pidUsage
 var CPU = 50;
@@ -42,17 +33,6 @@ describe('cpuUsageThrottle', function () {
             clearTimeout(plugin._timeout);
             assert(cont instanceof Error, 'Should call next with error');
             assert.equal(cont.statusCode, 503, 'Defaults to 503 status');
-            done();
-        }
-        plugin({}, {}, next);
-    });
-
-    it('Unit: Should support custom response', function (done) {
-        var opts = { limit: 0, interval:500, err: restifyError };
-        var plugin = cpuUsageThrottle(opts);
-        function next (cont) {
-            clearTimeout(plugin._timeout);
-            assert.equal(cont.name, restifyError.displayName, 'Overrides body');
             done();
         }
         plugin({}, {}, next);
@@ -98,7 +78,7 @@ describe('cpuUsageThrottle', function () {
         var client = {
             close: function () {}
         };
-        var opts = { interval: 500, limit: 0, err: restifyError };
+        var opts = { interval: 500, limit: 0 };
         var plugin = cpuUsageThrottle(opts);
         server.pre(plugin);
         server.get('/foo', function (req, res, next) {
@@ -112,9 +92,7 @@ describe('cpuUsageThrottle', function () {
             });
             client.get({ path: '/foo' }, function (e, _, res) {
                 assert(e, 'Second request is shed');
-                assert.equal(e.name, errorName + 'Error',
-                    'Default err returned');
-                assert.equal(res.statusCode, errorStatus,
+                assert.equal(res.statusCode, 503,
                     'Default shed status code returned');
                 clearTimeout(plugin._timeout);
                 done();
