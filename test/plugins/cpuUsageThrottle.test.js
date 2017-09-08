@@ -69,6 +69,29 @@ describe('cpuUsageThrottle', function () {
         plugin({}, {}, next);
     });
 
+    it('Unit: Update should update state', function (done) {
+        var opts = {
+            max: 1,
+            limit: 0.9,
+            halfLife: 50,
+            interval: 50
+        };
+        var plugin = cpuUsageThrottle(opts);
+        opts = {
+            max: 0.5,
+            limit: 0.1,
+            halfLife: 1000,
+            interval: 1000
+        };
+        plugin.update(opts);
+        assert.equal(plugin.state._limit, opts.limit, 'opts.limit');
+        assert.equal(plugin.state._max, opts.max, 'opts.max');
+        assert.equal(plugin.state._halfLife, opts.halfLife, 'opts.halfLife');
+        assert.equal(plugin.state._interval, opts.interval, 'opts.interval');
+        plugin.close();
+        done();
+    });
+
     it('Integration: Should shed load', function (done) {
         var server = restify.createServer();
         var client = {
