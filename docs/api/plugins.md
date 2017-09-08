@@ -563,6 +563,15 @@ Params:
   * `halfLife` - When we sample the CPU usage on an interval, we create a series of data points. We take these points and calculate a moving average. The halfLife indicates how quickly a point "decays" to half it's value in the moving average. The lower the halfLife, the more impact newer data points have on the average. If you want to be extremely responsive to spikes in CPU usage, set this to a lower value. If you want your process to put more emphasis on recent historical CPU usage when determininng whether it should shed load, set this to a higher value. The unit is in ms. The default is to set this to the same value as interval.
   * `err` - A restify error used as a response when the cpu usage limit is exceeded
 
+You can also update the plugin during runtime using the `.update()` function. This function accepts the same `opts` object as a constructor.
+
+```js
+var plugin = restify.plugins.cpuUsageThrottle(options);
+server.pre(plugin);
+
+plugin.update({ limit: .4, halfLife: 5000 });
+```
+
 ## Conditional Request Handler
 
 ```js
