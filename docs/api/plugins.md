@@ -535,7 +535,6 @@ using `pre` to avoid performing unnecessary work.
 
 ```js
 var restify = require('restify');
-var errors = require('restify-errors');
 
 var server = restify.createServer();
 const options = {
@@ -543,7 +542,6 @@ const options = {
   max: 1,
   interval: 250,
   halfLife: 500,
-  err: new errors.InternalServerError()
 }
 
 server.pre(restify.plugins.cpuUsageThrottle(options));
@@ -562,7 +560,6 @@ Params:
   * `max` - The point at which restify will reject 100% of all requests at the front door. This is used in conjunction with limit to determine what % of traffic restify needs to reject when attempting to bring the average load back within tolerable thresholds. Since Node.js is single threaded, the default for this is `1`. In some rare cases, a Node.js process can exceed 100% CPU usage and you will want to update this value.
   * `interval` - How frequently we calculate the average CPU utilization. When we calculate an average CPU utilization, we calculate it over this interval, and this drives whether or not we should be shedding load. This can be thought of as a "resolution" where the lower this value, the higher the resolution our load average will be and the more frequently we will recalculate the % of traffic we should be shedding. This check is rather lightweight, while the default is 250ms, you should be able to decrease this value without seeing a significant impact to performance.
   * `halfLife` - When we sample the CPU usage on an interval, we create a series of data points. We take these points and calculate a moving average. The halfLife indicates how quickly a point "decays" to half it's value in the moving average. The lower the halfLife, the more impact newer data points have on the average. If you want to be extremely responsive to spikes in CPU usage, set this to a lower value. If you want your process to put more emphasis on recent historical CPU usage when determininng whether it should shed load, set this to a higher value. The unit is in ms. Defaults to `250`.
-  * `err` - A restify error used as a response when the cpu usage limit is exceeded
 
 You can also update the plugin during runtime using the `.update()` function. This function accepts the same `opts` object as a constructor.
 
