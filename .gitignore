@@ -1,6 +1,8 @@
 .coverage_data
 cover_html
 node_modules
+package-lock.json
+npm-shrinkwrap.json
 docs/*.html
 docs/pkg
 examples/todoapp/node_modules
