@@ -73,7 +73,7 @@ server.get('/hello/:one', function(req, res, next) {
     return next();
 });
 
-// the server will will now convert requests to /hello//jake => /hello/jake
+// the server will now convert requests to /hello//jake => /hello/jake
 ```
 
 ### `restify.plugins.pre.reqIdHeaders(opts)`
@@ -150,7 +150,7 @@ is unrecognized, the only thing available in `req.authorization` will be
 `scheme` and `credentials` - it will be up to you to parse out the rest.
 
 
-### `restify.plugins.dateParser(sec)
+### `restify.plugins.dateParser(sec)`
 
 Parses out the HTTP Date header (if present) and checks for clock skew.  If the
 header is invalid, a `InvalidHeaderError` (400) is returned. If the clock skew
