@@ -65,7 +65,8 @@ test: $(NODEUNIT)
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
-	@$(NPM) shrinkwrap --dev
+	@$(NPM) prune
+	@$(NPM) shrinkwrap
 	@($(NSP) check) | $(NSP_BADGE)
 	@rm $(SHRINKWRAP)
 
