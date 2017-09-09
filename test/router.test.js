@@ -210,13 +210,26 @@ test('Default non-strict routing ignores trailing slash(es)', function (t) {
 
     var trailing = server.router.routes.GET[0];
     t.ok(trailing.path.test('/trailing/'));
-    t.ok(trailing.path.test('//trailing//'));
+    t.ok(trailing.path.test('/trailing//'));
     t.ok(trailing.path.test('/trailing'));
 
     var noTrailing = server.router.routes.GET[1];
     t.ok(noTrailing.path.test('/no-trailing'));
-    t.ok(noTrailing.path.test('//no-trailing//'));
+    t.ok(noTrailing.path.test('/no-trailing//'));
     t.ok(noTrailing.path.test('/no-trailing/'));
+
+    t.end();
+});
+
+test('Default non-strict routing doesn\'t match non-trailing slash(es)',
+  function (t) {
+    var server = restify.createServer();
+    function noop () {}
+
+    server.get('/no-trailing', noop);
+
+    var noTrailing = server.router.routes.GET[0];
+    t.notOk(noTrailing.path.test('//no-trailing'));
 
     t.end();
 });
