@@ -31,9 +31,8 @@ NPM		:= npm
 #
 DOC_FILES	 = index.restdown
 JS_FILES	 = '.'
-SHRINKWRAP	 = npm-shrinkwrap.json
 
-CLEAN_FILES	+= node_modules $(SHRINKWRAP) cscope.files
+CLEAN_FILES	+= node_modules cscope.files
 
 include ./tools/mk/Makefile.defs
 
@@ -65,9 +64,7 @@ test: $(NODEUNIT)
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
-	@$(NPM) shrinkwrap --dev
 	@($(NSP) check) | $(NSP_BADGE)
-	@rm $(SHRINKWRAP)
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
