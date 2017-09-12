@@ -1,6 +1,7 @@
 .coverage_data
 .dir-locals.el
 .gitmodules
+.github
 .travis.yml
 Makefile
 cover_html
