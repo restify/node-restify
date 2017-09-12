@@ -1,12 +1,13 @@
+var path = require('path');
 var fs = require('fs');
 var bunyan = require('bunyan');
 var restify = require('../../lib');
 
 var srv = restify.createServer({
     spdy: {
-        cert: fs.readFileSync('./keys/spdy-cert.pem'),
-        key: fs.readFileSync('./keys/spdy-key.pem'),
-        ca: fs.readFileSync('keys/spdy-csr.pem')
+        cert: fs.readFileSync(path.join(__dirname, './keys/spdy-cert.pem')),
+        key: fs.readFileSync(path.join(__dirname, './keys/spdy-key.pem')),
+        ca: fs.readFileSync(path.join(__dirname, 'keys/spdy-csr.pem'))
     }
 });
 
@@ -16,6 +17,7 @@ srv.get('/', function (req, res, next) {
 });
 
 srv.on('after', restify.plugins.auditLogger({
+    event: 'after',
     body: true,
     log: bunyan.createLogger({
         name: 'audit',
