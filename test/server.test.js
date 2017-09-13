@@ -1204,6 +1204,47 @@ test('versioned route matching should not throw TypeError' , function (t) {
 });
 
 
+test('GH-652 throw InvalidVersion on version mismatch', function (t) {
+    function response (req, res, next) {
+        return res.send(req.route.version);
+    }
+    SERVER.get({ path: '/ping', version: '1.0.1' }, response);
+    SERVER.listen(0, '127.0.0.1', function () {
+        var opts = {
+            path: '/ping',
+            headers: {
+                'accept-version': '1.0.2'
+            }
+        };
+        CLIENT.get(opts, function (err, req, res, data) {
+            t.equal(res.statusCode, 400);
+            t.equal(data.code, 'InvalidVersion');
+            t.done();
+        });
+    });
+});
+
+test('GH-652 throw InvalidVersion on non-versioned route', function (t) {
+    function response (req, res, next) {
+        return res.send(req.route.version);
+    }
+    SERVER.get({ path: '/ping' }, response);
+    SERVER.listen(0, '127.0.0.1', function () {
+        var opts = {
+            path: '/ping',
+            headers: {
+                'accept-version': '1.0.1'
+            }
+        };
+        CLIENT.get(opts, function (err, req, res, data) {
+            t.equal(res.statusCode, 400);
+            t.equal(data.code, 'InvalidVersion');
+            t.done();
+        });
+    });
+});
+
+
 test('GH-959 matchedVersion() should return on cached routes', function (t) {
 
     SERVER.get({
