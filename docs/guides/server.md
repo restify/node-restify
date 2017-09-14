@@ -491,6 +491,15 @@ restify.createServer({
 });
 ```
 
+Restify ships with the following default formatters, which can be overridden
+when passing a formatters options to `createServer()`:
+
+* application/javascript
+* application/json
+* text/plain
+* application/octet-stream
+
+
 The restify response object retains has all the "raw" methods of a node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
  on it as well.

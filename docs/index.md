@@ -525,14 +525,9 @@ statement. This gives you a way to handle all errors of the same class
 identically across the server. You can also use a generic `restifyError` event
 which will catch errors of all types.
 
+An example of sending a 404:
 
 ```js
-server.get('/hello/:name', function(req, res, next) {
-  // some internal unrecoverable error
-  var err = new restify.errors.InternalServerError('oh noes!');
-  return next(err);
-});
-
 server.get('/hello/:foo', function(req, res, next) {
   // resource not found error
   var err = new restify.errors.NotFoundError('oh noes!');
@@ -543,15 +538,41 @@ server.on('NotFound', function (req, res, err, cb) {
   // do not call res.send! you are now in an error context and are outside
   // of the normal next chain. you can log or do metrics here, and invoke
   // the callback when you're done. restify will automtically render the
-  // NotFoundError as a JSON response.
+  // NotFoundError depending on the content-type header you have set in your
+  // response.
   return cb();
+});
+```
+
+For customizing the error being sent back to the client:
+
+```js
+server.get('/hello/:name', function(req, res, next) {
+  // some internal unrecoverable error
+  var err = new restify.errors.InternalServerError('oh noes!');
+  return next(err);
 });
 
 server.on('InternalServer', function (req, res, err, cb) {
-  // if you don't want restify to automatically render the Error object
-  // as a JSON response, you can customize the response by setting the
-  // `body` property of the error
-  err.body = '<html><body>some custom error content!</body></html>';
+  // by default, restify will usually render the Error object as plaintext or
+  // JSON depending on content negotiation. the default text formatter and JSON
+  // formatter are pretty simple, they just call toString() and toJSON() on the
+  // object being passed to res.send, which in this case, is the error object.
+  // so to customize what it sent back to the client when this error occurs,
+  // you would implement as follows:
+
+  // for any response that is text/plain
+  err.toString = function toString() {
+    return 'an internal server error occurred!';
+  };
+  // for any response that is application/json
+  err.toJSON = function toJSON() {
+    return {
+      message: 'an internal server error occurred!',
+      code: 'boom!'
+    }
+  };
+
   return cb();
 });
 
@@ -560,6 +581,29 @@ server.on('restifyError', function (req, res, err, cb) {
   // `err` here is the same as the error that was passed to the above
   // error handlers.
   return cb();
+});
+```
+
+Here is another example of `InternalServerError`, but this time with a custom
+formatter:
+
+```js
+const errs = require('restify-errors');
+
+const server = restify.createServer({
+  formatters: {
+    'text/html': function(req, res, body) {
+      if (body instanceof Error) {
+        // body here is an instance of InternalServerError
+        return '<html><body>' + body.message + '</body></html>';
+      }
+    }
+  }
+});
+
+server.get('/', function(req, res, next) {
+  res.header('content-type', 'text/html');
+  return next(new errs.InternalServerError('oh noes!'));
 });
 ```
 
