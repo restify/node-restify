@@ -1,3 +1,22 @@
+<a name="6.0.0"></a>
+## 6.0.0 (2017-09-15)
+
+
+#### Bug Fixes
+
+* exclude package-lock.json (#1477) ([011fdf0e](git://github.com/restify/node-restify.git/commit/011fdf0e))
+* Update dependency mime to 1.4.0 (#1467) ([6d38b38c](git://github.com/restify/node-restify.git/commit/6d38b38c))
+* **cpuUsageThrottle:** Always queue a new timeout (#1484) ([e4ffe430](git://github.com/restify/node-restify.git/commit/e4ffe430))
+* **inflightRequestThrottle:** properly handle next (#1471) ([4db404f9](git://github.com/restify/node-restify.git/commit/4db404f9))
+* **static:** avoid user-provided data in Error messages being interpreted as sprintf codes (# ([99063447](git://github.com/restify/node-restify.git/commit/99063447))
+
+
+#### Features
+
+* cpuUsageThrottle (#1460) ([84be6799](git://github.com/restify/node-restify.git/commit/84be6799))
+* **throttle plugin:** expose rate limit metrics as headers (#1453) ([1627a557](git://github.com/restify/node-restify.git/commit/1627a557))
+
+
 <a name="5.2.0"></a>
 ## 5.2.0 (2017-08-16)
 
