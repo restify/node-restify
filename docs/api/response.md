@@ -93,6 +93,14 @@ Sets the link header.
 * `url` {String} a url to redirect to
 * `next` {Function} a callback function
 * `options` {Object} an options object to configure a redirect
+* `[options.secure]` {Boolean} whether to redirect to http or https
+* `[options.hostname]` {String} redirect location's hostname
+* `[options.pathname]` {String} redirect location's pathname
+* `[options.port]` {String} redirect location's port number
+* `[options.query]` {String} redirect location's query string parameters
+* `[options.overrideQuery]` {Boolean} if true, `options.query` stomps over any
+existing query parameters on current URL. by default, will merge the two.
+* `[options.permanent]` {Boolean} if true, sets 301. defaults to 302.
 
 A convenience method for 301/302 redirects. Using this method will
 tell restify to stop execution of your handler chain. You can also
