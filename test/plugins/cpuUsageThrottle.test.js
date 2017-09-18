@@ -72,7 +72,7 @@ describe('cpuUsageThrottle', function () {
         done();
     });
 
-    it('Unit: Should have proper name', function(done) {
+    it('Unit: Should have proper name', function (done) {
         var opts = {
             max: 1,
             limit: 0.9,
