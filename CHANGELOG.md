@@ -1,3 +1,13 @@
+<a name="6.0.1"></a>
+### 6.0.1 (2017-09-19)
+
+
+#### Bug Fixes
+
+* **cpuUsageThrottle:** Correctly named handler for debugInfo (#1499) ([78b0900b](git://github.com/restify/node-restify.git/commit/78b0900b))
+* **server:** error in pre handler triggers after event (#1500) ([c2e6deae](git://github.com/restify/node-restify.git/commit/c2e6deae))
+
+
 <a name="6.0.0"></a>
 ## 6.0.0 (2017-09-15)
 
