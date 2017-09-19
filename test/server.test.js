@@ -2957,3 +2957,22 @@ test('calling next twice should throw', function (t) {
         t.ifError(err);
     });
 });
+
+test('aborting pre should still call after', function (t) {
+    setTimeout(function () {
+        t.fail('Timed out');
+        t.end();
+    }, 2000);
+    var error = new Error();
+    SERVER.pre(function (req, res, next) {
+        next(error);
+    });
+    SERVER.get('/', function (req, res, next) {
+        t.fail('should have aborted stack before routing');
+    });
+    SERVER.on('after', function (req, res, route, err) {
+        t.equal(err, error);
+        t.end();
+    });
+    CLIENT.get('/', function () {});
+});
