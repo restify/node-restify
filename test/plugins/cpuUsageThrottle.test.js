@@ -72,6 +72,18 @@ describe('cpuUsageThrottle', function () {
         done();
     });
 
+    it('Unit: Should have proper name', function (done) {
+        var opts = {
+            max: 1,
+            limit: 0.9,
+            halfLife: 50,
+            interval: 50
+        };
+        var plugin = cpuUsageThrottle(opts);
+        assert.equal(plugin.name, 'cpuUsageThrottle');
+        done();
+    });
+
 
     it('Integration: Should shed load', function (done) {
         var server = restify.createServer();
