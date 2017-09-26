@@ -30,7 +30,7 @@ describe('cpuUsageThrottle', function () {
         var opts = { limit: 0, interval: 500 };
         var plugin = cpuUsageThrottle(opts);
         function next (cont) {
-            clearTimeout(plugin._timeout);
+            plugin.close();
             assert(cont instanceof Error, 'Should call next with error');
             assert.equal(cont.statusCode, 503, 'Defaults to 503 status');
             done();
@@ -42,8 +42,8 @@ describe('cpuUsageThrottle', function () {
         var opts = { interval: 500, limit: 0.9 };
         var plugin = cpuUsageThrottle(opts);
         function next (cont) {
+            plugin.close();
             assert.isUndefined(cont, 'Should call next');
-            clearTimeout(plugin._timeout);
             done();
         }
         plugin({}, {}, next);
@@ -64,11 +64,11 @@ describe('cpuUsageThrottle', function () {
             interval: 1000
         };
         plugin.update(opts);
+        plugin.close();
         assert.equal(plugin.state.limit, opts.limit, 'opts.limit');
         assert.equal(plugin.state.max, opts.max, 'opts.max');
         assert.equal(plugin.state.halfLife, opts.halfLife, 'opts.halfLife');
         assert.equal(plugin.state.interval, opts.interval, 'opts.interval');
-        plugin.close();
         done();
     });
 
@@ -80,8 +80,22 @@ describe('cpuUsageThrottle', function () {
             interval: 50
         };
         var plugin = cpuUsageThrottle(opts);
+        plugin.close();
         assert.equal(plugin.name, 'cpuUsageThrottle');
         done();
+    });
+
+    it('Unit: Should report proper lag', function (done) {
+      var opts = { max: 1, limit: 0.9, halfLife: 50, interval: 50 };
+      var dn = Date.now;
+      var now = 0;
+      // First timer will be 0, all future timers will be interval
+      Date.now = () => (now++ > 0) * opts.interval;
+      var plugin = cpuUsageThrottle(opts);
+      Date.now = dn;
+      plugin.close();
+      assert.equal(plugin.state.lag, 0);
+      done();
     });
 
 
@@ -107,6 +121,7 @@ describe('cpuUsageThrottle', function () {
                 assert.equal(res.statusCode, 503,
                     'Default shed status code returned');
                 clearTimeout(plugin._timeout);
+                plugin.close();
                 done();
             });
         });
