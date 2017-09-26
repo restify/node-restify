@@ -86,16 +86,18 @@ describe('cpuUsageThrottle', function () {
     });
 
     it('Unit: Should report proper lag', function (done) {
-      var opts = { max: 1, limit: 0.9, halfLife: 50, interval: 50 };
-      var dn = Date.now;
-      var now = 0;
-      // First timer will be 0, all future timers will be interval
-      Date.now = () => (now++ > 0) * opts.interval;
-      var plugin = cpuUsageThrottle(opts);
-      Date.now = dn;
-      plugin.close();
-      assert.equal(plugin.state.lag, 0);
-      done();
+        var opts = { max: 1, limit: 0.9, halfLife: 50, interval: 50 };
+        var dn = Date.now;
+        var now = 0;
+        // First timer will be 0, all future timers will be interval
+        Date.now = function () {
+            return (now++ > 0) * opts.interval;
+        };
+        var plugin = cpuUsageThrottle(opts);
+        Date.now = dn;
+        plugin.close();
+        assert.equal(plugin.state.lag, 0);
+        done();
     });
 
 
