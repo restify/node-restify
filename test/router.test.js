@@ -189,19 +189,27 @@ test('Strict routing distinguishes trailing slash', function (t) {
     server.get('/trailing/', noop);
     server.get('/no-trailing', noop);
 
-
     var trailing = server.router.routes.GET[0];
-    t.ok(trailing.path.test('/trailing/'));
-    t.notOk(trailing.path.test('/trailing'));
+    t.ok(trailing.path.test('/trailing/'), 'Single trailing slash is ok');
+    t.notOk(trailing.path.test('/trailing'), 'No trailing slash is not ok');
+    t.notOk(trailing.path.test('/trailing//'),
+            'Double trailing slash is not ok');
+    t.notOk(trailing.path.test('//trailing/'),
+            'Double heading slash is not ok');
 
     var noTrailing = server.router.routes.GET[1];
-    t.ok(noTrailing.path.test('/no-trailing'));
-    t.notOk(noTrailing.path.test('/no-trailing/'));
+    t.ok(noTrailing.path.test('/no-trailing', 'No trailing slash is ok'));
+    t.notOk(noTrailing.path.test('/no-trailing/'),
+            'Single trailing slash is not ok');
+    t.notOk(noTrailing.path.test('/no-trailing//'),
+            'Double trailing slash is not ok');
+    t.notOk(noTrailing.path.test('//no-trailing'),
+            'Double heading slash is not ok');
 
     t.end();
 });
 
-test('Default non-strict routing ignores trailing slash(es)', function (t) {
+test('Non-strict routing distinguishes trailing slash', function (t) {
     var server = restify.createServer();
     function noop () {}
 
@@ -209,27 +217,20 @@ test('Default non-strict routing ignores trailing slash(es)', function (t) {
     server.get('/no-trailing', noop);
 
     var trailing = server.router.routes.GET[0];
-    t.ok(trailing.path.test('/trailing/'));
-    t.ok(trailing.path.test('/trailing//'));
-    t.ok(trailing.path.test('/trailing'));
+    t.ok(trailing.path.test('/trailing/', 'Single trailing slash is ok'));
+    t.ok(trailing.path.test('/trailing'), 'No trailing slash is not ok');
+    t.notOk(trailing.path.test('/trailing//'),
+            'Double trailing slash is not ok');
+    t.notOk(trailing.path.test('//trailing'),
+            'Double heading slash is not ok');
 
     var noTrailing = server.router.routes.GET[1];
-    t.ok(noTrailing.path.test('/no-trailing'));
-    t.ok(noTrailing.path.test('/no-trailing//'));
-    t.ok(noTrailing.path.test('/no-trailing/'));
-
-    t.end();
-});
-
-test('Default non-strict routing doesn\'t match non-trailing slash(es)',
-  function (t) {
-    var server = restify.createServer();
-    function noop () {}
-
-    server.get('/no-trailing', noop);
-
-    var noTrailing = server.router.routes.GET[0];
-    t.notOk(noTrailing.path.test('//no-trailing'));
+    t.ok(noTrailing.path.test('/no-trailing', 'No trailing slash is ok'));
+    t.ok(noTrailing.path.test('/no-trailing/'), 'Single trailing slash is ok');
+    t.notOk(noTrailing.path.test('/no-trailing//'),
+            'Double trailing slash is not ok');
+    t.notOk(noTrailing.path.test('//no-trailing'),
+            'Double heading slash is not ok');
 
     t.end();
 });
