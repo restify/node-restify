@@ -96,13 +96,13 @@ req.getQuery();
 // => 'a=1'
 ```
 
-Note that if the query parser plugin is used, then this method will returned
-the parsed query string:
+If the `queryParser` plugin is used, the parsed query string is available 
+under the `req.query`:
 
 ```js
 // incoming request is /foo?a=1
 server.use(restify.plugins.queryParser());
-req.getQuery();
+req.query;
 // => { a: 1 }
 ```
 
