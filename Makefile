@@ -63,7 +63,7 @@ test: $(NODEUNIT)
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
-	@($(NSP) check)
+	@($(NSP) check) | true
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
