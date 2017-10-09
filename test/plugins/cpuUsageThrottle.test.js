@@ -19,7 +19,7 @@ var cpuUsageThrottle = proxyquire('../../lib/plugins/cpuUsageThrottle.js', {
 var MR = Math.random;
 describe('cpuUsageThrottle', function () {
 
-    var plugin = undefined
+    var plugin;
 
     before('Setup: stub math.random', function (done) {
         Math.random = function () {
@@ -125,8 +125,8 @@ describe('cpuUsageThrottle', function () {
         });
     });
 
-    afterEach(function(done) {
-        if(plugin) {
+    afterEach(function (done) {
+        if (plugin) {
             plugin.close();
         }
         plugin = undefined;
