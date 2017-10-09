@@ -101,14 +101,13 @@ test('redirect to new relative string url as-is', function (t) {
         res.redirect('/1', next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/20'), function (err, _, res) {
+    CLIENT.get(join(LOCALHOST, '/20?a=1'), function (err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, '/1');
         t.end();
     });
 });
-
 
 test('redirect to current url (reload)', function (t) {
     SERVER.get('/2', function (req, res, next) {
@@ -158,7 +157,6 @@ test('redirect to current url from https -> http', function (t) {
     });
 });
 
-
 test('redirect by changing path', function (t) {
     SERVER.get('/4', function (req, res, next) {
         res.redirect({
@@ -170,6 +168,30 @@ test('redirect by changing path', function (t) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, join(LOCALHOST, '/1'));
+        t.end();
+    });
+});
+
+test('GH-1494: redirect should succeed even if req.url does not specify host' +
+' or protocol', function (t) {
+    SERVER.get('/5', function (req, res, next) {
+        res.redirect({
+            pathname: '/'
+        }, next);
+    });
+
+    // use a relative URL here instead of request with full protocol and host.
+    // this causes node to receive different values for req.url, which affects
+    // how reconstruction of the redirect URL is done. for example including
+    // full host will result in a req.url value of:
+    //         http://127.0.0.1:57824/5
+    // using relative URL results in a req.url value of:
+    //         /5
+    // this causes a bug as documented in GH-1494
+    CLIENT.get('/5', function (err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, '/');
         t.end();
     });
 });

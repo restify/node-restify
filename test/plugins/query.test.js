@@ -57,6 +57,23 @@ describe('query parser', function () {
         });
     });
 
+    it('req.getQuery() should return with raw query string', function (done) {
+        SERVER.use(restify.plugins.queryParser());
+
+        SERVER.get('/query/:id', function (req, res, next) {
+            assert.equal(req.getQuery(), 'a=1');
+            assert.deepEqual(req.query, { a: '1' });
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/query/foo?a=1', function (err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
     it('should parse req.query and req.params independently', function (done) {
         SERVER.use(restify.plugins.queryParser());
 
