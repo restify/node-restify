@@ -23,7 +23,6 @@ NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
-NSP_BADGE	:= ./tools/nspBadge.js
 NPM		:= npm
 
 #
@@ -64,7 +63,7 @@ test: $(NODEUNIT)
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
-	@($(NSP) check) | $(NSP_BADGE)
+	@($(NSP) check) | true
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
