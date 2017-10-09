@@ -76,17 +76,23 @@ describe('dedupe forward slashes in URL', function() {
             });
         });
 
-        it(
-            'should remove duplicate slashes ' + 'including trailing slashes',
-            function(done) {
-                CLIENT.get('//foo//bar//', function(err, _, res, data) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 200);
-                    assert.equal(data, '/foo/bar/');
-                    done();
-                });
-            }
-        );
+        // eslint-disable-next-line
+        it('should remove duplicate slashes including trailing slashes', function(done) {
+            CLIENT.get('//foo//bar//', function(err, _, res, data) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.equal(data, '/foo/bar/');
+                done();
+            });
+        });
+        it('should merge multiple slashes', function(done) {
+            CLIENT.get('//////foo///bar///////', function(err, _, res, data) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.equal(data, '/foo/bar/');
+                done();
+            });
+        });
     });
 
     describe('strict routing', function() {
@@ -131,7 +137,7 @@ describe('dedupe forward slashes in URL', function() {
         });
 
         it('should remove duplicate slashes', function(done) {
-            CLIENT.get('//foo//bar//', function(err, _, res, data) {
+            CLIENT.get('//////foo///bar///////', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -139,16 +145,14 @@ describe('dedupe forward slashes in URL', function() {
             });
         });
 
-        it(
-            'should remove duplicate slashes ' + 'including trailing slashes',
-            function(done) {
-                CLIENT.get('//foo//bar//', function(err, _, res, data) {
-                    assert.ifError(err);
-                    assert.equal(res.statusCode, 200);
-                    assert.equal(data, '/foo/bar/');
-                    done();
-                });
-            }
-        );
+        // eslint-disable-next-line
+        it('should remove duplicate slashes including trailing slashes', function(done) {
+            CLIENT.get('//foo//bar//', function(err, _, res, data) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                assert.equal(data, '/foo/bar/');
+                done();
+            });
+        });
     });
 });
