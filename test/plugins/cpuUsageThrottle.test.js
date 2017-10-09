@@ -19,6 +19,8 @@ var cpuUsageThrottle = proxyquire('../../lib/plugins/cpuUsageThrottle.js', {
 var MR = Math.random;
 describe('cpuUsageThrottle', function () {
 
+    var plugin;
+
     before('Setup: stub math.random', function (done) {
         Math.random = function () {
             return 0;
@@ -28,9 +30,8 @@ describe('cpuUsageThrottle', function () {
 
     it('Unit: Should shed load', function (done) {
         var opts = { limit: 0, interval: 500 };
-        var plugin = cpuUsageThrottle(opts);
+        plugin = cpuUsageThrottle(opts);
         function next (cont) {
-            clearTimeout(plugin._timeout);
             assert(cont instanceof Error, 'Should call next with error');
             assert.equal(cont.statusCode, 503, 'Defaults to 503 status');
             done();
@@ -40,10 +41,9 @@ describe('cpuUsageThrottle', function () {
 
     it('Unit: Should let request through when not under load', function (done) {
         var opts = { interval: 500, limit: 0.9 };
-        var plugin = cpuUsageThrottle(opts);
+        plugin = cpuUsageThrottle(opts);
         function next (cont) {
             assert.isUndefined(cont, 'Should call next');
-            clearTimeout(plugin._timeout);
             done();
         }
         plugin({}, {}, next);
@@ -56,7 +56,7 @@ describe('cpuUsageThrottle', function () {
             halfLife: 50,
             interval: 50
         };
-        var plugin = cpuUsageThrottle(opts);
+        plugin = cpuUsageThrottle(opts);
         opts = {
             max: 0.5,
             limit: 0.1,
@@ -68,7 +68,6 @@ describe('cpuUsageThrottle', function () {
         assert.equal(plugin.state.max, opts.max, 'opts.max');
         assert.equal(plugin.state.halfLife, opts.halfLife, 'opts.halfLife');
         assert.equal(plugin.state.interval, opts.interval, 'opts.interval');
-        plugin.close();
         done();
     });
 
@@ -79,8 +78,22 @@ describe('cpuUsageThrottle', function () {
             halfLife: 50,
             interval: 50
         };
-        var plugin = cpuUsageThrottle(opts);
+        plugin = cpuUsageThrottle(opts);
         assert.equal(plugin.name, 'cpuUsageThrottle');
+        done();
+    });
+
+    it('Unit: Should report proper lag', function (done) {
+        var opts = { max: 1, limit: 0.9, halfLife: 50, interval: 50 };
+        var dn = Date.now;
+        var now = 0;
+        // First timer will be 0, all future timers will be interval
+        Date.now = function () {
+            return (now++ > 0) * opts.interval;
+        };
+        plugin = cpuUsageThrottle(opts);
+        Date.now = dn;
+        assert.equal(plugin.state.lag, 0);
         done();
     });
 
@@ -91,7 +104,7 @@ describe('cpuUsageThrottle', function () {
             close: function () {}
         };
         var opts = { interval: 500, limit: 0 };
-        var plugin = cpuUsageThrottle(opts);
+        plugin = cpuUsageThrottle(opts);
         server.pre(plugin);
         server.get('/foo', function (req, res, next) {
             res.send(200);
@@ -110,6 +123,14 @@ describe('cpuUsageThrottle', function () {
                 done();
             });
         });
+    });
+
+    afterEach(function (done) {
+        if (plugin) {
+            plugin.close();
+        }
+        plugin = undefined;
+        done();
     });
 
     after('Teardown: Reset Math.random', function (done) {
