@@ -9,24 +9,24 @@ permalink: /docs/server-api/
 
 -   [createServer](#createserver)
 -   [Server](#server)
-    -   [address](#address)
     -   [listen](#listen)
     -   [close](#close)
-    -   [inflightRequests](#inflightrequests)
-    -   [del](#del)
     -   [get](#get)
     -   [head](#head)
-    -   [opts](#opts)
     -   [post](#post)
     -   [put](#put)
     -   [patch](#patch)
+    -   [del](#del)
+    -   [opts](#opts)
+    -   [pre](#pre)
+    -   [use](#use)
     -   [param](#param)
     -   [versionedUse](#versioneduse)
     -   [rm](#rm)
-    -   [use](#use)
-    -   [pre](#pre)
-    -   [toString](#tostring)
+    -   [address](#address)
+    -   [inflightRequests](#inflightrequests)
     -   [debugInfo](#debuginfo)
+    -   [toString](#tostring)
 -   [Events](#events)
 -   [Errors](#errors)
 -   [Types](#types)
@@ -138,14 +138,6 @@ srv.listen(8080, function () {
 });
 ```
 
-### address
-
-Returns the server address.
-Wraps node's
-[address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
-
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
-
 ### listen
 
 Gets the server up and listening.
@@ -184,23 +176,6 @@ Wraps node's
 
 Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
 
-### inflightRequests
-
-Returns the number of inflight requests currently being handled by the server
-
-Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
-
-### del
-
-Mounts a chain on the given path against this HTTP verb
-
-**Parameters**
-
--   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
-                                    if options, the URL to handle, at minimum.
-
-Returns **Route** the newly created route.
-
 ### get
 
 Mounts a chain on the given path against this HTTP verb
@@ -213,17 +188,6 @@ Mounts a chain on the given path against this HTTP verb
 Returns **Route** the newly created route.
 
 ### head
-
-Mounts a chain on the given path against this HTTP verb
-
-**Parameters**
-
--   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
-                                    if options, the URL to handle, at minimum.
-
-Returns **Route** the newly created route.
-
-### opts
 
 Mounts a chain on the given path against this HTTP verb
 
@@ -266,6 +230,79 @@ Mounts a chain on the given path against this HTTP verb
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
+
+### del
+
+Mounts a chain on the given path against this HTTP verb
+
+**Parameters**
+
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
+                                    if options, the URL to handle, at minimum.
+
+Returns **Route** the newly created route.
+
+### opts
+
+Mounts a chain on the given path against this HTTP verb
+
+**Parameters**
+
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
+                                    if options, the URL to handle, at minimum.
+
+Returns **Route** the newly created route.
+
+### pre
+
+Gives you hooks to run _before_ any routes are located.  This gives you
+a chance to intercept the request and change headers, etc., that routing
+depends on.  Note that req.params will _not_ be set yet.
+
+**Parameters**
+
+-   `handler` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that run for all
+    routes. _before_ routing occurs.
+    This gives you a hook to change request headers and the like if you need to.
+    Note that `req.params` will be undefined, as that's filled in _after_
+    routing.
+    Takes a function, or an array of functions.
+    variable number of nested arrays of handler functions
+
+**Examples**
+
+```javascript
+server.pre(function(req, res, next) {
+  req.headers.accept = 'application/json';
+  return next();
+});
+```
+
+_For example, `pre()` can be used to deduplicate slashes in
+URLs_
+
+```javascript
+server.pre(restify.pre.dedupeSlashes());
+```
+
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
+
+### use
+
+Allows you to add in handlers that run for all routes. Note that handlers
+added
+via `use()` will run only after the router has found a matching route. If no
+match is found, these handlers will never run. Takes a function, or an array
+of functions.
+
+You can pass in any combination of functions or array of functions.
+
+**Parameters**
+
+-   `handlers` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
+        variable number of nested arrays of handler functions
+
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### param
 
@@ -316,68 +353,31 @@ You pass in the route 'blob' you got from a mount call.
 
 Returns **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** true if route was removed, false if not.
 
-### use
+### address
 
-Allows you to add in handlers that run for all routes. Note that handlers
-added
-via `use()` will run only after the router has found a matching route. If no
-match is found, these handlers will never run. Takes a function, or an array
-of functions.
-
-You can pass in any combination of functions or array of functions.
-
-**Parameters**
-
--   `handlers` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
-        variable number of nested arrays of handler functions
-
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
-
-### pre
-
-Gives you hooks to run _before_ any routes are located.  This gives you
-a chance to intercept the request and change headers, etc., that routing
-depends on.  Note that req.params will _not_ be set yet.
-
-**Parameters**
-
--   `handler` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that run for all
-    routes. _before_ routing occurs.
-    This gives you a hook to change request headers and the like if you need to.
-    Note that `req.params` will be undefined, as that's filled in _after_
-    routing.
-    Takes a function, or an array of functions.
-    variable number of nested arrays of handler functions
-
-**Examples**
-
-```javascript
-server.pre(function(req, res, next) {
-  req.headers.accept = 'application/json';
-  return next();
-});
-```
-
-_For example, `pre()` can be used to deduplicate slashes in
-URLs_
-
-```javascript
-server.pre(restify.pre.dedupeSlashes());
-```
-
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
-
-### toString
-
-toString() the server for easy reading/output.
+Returns the server address.
+Wraps node's
+[address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### inflightRequests
+
+Returns the number of inflight requests currently being handled by the server
+
+Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
 
 ### debugInfo
 
 Return debug information about the server.
 
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+### toString
+
+toString() the server for easy reading/output.
+
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ## Events
 
