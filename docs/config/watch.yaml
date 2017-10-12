@@ -1,0 +1,17 @@
+toc:
+  - createServer
+  - Server
+  - name: Events
+    file: ../api/server-events.md
+  - name: Errors
+    file: ../api/server-errors.md
+  - name: Plugins
+    description: |
+      Restify comes bundled with a selection of useful plugins. These are accessible
+      off of `restify.plugins` and `restify.pre`.
+  - auditLogger
+  - createMetrics
+  - jsonp
+  - name: Types
+  - Server~methodOpts
+  - createMetrics~callback
