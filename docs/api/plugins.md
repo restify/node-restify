@@ -614,6 +614,7 @@ the `after` event:
 
 ```js
 server.on('after', restify.plugins.auditLogger({
+  event: 'after',
   log: bunyan.createLogger({
     name: 'audit',
     stream: process.stdout
