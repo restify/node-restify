@@ -45,10 +45,10 @@ The signature is for the after event is as follows:
 function(req, res, route, error) { }
 ```
 
-* req - the request object
-* res - the response object
-* route - the route object that serviced the request
-* error - the error passed to `next()`, if applicable
+* `req` - the request object
+* `res` - the response object
+* `route` - the route object that serviced the request
+* `error` - the error passed to `next()`, if applicable
 
 Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
@@ -66,8 +66,8 @@ The signature for the `pre` event is as follows:
 ```js
 function(req, res) {}
 ```
-* req - the request object
-* res - the response object
+* `req` - the request object
+* `res` - the response object
 
 Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
@@ -84,9 +84,9 @@ The signature for the `routed` event is as follows:
 function(req, res, route) {}
 ```
 
-* req - the request object
-* res - the response object
-* route - the route object that serviced the request
+* `req` - the request object
+* `res` - the response object
+* `route` - the route object that serviced the request
 
 Note that this event will *not* fire if a requests comes in that are not
 routable, i.e. one that would result in a `404`.
@@ -124,10 +124,10 @@ The signature is for the after event is as follows:
 function(req, res, route, error) { }
 ```
 
-* req - the request object
-* res - the response object
-* route - the route object that serviced the request
-* error - the error passed to `next()`, if applicable
+* `req` - the request object
+* `res` - the response object
+* `route` - the route object that serviced the request
+* `error` - the error passed to `next()`, if applicable
 
 ### close
 
