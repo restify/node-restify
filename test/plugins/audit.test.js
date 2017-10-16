@@ -484,4 +484,45 @@ describe('audit logger', function () {
             done();
         });
     });
+
+    it('should work with custom context functions', function (done) {
+        SERVER.once('after', restify.plugins.auditLogger({
+            log: bunyan.createLogger({
+                name: 'audit',
+                streams: [{
+                    level: 'info',
+                    stream: process.stdout
+                }]
+            }),
+            context: function (req, res, route, err) {
+                return {
+                    qs: req.getQuery()
+                };
+            },
+            server: SERVER,
+            event: 'after'
+        }));
+
+        SERVER.once('audit', function (data) {
+            assert.ok(data);
+            assert.ok(data.req_id);
+            assert.isNumber(data.latency);
+            assert.ok(data.context);
+            assert.equal(data.context.qs, 'foo=bar');
+            done();
+        });
+
+        SERVER.get('/audit', [
+            restify.plugins.queryParser(),
+            function (req, res, next) {
+                res.send();
+                next();
+            }
+        ]);
+
+        CLIENT.get('/audit?foo=bar', function (err, req, res) {
+            assert.ifError(err);
+        });
+    });
+
 });

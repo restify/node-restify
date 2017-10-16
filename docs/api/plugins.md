@@ -231,6 +231,11 @@ event, e.g., `server.on('after', plugins.auditLogger());`:
 * `auditLogger(options)` - an audit logger for recording all handled requests
   * `options.event` {String} The name of the event, one of `pre`, `routed`, or `after`
   * `options.log` {Object} bunyan logger
+  * `[opts.context]` {Function} The optional context function of signature
+   f(req, res, route, err).  Invoked each time an audit log is generated. This
+   function can return an object that customizes the format of anything off the
+   req, res, route, and err objects. The output of this function will be
+   available on the `context` key in the audit object.
   * `[options.server]` {Object} restify server. if passed in, causes server to
      emit 'auditlog' event after audit logs are flushed
   * `[options.printLog]` {Boolean} when true, prints audit logs. defaults to true.
