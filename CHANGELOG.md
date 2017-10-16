@@ -1,3 +1,13 @@
+<a name="6.2.0"></a>
+## 6.2.0 (2017-10-16)
+
+
+#### Bug Fixes
+
+* **cpuUsageThrottle:** dont include interval in lag (#1504) ([eecb2d25](git://github.com/restify/node-restify.git/commit/eecb2d25))
+* **plugins:** use process.hrtime() for duration calculation (#1507) ([e8efd6cd](git://github.com/restify/node-restify.git/commit/e8efd6cd))
+
+
 <a name="6.1.0"></a>
 ## 6.1.0 (2017-10-16)
 
