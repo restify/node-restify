@@ -31,7 +31,6 @@ NODE		:= node
 #
 # Files
 #
-DOC_FILES_TO_WATCH = ./lib/index.js ./lib/server.js ./lib/plugins/audit.js ./lib/plugins/metrics.js ./lib/plugins/jsonp.js
 JS_FILES	 = '.'
 
 CLEAN_FILES	+= node_modules cscope.files
@@ -71,10 +70,6 @@ nsp: node_modules $(NSP)
 .PHONY: docs-build
 docs-build:
 	@($(NODE) $(DOCS_BUILD))
-
-.PHONY: docs-watch
-docs-watch:
-	@($(DOCUMENTATION) serve $(DOC_FILES_TO_WATCH) --shallow --config docs/config/watch.yaml --watch)
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
