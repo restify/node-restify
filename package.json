@@ -110,7 +110,6 @@
     "restify-errors": "^5.0.0",
     "semver": "^5.0.1",
     "spdy": "^3.3.3",
-    "unleash": "^1.6.1",
     "uuid": "^3.0.0",
     "vasync": "^1.6.4",
     "verror": "^1.9.0"
@@ -136,6 +135,7 @@
     "proxyquire": "^1.8.0",
     "restify-clients": "^1.5.2",
     "rimraf": "^2.6.2",
+    "unleash": "^1.6.1",
     "validator": "^7.0.0",
     "watershed": "^0.3.4"
   },
