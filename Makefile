@@ -19,7 +19,6 @@
 #
 ESLINT		:= ./node_modules/.bin/eslint
 DOCUMENTATION		:= ./node_modules/.bin/documentation
-JSCS		:= ./node_modules/.bin/jscs
 NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha

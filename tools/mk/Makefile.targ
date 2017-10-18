@@ -122,16 +122,12 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 %.bashstyle: %
 	$(BASHSTYLE) $^
 
-.PHONY: check-jscs
-check-jscs::
-	$(JSCS) $(JS_FILES)
-
 .PHONY: check-eslint
 check-eslint::
 	$(ESLINT) $(JS_FILES)
 
 .PHONY: check
-check: check-eslint check-jscs check-bash
+check: check-eslint check-bash
 	@echo check ok
 
 .PHONY: clean
