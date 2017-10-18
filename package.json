@@ -134,6 +134,7 @@
     "proxyquire": "^1.8.0",
     "restify-clients": "^1.5.2",
     "rimraf": "^2.6.2",
+    "unleash": "^1.6.1",
     "validator": "^7.0.0",
     "watershed": "^0.3.4"
   },
