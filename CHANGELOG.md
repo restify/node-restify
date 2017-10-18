@@ -1,3 +1,12 @@
+<a name="6.2.2"></a>
+### 6.2.2 (2017-10-18)
+
+
+#### Bug Fixes
+
+* **package-lock.json:** remove artifacts.netflix.com repo (#1526) ([3d2f0f7d](git://github.com/restify/node-restify.git/commit/3d2f0f7d))
+
+
 <a name="6.2.1"></a>
 ### 6.2.1 (2017-10-18)
 
