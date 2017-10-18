@@ -110,7 +110,6 @@
     "restify-errors": "^5.0.0",
     "semver": "^5.0.1",
     "spdy": "^3.3.3",
-    "unleash": "^1.6.1",
     "uuid": "^3.0.0",
     "vasync": "^1.6.4",
     "verror": "^1.9.0"
