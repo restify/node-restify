@@ -49,6 +49,6 @@ Cutting a release is currently a manual process. We use a [Conventional Changelo
 ```
 $ git fetch
 $ git pull origin master # ensure you have the latest changes
-$ unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
-$ unleash [-p for patch, -m for minor, -M for major]
+$ npx unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
+$ npx unleash [-p for patch, -m for minor, -M for major]
 ```
