@@ -20,6 +20,15 @@ var docsConfig = [
             path.join(__dirname, LIB_PATH, 'server.js')
         ],
         config: path.join(__dirname, DOCS_PATH, 'config/server.yaml')
+    },
+    {
+        title: 'Request API',
+        permalink: '/docs/request-api/',
+        output: path.join(__dirname, OUTPUT_PATH, 'request.md'),
+        files: [
+            path.join(__dirname, LIB_PATH, 'request.js')
+        ],
+        config: path.join(__dirname, DOCS_PATH, 'config/request.yaml')
     }
     // {
     //     title: 'Plugins API',
