@@ -108,48 +108,48 @@ describe('form body parser', function () {
     });
 
     it('should take req.body and stomp on req.params',
-    function (done) {
+        function (done) {
 
-        SERVER.use(restify.plugins.queryParser({
-            mapParams: true
-        }));
-        SERVER.use(restify.plugins.bodyParser({
-            mapParams: true,
-            overrideParams: true
-        }));
+            SERVER.use(restify.plugins.queryParser({
+                mapParams: true
+            }));
+            SERVER.use(restify.plugins.bodyParser({
+                mapParams: true,
+                overrideParams: true
+            }));
 
-        SERVER.post('/bodyurl2/:id',
-            function (req, res, next) {
-                assert.equal(req.query.name, 'markc');
+            SERVER.post('/bodyurl2/:id',
+                function (req, res, next) {
+                    assert.equal(req.query.name, 'markc');
 
-                assert.equal(req.body.phone, '(206) 555-1212');
-                assert.equal(req.body.name, 'somethingelse');
+                    assert.equal(req.body.phone, '(206) 555-1212');
+                    assert.equal(req.body.name, 'somethingelse');
 
-                assert.equal(req.params.id, 'foo');
-                assert.equal(req.params.name, 'somethingelse');
-                assert.equal(req.params.phone, '(206) 555-1212');
+                    assert.equal(req.params.id, 'foo');
+                    assert.equal(req.params.name, 'somethingelse');
+                    assert.equal(req.params.phone, '(206) 555-1212');
 
-                res.send();
-                next();
+                    res.send();
+                    next();
+                });
+
+            var opts = {
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/bodyurl2/foo?name=markc',
+                agent: false,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            };
+            var client = http.request(opts, function (res) {
+                assert.equal(res.statusCode, 200);
+                done();
             });
-
-        var opts = {
-            hostname: '127.0.0.1',
-            port: PORT,
-            path: '/bodyurl2/foo?name=markc',
-            agent: false,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        };
-        var client = http.request(opts, function (res) {
-            assert.equal(res.statusCode, 200);
-            done();
+            client.write('phone=(206)%20555-1212&name=somethingelse');
+            client.end();
         });
-        client.write('phone=(206)%20555-1212&name=somethingelse');
-        client.end();
-    });
 
     it('should parse associative array syntax', function (done) {
 

@@ -30,7 +30,7 @@ var TIMEOUT = 15000;
 ///--- Test Helper
 
 function
-    finish_latch(_test, _names) {
+finish_latch(_test, _names) {
     var complete = false;
     var t = _test;
     var names = _names;

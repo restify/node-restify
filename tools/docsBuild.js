@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var path = require('path');
 var util = require('util');
@@ -56,7 +56,7 @@ function build (options) {
         })
         .then(function (docsContent) {
             var output = util.format(JEKYLL_HEADER_TEMPLATE, options.title,
-              options.permalink, docsContent);
+                options.permalink, docsContent);
 
             fs.writeFileSync(options.output, output);
         });

@@ -1136,36 +1136,36 @@ test('gh-635 routes match the maximum version', function (t) {
 
 test('versioned route matching should prefer \
     first match if equal versions', function (t) {
-    var p = '/' + uuid.v4();
+        var p = '/' + uuid.v4();
 
-    SERVER.get({
-        path: p,
-        version: ['1.1.0', '1.2.0']
-    }, function (req, res, next) {
-        res.json(200, {route: p});
-        next();
+        SERVER.get({
+            path: p,
+            version: ['1.1.0', '1.2.0']
+        }, function (req, res, next) {
+            res.json(200, {route: p});
+            next();
+        });
+
+        SERVER.get({
+            path: '/:id',
+            version: ['1.1.0', '1.2.0']
+        }, function (req, res, next) {
+            res.json(200, {route: 'id'});
+            next();
+        });
+
+        var opts = {
+            path: p,
+            headers: {
+                'accept-version': '~1'
+            }
+        };
+
+        CLIENT.get(opts, function (err, _, res, obj) {
+            t.equal(obj.route, p);
+            t.end();
+        });
     });
-
-    SERVER.get({
-        path: '/:id',
-        version: ['1.1.0', '1.2.0']
-    }, function (req, res, next) {
-        res.json(200, {route: 'id'});
-        next();
-    });
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '~1'
-        }
-    };
-
-    CLIENT.get(opts, function (err, _, res, obj) {
-        t.equal(obj.route, p);
-        t.end();
-    });
-});
 
 
 test('versioned route matching should not throw TypeError' , function (t) {
@@ -1864,25 +1864,25 @@ test('error handler defers "after" event', function (t) {
 
 
 test('gh-757 req.absoluteUri() defaults path segment to req.path()',
-     function (t) {
-    SERVER.get('/the-original-path', function (req, res, next) {
-        var prefix = 'http://127.0.0.1:' + PORT;
-        t.equal(req.absoluteUri('?key=value'),
+    function (t) {
+        SERVER.get('/the-original-path', function (req, res, next) {
+            var prefix = 'http://127.0.0.1:' + PORT;
+            t.equal(req.absoluteUri('?key=value'),
                 prefix + '/the-original-path/?key=value');
-        t.equal(req.absoluteUri('#fragment'),
+            t.equal(req.absoluteUri('#fragment'),
                 prefix + '/the-original-path/#fragment');
-        t.equal(req.absoluteUri('?key=value#fragment'),
+            t.equal(req.absoluteUri('?key=value#fragment'),
                 prefix + '/the-original-path/?key=value#fragment');
-        res.send();
-        next();
-    });
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/the-original-path', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
+        CLIENT.get('/the-original-path', function (err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
     });
-});
 
 
 test('GH-693 sending multiple response header values', function (t) {
@@ -1909,7 +1909,7 @@ test('gh-762 res.noCache()', function (t) {
 
     CLIENT.get('/some-path', function (err, _, res) {
         t.equal(res.headers['cache-control'],
-          'no-cache, no-store, must-revalidate');
+            'no-cache, no-store, must-revalidate');
         t.equal(res.headers.pragma, 'no-cache');
         t.equal(res.headers.expires, '0');
         t.end();
@@ -1927,7 +1927,7 @@ test('gh-779 set-cookie fields should never have commas', function (t) {
     CLIENT.get('/set-cookie', function (err, _, res) {
         t.ifError(err);
         t.equal(res.headers['set-cookie'].length, 1,
-                'set-cookie header should only have 1 element');
+            'set-cookie header should only have 1 element');
         t.equal(res.headers['set-cookie'], 'bar');
         t.end();
     });
@@ -1937,39 +1937,39 @@ test('gh-779 set-cookie fields should never have commas', function (t) {
 test('gh-986 content-type fields should never have commas'
     + ' (via `res.header(...)`)', function (t) {
 
-        SERVER.get('/content-type', function (req, res, next) {
-            res.header('content-type', 'foo');
-            res.header('content-type', 'bar');
-            res.send(200);
-        });
-
-        CLIENT.get('/content-type', function (err, _, res) {
-            t.ifError(err);
-            t.equal(Array.isArray(res.headers['content-type']), false,
-                    'content-type header should not be an array');
-            t.equal(res.headers['content-type'], 'bar');
-            t.end();
-        });
+    SERVER.get('/content-type', function (req, res, next) {
+        res.header('content-type', 'foo');
+        res.header('content-type', 'bar');
+        res.send(200);
     });
+
+    CLIENT.get('/content-type', function (err, _, res) {
+        t.ifError(err);
+        t.equal(Array.isArray(res.headers['content-type']), false,
+            'content-type header should not be an array');
+        t.equal(res.headers['content-type'], 'bar');
+        t.end();
+    });
+});
 
 
 test('gh-986 content-type fields should never have commas'
     + ' (via `res.setHeader(...)`)', function (t) {
 
-        SERVER.get('/content-type', function (req, res, next) {
-            res.setHeader('content-type', 'foo');
-            res.setHeader('content-type', 'bar');
-            res.send(200);
-        });
-
-        CLIENT.get('/content-type', function (err, _, res) {
-            t.ifError(err);
-            t.equal(Array.isArray(res.headers['content-type']), false,
-                    'content-type header should not be an array');
-            t.equal(res.headers['content-type'], 'bar');
-            t.end();
-        });
+    SERVER.get('/content-type', function (req, res, next) {
+        res.setHeader('content-type', 'foo');
+        res.setHeader('content-type', 'bar');
+        res.send(200);
     });
+
+    CLIENT.get('/content-type', function (err, _, res) {
+        t.ifError(err);
+        t.equal(Array.isArray(res.headers['content-type']), false,
+            'content-type header should not be an array');
+        t.equal(res.headers['content-type'], 'bar');
+        t.end();
+    });
+});
 
 
 test('gh-630 handle server versions as an array or string', function (t) {
@@ -2071,7 +2071,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -2091,7 +2091,7 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
                 // check records
                 t.ok(ringbuffer.records[0], 'no log records');
                 t.equal(ringbuffer.records.length, 1,
-                        'should only have 1 log record');
+                    'should only have 1 log record');
                 // TODO: fix this after plugin is fixed to use
                 // req.connectionState()
                 // t.equal(ringbuffer.records[0].req.clientClosed, true);
@@ -2099,11 +2099,11 @@ test('GH-733 if request closed early, stop processing. ensure only ' +
                 // check timers
                 var handlers = Object.keys(ringbuffer.records[0].req.timers);
                 t.equal(handlers.length, 2,
-                        'should only have 2 req timers');
+                    'should only have 2 req timers');
                 t.equal(handlers[0], 'first',
-                        'first handler timer not in order');
+                    'first handler timer not in order');
                 t.equal(handlers[handlers.length - 1], 'second',
-                        'second handler not last');
+                    'second handler not last');
                 t.end();
 
                 // ensure third handler never ran
@@ -2177,24 +2177,24 @@ test('GH-667 emit error event for generic Errors', function (t) {
 
 
 test('GH-667 returning error in error handler should not do anything',
-function (t) {
+    function (t) {
 
-    SERVER.on('ImATeapot', function (req, res, err, cb) {
+        SERVER.on('ImATeapot', function (req, res, err, cb) {
         // attempt to pass a new error back
-        return cb(new errors.LockedError('oh noes'));
-    });
+            return cb(new errors.LockedError('oh noes'));
+        });
 
-    SERVER.get('/1', function (req, res, next) {
-        return next(new errors.ImATeapotError('foobar'));
-    });
+        SERVER.get('/1', function (req, res, next) {
+            return next(new errors.ImATeapotError('foobar'));
+        });
 
-    CLIENT.get('/1', function (err, req, res, data) {
-        t.ok(err);
-        // should still get the original error
-        t.equal(err.name, 'ImATeapotError');
-        t.end();
+        CLIENT.get('/1', function (err, req, res, data) {
+            t.ok(err);
+            // should still get the original error
+            t.equal(err.name, 'ImATeapotError');
+            t.end();
+        });
     });
-});
 
 
 test('GH-958 RCS does not write triggering record', function (t) {
@@ -2412,33 +2412,33 @@ test('GH-1078: server name should be customizable', function (t) {
 
 
 test('GH-1078: server name should be overridable and not sent down',
-function (t) {
+    function (t) {
 
-    var myServer = restify.createServer({
-        name: ''
-    });
-    var port = 3000;
+        var myServer = restify.createServer({
+            name: ''
+        });
+        var port = 3000;
 
-    myServer.get('/', function (req, res, next) {
-        res.send('hi');
-        return next();
-    });
+        myServer.get('/', function (req, res, next) {
+            res.send('hi');
+            return next();
+        });
 
-    var myClient = restifyClients.createStringClient({
-        url: 'http://127.0.0.1:' + port,
-        headers: {
-            connection: 'close'
-        }
-    });
+        var myClient = restifyClients.createStringClient({
+            url: 'http://127.0.0.1:' + port,
+            headers: {
+                connection: 'close'
+            }
+        });
 
-    myServer.listen(port, function () {
-        myClient.get('/', function (err, req, res, data) {
-            t.ifError(err);
-            t.equal(res.headers.hasOwnProperty('server'), false);
-            myServer.close(t.end);
+        myServer.listen(port, function () {
+            myClient.get('/', function (err, req, res, data) {
+                t.ifError(err);
+                t.equal(res.headers.hasOwnProperty('server'), false);
+                myServer.close(t.end);
+            });
         });
     });
-});
 
 
 test('should emit \'after\' on successful request', function (t) {
@@ -2498,28 +2498,28 @@ test('should emit \'after\' on uncaughtException', function (t) {
 
 
 test('should emit \'after\' when sending res on uncaughtException',
-function (t) {
+    function (t) {
 
-    SERVER.on('after', function (req, res, route, err) {
-        t.ok(err);
-        t.equal(err.message, 'oh noes');
+        SERVER.on('after', function (req, res, route, err) {
+            t.ok(err);
+            t.equal(err.message, 'oh noes');
+        });
+
+        SERVER.on('uncaughtException', function (req, res, route, err) {
+            res.send(504, 'boom');
+        });
+
+
+        SERVER.get('/foobar', function (req, res, next) {
+            throw new Error('oh noes');
+        });
+
+        CLIENT.get('/foobar', function (err, _, res) {
+            t.ok(err);
+            t.equal(err.name, 'GatewayTimeoutError');
+            t.end();
+        });
     });
-
-    SERVER.on('uncaughtException', function (req, res, route, err) {
-        res.send(504, 'boom');
-    });
-
-
-    SERVER.get('/foobar', function (req, res, next) {
-        throw new Error('oh noes');
-    });
-
-    CLIENT.get('/foobar', function (err, _, res) {
-        t.ok(err);
-        t.equal(err.name, 'GatewayTimeoutError');
-        t.end();
-    });
-});
 
 
 test('should emit \'after\' on client closed request ' +
@@ -2592,35 +2592,35 @@ test('should increment/decrement inflight request count', function (t) {
 
 
 test('should increment/decrement inflight request count for concurrent reqs',
-function (t) {
+    function (t) {
 
-    SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.inflightRequests(), 1);
-        setTimeout(function () {
+        SERVER.get('/foo1', function (req, res, next) {
+            t.equal(SERVER.inflightRequests(), 1);
+            setTimeout(function () {
+                res.send();
+                return next();
+            }, 250);
+        });
+
+        SERVER.get('/foo2', function (req, res, next) {
+            t.equal(SERVER.inflightRequests(), 2);
             res.send();
             return next();
-        }, 250);
-    });
+        });
 
-    SERVER.get('/foo2', function (req, res, next) {
-        t.equal(SERVER.inflightRequests(), 2);
-        res.send();
-        return next();
-    });
+        CLIENT.get('/foo1', function (err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        });
 
-    CLIENT.get('/foo1', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
-        t.end();
+        CLIENT.get('/foo2', function (err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.equal(SERVER.inflightRequests(), 1);
+        });
     });
-
-    CLIENT.get('/foo2', function (err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
-    });
-});
 
 test('should emit \'close\' on server close', function (t) {
     var server = restify.createServer();
@@ -2697,21 +2697,21 @@ test('should cleanup inflight requests count for timeouts', function (t) {
 test('should cleanup inflight requests count on uncaughtExceptions',
     function (t) {
 
-    SERVER.on('uncaughtException', function (req, res, route, err) {
-        res.send(500, 'asplode');
-    });
+        SERVER.on('uncaughtException', function (req, res, route, err) {
+            res.send(500, 'asplode');
+        });
 
-    SERVER.get('/foo1', function (req, res, next) {
-        t.equal(SERVER.inflightRequests(), 1);
-        throw new Error('oh noes');
-    });
+        SERVER.get('/foo1', function (req, res, next) {
+            t.equal(SERVER.inflightRequests(), 1);
+            throw new Error('oh noes');
+        });
 
-    CLIENT.get('/foo1', function (err, _, res) {
-        t.ok(err);
-        t.equal(SERVER.inflightRequests(), 0);
-        t.end();
+        CLIENT.get('/foo1', function (err, _, res) {
+            t.ok(err);
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        });
     });
-});
 
 
 test('should show debug information', function (t) {
@@ -2747,10 +2747,10 @@ test('should show debug information', function (t) {
     });
 
     SERVER.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/,
-    function freeform(req, res, next) {
-        res.end();
-        return next();
-    });
+        function freeform(req, res, next) {
+            res.end();
+            return next();
+        });
 
     var debugInfo = SERVER.getDebugInfo();
 
@@ -2819,7 +2819,7 @@ test('should show debug information', function (t) {
     t.ok(debugInfo.routes[2].compiledRegex instanceof RegExp);
     // freeform regex input should equal output
     t.equal(debugInfo.routes[2].input.toString(),
-            debugInfo.routes[2].compiledRegex.toString());
+        debugInfo.routes[2].compiledRegex.toString());
     t.deepEqual(debugInfo.routes[2].compiledUrlParams, null);
 
     // verify other server details

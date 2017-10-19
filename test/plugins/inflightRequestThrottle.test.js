@@ -48,7 +48,7 @@ describe('inlfightRequestThrottle', function () {
         function next () {
             assert(false, 'Should not call next');
         }
-        var fakeReq = { log : { trace: function () {} } };
+        var fakeReq = { log: { trace: function () {} } };
         plugin(fakeReq, { send: send }, next);
     });
 
@@ -62,7 +62,7 @@ describe('inlfightRequestThrottle', function () {
             assert.isUndefined(cont, 'Should call next');
             done();
         }
-        var fakeReq = { log : { trace: function () {} } };
+        var fakeReq = { log: { trace: function () {} } };
         plugin(fakeReq, { send: send }, next);
     });
 

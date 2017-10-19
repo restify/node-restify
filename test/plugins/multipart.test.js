@@ -259,43 +259,44 @@ describe('multipart parser', function () {
     });
 
     it('restify-GH-694 pass hash option through to Formidable',
-    function (done) {
-        var content = 'Hello World!';
-        var hash = '2ef7bde608ce5404e97d5f042f95f89f1c232871';
-        SERVER.post('/multipart',
-            restify.plugins.bodyParser({hash: 'sha1'}),
-            function (req, res, next) {
-                assert.equal(req.files.details.hash, hash);
-                res.send();
-                next();
+        function (done) {
+            var content = 'Hello World!';
+            var hash = '2ef7bde608ce5404e97d5f042f95f89f1c232871';
+            SERVER.post('/multipart',
+                restify.plugins.bodyParser({hash: 'sha1'}),
+                function (req, res, next) {
+                    assert.equal(req.files.details.hash, hash);
+                    res.send();
+                    next();
+                });
+
+            var opts = {
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/multipart',
+                agent: false,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data; boundary=huff'
+                }
+            };
+
+            var client = http.request(opts, function (res) {
+                assert.equal(res.statusCode, 200);
+                done();
             });
 
-        var opts = {
-            hostname: '127.0.0.1',
-            port: PORT,
-            path: '/multipart',
-            agent: false,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'multipart/form-data; boundary=huff'
-            }
-        };
+            client.write('--huff\r\n');
 
-        var client = http.request(opts, function (res) {
-            assert.equal(res.statusCode, 200);
-            done();
+            // jscs:disable maximumLineLength
+            client.write('Content-Disposition: form-data; name="details"; ' +
+                'filename="mood_details.txt"\r\n');
+
+            // jscs:enable maximumLineLength
+            client.write('Content-Type: text/plain\r\n\r\n');
+            client.write(content + '\r\n');
+            client.write('--huff--');
+
+            client.end();
         });
-
-        client.write('--huff\r\n');
-
-        // jscs:disable maximumLineLength
-        client.write('Content-Disposition: form-data; name="details"; filename="mood_details.txt"\r\n');
-
-        // jscs:enable maximumLineLength
-        client.write('Content-Type: text/plain\r\n\r\n');
-        client.write(content + '\r\n');
-        client.write('--huff--');
-
-        client.end();
-    });
 });
