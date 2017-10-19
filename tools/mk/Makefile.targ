@@ -126,8 +126,16 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 check-eslint::
 	$(ESLINT) $(JS_FILES)
 
+.PHONY: check-lint
+check-lint::
+	NO_STYLE=true $(ESLINT) $(JS_FILES)
+
+.PHONY: check-style
+check-style::
+	NO_LINT=true $(ESLINT) $(JS_FILES)
+
 .PHONY: check
-check: check-eslint check-bash
+check: check-lint check-style check-bash
 	@echo check ok
 
 .PHONY: clean
