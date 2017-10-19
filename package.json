@@ -122,7 +122,7 @@
     "cover": "^0.2.9",
     "coveralls": "^2.13.3",
     "documentation": "5.3.2",
-    "eslint": "^3.19.0",
+    "eslint": "4.9.0",
     "filed": "^0.1.0",
     "istanbul": "^0.4.5",
     "mkdirp": "^0.5.1",
