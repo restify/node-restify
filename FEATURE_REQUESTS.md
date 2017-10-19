@@ -52,7 +52,7 @@ start!
 * [Document all client options][1326]
 * [Client tunneling vs. proxying][1327]
 * [Explain why Restify is great!][927]
-* [`BasicAut` examples][1099]
+* [`BasicAuth` examples][1099]
 * [Document `next` behaviour][1068]
 * [Remove defaultResponseHeaders][1040]
 * [Properly document req.accepts][957]
