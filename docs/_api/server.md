@@ -99,7 +99,7 @@ Creates a new Server.
         instance.
     -   `options.version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))?** Default version(s) to use in all
         routes.
-    -   `options.acceptable` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)?** String)|List of content-types this
+    -   `options.acceptable` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>?** List of content-types this
         server can respond with.
     -   `options.url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
@@ -148,7 +148,7 @@ Wraps node's
 
 -   `port` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Port
 -   `host` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Host
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** optionally get notified when listening.
+-   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** optionally get notified when listening.
 
 **Examples**
 
@@ -172,7 +172,7 @@ Wraps node's
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** optional callback to invoke when done.
+-   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** callback to invoke when done
 
 Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
 
@@ -184,6 +184,15 @@ Mounts a chain on the given path against this HTTP verb
 
 -   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
+
+**Examples**
+
+```javascript
+server.get('/', function (req, res, next) {
+   res.send({ hello: 'world' });
+   next();
+});
+```
 
 Returns **Route** the newly created route.
 
@@ -359,7 +368,19 @@ Returns the server address.
 Wraps node's
 [address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+**Examples**
+
+```javascript
+server.address()
+```
+
+_Output:_
+
+```javascript
+{ address: '::', family: 'IPv6', port: 8080 }
+```
+
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Address of server
 
 ### inflightRequests
 
@@ -371,11 +392,78 @@ Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Return debug information about the server.
 
+**Examples**
+
+```javascript
+server.getDebugInfo()
+```
+
+_Output:_
+
+```javascript
+{ 
+  routes: [ 
+    { 
+      name: 'get',
+      method: 'get',
+      input: '/',
+      compiledRegex: /^[\/]*$/,
+      compiledUrlParams: null,
+      versions: null,
+      handlers: [Array]
+     }
+  ],
+  server: { 
+    formatters: { 
+      'application/javascript': [Function: formatJSONP],
+      'application/json': [Function: formatJSON],
+      'text/plain': [Function: formatText],
+      'application/octet-stream': [Function: formatBinary]
+    },
+    address: '::',
+    port: 8080,
+    inflightRequests: 0,
+    pre: [],
+    use: [ 'parseQueryString', '_jsonp' ],
+    after: []
+  }
+}
+```
+
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 ### toString
 
 toString() the server for easy reading/output.
+
+**Examples**
+
+```javascript
+server.toString()
+```
+
+_Output:_
+
+```javascript
+Accepts: application/json, text/plain, application/octet-stream, 
+application/javascript
+Name: restify
+Pre: []
+Router: RestifyRouter:
+	DELETE: []
+	GET: [get]
+	HEAD: []
+	OPTIONS: []
+	PATCH: []
+	POST: []
+	PUT: []
+
+Routes: 
+	get: [parseQueryString, _jsonp, function]
+Secure: false
+Url: http://[::]:8080
+Version:
+```
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
@@ -427,10 +515,10 @@ The signature is for the after event is as follows:
 function(req, res, route, error) { }
 ```
 
--   req - the request object
--   res - the response object
--   route - the route object that serviced the request
--   error - the error passed to `next()`, if applicable
+-   `req` - the request object
+-   `res` - the response object
+-   `route` - the route object that serviced the request
+-   `error` - the error passed to `next()`, if applicable
 
 Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
@@ -448,8 +536,8 @@ The signature for the `pre` event is as follows:
 function(req, res) {}
 ```
 
--   req - the request object
--   res - the response object
+-   `req` - the request object
+-   `res` - the response object
 
 Note that when the server automatically responds with a
 NotFound/MethodNotAllowed/VersionNotAllowed, this event will still be fired.
@@ -465,9 +553,9 @@ The signature for the `routed` event is as follows:
 function(req, res, route) {}
 ```
 
--   req - the request object
--   res - the response object
--   route - the route object that serviced the request
+-   `req` - the request object
+-   `res` - the response object
+-   `route` - the route object that serviced the request
 
 Note that this event will _not_ fire if a requests comes in that are not
 routable, i.e. one that would result in a `404`.
@@ -504,10 +592,10 @@ The signature is for the after event is as follows:
 function(req, res, route, error) { }
 ```
 
--   req - the request object
--   res - the response object
--   route - the route object that serviced the request
--   error - the error passed to `next()`, if applicable
+-   `req` - the request object
+-   `res` - the response object
+-   `route` - the route object that serviced the request
+-   `error` - the error passed to `next()`, if applicable
 
 ### close
 
@@ -576,54 +664,54 @@ emitted error events. The signature is as follows:
 function(req, res, err, callback) { }
 ```
 
--   req - the request object
--   res - the response object
--   err - the error object
--   callback - a callback function to invoke
+-   `req` - the request object
+-   `res` - the response object
+-   `err` - the error object
+-   `callback` - a callback function to invoke
 
 When using this feature in conjunction with
 [restify-errors](https://github.com/restify/errors), restify will emit events
 for all of the basic http errors:
 
--   400 BadRequestError
--   401 UnauthorizedError
--   402 PaymentRequiredError
--   403 ForbiddenError
--   404 NotFoundError
--   405 MethodNotAllowedError
--   406 NotAcceptableError
--   407 ProxyAuthenticationRequiredError
--   408 RequestTimeoutError
--   409 ConflictError
--   410 GoneError
--   411 LengthRequiredError
--   412 PreconditionFailedError
--   413 RequestEntityTooLargeError
--   414 RequesturiTooLargeError
--   415 UnsupportedMediaTypeError
--   416 RangeNotSatisfiableError (node >= 4)
--   416 RequestedRangeNotSatisfiableError (node 0.x)
--   417 ExpectationFailedError
--   418 ImATeapotError
--   422 UnprocessableEntityError
--   423 LockedError
--   424 FailedDependencyError
--   425 UnorderedCollectionError
--   426 UpgradeRequiredError
--   428 PreconditionRequiredError
--   429 TooManyRequestsError
--   431 RequestHeaderFieldsTooLargeError
--   500 InternalServerError
--   501 NotImplementedError
--   502 BadGatewayError
--   503 ServiceUnavailableError
--   504 GatewayTimeoutError
--   505 HttpVersionNotSupportedError
--   506 VariantAlsoNegotiatesError
--   507 InsufficientStorageError
--   509 BandwidthLimitExceededError
--   510 NotExtendedError
--   511 NetworkAuthenticationRequiredError
+-   `400` - `BadRequestError`
+-   `401` - `UnauthorizedError`
+-   `402` - `PaymentRequiredError`
+-   `403` - `ForbiddenError`
+-   `404` - `NotFoundError`
+-   `405` - `MethodNotAllowedError`
+-   `406` - `NotAcceptableError`
+-   `407` - `ProxyAuthenticationRequiredError`
+-   `408` - `RequestTimeoutError`
+-   `409` - `ConflictError`
+-   `410` - `GoneError`
+-   `411` - `LengthRequiredError`
+-   `412` - `PreconditionFailedError`
+-   `413` - `RequestEntityTooLargeError`
+-   `414` - `RequesturiTooLargeError`
+-   `415` - `UnsupportedMediaTypeError`
+-   `416` - `RangeNotSatisfiableError` (node >= 4)
+-   `416` - `RequestedRangeNotSatisfiableError` (node 0.x)
+-   `417` - `ExpectationFailedError`
+-   `418` - `ImATeapotError`
+-   `422` - `UnprocessableEntityError`
+-   `423` - `LockedError`
+-   `424` - `FailedDependencyError`
+-   `425` - `UnorderedCollectionError`
+-   `426` - `UpgradeRequiredError`
+-   `428` - `PreconditionRequiredError`
+-   `429` - `TooManyRequestsError`
+-   `431` - `RequestHeaderFieldsTooLargeError`
+-   `500` - `InternalServerError`
+-   `501` - `NotImplementedError`
+-   `502` - `BadGatewayError`
+-   `503` - `ServiceUnavailableError`
+-   `504` - `GatewayTimeoutError`
+-   `505` - `HttpVersionNotSupportedError`
+-   `506` - `VariantAlsoNegotiatesError`
+-   `507` - `InsufficientStorageError`
+-   `509` - `BandwidthLimitExceededError`
+-   `510` - `NotExtendedError`
+-   `511` - `NetworkAuthenticationRequiredError`
 
 Restify will also emit the following events:
 
@@ -668,7 +756,7 @@ Type: ([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Referenc
 
 -   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
 -   `path` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp))** a string or regex matching the route
--   `version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) | ArrayOfString)** versions supported by this route
+-   `version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>)** versions supported by this route
 
 **Examples**
 
