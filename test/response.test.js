@@ -366,20 +366,21 @@ test('redirect using default hostname with custom port', function (t) {
 });
 
 // jscs:disable maximumLineLength
-test('redirect should cause InternalError when invoked without next', function (t) {
+test('redirect should cause InternalError when invoked without next',
+    function (t) {
 
-    SERVER.get('/9', function (req, res, next) {
-        res.redirect();
+        SERVER.get('/9', function (req, res, next) {
+            res.redirect();
+        });
+
+        CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res, body) {
+            t.equal(res.statusCode, 500);
+
+            // json parse the response
+            t.equal(body.code, 'Internal');
+            t.end();
+        });
     });
-
-    CLIENT.get(join(LOCALHOST, '/9'), function (err, _, res, body) {
-        t.equal(res.statusCode, 500);
-
-        // json parse the response
-        t.equal(body.code, 'Internal');
-        t.end();
-    });
-});
 
 // jscs:enable maximumLineLength
 

@@ -164,33 +164,33 @@ describe('strictQueryParams', function () {
         function (done) {
 
 
-        SERVER.pre(restify.plugins.pre.strictQueryParams({
-            message: MESSAGE
-        }));
+            SERVER.pre(restify.plugins.pre.strictQueryParams({
+                message: MESSAGE
+            }));
 
-        SERVER.use(restify.plugins.queryParser({
-            mapParams: true,
-            overrideParams: true
-        }));
+            SERVER.use(restify.plugins.queryParser({
+                mapParams: true,
+                overrideParams: true
+            }));
 
-        SERVER.get('/query/:id',
-            function (req, res, next) {
-                res.send();
-                next();
-            });
-
-        CLIENT.get('/query/foo?id=bar&name=josep&jorge',
-            function (err, _, res) {
-
-                assert.equal(typeof err, 'object');
-                assert.equal(res.statusCode, 400);
-                assert.deepEqual(JSON.parse(res.body), {
-                    code: 'BadRequest',
-                    message: MESSAGE
+            SERVER.get('/query/:id',
+                function (req, res, next) {
+                    res.send();
+                    next();
                 });
-                done();
-            });
-    });
+
+            CLIENT.get('/query/foo?id=bar&name=josep&jorge',
+                function (err, _, res) {
+
+                    assert.equal(typeof err, 'object');
+                    assert.equal(res.statusCode, 400);
+                    assert.deepEqual(JSON.parse(res.body), {
+                        code: 'BadRequest',
+                        message: MESSAGE
+                    });
+                    done();
+                });
+        });
 
     it('should respond to valid query param value with 200', function (done) {
 

@@ -65,12 +65,12 @@ describe('audit logger', function () {
 
 
         SERVER.get('/foo', function (req, res, next) {
-            res.send(200, {testdata : 'foo'});
+            res.send(200, {testdata: 'foo'});
             next();
         });
 
         SERVER.get('/bar', function (req, res, next) {
-            res.send(200, {testdata : 'bar'});
+            res.send(200, {testdata: 'bar'});
             next();
         });
 
@@ -155,7 +155,7 @@ describe('audit logger', function () {
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -221,7 +221,7 @@ describe('audit logger', function () {
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -269,9 +269,9 @@ describe('audit logger', function () {
 
             var handlers = Object.keys(record.req.timers);
             assert.equal(handlers[handlers.length - 2], 'handler-1-audit-sub',
-                    'sub handler timer not in order');
+                'sub handler timer not in order');
             assert.equal(handlers[handlers.length - 1], 'handler-1',
-                    'handler-1 not last');
+                'handler-1 not last');
             done();
         });
     });
@@ -284,7 +284,7 @@ describe('audit logger', function () {
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -340,7 +340,7 @@ describe('audit logger', function () {
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -377,7 +377,7 @@ describe('audit logger', function () {
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     type: 'raw',
                     stream: ringbuffer
@@ -418,7 +418,7 @@ describe('audit logger', function () {
         SERVER.once('pre', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     stream: ptStream
                 }]
@@ -455,7 +455,7 @@ describe('audit logger', function () {
         SERVER.once('routed', restify.plugins.auditLogger({
             log: bunyan.createLogger({
                 name: 'audit',
-                streams:[ {
+                streams: [ {
                     level: 'info',
                     stream: ptStream
                 }]

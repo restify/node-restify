@@ -185,14 +185,14 @@ test('should provide route object', function (t) {
         var routeInfo = req.getRoute();
         t.equal(routeInfo.path, '/ping/:name');
         t.equal(routeInfo.method, 'GET');
-        res.send({name:req.params.name});
+        res.send({name: req.params.name});
         return next();
     });
 
     CLIENT.get('/ping/lagavulin', function (err, _, res, parsedBody) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.deepEqual(parsedBody, {name:'lagavulin'});
+        t.deepEqual(parsedBody, {name: 'lagavulin'});
         t.end();
     });
 });

@@ -27,7 +27,7 @@ test('render route', function (t) {
     server.get({name: 'countries', path: '/countries'}, mockResponse);
     server.get({name: 'country', path: '/countries/:name'}, mockResponse);
     server.get({name: 'cities', path: '/countries/:name/states/:state/cities'},
-               mockResponse);
+        mockResponse);
 
     var countries = server.router.render('countries', {});
     t.equal(countries, '/countries');
@@ -49,7 +49,7 @@ test('render route (missing params)', function (t) {
 
     var server = restify.createServer();
     server.get({name: 'cities', path: '/countries/:name/states/:state/cities'},
-               mockResponse);
+        mockResponse);
 
     try {
         server.router.render('cities', {name: 'Australia'});
@@ -127,7 +127,7 @@ test('render route (query string)', function (t) {
     });
 
     t.equal(country1,
-            '/countries/Australia?state=New%20South%20Wales&cities%2Ftowns=5');
+        '/countries/Australia?state=New%20South%20Wales&cities%2Ftowns=5');
 
     var country2 = server.router.render('country', {
         name: 'Australia'
@@ -137,7 +137,7 @@ test('render route (query string)', function (t) {
     });
 
     t.equal(country2,
-            '/countries/Australia?state=NSW%20%26%20VIC&cities%26towns=5');
+        '/countries/Australia?state=NSW%20%26%20VIC&cities%26towns=5');
 
     t.end();
 });
@@ -162,7 +162,7 @@ test('clean up xss for 404', function (t) {
         }, function (clientErr, req, res, data) {
             t.ok(clientErr);
             t.ok(data.indexOf('%22%3E%3Cscript%3Ealert(73541)') === -1,
-                 'should not reflect raw url');
+                'should not reflect raw url');
 
             server.close(function () {
                 t.end();
@@ -229,14 +229,14 @@ test('Find existing route with path', function (t) {
     server.get(routePath, noop);
 
     var foundRoute = server.router.findByPath(
-      '/route/:withADifferentParamName',
-      { method: 'GET' }
+        '/route/:withADifferentParamName',
+        { method: 'GET' }
     );
     t.equal(foundRoute.spec.path, routePath);
 
     var notFoundRoute = server.router.findByPath(
-      '/route/:withADifferentParamName([A-Z]{2,3})',
-      { method: 'GET' }
+        '/route/:withADifferentParamName([A-Z]{2,3})',
+        { method: 'GET' }
     );
     t.notOk(notFoundRoute);
 
