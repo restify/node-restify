@@ -37,18 +37,41 @@ var docsConfig = [
         files: [
             path.join(__dirname, LIB_PATH, 'response.js')
         ]
+    },
+    {
+        title: 'Plugins API',
+        permalink: '/docs/plugins-api/',
+        output: path.join(__dirname, OUTPUT_PATH, 'plugins.md'),
+        files: [
+            // Pre plugins
+            path.join(__dirname, LIB_PATH, 'plugins/pre/context.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/dedupeSlashes.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/pause.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/prePath.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/reqIdHeaders.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/strictQueryParams.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/pre/userAgent.js'),
+            // Use plugins
+            path.join(__dirname, LIB_PATH, 'plugins/accept.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/authorization.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/date.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/query.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/jsonp.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/bodyParser.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/bunyan.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/gzip.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/static.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/throttle.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/requestExpiry.js'),
+            path.join(__dirname, LIB_PATH,
+                'plugins/inflightRequestThrottle.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/cpuUsageThrottle.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/conditionalRequest.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/audit.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/metrics.js')
+        ],
+        config: path.join(__dirname, DOCS_PATH, 'config/plugins.yaml')
     }
-    // {
-    //     title: 'Plugins API',
-    //     permalink: '/docs/plugins-api/',
-    //     output: path.join(__dirname, OUTPUT_PATH, 'plugins.md'),
-    //     files: [
-    //         path.join(__dirname, LIB_PATH, 'plugins/audit.js'),
-    //         path.join(__dirname, LIB_PATH, 'plugins/metrics.js'),
-    //         path.join(__dirname, LIB_PATH, 'plugins/jsonp.js')
-    //     ],
-    //     config: path.join(__dirname, DOCS_PATH, 'config/plugins.yaml')
-    // }
 ];
 
 /**
