@@ -84,7 +84,7 @@ srv.listen(8080, function () {
 });
 ```
 
-Returns **[Server](#server)** 
+Returns **[Server](#server)** server
 
 ## Server
 
@@ -162,7 +162,7 @@ server.listen('/tmp/server.sock')
 
 -   Throws **[TypeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** 
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### close
 
@@ -174,7 +174,7 @@ Wraps node's
 
 -   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** callback to invoke when done
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### get
 
@@ -270,8 +270,8 @@ depends on.  Note that req.params will _not_ be set yet.
 
 **Parameters**
 
--   `handler` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that run for all
-    routes. _before_ routing occurs.
+-   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that 
+    run for all routes. _before_ routing occurs.
     This gives you a hook to change request headers and the like if you need to.
     Note that `req.params` will be undefined, as that's filled in _after_
     routing.
@@ -308,20 +308,31 @@ You can pass in any combination of functions or array of functions.
 
 **Parameters**
 
--   `handlers` **([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
+-   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
         variable number of nested arrays of handler functions
 
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### param
 
+-   **See: <http://expressjs.com/guide.html#route-param%20pre-conditions>**
+
 Minimal port of the functionality offered by Express.js Route Param
 Pre-conditions
+
+This basically piggy-backs on the `server.use` method. It attaches a
+new middleware function that only fires if the specified parameter exists
+in req.params
+
+Exposes an API:
+  server.param("user", function (req, res, next) {
+    // load the user's information here, always making sure to call next()
+  });
 
 **Parameters**
 
 -   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the URL param to respond to
--   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** The middleware function to execute
+-   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)**   The middleware function to execute
 
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
@@ -342,11 +353,11 @@ Exposes an API:
 **Parameters**
 
 -   `versions` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** the version(s) the URL to respond to
--   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** the middleware function to execute, the
+-   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)**       the middleware function to execute, the
                                       fourth parameter will be the selected
                                       version
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### rm
 
@@ -386,7 +397,7 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 Returns the number of inflight requests currently being handled by the server
 
-Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** number of inflight requests
 
 ### debugInfo
 
@@ -430,7 +441,7 @@ _Output:_
 }
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** debug info
 
 ### toString
 
@@ -465,7 +476,7 @@ Url: http://[::]:8080
 Version:
 ```
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** stringified server
 
 ## Events
 
