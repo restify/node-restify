@@ -16,10 +16,15 @@ var helper = require('../lib/helper');
 var vasync = require('vasync');
 
 // local globals
+var MILLISECOND_IN_MICROSECONDS = 1000;
+var TOLERATED_MICROSECONDS = MILLISECOND_IN_MICROSECONDS;
 var SERVER;
 var CLIENT;
 var PORT;
 
+function assertIsAtLeastWithTolerate (num1, num2, tolerate, msg) {
+    assert.isAtLeast(num1, num2 - tolerate, msg + 'should be >= ' + num2);
+}
 
 describe('audit logger', function () {
 
@@ -152,6 +157,7 @@ describe('audit logger', function () {
     it('should log handler timers', function (done) {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
@@ -172,7 +178,7 @@ describe('audit logger', function () {
                 req.endHandlerTimer('audit-sub');
                 res.send('');
                 return (next());
-            }, 1100);
+            }, WAIT_IN_MILLISECONDS);
             // this really should be 1000 but make it 1100 so that the tests
             // don't sporadically fail due to timing issues.
         });
@@ -188,13 +194,17 @@ describe('audit logger', function () {
                 ringbuffer.records.length, 1,
                 'should only have 1 log record'
             );
-            assert.ok(
-                record.req.timers.aTestHandler > 1000000,
-                'atestHandler should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers.aTestHandler,
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'atestHandler'
             );
-            assert.ok(
-                record.req.timers['aTestHandler-audit-sub'] > 1000000,
-                'aTestHandler-audit-sub should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers['aTestHandler-audit-sub'],
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'aTestHandler-audit-sub'
             );
 
             var handlers = Object.keys(record.req.timers);
@@ -218,6 +228,7 @@ describe('audit logger', function () {
 
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        var WAIT_IN_MILLISECONDS = 1000;
 
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
@@ -234,7 +245,7 @@ describe('audit logger', function () {
         SERVER.get('/audit', function (req, res, next) {
             setTimeout(function () {
                 return (next());
-            }, 1000);
+            }, WAIT_IN_MILLISECONDS);
         }, function (req, res, next) {
             req.startHandlerTimer('audit-sub');
 
@@ -242,7 +253,7 @@ describe('audit logger', function () {
                 req.endHandlerTimer('audit-sub');
                 res.send('');
                 return (next());
-            }, 1000);
+            }, WAIT_IN_MILLISECONDS);
         });
 
         CLIENT.get('/audit', function (err, req, res) {
@@ -255,17 +266,23 @@ describe('audit logger', function () {
                 ringbuffer.records.length, 1,
                 'should only have 1 log record'
             );
-            assert.ok(
-                record.req.timers['handler-0'] > 1000000,
-                'handler-0 should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers['handler-0'],
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'handler-0'
             );
-            assert.ok(
-                record.req.timers['handler-1'] > 1000000,
-                'handler-1 should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers['handler-1'],
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'handler-1'
             );
-            assert.ok(
-                record.req.timers['handler-1-audit-sub'] > 1000000,
-                'handler-0-audit-sub should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers['handler-1-audit-sub'],
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'handler-0-audit-sub'
             );
 
             var handlers = Object.keys(record.req.timers);
@@ -281,6 +298,7 @@ describe('audit logger', function () {
     it('restify-GH-1435 should accumulate log handler timers', function (done) {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once('after', restify.plugins.auditLogger({
             log: bunyan.createLogger({
@@ -304,7 +322,7 @@ describe('audit logger', function () {
                 req.endHandlerTimer('audit-acc');
                 res.send('');
                 return (next());
-            }, 1100);
+            }, WAIT_IN_MILLISECONDS);
             // this really should be 1000 but make it 1100 so that the tests
             // don't sporadically fail due to timing issues.
         });
@@ -320,13 +338,17 @@ describe('audit logger', function () {
                 ringbuffer.records.length, 1,
                 'should only have 1 log record'
             );
-            assert.ok(
-                record.req.timers.aTestHandler > 1000000,
-                'atestHandler should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers.aTestHandler,
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'atestHandler'
             );
-            assert.ok(
-                record.req.timers['aTestHandler-audit-acc'] > 1000000,
-                'aTestHandler-audit-acc should be > 1000000'
+            assertIsAtLeastWithTolerate(
+                record.req.timers['aTestHandler-audit-acc'],
+                WAIT_IN_MILLISECONDS * MILLISECOND_IN_MICROSECONDS,
+                TOLERATED_MICROSECONDS,
+                'aTestHandler-audit-acc'
             );
             done();
         });
