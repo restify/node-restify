@@ -292,6 +292,7 @@ describe('all other plugins', function () {
 
         for (var i = 0; i < tests.input.length; i++) {
             (function () {
+            // eslint-disable-next-line wrap-iife
                 var index = i;
                 it(tests.description[index], function (done) {
                     var req = { url: tests.input[index] };

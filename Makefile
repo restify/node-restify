@@ -26,6 +26,7 @@ NODECOVER	:= ./node_modules/.bin/cover
 DOCS_BUILD	:= ./tools/docsBuild.js
 NPM		:= npm
 NODE		:= node
+PRETTIER		:= ./node_modules/.bin/prettier
 
 #
 # Files
