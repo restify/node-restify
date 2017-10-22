@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var assert = require('chai').assert;
 var restify = require('../../lib/index.js');

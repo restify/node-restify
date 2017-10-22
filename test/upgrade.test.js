@@ -2,6 +2,7 @@
 // vim: set ts=8 sts=8 sw=8 et:
 
 'use strict';
+/* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
 var Watershed = require('watershed').Watershed;

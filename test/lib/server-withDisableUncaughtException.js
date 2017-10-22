@@ -3,6 +3,7 @@
 // and sends back the server's bound port number.
 
 'use strict';
+/* eslint-disable func-names */
 
 var restify = require('../../lib');
 

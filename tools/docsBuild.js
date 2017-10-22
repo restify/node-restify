@@ -89,12 +89,12 @@ function build (options) {
         shallow: true,
         config: options.config
     })
-        .then(function (docs) {
+        .then(function docsFormat (docs) {
             return documentation.formats.md(docs, {
                 markdownToc: true
             });
         })
-        .then(function (docsContent) {
+        .then(function docsWrite (docsContent) {
             var output = util.format(JEKYLL_HEADER_TEMPLATE, options.title,
                 options.permalink, docsContent);
 
@@ -104,11 +104,11 @@ function build (options) {
 
 // eslint-disable-next-line
 Promise.all(docsConfig.map(build))
-    .then(function (res) {
+    .then(function onSucceed (res) {
         console.log('Docs built');
         process.exit(0);
     })
-    .catch(function (err) {
+    .catch(function onError (err) {
         console.error(err);
         process.exit(1);
     });

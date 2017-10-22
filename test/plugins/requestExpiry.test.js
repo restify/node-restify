@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 // external modules
 var assert = require('chai').assert;

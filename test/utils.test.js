@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var mergeQs = require('../lib/utils').mergeQs;
 

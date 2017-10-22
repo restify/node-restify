@@ -1,6 +1,7 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
 'use strict';
+/* eslint-disable func-names */
 
 // external requires
 var assert = require('chai').assert;
