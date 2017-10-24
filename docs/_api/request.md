@@ -39,13 +39,13 @@ permalink: /docs/request-api/
 
 **Extends http.IncomingMessage**
 
-Wraps all of the node 
-[http.IncomingMessage](https://nodejs.org/api/http.html#http_http_incomingmessage) 
+Wraps all of the node
+[http.IncomingMessage](https://nodejs.org/api/http.html#http_http_incomingmessage)
 APIs, events and properties, plus the following.
 
 ### accepts
 
-Check if the Accept header is present, and includes the given type. 
+Check if the Accept header is present, and includes the given type.
 When the Accept header is not present true is returned.
 Otherwise the given type is matched by an exact match, and then subtypes.
 
@@ -55,7 +55,7 @@ Otherwise the given type is matched by an exact match, and then subtypes.
 
 **Examples**
 
-_You may pass the subtype such as html which is then converted internally to 
+_You may pass the subtype such as html which is then converted internally to
 text/html using the mime lookup table:_
 
 ```javascript
@@ -95,14 +95,14 @@ Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### getContentType
 
-Returns the value of the content-type header. If a content-type is not set, 
+Returns the value of the content-type header. If a content-type is not set,
 this will return a default value of `application/octet-stream`
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ### date
 
-Returns a Date object representing when the request was setup. 
+Returns a Date object representing when the request was setup.
 Like `time()`, but returns a Date object.
 
 Returns **[Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)** date
@@ -125,9 +125,9 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### id
 
-Returns the request id. If a `reqId` value is passed in, 
-this will become the request’s new id. The request id is immutable, 
-and can only be set once. Attempting to set the request id more than 
+Returns the request id. If a `reqId` value is passed in,
+this will become the request’s new id. The request id is immutable,
+and can only be set once. Attempting to set the request id more than
 once will cause restify to throw.
 
 **Parameters**
@@ -154,7 +154,7 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### getQuery
 
-Returns the raw query string. Returns empty string 
+Returns the raw query string. Returns empty string
 if no query string is found.
 
 **Examples**
@@ -165,7 +165,7 @@ req.getQuery();
 // => 'a=1'
 ```
 
-_If the queryParser plugin is used, the parsed query string is 
+_If the queryParser plugin is used, the parsed query string is
 available under the req.query:_
 
 ```javascript
@@ -179,7 +179,7 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### time
 
-The number of ms since epoch of when this request began being processed. 
+The number of ms since epoch of when this request began being processed.
 Like date(), but returns a number.
 
 Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** time
@@ -192,7 +192,7 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### header
 
-Get the case-insensitive request header key, 
+Get the case-insensitive request header key,
 and optionally provide a default value (express-compliant).
 Returns any header off the request. also, 'correct' any
 correctly spelled 'referrer' header to the actual spelling used.
@@ -200,7 +200,7 @@ correctly spelled 'referrer' header to the actual spelling used.
 **Parameters**
 
 -   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the key of the header
--   `defaultValue` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** default value if header isn't 
+-   `defaultValue` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** default value if header isn't
                                       found on the req
 
 **Examples**
@@ -227,7 +227,7 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### is
 
-Check if the incoming request contains the `Content-Type` header field, 
+Check if the incoming request contains the `Content-Type` header field,
 and if it contains the given mime type.
 
 **Parameters**
@@ -297,10 +297,10 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### startHandlerTimer
 
-Start the timer for a request handler. 
-By default, restify uses calls this automatically for all handlers 
-registered in your handler chain. 
-However, this can be called manually for nested functions inside the handler 
+Start the timer for a request handler.
+By default, restify uses calls this automatically for all handlers
+registered in your handler chain.
+However, this can be called manually for nested functions inside the handler
 chain to record timing information.
 
 **Parameters**
@@ -339,8 +339,8 @@ Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Re
 
 ### endHandlerTimer
 
-End the timer for a request handler. 
-You must invoke this function if you called `startRequestHandler` on a 
+End the timer for a request handler.
+You must invoke this function if you called `startRequestHandler` on a
 handler. Otherwise the time recorded will be incorrect.
 
 **Parameters**

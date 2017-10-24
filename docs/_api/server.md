@@ -270,7 +270,7 @@ depends on.  Note that req.params will _not_ be set yet.
 
 **Parameters**
 
--   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that 
+-   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that
     run for all routes. _before_ routing occurs.
     This gives you a hook to change request headers and the like if you need to.
     Note that `req.params` will be undefined, as that's filled in _after_
@@ -412,9 +412,9 @@ server.getDebugInfo()
 _Output:_
 
 ```javascript
-{ 
-  routes: [ 
-    { 
+{
+  routes: [
+    {
       name: 'get',
       method: 'get',
       input: '/',
@@ -424,8 +424,8 @@ _Output:_
       handlers: [Array]
      }
   ],
-  server: { 
-    formatters: { 
+  server: {
+    formatters: {
       'application/javascript': [Function: formatJSONP],
       'application/json': [Function: formatJSON],
       'text/plain': [Function: formatText],
@@ -456,7 +456,7 @@ server.toString()
 _Output:_
 
 ```javascript
-Accepts: application/json, text/plain, application/octet-stream, 
+Accepts: application/json, text/plain, application/octet-stream,
 application/javascript
 Name: restify
 Pre: []
@@ -469,7 +469,7 @@ Router: RestifyRouter:
 	POST: []
 	PUT: []
 
-Routes: 
+Routes:
 	get: [parseQueryString, _jsonp, function]
 Secure: false
 Url: http://[::]:8080

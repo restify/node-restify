@@ -76,7 +76,7 @@ method.
 
 ### context
 
-This plugin creates `req.set(key, val)` and `req.get(key)` methods for 
+This plugin creates `req.set(key, val)` and `req.get(key)` methods for
 setting and retrieving request specific data.
 
 **Examples**
@@ -119,24 +119,24 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 ### pause
 
 This pre handler fixes issues with node hanging when an `asyncHandler` is
-used prior to `bodyParser`.  
-<https://github.com/restify/node-restify/issues/287>  
-<https://github.com/restify/node-restify/issues/409>  
+used prior to `bodyParser`.
+<https://github.com/restify/node-restify/issues/287>
+<https://github.com/restify/node-restify/issues/409>
 <https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips>
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** Handler
 
 ### sanitizePath
 
-Cleans up sloppy URLs on the request object, 
+Cleans up sloppy URLs on the request object,
 like `/foo////bar///` to `/foo/bar`.
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** Handler
 
 ### reqIdHeaders
 
-This plugin pulls the value from an incoming request header and uses it 
-as the value of the request id. Subsequent calls to `req.id()` 
+This plugin pulls the value from an incoming request header and uses it
+as the value of the request id. Subsequent calls to `req.id()`
 will return the header values.
 
 **Parameters**
@@ -166,7 +166,7 @@ RFC 2616 Fielding, et al.
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
     -   `options.message` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** a custom error message
-                                     default value: 
+                                     default value:
                                      "Url query params does not meet strict format"
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** Handler
@@ -189,7 +189,7 @@ agent regexp, however.
 **Parameters**
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.userAgentRegExp` **[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)** matching any 
+    -   `options.userAgentRegExp` **[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)** matching any
                                                                user-agents applicable (optional, default `/^curl.+/`)
 
 Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** Handler
@@ -226,14 +226,14 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ### authorizationParser
 
-Parses out the `Authorization` header as best restify can. 
-Currently only HTTP Basic Auth and 
+Parses out the `Authorization` header as best restify can.
+Currently only HTTP Basic Auth and
 [HTTP Signature](https://github.com/joyent/node-http-signature)
 schemes are supported.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an optional options object that is 
+-   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an optional options object that is
                                    passed to http-signature
 
 **Examples**
@@ -259,12 +259,12 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ### dateParser
 
-Parses out the HTTP Date header (if present) and checks for clock skew. 
-If the header is invalid, a `InvalidHeaderError` (`400`) is returned. 
-If the clock skew exceeds the specified value, 
+Parses out the HTTP Date header (if present) and checks for clock skew.
+If the header is invalid, a `InvalidHeaderError` (`400`) is returned.
+If the clock skew exceeds the specified value,
 a `RequestExpiredError` (`400`) is returned.
 Where expired means the request originated at a time
-before (`$now - $clockSkew`).  
+before (`$now - $clockSkew`).
 The default clockSkew allowance is 5m (thanks
 Kerberos!)
 
@@ -286,9 +286,9 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ### queryParser
 
-Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`). 
-If you use this, the parsed content will always be available in `req.query`, 
-additionally params are merged into `req.params`. 
+Parses the HTTP query string (i.e., `/foo?id=bar&name=mark`).
+If you use this, the parsed content will always be available in `req.query`,
+additionally params are merged into `req.params`.
 You can disable by passing in `mapParams: false` in the options object.
 
 Many options correspond directly to option defined for the underlying
@@ -298,26 +298,26 @@ Many options correspond directly to option defined for the underlying
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
     -   `options.mapParams` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** disable passing (optional, default `true`)
-    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Copies parsed query parameters 
+    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Copies parsed query parameters
         into`req.params`. (optional, default `false`)
-    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Only applies when if 
-        mapParams true. 
+    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Only applies when if
+        mapParams true.
         When true, will stomp on req.params field when existing value is found. (optional, default `false`)
     -   `options.allowDots` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Transform `?foo.bar=baz` to a 
         nested object: `{foo: {bar: 'baz'}}`. (optional, default `false`)
-    -   `options.arrayLimit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Only transform `?a[$index]=b` 
+    -   `options.arrayLimit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Only transform `?a[$index]=b`
         to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
-    -   `options.depth` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The depth limit for parsing 
+    -   `options.depth` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** The depth limit for parsing
         nested objects, e.g. `?a[b][c][d][e][f][g][h][i]=j`. (optional, default `5`)
-    -   `options.parameterLimit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Maximum number of query 
+    -   `options.parameterLimit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Maximum number of query
         params parsed. Additional params are silently dropped. (optional, default `1000`)
-    -   `options.parseArrays` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether to parse 
+    -   `options.parseArrays` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether to parse
         `?a[]=b&a[1]=c` to an array, e.g. `{a: ['b', 'c']}`. (optional, default `true`)
-    -   `options.plainObjects` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether `req.query` is a 
-        "plain" object -- does not inherit from `Object`. 
-        This can be used to allow query params whose names collide with Object 
+    -   `options.plainObjects` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether `req.query` is a
+        "plain" object -- does not inherit from `Object`.
+        This can be used to allow query params whose names collide with Object
         methods, e.g. `?hasOwnProperty=blah`. (optional, default `false`)
-    -   `options.strictNullHandling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If true, `?a&b=` 
+    -   `options.strictNullHandling` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If true, `?a&b=`
         results in `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`. (optional, default `false`)
 
 **Examples**
@@ -354,77 +354,77 @@ Blocks your chain on reading and parsing the HTTP request body.  Switches on
 `application/x-www-form-urlencoded` and `multipart/form-data` are currently
 supported.
 
-Parses `POST` bodies to `req.body`. automatically uses one of the following 
-parsers based on content type:  
+Parses `POST` bodies to `req.body`. automatically uses one of the following
+parsers based on content type:
 
 -   `urlEncodedBodyParser(options)` - parses url encoded form bodies
 -   `jsonBodyParser(options)` - parses JSON POST bodies
 -   `multipartBodyParser(options)` - parses multipart form bodies
 
-All bodyParsers support the following options:  
+All bodyParsers support the following options:
 
--   `options.mapParams` - default false. copies parsed post body values onto 
+-   `options.mapParams` - default false. copies parsed post body values onto
     req.params
--   `options.overrideParams` - default false. only applies when if 
-    mapParams true. when true, will stomp on req.params value when 
+-   `options.overrideParams` - default false. only applies when if
+    mapParams true. when true, will stomp on req.params value when
     existing value is found.
 
 **Parameters**
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an option object
-    -   `options.maxBodySize` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The maximum size in bytes allowed in 
+    -   `options.maxBodySize` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The maximum size in bytes allowed in
         the HTTP body. Useful for limiting clients from hogging server memory.
-    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with 
+    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with
         parsed parameters from HTTP body.
-    -   `options.mapFiles` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with 
-        the contents of files sent through a multipart request. 
-        [formidable](https://github.com/felixge/node-formidable) is used internally 
-        for parsing, and a file is denoted as a multipart part with the `filename` 
-        option set in its `Content-Disposition`. This will only be performed if 
+    -   `options.mapFiles` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with
+        the contents of files sent through a multipart request.
+        [formidable](https://github.com/felixge/node-formidable) is used internally
+        for parsing, and a file is denoted as a multipart part with the `filename`
+        option set in its `Content-Disposition`. This will only be performed if
         `mapParams` is true.
-    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if an entry in `req.params` 
-        should be overwritten by the value in the body if the names are the same. 
-        For instance, if you have the route `/:someval`, 
-        and someone posts an `x-www-form-urlencoded` 
-        Content-Type with the body `someval=happy` to `/sad`, the value will be 
+    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if an entry in `req.params`
+        should be overwritten by the value in the body if the names are the same.
+        For instance, if you have the route `/:someval`,
+        and someone posts an `x-www-form-urlencoded`
+        Content-Type with the body `someval=happy` to `/sad`, the value will be
         `happy` if `overrideParams` is `true`, `sad` otherwise.
-    -   `options.multipartHandler` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any 
-        multipart part which is not a file. 
-        If this is omitted, the default handler is invoked which may 
-        or may not map the parts into `req.params`, depending on 
+    -   `options.multipartHandler` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any
+        multipart part which is not a file.
+        If this is omitted, the default handler is invoked which may
+        or may not map the parts into `req.params`, depending on
         the `mapParams`-option.
-    -   `options.multipartFileHandler` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any 
-        multipart file. 
-        It will be a file if the part has a `Content-Disposition` with the 
-        `filename` parameter set. This typically happens when a browser sends a 
-        form and there is a parameter similar to `<input type="file" />`. 
-        If this is not provided, the default behaviour is to map the contents 
+    -   `options.multipartFileHandler` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any
+        multipart file.
+        It will be a file if the part has a `Content-Disposition` with the
+        `filename` parameter set. This typically happens when a browser sends a
+        form and there is a parameter similar to `<input type="file" />`.
+        If this is not provided, the default behaviour is to map the contents
         into `req.params`.
-    -   `options.keepExtensions` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want the uploaded 
-        files to include the extensions of the original files 
-        (multipart uploads only). 
+    -   `options.keepExtensions` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want the uploaded
+        files to include the extensions of the original files
+        (multipart uploads only).
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.uploadDir` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Where uploaded files are 
-        intermediately stored during transfer before the contents is mapped 
-        into `req.params`. 
+    -   `options.uploadDir` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Where uploaded files are
+        intermediately stored during transfer before the contents is mapped
+        into `req.params`.
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.multiples` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want to support html5 multiple 
+    -   `options.multiples` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want to support html5 multiple
         attribute in upload fields.
-    -   `options.hash` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** If you want checksums calculated for 
+    -   `options.hash` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** If you want checksums calculated for
         incoming files, set this to either `sha1` or `md5`.
-    -   `options.rejectUnknown` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Set to `true` if you want to end 
-        the request with a `UnsupportedMediaTypeError` when none of 
+    -   `options.rejectUnknown` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Set to `true` if you want to end
+        the request with a `UnsupportedMediaTypeError` when none of
         the supported content types was given.
-    -   `options.requestBodyOnGet` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  Parse body of a GET 
+    -   `options.requestBodyOnGet` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  Parse body of a GET
         request. (optional, default `false`)
-    -   `options.reviver` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** `jsonParser` only. If a function, 
-        this prescribes how the value originally produced by parsing is transformed, 
-        before being returned. For more information check out 
+    -   `options.reviver` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** `jsonParser` only. If a function,
+        this prescribes how the value originally produced by parsing is transformed,
+        before being returned. For more information check out
         `JSON.parse(text[, reviver])`.
-    -   `options.maxFieldsSize` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** `multipartParser` 
-        only. 
-        Limits the amount of memory all fields together (except files) 
-        can allocate in bytes. 
+    -   `options.maxFieldsSize` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** `multipartParser`
+        only.
+        Limits the amount of memory all fields together (except files)
+        can allocate in bytes.
         The default size is `2 * 1024 * 1024` bytes _(2MB)_. (optional, default `2*1024*1024`)
 
 **Examples**
@@ -462,7 +462,7 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ### requestLogger
 
-Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with 
+Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with
 the current request id filled in, along with any other parameters you define.
 
 You can pass in no options to this, in which case only the request id will be
@@ -476,7 +476,7 @@ plugin or a custom middleware for that use.
 **Parameters**
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.headers` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)?** A list of headers to transfer from 
+    -   `options.headers` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)?** A list of headers to transfer from
                                          the request to top level props on the log.
 
 **Examples**
@@ -495,15 +495,15 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 ### gzipResponse
 
 If the client sends an `accept-encoding: gzip` header (or one with an
-appropriate q-val), then the server will automatically gzip all 
+appropriate q-val), then the server will automatically gzip all
 response data.
-Note that only `gzip` is supported, as this is most widely supported by 
-clients in the wild. 
+Note that only `gzip` is supported, as this is most widely supported by
+clients in the wild.
 This plugin will overwrite some of the internal streams, so any
 calls to `res.send`, `res.write`, etc., will be compressed.  A side effect is
 that the `content-length` header cannot be known, and so
-`transfer-encoding: chunked` will _always_ be set when this is in effect. 
-This plugin has no impact if the client does not send 
+`transfer-encoding: chunked` will _always_ be set when this is in effect.
+This plugin has no impact if the client does not send
 `accept-encoding: gzip`.
 
 <https://github.com/restify/node-restify/issues/284>
@@ -530,7 +530,7 @@ Serves static files.
 
 **Examples**
 
-_The serveStatic module is different than most of the other plugins, in that 
+_The serveStatic module is different than most of the other plugins, in that
 it is expected that you are going to map it to a route, as below:_
 
 ```javascript
@@ -540,25 +540,25 @@ server.get(/\/docs\/current\/?.*\/, restify.plugins.serveStatic({
 }));
 ```
 
-_The above `route` and `directory` combination will serve a file located in 
-`./documentation/v1/docs/current/index.html` when you attempt to hit 
-`http://localhost:8080/docs/current/`. If you want the serveStatic module to 
-serve files directly from the `/documentation/v1` directory 
-(and not append the request path `/docs/current/`), 
+_The above `route` and `directory` combination will serve a file located in
+`./documentation/v1/docs/current/index.html` when you attempt to hit
+`http://localhost:8080/docs/current/`. If you want the serveStatic module to
+serve files directly from the `/documentation/v1` directory
+(and not append the request path `/docs/current/`),
 you can set the `appendRequestPath` option to `false`, and the served file
-would be `./documentation/v1/index.html`, in the previous example.The plugin will enforce that all files under `directory` are served. 
-The `directory` served is relative to the process working directory. 
-You can also provide a `default` parameter such as index.html for any 
-directory that lacks a direct file match. 
-You can specify additional restrictions by passing in a `match` parameter, 
+would be `./documentation/v1/index.html`, in the previous example.The plugin will enforce that all files under `directory` are served.
+The `directory` served is relative to the process working directory.
+You can also provide a `default` parameter such as index.html for any
+directory that lacks a direct file match.
+You can specify additional restrictions by passing in a `match` parameter,
 which is just a `RegExp` to check against the requested file name.
-Additionally, you may set the `charSet` parameter, which will append a 
-character set to the content-type detected by the plugin. 
-For example, `charSet: 'utf-8'` will result in HTML being served with a 
+Additionally, you may set the `charSet` parameter, which will append a
+character set to the content-type detected by the plugin.
+For example, `charSet: 'utf-8'` will result in HTML being served with a
 `Content-Type` of `text/html; charset=utf-8`.
-Lastly, you can pass in a `maxAge` numeric, which will set the 
-`Cache-Control` header. Default is `3600` (1 hour).An additional option for serving a static file is to pass `file` in to the 
-serveStatic method as an option. The following will serve index.html from 
+Lastly, you can pass in a `maxAge` numeric, which will set the
+`Cache-Control` header. Default is `3600` (1 hour).An additional option for serving a static file is to pass `file` in to the
+serveStatic method as an option. The following will serve index.html from
 the documentation/v1/ directory anytime a client requests `/home/`._
 
 ```javascript
@@ -580,13 +580,13 @@ Creates an API rate limiter that can be plugged into the standard
 restify request handling pipeline.
 
 `restify` ships with a fairly comprehensive implementation of
-[Token bucket](http://en.wikipedia.org/wiki/Token_bucket), with the ability 
-to throttle on IP (or x-forwarded-for) and username (from `req.username`). 
-You define "global" request rate and burst rate, and you can define 
-overrides for specific keys. 
+[Token bucket](http://en.wikipedia.org/wiki/Token_bucket), with the ability
+to throttle on IP (or x-forwarded-for) and username (from `req.username`).
+You define "global" request rate and burst rate, and you can define
+overrides for specific keys.
 Note that you can always place this on per-URL routes to enable
-different request rates to different resources (if for example, one route, 
-like `/my/slow/database` is much easier to overwhlem 
+different request rates to different resources (if for example, one route,
+like `/my/slow/database` is much easier to overwhlem
 than `/my/fast/memcache`).
 
 If a client has consumed all of their available rate/burst, an HTTP response
@@ -628,8 +628,8 @@ On the `options` object ip and username are treated as an XOR.
                                      use an in-memory O(1) LRU, with 10k distinct
                                      keys.  Any implementation just needs to support
                                      put/get.
-    -   `options.maxKeys` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** If using the default 
-                                     implementation, you can specify how large you 
+    -   `options.maxKeys` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** If using the default
+                                     implementation, you can specify how large you
                                      want the table to be. (optional, default `10000`)
 
 **Examples**
@@ -656,8 +656,8 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 ### requestExpiry
 
 Request Expiry can be used to throttle requests that have already exceeded
-their client timeouts. Requests can be sent with a configurable client 
-timeout header, e.g. 'x-request-expiry-time', which gives in absolute ms 
+their client timeouts. Requests can be sent with a configurable client
+timeout header, e.g. 'x-request-expiry-time', which gives in absolute ms
 since epoch, when this request will be timed out by the client.
 
 This plugin will throttle all incoming requests via a 504 where
@@ -684,9 +684,9 @@ key is consuming.  If this suits you, you can tune the maximum number of keys
 to store in memory with `options.maxKeys`; the default is 10000.
 
 In some circumstances, you want to offload this into a shared system, such as
-Redis, if you have a fleet of API servers and you're not getting steady 
+Redis, if you have a fleet of API servers and you're not getting steady
 and/or uniform request distribution.  To enable this, you can pass in
-`options.tokensTable`, which is simply any Object that supports `put` and 
+`options.tokensTable`, which is simply any Object that supports `put` and
 `get` with a `String` key, and an `Object` value.
 
 **Parameters**
@@ -702,7 +702,7 @@ and/or uniform request distribution.  To enable this, you can pass in
 
 **Examples**
 
-_The only option provided is `header` which is the request header used 
+_The only option provided is `header` which is the request header used
 to specify the client timeout._
 
 ```javascript
@@ -732,9 +732,9 @@ using `pre` to avoid performing unnecessary work.
 -   `opts` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** configure this plugin
     -   `opts.limit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum number of inflight requests the server
            will handle before returning an error
-    -   `opts.err` **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** A restify error used as a response when the 
+    -   `opts.err` **[Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)** A restify error used as a response when the
            inflight request limit is exceeded
-    -   `opts.server` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** the instance of the restify server this 
+    -   `opts.server` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** the instance of the restify server this
            plugin will throttle.
 
 **Examples**
@@ -753,54 +753,54 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 
 ### cpuUsageThrottle
 
-cpuUsageThrottle is a middleware that rejects a variable number of requests 
-(between 0% and 100%) based on a historical view of CPU utilization of a 
-Node.js process. Essentially, this plugin allows you to define what 
-constitutes a saturated Node.js process via CPU utilization and it will 
-handle dropping a % of requests based on that definiton. This is useful when 
-you would like to keep CPU bound tasks from piling up causing an increased 
+cpuUsageThrottle is a middleware that rejects a variable number of requests
+(between 0% and 100%) based on a historical view of CPU utilization of a
+Node.js process. Essentially, this plugin allows you to define what
+constitutes a saturated Node.js process via CPU utilization and it will
+handle dropping a % of requests based on that definiton. This is useful when
+you would like to keep CPU bound tasks from piling up causing an increased
 per-request latency.
 
-The algorithm asks you for a maximum CPU utilization rate, which it uses to 
+The algorithm asks you for a maximum CPU utilization rate, which it uses to
 determine at what point it should be rejecting 100% of traffic. For a normal 
-Node.js service, this is 1 since Node is single threaded. It uses this, 
-paired with a limit that you provide to determine the total % of traffic it 
-should be rejecting. For example, if you specify a limit of .5 and a max of 
-1, and the current EWMA (next paragraph) value reads .75, this plugin will 
+Node.js service, this is 1 since Node is single threaded. It uses this,
+paired with a limit that you provide to determine the total % of traffic it
+should be rejecting. For example, if you specify a limit of .5 and a max of
+1, and the current EWMA (next paragraph) value reads .75, this plugin will
 reject approximately 50% of all requests.
 
-When looking at the process' CPU usage, this algorithm will take a load 
-average over a user specified interval. example, if given an interval of 
-250ms, this plugin will attempt to record the average CPU utilization over 
-250ms intervals. Due to contention for resources, the duration of each 
-average may be wider or narrower than 250ms. To compensate for this, we use 
-an exponentially weighted moving average. The EWMA algorithm is provided by 
-the ewma module. The parameter for configuring the EWMA is halfLife. This 
-value controls how quickly each load average measurment decays to half it's 
-value when being represented in the current average. For example, if you 
-have an interval of 250, and a halfLife of 250, you will take the previous 
-ewma value multiplied by 0.5 and add it to the new CPU utilization average 
-measurement multiplied by 0.5. The previous value and the new measurement 
-would each represent 50% of the new value. A good way of thinking about the 
-halfLife is in terms of how responsive this plugin will be to spikes in CPU 
-utilization. The higher the halfLife, the longer CPU utilization will have 
-to remain above your defined limit before this plugin begins rejecting 
-requests and, converserly, the longer it will have to drop below your limit 
-before the plugin begins accepting requests again. This is a knob you will 
-want to with play when trying to determine the ideal value for your use 
+When looking at the process' CPU usage, this algorithm will take a load
+average over a user specified interval. example, if given an interval of
+250ms, this plugin will attempt to record the average CPU utilization over
+250ms intervals. Due to contention for resources, the duration of each
+average may be wider or narrower than 250ms. To compensate for this, we use
+an exponentially weighted moving average. The EWMA algorithm is provided by
+the ewma module. The parameter for configuring the EWMA is halfLife. This
+value controls how quickly each load average measurment decays to half it's
+value when being represented in the current average. For example, if you
+have an interval of 250, and a halfLife of 250, you will take the previous
+ewma value multiplied by 0.5 and add it to the new CPU utilization average
+measurement multiplied by 0.5. The previous value and the new measurement
+would each represent 50% of the new value. A good way of thinking about the
+halfLife is in terms of how responsive this plugin will be to spikes in CPU
+utilization. The higher the halfLife, the longer CPU utilization will have
+to remain above your defined limit before this plugin begins rejecting
+requests and, converserly, the longer it will have to drop below your limit
+before the plugin begins accepting requests again. This is a knob you will
+want to with play when trying to determine the ideal value for your use
 case.
 
-For a better understanding of the EWMA algorithn, refer to the documentation 
+For a better understanding of the EWMA algorithn, refer to the documentation
 for the ewma module.
 
 **Parameters**
 
 -   `opts` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Configure this plugin.
-    -   `opts.limit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will begin 
-           rejecting a % of all requests at the front door. 
+    -   `opts.limit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will begin
+           rejecting a % of all requests at the front door.
            This value is a percentage.
            For example 0.8 === 80% average CPU utilization. Defaults to 0.75.
-    -   `opts.max` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will reject 100% of 
+    -   `opts.max` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will reject 100% of
            all requests at the front door. This is used in conjunction with limit to
            determine what % of traffic restify needs to reject when attempting to
            bring the average load back to the user requested values. Since Node.js is
@@ -814,8 +814,8 @@ for the ewma module.
            we will recalculate the % of traffic we should be shedding. This check
            is rather lightweight, while the default is 250ms, you should be able to
            decrease this value without seeing a significant impact to performance.
-    -   `opts.halfLife` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** When we sample the CPU usage on an 
-           interval, we create a series of data points. 
+    -   `opts.halfLife` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** When we sample the CPU usage on an
+           interval, we create a series of data points.
            We take these points and calculate a
            moving average. The halfLife indicates how quickly a point "decays" to
            half it's value in the moving average. The lower the halfLife, the more
@@ -913,7 +913,7 @@ Returns **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refere
         function can return an object that customizes the format of anything off the
         req, res, route, and err objects. The output of this function will be
         available on the `context` key in the audit object.
-    -   `opts.server` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** The restify server, used to emit 
+    -   `opts.server` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** The restify server, used to emit
         the audit log object programmatically
     -   `opts.printLog` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether to print the log
         via the logger. (optional, default `true`)
@@ -1082,9 +1082,9 @@ Type: [Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Referen
     -   `metrics.inflightRequests` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Number of inflight requests pending
           in restify.
     -   `metrics.unifinishedRequests` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Same as `inflightRequests`
-    -   `metrics.connectionState` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** can be either `'close'`, 
-          `'aborted'`, or `undefined`. If this value is set, err will be a 
-          corresponding `RequestCloseError` or `RequestAbortedError`. 
+    -   `metrics.connectionState` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** can be either `'close'`,
+          `'aborted'`, or `undefined`. If this value is set, err will be a
+          corresponding `RequestCloseError` or `RequestAbortedError`.
           If connectionState is either
           `'close'` or `'aborted'`, then the `statusCode` is not applicable since the
           connection was severed before a response was written.
