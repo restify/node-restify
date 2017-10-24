@@ -9,6 +9,7 @@ var config = {
         node: true,
         es6: false
     },
+    plugins: ['jsdoc'],
     rules: {}
 };
 
@@ -152,6 +153,17 @@ if (!process.env.NO_STYLE) {
     config.rules['space-before-blocks'] = ERROR;
     config.rules['space-infix-ops'] = ERROR;
     config.rules['space-unary-ops'] = ERROR;
+
+    // JSDoc
+    config.rules['jsdoc/check-param-names'] = ERROR;
+    config.rules['jsdoc/check-tag-names'] = ERROR;
+    config.rules['jsdoc/newline-after-description'] = ERROR;
+    config.rules['jsdoc/require-hyphen-before-param-description'] = ERROR;
+    config.rules['jsdoc/require-param'] = ERROR;
+    config.rules['jsdoc/require-param-description'] = ERROR;
+    config.rules['jsdoc/require-param-type'] = ERROR;
+    config.rules['jsdoc/require-returns-description'] = ERROR;
+    config.rules['jsdoc/require-returns-type'] = ERROR;
 };
 
 module.exports = config;

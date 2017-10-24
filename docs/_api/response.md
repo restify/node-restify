@@ -26,8 +26,8 @@ permalink: /docs/response-api/
 
 **Extends http.ServerResponse**
 
-Wraps all of the node 
-[http.ServerResponse](https://nodejs.org/docs/latest/api/http.html#http.ServerResponse) 
+Wraps all of the node
+[http.ServerResponse](https://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
 APIs, events and properties, plus the following.
 
 ### cache
@@ -36,7 +36,7 @@ Sets the `cache-control` header.
 
 **Parameters**
 
--   `type` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header 
+-   `type` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
                                        (`"public"` or `"private"`) (optional, default `"public"`)
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
     -   `options.maxAge` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** max-age in seconds
@@ -76,7 +76,7 @@ Sets headers on the response.
 
 **Examples**
 
-_If only key is specified, return the value of the header. 
+_If only key is specified, return the value of the header.
 If both key and value are specified, set the response header._
 
 ```javascript
@@ -93,7 +93,7 @@ res.header('foo', new Date());
 // => Fri, 03 Feb 2012 20:09:58 GMT
 ```
 
-_`header()` can also be used to automatically chain header values 
+_`header()` can also be used to automatically chain header values
 when applicable:_
 
 ```javascript
@@ -115,8 +115,8 @@ res.send({hello: 'world'});
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** http status code
--   `body` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** value to json.stringify
+-   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?**    http status code
+-   `body` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?**    value to json.stringify
 -   `headers` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** headers to set on the response
 
 **Examples**
@@ -126,7 +126,7 @@ res.header('content-type', 'json');
 res.send({hello: 'world'});
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
 
 ### link
 
@@ -134,7 +134,7 @@ Sets the link header.
 
 **Parameters**
 
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the link key
+-   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**  the link key
 -   `value` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the link value
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the header value set to res
@@ -152,11 +152,11 @@ formatter based on the `content-type` header.
 
 **Examples**
 
-_You can use send() to wrap up all the usual writeHead(), write(), end() 
-calls on the HTTP API of node.  
-You can pass send either a `code` and `body`, or just a body. body can be an 
-`Object`, a `Buffer`, or an `Error`.  
-When you call `send()`, restify figures out how to format the response based 
+_You can use send() to wrap up all the usual writeHead(), write(), end()
+calls on the HTTP API of node.
+You can pass send either a `code` and `body`, or just a body. body can be an
+`Object`, a `Buffer`, or an `Error`.
+When you call `send()`, restify figures out how to format the response based
 on the `content-type`._
 
 ```javascript
@@ -169,8 +169,8 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### sendRaw
 
-Like `res.send()`, but skips formatting. This can be useful when the payload 
-has already been preformatted.  
+Like `res.send()`, but skips formatting. This can be useful when the payload
+has already been preformatted.
 Sends the response object. pass through to internal `__send` that skips
 formatters entirely and sends the content as is.
 
@@ -184,7 +184,7 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### set
 
-Sets multiple header(s) on the response.  
+Sets multiple header(s) on the response.
 Uses `header()` underneath the hood, enabling multi-value headers.
 
 **Parameters**
@@ -241,7 +241,7 @@ Redirect is sugar method for redirecting.
                                         any existing query parameters on current URL.
                                         by default, will merge the two.
     -   `options.permanent` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, sets 301. defaults to 302.
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger audit 
+-   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger audit
                            logger.
 
 **Examples**
@@ -250,8 +250,8 @@ Redirect is sugar method for redirecting.
 res.redirect({...}, next);
 ```
 
-_A convenience method for 301/302 redirects. Using this method will tell 
-restify to stop execution of your handler chain.  
+_A convenience method for 301/302 redirects. Using this method will tell
+restify to stop execution of your handler chain.
 You can also use an options object. `next` is required._
 
 ```javascript
@@ -277,7 +277,7 @@ Redirect with code and url.
 
 -   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** http redirect status code
 -   `url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger 
+-   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
                            audit logger.
 
 **Examples**
@@ -295,7 +295,7 @@ Redirect with url.
 **Parameters**
 
 -   `url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger 
+-   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
                            audit logger.
 
 **Examples**

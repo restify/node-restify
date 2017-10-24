@@ -82,7 +82,7 @@ var docsConfig = [
 * @param {String} options.output - Path to output dir
 * @param {String} options.title - Jekyll title
 * @param {String} options.permalink - Jekyll permalink
-* @returns {Promise}
+* @returns {Promise} - Promise
 */
 function build (options) {
     return documentation.build(options.files, {
