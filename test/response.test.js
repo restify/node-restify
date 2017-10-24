@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var url = require('url');
 var restifyClients = require('restify-clients');

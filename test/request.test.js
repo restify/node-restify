@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
 var validator = require('validator');

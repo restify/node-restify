@@ -1,6 +1,7 @@
 // Copyright 2016 Brian Aabel, Inc.  All rights reserved.
 
 'use strict';
+/* eslint-disable func-names */
 
 var http = require('http');
 // external requires

@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 // runtime modules
 var PassThrough = require('stream').PassThrough;

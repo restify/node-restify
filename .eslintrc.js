@@ -48,6 +48,7 @@ if (!process.env.NO_LINT) {
     config.rules['valid-typeof'] = ERROR;
 
     // best practices
+    config.rules['func-names'] = ERROR;
     config.rules['block-scoped-var'] = ERROR;
     config.rules['consistent-return'] = ERROR;
     config.rules['curly'] = OFF;
@@ -138,7 +139,6 @@ if (!process.env.NO_STYLE) {
     config.rules['no-underscore-dangle'] = OFF;
     config.rules['no-whitespace-before-property'] = ERROR;
     config.rules['yoda'] = ERROR;
-    // config.rules['func-names'] = ERROR;          // TODO: unnamed functions
 
     // require rules
     config.rules['semi'] = ERROR;

@@ -5,6 +5,7 @@
 //
 
 'use strict';
+/* eslint-disable func-names */
 
 var domain = require('domain');
 

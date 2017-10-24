@@ -1,6 +1,7 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
 'use strict';
+/* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
 
