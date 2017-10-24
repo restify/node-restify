@@ -7,7 +7,6 @@ var restify = require('restify');
 
 var todo = require('../lib');
 
-
 ///--- Globals
 
 var CLIENT;
@@ -15,10 +14,9 @@ var DIR = '/tmp/.todo_unit_test';
 var SERVER;
 var SOCK = '/tmp/.todo_sock';
 
-
 ///--- Tests
 
-exports.setup = function (t) {
+exports.setup = function(t) {
     var log = bunyan.createLogger({
         name: 'todo_unit_test',
         level: process.env.LOG_LEVEL || 'info',
@@ -26,8 +24,7 @@ exports.setup = function (t) {
         stream: process.stdout
     });
 
-
-    fs.mkdir(DIR, function (err) {
+    fs.mkdir(DIR, function(err) {
         if (err && err.code !== 'EEXIST') {
             console.error('unable to mkdir: ' + err.stack);
             process.exit(1);
@@ -35,14 +32,14 @@ exports.setup = function (t) {
 
         SERVER = todo.createServer({
             directory: DIR,
-            log: log.child({component: 'server'}, true),
+            log: log.child({ component: 'server' }, true),
             noAudit: true
         });
 
         t.ok(SERVER);
-        SERVER.listen(SOCK, function () {
+        SERVER.listen(SOCK, function() {
             CLIENT = todo.createClient({
-                log: log.child({component: 'client'}, true),
+                log: log.child({ component: 'client' }, true),
                 socketPath: SOCK
             });
             t.ok(CLIENT);
@@ -51,9 +48,8 @@ exports.setup = function (t) {
     });
 };
 
-
-exports.listEmpty = function (t) {
-    CLIENT.list(function (err, todos) {
+exports.listEmpty = function(t) {
+    CLIENT.list(function(err, todos) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
@@ -65,10 +61,9 @@ exports.listEmpty = function (t) {
     });
 };
 
-
-exports.create = function (t) {
+exports.create = function(t) {
     var task = 'check that unit test works';
-    CLIENT.create(task, function (err, todo) {
+    CLIENT.create(task, function(err, todo) {
         t.ifError(err);
         t.ok(todo);
 
@@ -80,16 +75,15 @@ exports.create = function (t) {
     });
 };
 
-
-exports.listAndGet = function (t) {
-    CLIENT.list(function (err, todos) {
+exports.listAndGet = function(t) {
+    CLIENT.list(function(err, todos) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
 
         if (todos) {
             t.equal(todos.length, 1);
-            CLIENT.get(todos[0], function (err2, todo) {
+            CLIENT.get(todos[0], function(err2, todo) {
                 t.ifError(err2);
                 t.ok(todo);
                 t.done();
@@ -100,9 +94,8 @@ exports.listAndGet = function (t) {
     });
 };
 
-
-exports.update = function (t) {
-    CLIENT.list(function (err, todos) {
+exports.update = function(t) {
+    CLIENT.list(function(err, todos) {
         t.ifError(err);
         t.ok(todos);
         t.ok(Array.isArray(todos));
@@ -114,7 +107,7 @@ exports.update = function (t) {
                 name: todos[0],
                 task: 'something else'
             };
-            CLIENT.update(todo, function (err2) {
+            CLIENT.update(todo, function(err2) {
                 t.ifError(err2);
                 t.done();
             });
@@ -124,13 +117,12 @@ exports.update = function (t) {
     });
 };
 
-
 exports.teardown = function teardown(t) {
-    CLIENT.del(function (err) {
+    CLIENT.del(function(err) {
         t.ifError(err);
 
-        SERVER.once('close', function () {
-            fs.rmdir(DIR, function (err) {
+        SERVER.once('close', function() {
+            fs.rmdir(DIR, function(err) {
                 t.ifError(err);
                 t.done();
             });

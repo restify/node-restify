@@ -9,7 +9,6 @@ var restify = require('restify');
 
 var todo = require('./lib');
 
-
 ///--- Globals
 
 var NAME = 'todoapp';
@@ -20,7 +19,7 @@ var LOG = bunyan.createLogger({
     name: NAME,
     streams: [
         {
-            level: (process.env.LOG_LEVEL || 'info'),
+            level: process.env.LOG_LEVEL || 'info',
             stream: process.stderr
         },
         {
@@ -40,7 +39,6 @@ var LOG = bunyan.createLogger({
     ],
     serializers: restify.bunyan.serializers
 });
-
 
 ///--- Helpers
 
@@ -81,10 +79,10 @@ function parseOptions() {
             case 'v':
                 // Allows us to set -vvv -> this little hackery
                 // just ensures that we're never < TRACE
-                LOG.level(Math.max(bunyan.TRACE, (LOG.level() - 10)));
+                LOG.level(Math.max(bunyan.TRACE, LOG.level() - 10));
 
                 if (LOG.level() <= bunyan.DEBUG) {
-                    LOG = LOG.child({src: true});
+                    LOG = LOG.child({ src: true });
                 }
                 break;
 
@@ -98,22 +96,19 @@ function parseOptions() {
         }
     }
 
-    return (opts);
+    return opts;
 }
-
 
 function usage(msg) {
     if (msg) {
         console.error(msg);
     }
 
-    var str = 'usage: ' +
-        NAME +
-        ' [-v] [-d dir] [-p port] [-u user] [-z password]';
+    var str =
+        'usage: ' + NAME + ' [-v] [-d dir] [-p port] [-u user] [-z password]';
     console.error(str);
     process.exit(msg ? 1 : 0);
 }
-
 
 ///--- Mainline
 
@@ -140,7 +135,7 @@ function usage(msg) {
     });
 
     // At last, let's rock and roll
-    server.listen((options.port || 8080), function onListening() {
+    server.listen(options.port || 8080, function onListening() {
         LOG.info('listening at %s', server.url);
     });
 })();

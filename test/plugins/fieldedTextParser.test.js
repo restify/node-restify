@@ -32,15 +32,14 @@ var OBJECT_TSV = require(path.join(__dirname, '/files/object-tsv.json'));
  * Tests
  */
 
-describe('fielded text parser', function () {
-
-    beforeEach(function (done) {
+describe('fielded text parser', function() {
+    beforeEach(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
         });
         SERVER.use(restify.plugins.bodyParser());
-        SERVER.listen(PORT, '127.0.0.1', function () {
+        SERVER.listen(PORT, '127.0.0.1', function() {
             CLIENT = restifyClients.createClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
@@ -50,12 +49,12 @@ describe('fielded text parser', function () {
         });
     });
 
-    afterEach(function (done) {
+    afterEach(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
-    it('should parse CSV body', function (done) {
+    it('should parse CSV body', function(done) {
         var options = {
             path: '/data',
             headers: {
@@ -71,16 +70,16 @@ describe('fielded text parser', function () {
             return next();
         });
 
-        CLIENT.post(options, function (err, req) {
+        CLIENT.post(options, function(err, req) {
             assert.ifError(err);
-            req.on('result', function (errReq, res) {
+            req.on('result', function(errReq, res) {
                 assert.ifError(errReq);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function (chunk) {
+                res.on('data', function(chunk) {
                     res.body += chunk;
                 });
-                res.on('end', function () {
+                res.on('end', function() {
                     res.body = JSON.parse(res.body);
                     var parsedReqStr = JSON.stringify(res.body.parsedReq);
                     var objectStr = JSON.stringify(OBJECT_CSV);
@@ -93,47 +92,48 @@ describe('fielded text parser', function () {
         });
     });
 
-    it('#100 should parse CSV body even if bodyparser declared twice',
-        function (done) {
-            SERVER.use(restify.plugins.bodyParser());
-            var options = {
-                path: '/data',
-                headers: {
-                    'Content-Type': 'text/csv'
-                }
-            };
+    it('#100 should parse CSV body even if bodyparser declared twice', function(
+        done
+    ) {
+        SERVER.use(restify.plugins.bodyParser());
+        var options = {
+            path: '/data',
+            headers: {
+                'Content-Type': 'text/csv'
+            }
+        };
 
-            SERVER.post('/data', function respond(req, res, next) {
-                res.send({
-                    status: 'okay',
-                    parsedReq: req.body
-                });
-                return next();
+        SERVER.post('/data', function respond(req, res, next) {
+            res.send({
+                status: 'okay',
+                parsedReq: req.body
             });
-
-            CLIENT.post(options, function (err, req) {
-                assert.ifError(err);
-                req.on('result', function (errReq, res) {
-                    assert.ifError(errReq);
-                    res.body = '';
-                    res.setEncoding('utf8');
-                    res.on('data', function (chunk) {
-                        res.body += chunk;
-                    });
-                    res.on('end', function () {
-                        res.body = JSON.parse(res.body);
-                        var parsedReqStr = JSON.stringify(res.body.parsedReq);
-                        var objectStr = JSON.stringify(OBJECT_CSV);
-                        assert.equal(parsedReqStr, objectStr);
-                        done();
-                    });
-                });
-                req.write(DATA_CSV);
-                req.end();
-            });
+            return next();
         });
 
-    it('should parse TSV body', function (done) {
+        CLIENT.post(options, function(err, req) {
+            assert.ifError(err);
+            req.on('result', function(errReq, res) {
+                assert.ifError(errReq);
+                res.body = '';
+                res.setEncoding('utf8');
+                res.on('data', function(chunk) {
+                    res.body += chunk;
+                });
+                res.on('end', function() {
+                    res.body = JSON.parse(res.body);
+                    var parsedReqStr = JSON.stringify(res.body.parsedReq);
+                    var objectStr = JSON.stringify(OBJECT_CSV);
+                    assert.equal(parsedReqStr, objectStr);
+                    done();
+                });
+            });
+            req.write(DATA_CSV);
+            req.end();
+        });
+    });
+
+    it('should parse TSV body', function(done) {
         var options = {
             path: '/data',
             headers: {
@@ -149,16 +149,16 @@ describe('fielded text parser', function () {
             return next();
         });
 
-        CLIENT.post(options, function (err, req) {
+        CLIENT.post(options, function(err, req) {
             assert.ifError(err);
-            req.on('result', function (errReq, res) {
+            req.on('result', function(errReq, res) {
                 assert.ifError(errReq);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function (chunk) {
+                res.on('data', function(chunk) {
                     res.body += chunk;
                 });
-                res.on('end', function () {
+                res.on('end', function() {
                     res.body = JSON.parse(res.body);
                     var parsedReqStr = JSON.stringify(res.body.parsedReq);
                     var objectStr = JSON.stringify(OBJECT_TSV);
@@ -171,7 +171,7 @@ describe('fielded text parser', function () {
         });
     });
 
-    it('plugins-GH-6: should expose rawBody on request', function (done) {
+    it('plugins-GH-6: should expose rawBody on request', function(done) {
         var options = {
             path: '/data',
             headers: {
@@ -185,13 +185,13 @@ describe('fielded text parser', function () {
             return next();
         });
 
-        CLIENT.post(options, function (err, req) {
+        CLIENT.post(options, function(err, req) {
             assert.ifError(err);
-            req.on('result', function (errReq, res) {
+            req.on('result', function(errReq, res) {
                 assert.ifError(errReq);
                 res.body = '';
                 res.setEncoding('utf8');
-                res.on('data', function (chunk) {
+                res.on('data', function(chunk) {
                     res.body += chunk;
                 });
                 res.on('end', done);
@@ -201,4 +201,3 @@ describe('fielded text parser', function () {
         });
     });
 });
-

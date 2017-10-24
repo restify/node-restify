@@ -16,30 +16,27 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-
-describe('body reader', function () {
-
-    describe('gzip content encoding', function () {
-
-        beforeEach(function (done) {
+describe('body reader', function() {
+    describe('gzip content encoding', function() {
+        beforeEach(function(done) {
             SERVER = restify.createServer({
                 dtrace: helper.dtrace,
                 log: helper.getLog('server')
             });
 
-            SERVER.listen(0, '127.0.0.1', function () {
+            SERVER.listen(0, '127.0.0.1', function() {
                 PORT = SERVER.address().port;
 
                 done();
             });
         });
 
-        afterEach(function (done) {
+        afterEach(function(done) {
             CLIENT.close();
             SERVER.close(done);
         });
 
-        it('should parse gzip encoded content', function (done) {
+        it('should parse gzip encoded content', function(done) {
             SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
@@ -48,22 +45,26 @@ describe('body reader', function () {
                 gzip: {}
             });
 
-            SERVER.post('/compressed', function (req, res, next) {
+            SERVER.post('/compressed', function(req, res, next) {
                 assert.equal(req.body.apple, 'red');
                 res.send();
                 next();
             });
 
-            CLIENT.post('/compressed', {
-                apple: 'red'
-            }, function (err, _, res) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                done();
-            });
+            CLIENT.post(
+                '/compressed',
+                {
+                    apple: 'red'
+                },
+                function(err, _, res) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    done();
+                }
+            );
         });
 
-        it('should not accept unsupported content encoding', function (done) {
+        it('should not accept unsupported content encoding', function(done) {
             SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
@@ -74,23 +75,27 @@ describe('body reader', function () {
                 }
             });
 
-            SERVER.post('/compressed', function (req, res, next) {
+            SERVER.post('/compressed', function(req, res, next) {
                 assert.equal(req.body.apple, 'red');
                 res.send();
                 next();
             });
 
-            CLIENT.post('/compressed', {
-                apple: 'red'
-            }, function (err, _, res) {
-                assert.isOk(err, 'should fail');
-                assert.equal(res.statusCode, 415);
-                assert.equal(res.headers['accept-encoding'], 'gzip');
-                done();
-            });
+            CLIENT.post(
+                '/compressed',
+                {
+                    apple: 'red'
+                },
+                function(err, _, res) {
+                    assert.isOk(err, 'should fail');
+                    assert.equal(res.statusCode, 415);
+                    assert.equal(res.headers['accept-encoding'], 'gzip');
+                    done();
+                }
+            );
         });
 
-        it('should parse unencoded content', function (done) {
+        it('should parse unencoded content', function(done) {
             SERVER.use(restify.plugins.bodyParser());
 
             CLIENT = restifyClients.createJsonClient({
@@ -98,20 +103,23 @@ describe('body reader', function () {
                 retry: false
             });
 
-            SERVER.post('/compressed', function (req, res, next) {
+            SERVER.post('/compressed', function(req, res, next) {
                 assert.equal(req.body.apple, 'red');
                 res.send();
                 next();
             });
 
-            CLIENT.post('/compressed', {
-                apple: 'red'
-            }, function (err, _, res) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                done();
-            });
+            CLIENT.post(
+                '/compressed',
+                {
+                    apple: 'red'
+                },
+                function(err, _, res) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    done();
+                }
+            );
         });
     });
-
 });

@@ -4,10 +4,10 @@ var socketio = require('socket.io');
 
 var restify = require('../../lib');
 
-
 ///--- Globals
 
-var HTML = '<script src="/socket.io/socket.io.js"></script>\n' +
+var HTML =
+    '<script src="/socket.io/socket.io.js"></script>\n' +
     '<script>\n' +
     'var socket = io("http://localhost:8080");\n' +
     'socket.on("news", function (data) {\n' +
@@ -15,7 +15,6 @@ var HTML = '<script src="/socket.io/socket.io.js"></script>\n' +
     'socket.emit("my other event", { my: "data" });\n' +
     '});\n' +
     '</script>';
-
 
 ///--- Mainline
 
@@ -31,14 +30,13 @@ server.get('/', function indexHTML(req, res, next) {
     next();
 });
 
-
-io.on('connection', function (socket) {
+io.on('connection', function(socket) {
     socket.emit('news', { hello: 'world' });
-    socket.on('my other event', function (data) {
+    socket.on('my other event', function(data) {
         console.log(data);
     });
 });
 
-server.listen(8080, function () {
+server.listen(8080, function() {
     console.log('socket.io server listening at %s', server.url);
 });

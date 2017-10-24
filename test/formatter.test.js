@@ -12,7 +12,6 @@ if (require.cache[__dirname + '/lib/helper.js']) {
 }
 var helper = require('./lib/helper.js');
 
-
 ///--- Globals
 
 var after = helper.after;
@@ -23,25 +22,24 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-
 ///--- Tests
 
-before(function (callback) {
+before(function(callback) {
     try {
         SERVER = restify.createServer({
             handleUncaughtExceptions: true,
             formatters: {
-                'text/sync': function (req, res, body) {
+                'text/sync': function(req, res, body) {
                     return 'sync fmt';
                 },
-                'text/syncerror': function (req, res, body) {
+                'text/syncerror': function(req, res, body) {
                     // this is a bad formatter, on purpose.
                     return x.toString(); // eslint-disable-line no-undef
                 },
-                'application/foo; q=0.9': function (req, res, body) {
+                'application/foo; q=0.9': function(req, res, body) {
                     return 'foo!';
                 },
-                'application/bar; q=0.1': function (req, res, body) {
+                'application/bar; q=0.1': function(req, res, body) {
                     return 'bar!';
                 }
             },
@@ -49,7 +47,7 @@ before(function (callback) {
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
-        SERVER.listen(PORT, '127.0.0.1', function () {
+        SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createStringClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -57,20 +55,21 @@ before(function (callback) {
                 retry: false,
                 agent: false
             });
-            SERVER.get('/sync', function (req, res, next) {
+            SERVER.get('/sync', function(req, res, next) {
                 res.send('dummy response');
                 return next();
             });
-            SERVER.get('/missingFormatter', function (req, res, next) {
+            SERVER.get('/missingFormatter', function(req, res, next) {
                 delete res.formatters['application/octet-stream'];
                 res.setHeader('content-type', 'text/html');
                 res.send('dummy response');
                 return next();
             });
-            SERVER.get('/jsonpSeparators', function (req, res, next) {
+            SERVER.get('/jsonpSeparators', function(req, res, next) {
                 res.setHeader('content-type', 'application/javascript');
-                res.send(String.fromCharCode(0x2028)
-                         + String.fromCharCode(0x2029));
+                res.send(
+                    String.fromCharCode(0x2028) + String.fromCharCode(0x2029)
+                );
                 return next();
             });
             process.nextTick(callback);
@@ -81,8 +80,7 @@ before(function (callback) {
     }
 });
 
-
-after(function (callback) {
+after(function(callback) {
     try {
         SERVER.close(callback);
     } catch (e) {
@@ -91,27 +89,26 @@ after(function (callback) {
     }
 });
 
-
-test('GH-845: sync formatter', function (t) {
-
-    CLIENT.get({
-        path: '/sync',
-        headers: {
-            accept: 'text/sync'
+test('GH-845: sync formatter', function(t) {
+    CLIENT.get(
+        {
+            path: '/sync',
+            headers: {
+                accept: 'text/sync'
+            }
+        },
+        function(err, req, res, data) {
+            t.ifError(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(data, 'sync fmt');
+            t.end();
         }
-    }, function (err, req, res, data) {
-        t.ifError(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(data, 'sync fmt');
-        t.end();
-    });
+    );
 });
 
-
-test('GH-845: sync formatter should blow up', function (t) {
-
-    SERVER.on('uncaughtException', function (req, res, route, err) {
+test('GH-845: sync formatter should blow up', function(t) {
+    SERVER.on('uncaughtException', function(req, res, route, err) {
         t.ok(err);
         t.equal(err.name, 'ReferenceError');
         t.equal(err.message, 'x is not defined');
@@ -119,26 +116,28 @@ test('GH-845: sync formatter should blow up', function (t) {
         res.end();
     });
 
-    CLIENT.get({
-        path: '/sync',
-        headers: {
-            accept: 'text/syncerror'
+    CLIENT.get(
+        {
+            path: '/sync',
+            headers: {
+                accept: 'text/syncerror'
+            }
+        },
+        function(err, req, res, data) {
+            t.equal(data, 'uncaughtException');
+            t.end();
         }
-    }, function (err, req, res, data) {
-        t.equal(data, 'uncaughtException');
-        t.end();
-    });
+    );
 });
 
-
-test('q-val priority', function (t) {
+test('q-val priority', function(t) {
     var opts = {
         path: '/sync',
         headers: {
             accept: 'application/*'
         }
     };
-    CLIENT.get(opts, function (err, req, res, data) {
+    CLIENT.get(opts, function(err, req, res, data) {
         t.ifError(err);
         t.ok(req);
         t.ok(res);
@@ -147,8 +146,7 @@ test('q-val priority', function (t) {
     });
 });
 
-
-test('GH-771 q-val priority on */*', function (t) {
+test('GH-771 q-val priority on */*', function(t) {
     var opts = {
         path: '/sync',
         headers: {
@@ -156,11 +154,10 @@ test('GH-771 q-val priority on */*', function (t) {
         }
     };
 
-
     // this test is a little flaky - it will look for first formatter that
     // satisfies q-val but in this test we have a bunch of bad formatters.
     // it appears V8 will use the first found formatter (this case, text/sync).
-    CLIENT.get(opts, function (err, req, res, data) {
+    CLIENT.get(opts, function(err, req, res, data) {
         t.ifError(err);
         t.ok(req);
         t.ok(res);
@@ -169,65 +166,67 @@ test('GH-771 q-val priority on */*', function (t) {
     });
 });
 
+test(
+    'GH-937 should return 406 when no content-type header set on response ' +
+        'matching an acceptable type found by matching client',
+    function(t) {
+        // ensure client accepts only a type not specified by server
+        var opts = {
+            path: '/sync',
+            headers: {
+                accept: 'text/html'
+            }
+        };
 
-test('GH-937 should return 406 when no content-type header set on response ' +
-'matching an acceptable type found by matching client', function (t) {
+        CLIENT.get(opts, function(err, req, res, data) {
+            t.ok(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(res.statusCode, 406);
+            t.end();
+        });
+    }
+);
 
-    // ensure client accepts only a type not specified by server
-    var opts = {
-        path: '/sync',
-        headers: {
-            accept: 'text/html'
-        }
-    };
+test(
+    'GH-937 should return 500 when no default formatter found ' +
+        'and octet-stream is not available',
+    function(t) {
+        // ensure client accepts only a type not specified by server
+        var opts = {
+            path: '/missingFormatter',
+            headers: {
+                accept: 'text/html'
+            }
+        };
 
-    CLIENT.get(opts, function (err, req, res, data) {
-        t.ok(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(res.statusCode, 406);
-        t.end();
-    });
-});
+        CLIENT.get(opts, function(err, req, res, data) {
+            t.ok(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(res.statusCode, 500);
+            t.end();
+        });
+    }
+);
 
+test(
+    'default jsonp formatter should escape ' + 'line and paragraph separators',
+    function(t) {
+        // ensure client accepts only a type not specified by server
+        var opts = {
+            path: '/jsonpSeparators',
+            headers: {
+                accept: 'application/javascript'
+            }
+        };
 
-test('GH-937 should return 500 when no default formatter found ' +
-'and octet-stream is not available', function (t) {
-
-    // ensure client accepts only a type not specified by server
-    var opts = {
-        path: '/missingFormatter',
-        headers: {
-            accept: 'text/html'
-        }
-    };
-
-    CLIENT.get(opts, function (err, req, res, data) {
-        t.ok(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
-
-
-test('default jsonp formatter should escape ' +
-     'line and paragraph separators', function (t) {
-
-    // ensure client accepts only a type not specified by server
-    var opts = {
-        path: '/jsonpSeparators',
-        headers: {
-            accept: 'application/javascript'
-        }
-    };
-
-    CLIENT.get(opts, function (err, req, res, data) {
-        t.ifError(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(data, '"\\u2028\\u2029"');
-        t.end();
-    });
-});
+        CLIENT.get(opts, function(err, req, res, data) {
+            t.ifError(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(data, '"\\u2028\\u2029"');
+            t.end();
+        });
+    }
+);

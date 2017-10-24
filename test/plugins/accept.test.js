@@ -14,9 +14,8 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-describe('accept parser', function () {
-
-    before(function (done) {
+describe('accept parser', function() {
+    before(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
@@ -29,7 +28,7 @@ describe('accept parser', function () {
             next();
         });
 
-        SERVER.listen(0, '127.0.0.1', function () {
+        SERVER.listen(0, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -41,21 +40,20 @@ describe('accept parser', function () {
         });
     });
 
-    after(function (done) {
+    after(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
-
-    it('accept ok', function (done) {
-        CLIENT.get('/', function (err, _, res) {
+    it('accept ok', function(done) {
+        CLIENT.get('/', function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             done();
         });
     });
 
-    it('accept not ok (406)', function (done) {
+    it('accept not ok (406)', function(done) {
         var opts = {
             path: '/',
             headers: {
@@ -63,7 +61,7 @@ describe('accept parser', function () {
             }
         };
 
-        CLIENT.get(opts, function (err, _, res) {
+        CLIENT.get(opts, function(err, _, res) {
             assert.ok(err);
             assert.equal(err.name, 'NotAcceptableError');
             assert.equal(res.statusCode, 406);
@@ -71,4 +69,3 @@ describe('accept parser', function () {
         });
     });
 });
-

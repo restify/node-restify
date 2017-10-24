@@ -14,9 +14,8 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-describe('accept parser', function () {
-
-    before(function (done) {
+describe('accept parser', function() {
+    before(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
@@ -24,7 +23,7 @@ describe('accept parser', function () {
 
         SERVER.use(restify.plugins.pre.context());
 
-        SERVER.listen(0, '127.0.0.1', function () {
+        SERVER.listen(0, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -36,14 +35,12 @@ describe('accept parser', function () {
         });
     });
 
-    after(function (done) {
+    after(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
-
-    it('should use context', function (done) {
-
+    it('should use context', function(done) {
         SERVER.get('/', [
             function one(req, res, next) {
                 req.set('foo', {
@@ -70,16 +67,14 @@ describe('accept parser', function () {
             }
         ]);
 
-        CLIENT.get('/', function (err, _, res) {
+        CLIENT.get('/', function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             return done();
         });
     });
 
-
-    it('should not share context', function (done) {
-
+    it('should not share context', function(done) {
         SERVER.get('/1', function one(req, res, next) {
             // ensure we don't get context from previous request
             assert.equal(req.get('foo', null));
@@ -87,7 +82,7 @@ describe('accept parser', function () {
             return next();
         });
 
-        CLIENT.get('/1', function (err, _, res) {
+        CLIENT.get('/1', function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             return done();
