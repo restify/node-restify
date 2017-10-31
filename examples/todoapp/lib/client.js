@@ -5,11 +5,9 @@ var util = require('util');
 var assert = require('assert-plus');
 var restify = require('restify');
 
-
 ///--- Globals
 
 var sprintf = util.format;
-
 
 ///--- API
 
@@ -30,7 +28,7 @@ function TodoClient(options) {
         url: options.url,
         version: ver
     });
-    this.log = options.log.child({component: 'TodoClient'}, true);
+    this.log = options.log.child({ component: 'TodoClient' }, true);
     this.url = options.url;
     this.version = ver;
 
@@ -40,12 +38,11 @@ function TodoClient(options) {
     }
 }
 
-
 TodoClient.prototype.create = function create(task, cb) {
     assert.string(task, 'task');
     assert.func(cb, 'callback');
 
-    this.client.post('/todo', {task: task}, function (err, req, res, obj) {
+    this.client.post('/todo', { task: task }, function(err, req, res, obj) {
         if (err) {
             cb(err);
         } else {
@@ -53,12 +50,11 @@ TodoClient.prototype.create = function create(task, cb) {
         }
     });
 };
-
 
 TodoClient.prototype.list = function list(cb) {
     assert.func(cb, 'callback');
 
-    this.client.get('/todo', function (err, req, res, obj) {
+    this.client.get('/todo', function(err, req, res, obj) {
         if (err) {
             cb(err);
         } else {
@@ -66,13 +62,12 @@ TodoClient.prototype.list = function list(cb) {
         }
     });
 };
-
 
 TodoClient.prototype.get = function get(name, cb) {
     assert.string(name, 'name');
     assert.func(cb, 'callback');
 
-    this.client.get('/todo/' + name, function (err, req, res, obj) {
+    this.client.get('/todo/' + name, function(err, req, res, obj) {
         if (err) {
             cb(err);
         } else {
@@ -81,12 +76,11 @@ TodoClient.prototype.get = function get(name, cb) {
     });
 };
 
-
 TodoClient.prototype.update = function update(todo, cb) {
     assert.object(todo, 'todo');
     assert.func(cb, 'callback');
 
-    this.client.put('/todo/' + todo.name, todo, function (err) {
+    this.client.put('/todo/' + todo.name, todo, function(err) {
         if (err) {
             cb(err);
         } else {
@@ -95,9 +89,8 @@ TodoClient.prototype.update = function update(todo, cb) {
     });
 };
 
-
 TodoClient.prototype.del = function del(name, cb) {
-    if (typeof (name) === 'function') {
+    if (typeof name === 'function') {
         cb = name;
         name = '';
     }
@@ -105,7 +98,7 @@ TodoClient.prototype.del = function del(name, cb) {
     assert.func(cb, 'callback');
 
     var p = '/todo' + (name.length > 0 ? '/' + name : '');
-    this.client.del(p, function (err) {
+    this.client.del(p, function(err) {
         if (err) {
             cb(err);
         } else {
@@ -114,18 +107,20 @@ TodoClient.prototype.del = function del(name, cb) {
     });
 };
 
-
 TodoClient.prototype.toString = function toString() {
-    var str = sprintf('[object TodoClient<url=%s, username=%s, version=%s]',
-        this.url, this.username || 'null', this.version);
-    return (str);
+    var str = sprintf(
+        '[object TodoClient<url=%s, username=%s, version=%s]',
+        this.url,
+        this.username || 'null',
+        this.version
+    );
+    return str;
 };
-
 
 ///--- API
 
 module.exports = {
     createClient: function createClient(options) {
-        return (new TodoClient(options));
+        return new TodoClient(options);
     }
 };

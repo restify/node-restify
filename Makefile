@@ -18,18 +18,19 @@
 # Tools
 #
 ESLINT		:= ./node_modules/.bin/eslint
-JSCS		:= ./node_modules/.bin/jscs
+DOCUMENTATION		:= ./node_modules/.bin/documentation
 NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
-NSP_BADGE	:= ./tools/nspBadge.js
+DOCS_BUILD	:= ./tools/docsBuild.js
 NPM		:= npm
+NODE		:= node
+PRETTIER		:= ./node_modules/.bin/prettier
 
 #
 # Files
 #
-DOC_FILES	 = index.restdown
 JS_FILES	 = '.'
 
 CLEAN_FILES	+= node_modules cscope.files
@@ -64,7 +65,11 @@ test: $(NODEUNIT)
 
 .PHONY: nsp
 nsp: node_modules $(NSP)
-	@($(NSP) check) | $(NSP_BADGE)
+	@($(NSP) check) | true
+
+.PHONY: docs-build
+docs-build:
+	@($(NODE) $(DOCS_BUILD))
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ

@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 // external requires
 var assert = require('chai').assert;
@@ -13,12 +14,9 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-
-describe('dedupe forward slashes in URL', function () {
-
-    describe('non-strict routing', function () {
-
-        before(function (done) {
+describe('dedupe forward slashes in URL', function() {
+    describe('non-strict routing', function() {
+        before(function(done) {
             SERVER = restify.createServer({
                 dtrace: helper.dtrace,
                 log: helper.getLog('server')
@@ -31,7 +29,7 @@ describe('dedupe forward slashes in URL', function () {
                 next();
             });
 
-            SERVER.listen(0, '127.0.0.1', function () {
+            SERVER.listen(0, '127.0.0.1', function() {
                 PORT = SERVER.address().port;
                 CLIENT = restifyClients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
@@ -43,13 +41,13 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        after(function (done) {
+        after(function(done) {
             CLIENT.close();
             SERVER.close(done);
         });
 
-        it('should not remove single slashes', function (done) {
-            CLIENT.get('/foo/bar', function (err, _, res, data) {
+        it('should not remove single slashes', function(done) {
+            CLIENT.get('/foo/bar', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar');
@@ -57,9 +55,10 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        it('should not remove single slashes including trailing slashes',
-        function (done) {
-            CLIENT.get('/foo/bar/', function (err, _, res, data) {
+        it('should not remove single slashes including trailing slashes', function(
+            done
+        ) {
+            CLIENT.get('/foo/bar/', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -67,8 +66,8 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        it('should remove duplicate slashes', function (done) {
-            CLIENT.get('//foo//bar', function (err, _, res, data) {
+        it('should remove duplicate slashes', function(done) {
+            CLIENT.get('//foo//bar', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar');
@@ -76,9 +75,10 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        it('should remove duplicate slashes including trailing slashes',
-        function (done) {
-            CLIENT.get('//foo//bar//', function (err, _, res, data) {
+        it('should remove duplicate slashes including trailing slashes', function(
+            done
+        ) {
+            CLIENT.get('//foo//bar//', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -87,11 +87,8 @@ describe('dedupe forward slashes in URL', function () {
         });
     });
 
-
-
-    describe('strict routing', function () {
-
-        before(function (done) {
+    describe('strict routing', function() {
+        before(function(done) {
             SERVER = restify.createServer({
                 strictRouting: true,
                 dtrace: helper.dtrace,
@@ -105,7 +102,7 @@ describe('dedupe forward slashes in URL', function () {
                 next();
             });
 
-            SERVER.listen(0, '127.0.0.1', function () {
+            SERVER.listen(0, '127.0.0.1', function() {
                 PORT = SERVER.address().port;
                 CLIENT = restifyClients.createJsonClient({
                     url: 'http://127.0.0.1:' + PORT,
@@ -117,13 +114,13 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        after(function (done) {
+        after(function(done) {
             CLIENT.close();
             SERVER.close(done);
         });
 
-        it('should not remove single slashes', function (done) {
-            CLIENT.get('/foo/bar/', function (err, _, res, data) {
+        it('should not remove single slashes', function(done) {
+            CLIENT.get('/foo/bar/', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -131,8 +128,8 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-        it('should remove duplicate slashes', function (done) {
-            CLIENT.get('//foo//bar//', function (err, _, res, data) {
+        it('should remove duplicate slashes', function(done) {
+            CLIENT.get('//foo//bar//', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -140,10 +137,10 @@ describe('dedupe forward slashes in URL', function () {
             });
         });
 
-
-        it('should remove duplicate slashes including trailing slashes',
-        function (done) {
-            CLIENT.get('//foo//bar//', function (err, _, res, data) {
+        it('should remove duplicate slashes including trailing slashes', function(
+            done
+        ) {
+            CLIENT.get('//foo//bar//', function(err, _, res, data) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.equal(data, '/foo/bar/');
@@ -152,5 +149,3 @@ describe('dedupe forward slashes in URL', function () {
         });
     });
 });
-
-

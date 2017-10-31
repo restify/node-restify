@@ -97,7 +97,7 @@ server.on('NotFound', function(req, res, err, cb) {
   // do some logging or metrics collection here. if you want to send a custom
   // response, you can do so here by setting the response on the body of the
   // error object.
-  err.body = 'whoops! can't find your stuff!'; // the body of the error becomes the response
+  err.body = "whoops! can't find your stuff!"; // the body of the error becomes the response
   return cb();
 });
 ```

@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
 var validator = require('validator');
@@ -10,7 +11,6 @@ if (require.cache[__dirname + '/lib/helper.js']) {
 }
 var helper = require('./lib/helper.js');
 
-
 ///--- Globals
 
 var after = helper.after;
@@ -21,14 +21,13 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-
-before(function (cb) {
+before(function(cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
         });
-        SERVER.listen(PORT, '127.0.0.1', function () {
+        SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -44,11 +43,10 @@ before(function (cb) {
     }
 });
 
-
-after(function (cb) {
+after(function(cb) {
     try {
         CLIENT.close();
-        SERVER.close(function () {
+        SERVER.close(function() {
             CLIENT = null;
             SERVER = null;
             cb();
@@ -59,120 +57,117 @@ after(function (cb) {
     }
 });
 
-
-test('query should return empty string', function (t) {
-    SERVER.get('/emptyQs', function (req, res, next) {
+test('query should return empty string', function(t) {
+    SERVER.get('/emptyQs', function(req, res, next) {
         t.equal(req.query(), '');
         t.equal(req.getQuery(), '');
         res.send();
         next();
     });
 
-    CLIENT.get('/emptyQs', function (err, _, res) {
+    CLIENT.get('/emptyQs', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-
-test('query should return raw query string string', function (t) {
-    SERVER.get('/qs', function (req, res, next) {
+test('query should return raw query string string', function(t) {
+    SERVER.get('/qs', function(req, res, next) {
         t.equal(req.query(), 'a=1&b=2');
         t.equal(req.getQuery(), 'a=1&b=2');
         res.send();
         next();
     });
 
-    CLIENT.get('/qs?a=1&b=2', function (err, _, res) {
+    CLIENT.get('/qs?a=1&b=2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-
-test('should generate request id on first req.id() call', function (t) {
-
-    SERVER.get('/ping', function (req, res, next) {
+test('should generate request id on first req.id() call', function(t) {
+    SERVER.get('/ping', function(req, res, next) {
         t.equal(typeof req.id(), 'string');
         t.equal(validator.isUUID(req.id(), 4), true);
         res.send();
         return next();
     });
 
-    CLIENT.get('/ping', function (err, _, res) {
+    CLIENT.get('/ping', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-
-test('should set request id', function (t) {
-
+test('should set request id', function(t) {
     SERVER.pre(function setId(req, res, next) {
         var newId = req.id('lagavulin');
         t.equal(newId, 'lagavulin');
         return next();
     });
 
-    SERVER.get('/ping', function (req, res, next) {
+    SERVER.get('/ping', function(req, res, next) {
         t.equal(typeof req.id(), 'string');
         t.equal(req.id(), 'lagavulin');
         res.send();
         return next();
     });
 
-    CLIENT.get('/ping', function (err, _, res) {
+    CLIENT.get('/ping', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-
-test('should throw when setting request id after autogeneration', function (t) {
-
-    SERVER.get('/ping', function (req, res, next) {
+test('should throw when setting request id after autogeneration', function(t) {
+    SERVER.get('/ping', function(req, res, next) {
         t.equal(typeof req.id(), 'string');
         t.equal(validator.isUUID(req.id(), 4), true);
-        t.throws(function () {
-            req.id('blowup');
-        }, Error, 'request id is immutable, cannot be set again!');
+        t.throws(
+            function() {
+                req.id('blowup');
+            },
+            Error,
+            'request id is immutable, cannot be set again!'
+        );
         res.send();
         return next();
     });
 
-    CLIENT.get('/ping', function (err, _, res) {
+    CLIENT.get('/ping', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-
-test('should throw when setting request id twice', function (t) {
-
-    SERVER.get('/ping', function (req, res, next) {
+test('should throw when setting request id twice', function(t) {
+    SERVER.get('/ping', function(req, res, next) {
         req.id('lagavulin');
-        t.throws(function () {
-            req.id('blowup');
-        }, Error, 'request id is immutable, cannot be set again!');
+        t.throws(
+            function() {
+                req.id('blowup');
+            },
+            Error,
+            'request id is immutable, cannot be set again!'
+        );
         res.send();
         return next();
     });
 
-    CLIENT.get('/ping', function (err, _, res) {
+    CLIENT.get('/ping', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
     });
 });
 
-test('should provide route object', function (t) {
-
-    SERVER.get('/ping/:name', function (req, res, next) {
+test('should provide route object', function(t) {
+    SERVER.get('/ping/:name', function(req, res, next) {
         /*
          req.getRoute() should return something like this :
              {
@@ -185,15 +180,14 @@ test('should provide route object', function (t) {
         var routeInfo = req.getRoute();
         t.equal(routeInfo.path, '/ping/:name');
         t.equal(routeInfo.method, 'GET');
-        res.send({name:req.params.name});
+        res.send({ name: req.params.name });
         return next();
     });
 
-    CLIENT.get('/ping/lagavulin', function (err, _, res, parsedBody) {
+    CLIENT.get('/ping/lagavulin', function(err, _, res, parsedBody) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.deepEqual(parsedBody, {name:'lagavulin'});
+        t.deepEqual(parsedBody, { name: 'lagavulin' });
         t.end();
     });
 });
-

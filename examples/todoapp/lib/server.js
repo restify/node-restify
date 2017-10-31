@@ -9,7 +9,6 @@ var bunyan = require('bunyan');
 var restify = require('restify');
 var errors = require('restify-errors');
 
-
 ///--- Errors
 
 errors.makeConstructor('MissingTaskError', {
@@ -18,7 +17,6 @@ errors.makeConstructor('MissingTaskError', {
     message: '"task" is a required parameter'
 });
 
-
 errors.makeConstructor('TodoExistsError', {
     statusCode: 409,
     restCode: 'TodoExists',
@@ -26,9 +24,9 @@ errors.makeConstructor('TodoExistsError', {
 });
 
 errors.makeConstructor('TodoNotFoundError', {
-        statusCode: 404,
-        restCode: 'TodoNotFound',
-        message: 'Todo was not found'
+    statusCode: 404,
+    restCode: 'TodoNotFound',
+    message: 'Todo was not found'
 });
 
 ///--- Formatters
@@ -42,7 +40,7 @@ function formatTodo(req, res, body, cb) {
     if (body instanceof Error) {
         res.statusCode = body.statusCode || 500;
         body = body.message;
-    } else if (typeof (body) === 'object') {
+    } else if (typeof body === 'object') {
         body = body.task || JSON.stringify(body);
     } else {
         body = body.toString();
@@ -51,7 +49,6 @@ function formatTodo(req, res, body, cb) {
     res.setHeader('Content-Length', Buffer.byteLength(body));
     return cb(null, body);
 }
-
 
 ///--- Handlers
 
@@ -80,15 +77,16 @@ function authenticate(req, res, next) {
         return;
     }
 
-    if (authz.username !== req.allow.user ||
-        authz.password !== req.allow.pass) {
+    if (
+        authz.username !== req.allow.user ||
+        authz.password !== req.allow.pass
+    ) {
         next(new errors.ForbiddenError('invalid credentials'));
         return;
     }
 
     next();
 }
-
 
 /**
  * Note this handler looks in `req.params`, which means we can load request
@@ -105,7 +103,7 @@ function authenticate(req, res, next) {
  */
 function createTodo(req, res, next) {
     if (!req.params.task) {
-        req.log.warn({params: p}, 'createTodo: missing task');
+        req.log.warn({ params: p }, 'createTodo: missing task');
         next(new errors.MissingTaskError());
         return;
     }
@@ -122,28 +120,25 @@ function createTodo(req, res, next) {
     }
 
     var p = path.normalize(req.dir + '/' + todo.name);
-    fs.writeFile(p, JSON.stringify(todo), function (err) {
+    fs.writeFile(p, JSON.stringify(todo), function(err) {
         if (err) {
             req.log.warn(err, 'createTodo: unable to save');
             next(err);
         } else {
-            req.log.debug({todo: todo}, 'createTodo: done');
+            req.log.debug({ todo: todo }, 'createTodo: done');
             res.send(201, todo);
             next();
         }
     });
 }
 
-
 /**
  * Deletes a TODO by name
  */
 function deleteTodo(req, res, next) {
-    fs.unlink(req.todo, function (err) {
+    fs.unlink(req.todo, function(err) {
         if (err) {
-            req.log.warn(err,
-                'deleteTodo: unable to unlink %s',
-                req.todo);
+            req.log.warn(err, 'deleteTodo: unable to unlink %s', req.todo);
             next(err);
         } else {
             res.send(204);
@@ -151,7 +146,6 @@ function deleteTodo(req, res, next) {
         }
     });
 }
-
 
 /**
  * Deletes all TODOs (in parallel)
@@ -175,7 +169,7 @@ function deleteAll(req, res, next) {
         return;
     }
 
-    req.todos.forEach(function (t) {
+    req.todos.forEach(function(t) {
         var p = req.dir + '/' + t;
         fs.unlink(p, cb);
     });
@@ -195,7 +189,6 @@ function ensureTodo(req, res, next) {
         next();
     }
 }
-
 
 /**
  * Loads a TODO by name
@@ -228,7 +221,7 @@ function getTodo(req, res, next) {
         return;
     }
 
-    fs.readFile(req.todo, 'utf8', function (err, data) {
+    fs.readFile(req.todo, 'utf8', function(err, data) {
         if (err) {
             req.log.warn(err, 'get: unable to read %s', req.todo);
             next(err);
@@ -240,17 +233,14 @@ function getTodo(req, res, next) {
     });
 }
 
-
 /**
  * Loads up all the stored TODOs from our "database". Most of the downstream
  * handlers look for these and do some amount of enforcement on what's there.
  */
 function loadTodos(req, res, next) {
-    fs.readdir(req.dir, function (err, files) {
+    fs.readdir(req.dir, function(err, files) {
         if (err) {
-            req.log.warn(err,
-                'loadTodo: unable to read %s',
-                req.dir);
+            req.log.warn(err, 'loadTodo: unable to read %s', req.dir);
             next(err);
         } else {
             req.todos = files;
@@ -259,16 +249,18 @@ function loadTodos(req, res, next) {
                 req.todo = req.dir + '/' + req.params.name;
             }
 
-            req.log.debug({
-                todo: req.todo,
-                todos: req.todos
-            }, 'loadTODO: done');
+            req.log.debug(
+                {
+                    todo: req.todo,
+                    todos: req.todos
+                },
+                'loadTODO: done'
+            );
 
             next();
         }
     });
 }
-
 
 /**
  * Simple returns the list of TODOs that were loaded.
@@ -281,29 +273,27 @@ function listTodos(req, res, next) {
     next();
 }
 
-
 /**
  * Replaces a TODO completely
  */
 function putTodo(req, res, next) {
     if (!req.params.task) {
-        req.log.warn({params: req.params}, 'putTodo: missing task');
+        req.log.warn({ params: req.params }, 'putTodo: missing task');
         next(new errors.MissingTaskError());
         return;
     }
 
-    fs.writeFile(req.todo, JSON.stringify(req.body), function (err) {
+    fs.writeFile(req.todo, JSON.stringify(req.body), function(err) {
         if (err) {
             req.log.warn(err, 'putTodo: unable to save');
             next(err);
         } else {
-            req.log.debug({todo: req.body}, 'putTodo: done');
+            req.log.debug({ todo: req.body }, 'putTodo: done');
             res.send(204);
             next();
         }
     });
 }
-
 
 ///--- API
 
@@ -340,11 +330,13 @@ function createServer(options) {
     server.use(restify.requestLogger());
 
     // Allow 5 requests/second by IP, and burst to 10
-    server.use(restify.throttle({
-        burst: 10,
-        rate: 5,
-        ip: true
-    }));
+    server.use(
+        restify.throttle({
+            burst: 10,
+            rate: 5,
+            ip: true
+        })
+    );
 
     // Use the common stuff you probably want
     server.use(restify.acceptParser(server.acceptable));
@@ -378,7 +370,6 @@ function createServer(options) {
     server.get('/todo', listTodos);
     server.head('/todo', listTodos);
 
-
     // everything else requires that the TODO exist
     server.use(ensureTodo);
 
@@ -392,10 +383,13 @@ function createServer(options) {
     // to send a different type
     // With the body parser, req.body will be the fully JSON
     // parsed document, so we just need to serialize and save
-    server.put({
-        path: '/todo/:name',
-        contentType: 'application/json'
-    }, putTodo);
+    server.put(
+        {
+            path: '/todo/:name',
+            contentType: 'application/json'
+        },
+        putTodo
+    );
 
     // Delete a TODO by name
     server.del('/todo/:name', deleteTodo);
@@ -405,7 +399,6 @@ function createServer(options) {
         res.send(204);
         next();
     });
-
 
     // Register a default '/' handler
 
@@ -425,19 +418,21 @@ function createServer(options) {
 
     // Setup an audit logger
     if (!options.noAudit) {
-        server.on('after', restify.auditLogger({
-            body: true,
-            log: bunyan.createLogger({
-                level: 'info',
-                name: 'todoapp-audit',
-                stream: process.stdout
+        server.on(
+            'after',
+            restify.auditLogger({
+                body: true,
+                log: bunyan.createLogger({
+                    level: 'info',
+                    name: 'todoapp-audit',
+                    stream: process.stdout
+                })
             })
-        }));
+        );
     }
 
-    return (server);
+    return server;
 }
-
 
 ///--- Exports
 

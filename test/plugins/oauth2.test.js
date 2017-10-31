@@ -1,6 +1,7 @@
 // Copyright 2016 Brian Aabel, Inc.  All rights reserved.
 
 'use strict';
+/* eslint-disable func-names */
 
 var http = require('http');
 // external requires
@@ -17,9 +18,8 @@ var CLIENT;
 var PORT;
 var TEST_TOKEN = '18926970-A-nMnSHDqg8Fsunm6Qx1cF1APp';
 
-describe('oauth2 token parser', function () {
-
-    before(function (done) {
+describe('oauth2 token parser', function() {
+    before(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
@@ -29,12 +29,11 @@ describe('oauth2 token parser', function () {
         SERVER.use(restify.plugins.oauth2TokenParser());
 
         SERVER.get('/', function respond(req, res, next) {
-
             res.send();
             next();
         });
 
-        SERVER.listen(0, '127.0.0.1', function () {
+        SERVER.listen(0, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -46,61 +45,54 @@ describe('oauth2 token parser', function () {
         });
     });
 
-    after(function (done) {
+    after(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
-
-    it('should parse oauth2 token from authorization header', function (done) {
+    it('should parse oauth2 token from authorization header', function(done) {
         var opts = {
             path: '/test1/auth-header',
             headers: {
-                Authorization : 'Bearer ' + TEST_TOKEN
+                Authorization: 'Bearer ' + TEST_TOKEN
             }
         };
-        SERVER.get('/test1/auth-header', function (req, res, next) {
+        SERVER.get('/test1/auth-header', function(req, res, next) {
             assert.isNotNull(req.oauth2.accessToken);
             assert.equal(req.oauth2.accessToken, TEST_TOKEN);
             res.send();
             next();
         });
-        CLIENT.get(opts, function (err, _, res) {
+        CLIENT.get(opts, function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             done();
         });
-
-
-
     });
 
-    it('should do nothing (token is null) if there is no oauth2 token set',
-     function (done) {
+    it('should do nothing (token is null) if there is no oauth2 token set', function(
+        done
+    ) {
         var opts = {
             path: '/test2/do/nothing'
-
         };
-        SERVER.get(opts, function (req, res, next) {
+        SERVER.get(opts, function(req, res, next) {
             assert.isNull(req.oauth2.accessToken);
             assert.equal(res.statusCode, 200);
             res.send();
             next();
         });
-        CLIENT.get(opts, function (err, _, res) {
+        CLIENT.get(opts, function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             done();
         });
-
     });
 
-    it('should parse from request body',
-     function (done) {
-
+    it('should parse from request body', function(done) {
         var test3Url = '/test3/contenttype/ok';
 
-        SERVER.post(test3Url, function (req, res, next) {
+        SERVER.post(test3Url, function(req, res, next) {
             assert.isNotNull(req.oauth2.accessToken);
             assert.equal(req.oauth2.accessToken, TEST_TOKEN);
             res.send();
@@ -117,21 +109,20 @@ describe('oauth2 token parser', function () {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         };
-        var client = http.request(opts, function (res) {
+        var client = http.request(opts, function(res) {
             assert.equal(res.statusCode, 200);
             done();
         });
         client.write('access_token=' + TEST_TOKEN);
         client.end();
-
     });
 
-    it('should parse oauth2 token from request body(case-insensitive)',
-        function (done) {
-
+    it('should parse oauth2 token from request body(case-insensitive)', function(
+        done
+    ) {
         var test4Url = '/test4/contenttype/mixedcase';
 
-        SERVER.post(test4Url, function (req, res, next) {
+        SERVER.post(test4Url, function(req, res, next) {
             assert.isNotNull(req.oauth2.accessToken);
             assert.equal(req.oauth2.accessToken, TEST_TOKEN);
             res.send();
@@ -148,7 +139,7 @@ describe('oauth2 token parser', function () {
                 'Content-Type': 'APPLICATION/x-www-form-urlencoded'
             }
         };
-        var client = http.request(opts, function (res) {
+        var client = http.request(opts, function(res) {
             assert.equal(res.statusCode, 200);
             done();
         });
@@ -156,11 +147,10 @@ describe('oauth2 token parser', function () {
         client.end();
     });
 
-    it('should ignore token from request body', function (done) {
-
+    it('should ignore token from request body', function(done) {
         var test5Url = '/test5/contenttype/missing/1';
 
-        SERVER.post(test5Url, function (req, res, next) {
+        SERVER.post(test5Url, function(req, res, next) {
             assert.isNull(req.oauth2.accessToken);
             res.send(200);
             next();
@@ -176,21 +166,18 @@ describe('oauth2 token parser', function () {
                 'Content-Type': 'text/xml'
             }
         };
-        var client = http.request(opts5, function (res) {
+        var client = http.request(opts5, function(res) {
             assert.equal(res.statusCode, 200);
             done();
         });
         client.write('access_token=' + TEST_TOKEN);
         client.end();
-
     });
 
-
-    it('should fail if more than one method is used to set the oauth2 token',
-        function (done) {
-
-
-        SERVER.post('/test6/multi/method/fail', function (req, res, next) {
+    it('should fail if more than one method is used to set the oauth2 token', function(
+        done
+    ) {
+        SERVER.post('/test6/multi/method/fail', function(req, res, next) {
             assert.isNull(req.oauth2.accessToken);
             res.send();
             next();
@@ -198,20 +185,15 @@ describe('oauth2 token parser', function () {
         var opts = {
             path: '/test6/multi/method/fail',
             headers: {
-                Authorization : 'Bearer ' + TEST_TOKEN,
+                Authorization: 'Bearer ' + TEST_TOKEN,
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         };
 
-        CLIENT.post(opts, {access_token: TEST_TOKEN},
-            function (err, _, res) {
-                assert.ok(err);
-                assert.equal(res.statusCode, 400);
-                done();
-            });
-
+        CLIENT.post(opts, { access_token: TEST_TOKEN }, function(err, _, res) {
+            assert.ok(err);
+            assert.equal(res.statusCode, 400);
+            done();
+        });
     });
-
-
 });
-

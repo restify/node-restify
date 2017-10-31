@@ -1,4 +1,5 @@
 'use strict';
+/* eslint-disable func-names */
 
 var mergeQs = require('../lib/utils').mergeQs;
 
@@ -11,8 +12,7 @@ var helper = require('./lib/helper.js');
 
 var test = helper.test;
 
-
-test('merge qs', function (t) {
+test('merge qs', function(t) {
     var qs1 = mergeQs(undefined, { a: 1 });
     t.deepEqual(qs1, { a: 1 });
 
@@ -20,7 +20,7 @@ test('merge qs', function (t) {
     t.deepEqual(qs2, { a: 1 });
 
     var qs3 = mergeQs({ a: 1 }, { a: 2 });
-    t.deepEqual(qs3, { a: [ 1, 2 ] });
+    t.deepEqual(qs3, { a: [1, 2] });
 
     var qs4 = mergeQs({ a: 1 }, { b: 2 });
     t.deepEqual(qs4, { a: 1, b: 2 });

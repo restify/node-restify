@@ -1,3 +1,47 @@
+<a name="6.2.3"></a>
+### 6.2.3 (2017-10-18)
+
+
+<a name="6.2.2"></a>
+### 6.2.2 (2017-10-18)
+
+
+#### Bug Fixes
+
+* **package-lock.json:** remove artifacts.netflix.com repo (#1526) ([3d2f0f7d](git://github.com/restify/node-restify.git/commit/3d2f0f7d))
+
+
+<a name="6.2.1"></a>
+### 6.2.1 (2017-10-18)
+
+
+#### Bug Fixes
+
+* **cpuUsageThrottle:** dont include interval in lag (#1504) ([eecb2d25](git://github.com/restify/node-restify.git/commit/eecb2d25))
+* **npm:** remove unleash dependency (#1522) ([a43aa60f](git://github.com/restify/node-restify.git/commit/a43aa60f))
+* **plugins:** use process.hrtime() for duration calculation (#1507) ([e8efd6cd](git://github.com/restify/node-restify.git/commit/e8efd6cd))
+
+
+<a name="6.2.0"></a>
+## 6.2.0 (2017-10-16)
+
+
+#### Bug Fixes
+
+* **cpuUsageThrottle:** dont include interval in lag (#1504) ([eecb2d25](git://github.com/restify/node-restify.git/commit/eecb2d25))
+* **plugins:** use process.hrtime() for duration calculation (#1507) ([e8efd6cd](git://github.com/restify/node-restify.git/commit/e8efd6cd))
+
+
+<a name="6.1.0"></a>
+## 6.1.0 (2017-10-16)
+
+
+#### Bug Fixes
+
+* **cpuUsageThrottle:** dont include interval in lag (#1504) ([eecb2d25](git://github.com/restify/node-restify.git/commit/eecb2d25))
+* **plugins:** use process.hrtime() for duration calculation (#1507) ([e8efd6cd](git://github.com/restify/node-restify.git/commit/e8efd6cd))
+
+
 <a name="6.0.1"></a>
 ### 6.0.1 (2017-09-19)
 

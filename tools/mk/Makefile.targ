@@ -122,16 +122,24 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 %.bashstyle: %
 	$(BASHSTYLE) $^
 
-.PHONY: check-jscs
-check-jscs::
-	$(JSCS) $(JS_FILES)
-
 .PHONY: check-eslint
 check-eslint::
 	$(ESLINT) $(JS_FILES)
 
+.PHONY: check-lint
+check-lint::
+	NO_STYLE=true $(ESLINT) $(JS_FILES)
+
+.PHONY: check-style
+check-style::
+	NO_LINT=true $(ESLINT) $(JS_FILES)
+
+.PHONY: fix-style
+fix-style::
+	$(PRETTIER) --write "**/*.js"
+
 .PHONY: check
-check: check-eslint check-jscs check-bash
+check: check-lint check-style check-bash
 	@echo check ok
 
 .PHONY: clean

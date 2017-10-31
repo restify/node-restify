@@ -1,0 +1,37 @@
+toc:
+  - name: Usage
+    file: ../api/plugins-usage.md
+  - name: server.pre() plugins
+    description: |
+      This module includes various pre plugins, which are intended to be used prior
+      to routing of the URL. To use a plugin before routing, use the `server.pre()`
+      method.
+    children:
+      - context
+      - dedupeSlashes
+      - pause
+      - sanitizePath
+      - reqIdHeaders
+      - strictQueryParams
+      - userAgentConnection
+  - name: server.use() plugins
+    children:
+      - acceptParser
+      - authorizationParser
+      - dateParser
+      - queryParser
+      - jsonp
+      - bodyParser
+      - requestLogger
+      - gzipResponse
+      - serveStatic
+      - throttle
+      - requestExpiry
+      - inflightRequestThrottle
+      - cpuUsageThrottle
+      - conditionalRequest
+      - auditLogger
+      - metrics
+  - name: Types
+    children:
+      - metrics~callback

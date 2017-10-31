@@ -30,6 +30,14 @@ git submodule update --remote && git add _docs && git commit -m 'bump' && git pu
 
 The website will automatically deploy itself with the new changes.
 
+### Updating a documentation page
+
+To update docs, simply run:  
+
+```
+make docs-build
+```
+
 ### Adding a documentation page
 
 To add a new page, simply give it a [permalink](https://github.com/restify/node-restify/blob/94fe715173ffcebd8814bed7e17a22a24fac4ae8/docs/index.md) and then update [docs.yml](https://github.com/restify/restify.github.io/blob/master/_data/docs.yml) with the new permalink.
@@ -41,6 +49,6 @@ Cutting a release is currently a manual process. We use a [Conventional Changelo
 ```
 $ git fetch
 $ git pull origin master # ensure you have the latest changes
-$ unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
-$ unleash [-p for patch, -m for minor, -M for major]
+$ npx unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
+$ npx unleash [-p for patch, -m for minor, -M for major]
 ```

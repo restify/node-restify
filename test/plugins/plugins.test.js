@@ -1,6 +1,7 @@
 // Copyright 2012 Mark Cavage, Inc.  All rights reserved.
 
 'use strict';
+/* eslint-disable func-names */
 
 // external requires
 var assert = require('chai').assert;
@@ -16,17 +17,15 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-
-describe('all other plugins', function () {
-
-    beforeEach(function (done) {
+describe('all other plugins', function() {
+    beforeEach(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server'),
             version: ['2.0.0', '0.5.4', '1.4.3']
         });
 
-        SERVER.listen(PORT, '127.0.0.1', function () {
+        SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
@@ -38,16 +37,13 @@ describe('all other plugins', function () {
         });
     });
 
-
-    afterEach(function (done) {
+    afterEach(function(done) {
         CLIENT.close();
         SERVER.close(done);
     });
 
-
-    describe('date parser', function () {
-
-        it('should reject expired request', function (done) {
+    describe('date parser', function() {
+        it('should reject expired request', function(done) {
             SERVER.use(restify.plugins.dateParser());
 
             SERVER.get('/', function respond(req, res, next) {
@@ -62,7 +58,7 @@ describe('all other plugins', function () {
                 }
             };
 
-            CLIENT.get(opts, function (err, _, res) {
+            CLIENT.get(opts, function(err, _, res) {
                 assert.ok(err);
                 assert.ok(/Date header .+ is too old/.test(err.message));
                 assert.equal(res.statusCode, 400);
@@ -71,16 +67,15 @@ describe('all other plugins', function () {
         });
     });
 
-    describe('request logger', function () {
-
-        it('tests the requestLoggers extra header properties', function (done) {
+    describe('request logger', function() {
+        it('tests the requestLoggers extra header properties', function(done) {
             var key = 'x-request-uuid';
             var badKey = 'x-foo-bar';
             var getPath = '/requestLogger/extraHeaders';
             var headers = [key, badKey];
 
-            SERVER.use(restify.plugins.requestLogger({headers: headers}));
-            SERVER.get(getPath, function (req, res, next) {
+            SERVER.use(restify.plugins.requestLogger({ headers: headers }));
+            SERVER.get(getPath, function(req, res, next) {
                 assert.equal(req.log.fields[key], 'foo-for-eva');
                 assert.equal(req.log.fields.hasOwnProperty(badKey), false);
                 res.send();
@@ -89,21 +84,19 @@ describe('all other plugins', function () {
 
             var obj = {
                 path: getPath,
-                headers: { }
+                headers: {}
             };
             obj.headers[key] = 'foo-for-eva';
-            CLIENT.get(obj, function (err, _, res) {
+            CLIENT.get(obj, function(err, _, res) {
                 assert.equal(res.statusCode, 200);
                 assert.ifError(err);
                 done();
             });
         });
-
     });
 
-    describe('full response', function () {
-
-        it('full response', function (done) {
+    describe('full response', function() {
+        it('full response', function(done) {
             SERVER.use(restify.plugins.fullResponse());
             SERVER.get('/bar/:id', function tester2(req, res, next) {
                 assert.ok(req.params);
@@ -112,7 +105,7 @@ describe('all other plugins', function () {
                 next();
             });
 
-            CLIENT.get('/bar/bar', function (err, _, res) {
+            CLIENT.get('/bar/bar', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 var headers = res.headers;
@@ -126,11 +119,10 @@ describe('all other plugins', function () {
                 done();
             });
         });
-
     });
 
-    describe('context', function () {
-        it('set and get request context', function (done) {
+    describe('context', function() {
+        it('set and get request context', function(done) {
             SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
@@ -138,11 +130,11 @@ describe('all other plugins', function () {
                 pink: 'floyd'
             };
             SERVER.get('/context', [
-                function (req, res, next) {
+                function(req, res, next) {
                     req.set('pink', 'floyd');
                     return next();
                 },
-                function (req, res, next) {
+                function(req, res, next) {
                     assert.equal('floyd', req.get('pink'));
                     assert.deepEqual(expectedData, req._getAllContext());
                     asserted = true;
@@ -151,7 +143,7 @@ describe('all other plugins', function () {
                 }
             ]);
 
-            CLIENT.get('/context', function (err, _, res) {
+            CLIENT.get('/context', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.ok(asserted);
@@ -159,13 +151,13 @@ describe('all other plugins', function () {
             });
         });
 
-        it('should throw if set key is not string', function (done) {
+        it('should throw if set key is not string', function(done) {
             SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
             SERVER.get('/context', [
-                function (req, res, next) {
+                function(req, res, next) {
                     try {
                         req.set({}, 'floyd');
                     } catch (e) {
@@ -176,7 +168,7 @@ describe('all other plugins', function () {
                 }
             ]);
 
-            CLIENT.get('/context', function (err, _, res) {
+            CLIENT.get('/context', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.ok(asserted);
@@ -184,13 +176,13 @@ describe('all other plugins', function () {
             });
         });
 
-        it('should throw if set key is empty string', function (done) {
+        it('should throw if set key is empty string', function(done) {
             SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
             SERVER.get('/context', [
-                function (req, res, next) {
+                function(req, res, next) {
                     try {
                         req.set('', 'floyd');
                     } catch (e) {
@@ -201,7 +193,7 @@ describe('all other plugins', function () {
                 }
             ]);
 
-            CLIENT.get('/context', function (err, _, res) {
+            CLIENT.get('/context', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.ok(asserted);
@@ -209,13 +201,13 @@ describe('all other plugins', function () {
             });
         });
 
-        it('should throw if get key is not string', function (done) {
+        it('should throw if get key is not string', function(done) {
             SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
             SERVER.get('/context', [
-                function (req, res, next) {
+                function(req, res, next) {
                     try {
                         req.get({});
                     } catch (e) {
@@ -226,7 +218,7 @@ describe('all other plugins', function () {
                 }
             ]);
 
-            CLIENT.get('/context', function (err, _, res) {
+            CLIENT.get('/context', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.ok(asserted);
@@ -234,13 +226,13 @@ describe('all other plugins', function () {
             });
         });
 
-        it('should throw if get key is empty string', function (done) {
+        it('should throw if get key is empty string', function(done) {
             SERVER.pre(restify.plugins.pre.context());
 
             var asserted = false;
 
             SERVER.get('/context', [
-                function (req, res, next) {
+                function(req, res, next) {
                     try {
                         req.get('');
                     } catch (e) {
@@ -251,7 +243,7 @@ describe('all other plugins', function () {
                 }
             ]);
 
-            CLIENT.get('/context', function (err, _, res) {
+            CLIENT.get('/context', function(err, _, res) {
                 assert.ifError(err);
                 assert.equal(res.statusCode, 200);
                 assert.ok(asserted);
@@ -260,7 +252,7 @@ describe('all other plugins', function () {
         });
     });
 
-    describe('sanitizePath', function () {
+    describe('sanitizePath', function() {
         // Ensure it santizies potential edge cases correctly
         var tests = {
             input: [
@@ -290,16 +282,17 @@ describe('all other plugins', function () {
         };
 
         for (var i = 0; i < tests.input.length; i++) {
-            (function () {
+            // eslint-disable-next-line wrap-iife
+            (function() {
                 var index = i;
-                it(tests.description[index], function (done) {
+                it(tests.description[index], function(done) {
                     var req = { url: tests.input[index] };
-                    sanitizePath()(req, null, function () {
+                    sanitizePath()(req, null, function() {
                         assert.equal(req.url, tests.output[index]);
                         done();
                     });
                 });
-            }());
+            })();
         }
     });
 });
