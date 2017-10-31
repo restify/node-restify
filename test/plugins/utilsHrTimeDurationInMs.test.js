@@ -2,12 +2,10 @@
 /* eslint-disable func-names */
 
 var assert = require('chai').assert;
-var hrTimeDurationInMs =
-    require('../../lib/plugins/utils/hrTimeDurationInMs');
+var hrTimeDurationInMs = require('../../lib/plugins/utils/hrTimeDurationInMs');
 
-describe('utils #hrTimeDurationInMs', function () {
-
-    it('should return with duration', function () {
+describe('utils #hrTimeDurationInMs', function() {
+    it('should return with duration', function() {
         var startTime = [0, 0];
         var endTime = [1, 1e6];
 
@@ -15,5 +13,4 @@ describe('utils #hrTimeDurationInMs', function () {
 
         assert.equal(duration, 1001);
     });
-
 });

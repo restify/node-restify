@@ -25,18 +25,14 @@ var docsConfig = [
         title: 'Request API',
         permalink: '/docs/request-api/',
         output: path.join(__dirname, OUTPUT_PATH, 'request.md'),
-        files: [
-            path.join(__dirname, LIB_PATH, 'request.js')
-        ],
+        files: [path.join(__dirname, LIB_PATH, 'request.js')],
         config: path.join(__dirname, DOCS_PATH, 'config/request.yaml')
     },
     {
         title: 'Response API',
         permalink: '/docs/response-api/',
         output: path.join(__dirname, OUTPUT_PATH, 'response.md'),
-        files: [
-            path.join(__dirname, LIB_PATH, 'response.js')
-        ]
+        files: [path.join(__dirname, LIB_PATH, 'response.js')]
     },
     {
         title: 'Plugins API',
@@ -63,8 +59,11 @@ var docsConfig = [
             path.join(__dirname, LIB_PATH, 'plugins/static.js'),
             path.join(__dirname, LIB_PATH, 'plugins/throttle.js'),
             path.join(__dirname, LIB_PATH, 'plugins/requestExpiry.js'),
-            path.join(__dirname, LIB_PATH,
-                'plugins/inflightRequestThrottle.js'),
+            path.join(
+                __dirname,
+                LIB_PATH,
+                'plugins/inflightRequestThrottle.js'
+            ),
             path.join(__dirname, LIB_PATH, 'plugins/cpuUsageThrottle.js'),
             path.join(__dirname, LIB_PATH, 'plugins/conditionalRequest.js'),
             path.join(__dirname, LIB_PATH, 'plugins/audit.js'),
@@ -84,19 +83,24 @@ var docsConfig = [
 * @param {String} options.permalink - Jekyll permalink
 * @returns {Promise} - Promise
 */
-function build (options) {
-    return documentation.build(options.files, {
-        shallow: true,
-        config: options.config
-    })
-        .then(function docsFormat (docs) {
+function build(options) {
+    return documentation
+        .build(options.files, {
+            shallow: true,
+            config: options.config
+        })
+        .then(function docsFormat(docs) {
             return documentation.formats.md(docs, {
                 markdownToc: true
             });
         })
-        .then(function docsWrite (docsContent) {
-            var output = util.format(JEKYLL_HEADER_TEMPLATE, options.title,
-                options.permalink, docsContent);
+        .then(function docsWrite(docsContent) {
+            var output = util.format(
+                JEKYLL_HEADER_TEMPLATE,
+                options.title,
+                options.permalink,
+                docsContent
+            );
 
             fs.writeFileSync(options.output, output);
         });
@@ -104,11 +108,11 @@ function build (options) {
 
 // eslint-disable-next-line
 Promise.all(docsConfig.map(build))
-    .then(function onSucceed (res) {
+    .then(function onSucceed(res) {
         console.log('Docs built');
         process.exit(0);
     })
-    .catch(function onError (err) {
+    .catch(function onError(err) {
         console.error(err);
         process.exit(1);
     });

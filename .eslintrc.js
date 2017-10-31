@@ -4,12 +4,13 @@ var OFF = 0;
 var ERROR = 2;
 
 var config = {
+    extends: [],
+    plugins: ['jsdoc'],
     env: {
         browser: false,
         node: true,
         es6: false
     },
-    plugins: ['jsdoc'],
     rules: {}
 };
 
@@ -40,12 +41,15 @@ if (!process.env.NO_LINT) {
     config.rules['no-sparse-arrays'] = ERROR;
     config.rules['no-unreachable'] = ERROR;
     config.rules['use-isnan'] = ERROR;
-    config.rules['valid-jsdoc'] = [ ERROR, {
-        'requireReturnDescription': false,
-        'prefer': {
-            'return': 'returns'
+    config.rules['valid-jsdoc'] = [
+        ERROR,
+        {
+            requireReturnDescription: false,
+            prefer: {
+                return: 'returns'
+            }
         }
-    }];
+    ];
     config.rules['valid-typeof'] = ERROR;
 
     // best practices
@@ -54,7 +58,7 @@ if (!process.env.NO_LINT) {
     config.rules['consistent-return'] = ERROR;
     config.rules['curly'] = OFF;
     config.rules['default-case'] = ERROR;
-    config.rules['dot-notation'] = [ ERROR, { 'allowKeywords': true } ];
+    config.rules['dot-notation'] = [ERROR, { allowKeywords: true }];
     config.rules['eqeqeq'] = ERROR;
     config.rules['guard-for-in'] = ERROR;
     config.rules['no-alert'] = ERROR;
@@ -90,13 +94,13 @@ if (!process.env.NO_LINT) {
     config.rules['no-throw-literal'] = ERROR;
     config.rules['no-unused-expressions'] = ERROR;
 
-    config.rules['no-warning-comments'] = [ 1 ];
+    config.rules['no-warning-comments'] = [1];
     config.rules['no-with'] = ERROR;
     config.rules['radix'] = ERROR;
     config.rules['wrap-iife'] = ERROR;
 
     // strict mode
-    config.rules['strict'] = [ ERROR, 'global' ];
+    config.rules['strict'] = [ERROR, 'global'];
 
     // variables
     config.rules['no-catch-shadow'] = ERROR;
@@ -106,11 +110,11 @@ if (!process.env.NO_LINT) {
     config.rules['no-undef'] = ERROR;
     config.rules['no-undef-init'] = ERROR;
     config.rules['no-undefined'] = OFF;
-    config.rules['no-unused-vars'] = [ ERROR, { 'vars': 'all', 'args': 'none' } ];
-    config.rules['no-use-before-define'] = [ ERROR, 'nofunc' ];
+    config.rules['no-unused-vars'] = [ERROR, { vars: 'all', args: 'none' }];
+    config.rules['no-use-before-define'] = [ERROR, 'nofunc'];
 
     // node.js
-    config.rules['handle-callback-err'] = [ ERROR, '^.*(e|E)rr' ];
+    config.rules['handle-callback-err'] = [ERROR, '^.*(e|E)rr'];
     config.rules['no-mixed-requires'] = ERROR;
     config.rules['no-new-require'] = ERROR;
     config.rules['no-path-concat'] = OFF;
@@ -119,40 +123,10 @@ if (!process.env.NO_LINT) {
 
 // stylistic.
 if (!process.env.NO_STYLE) {
-    // general rules
-    config.rules['consistent-this'] = [ERROR, 'self'];
-
-    // alignment rules
-    config.rules['max-len'] = [ERROR, 80];
-    config.rules['indent'] = [ERROR, 4];
-
-    // newline on EOF
-    config.rules['eol-last'] = [ERROR, 'always'];
-
-    // disallow rules
-    config.rules['no-implicit-coercion'] = ERROR;
-    config.rules['no-mixed-spaces-and-tabs'] = ERROR;
-    config.rules['no-trailing-spaces'] = ERROR;
-    config.rules['no-array-constructor'] = ERROR;
-    config.rules['no-nested-ternary'] = ERROR;
-    config.rules['no-new-object'] = ERROR;
-    config.rules['no-lonely-if'] = ERROR;
-    config.rules['no-underscore-dangle'] = OFF;
-    config.rules['no-whitespace-before-property'] = ERROR;
-    config.rules['yoda'] = ERROR;
-
-    // require rules
-    config.rules['semi'] = ERROR;
-    config.rules['comma-dangle'] = ERROR;
-    config.rules['key-spacing'] = ERROR;
-    config.rules['new-cap'] = ERROR;
-    config.rules['quotes'] = [ ERROR, 'single' ];
-    config.rules['space-infix-ops'] = ERROR;
-    config.rules['keyword-spacing'] = ERROR;
-    config.rules['space-unary-ops'] = ERROR;
-    config.rules['space-before-blocks'] = ERROR;
-    config.rules['space-infix-ops'] = ERROR;
-    config.rules['space-unary-ops'] = ERROR;
+    // Prettier
+    config.extends.push('prettier');
+    config.plugins.push('prettier');
+    config.rules['prettier/prettier'] = ERROR;
 
     // JSDoc
     config.rules['jsdoc/check-param-names'] = ERROR;
@@ -164,6 +138,6 @@ if (!process.env.NO_STYLE) {
     config.rules['jsdoc/require-param-type'] = ERROR;
     config.rules['jsdoc/require-returns-description'] = ERROR;
     config.rules['jsdoc/require-returns-type'] = ERROR;
-};
+}
 
 module.exports = config;

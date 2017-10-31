@@ -14,22 +14,20 @@ var once = require('once');
 
 var restify = require('../../lib');
 
-
 ///--- Exports
 
 module.exports = {
-
     after: function after(teardown) {
         module.parent.exports.tearDown = function _teardown(callback) {
             var d = domain.create();
             var self = this;
 
-            d.once('error', function (err) {
+            d.once('error', function(err) {
                 console.error('after: uncaught error\n', err.stack);
                 process.exit(1);
             });
 
-            d.run(function () {
+            d.run(function() {
                 teardown.call(self, once(callback));
             });
         };
@@ -40,13 +38,12 @@ module.exports = {
             var d = domain.create();
             var self = this;
 
-            d.once('error', function (err) {
-                console.error('before: uncaught error\n' +
-                    err.stack);
+            d.once('error', function(err) {
+                console.error('before: uncaught error\n' + err.stack);
                 process.exit(1);
             });
 
-            d.run(function () {
+            d.run(function() {
                 setup.call(self, once(callback));
             });
         };
@@ -57,18 +54,18 @@ module.exports = {
             var d = domain.create();
             var self = this;
 
-            d.once('error', function (err) {
+            d.once('error', function(err) {
                 t.ifError(err);
                 t.end();
             });
 
             d.add(t);
-            d.run(function () {
-                t.end = once(function () {
+            d.run(function() {
+                t.end = once(function() {
                     t.done();
                 });
                 t.notOk = function notOk(ok, message) {
-                    return (t.ok(!ok, message));
+                    return t.ok(!ok, message);
                 };
 
                 tester.call(self, t);
@@ -76,16 +73,15 @@ module.exports = {
         };
     },
 
-    getLog: function (name, streams, level) {
-        return (bunyan.createLogger({
-            level: (process.env.LOG_LEVEL || level || 'fatal'),
+    getLog: function(name, streams, level) {
+        return bunyan.createLogger({
+            level: process.env.LOG_LEVEL || level || 'fatal',
             name: name || process.argv[1],
-            streams: streams || [{stream: process.stdout}],
+            streams: streams || [{ stream: process.stdout }],
             src: true,
             serializers: restify.bunyan.serializers
-        }));
+        });
     },
-
 
     get dtrace() {
         var dtp;
@@ -97,6 +93,6 @@ module.exports = {
             dtp = null;
         }
 
-        return (dtp);
+        return dtp;
     }
 };

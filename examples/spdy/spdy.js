@@ -11,20 +11,23 @@ var srv = restify.createServer({
     }
 });
 
-srv.get('/', function (req, res, next) {
-    res.send({hello: 'world'});
+srv.get('/', function(req, res, next) {
+    res.send({ hello: 'world' });
     next();
 });
 
-srv.on('after', restify.plugins.auditLogger({
-    event: 'after',
-    body: true,
-    log: bunyan.createLogger({
-        name: 'audit',
-        stream: process.stdout
+srv.on(
+    'after',
+    restify.plugins.auditLogger({
+        event: 'after',
+        body: true,
+        log: bunyan.createLogger({
+            name: 'audit',
+            stream: process.stdout
+        })
     })
-}));
+);
 
-srv.listen(8080, function () {
+srv.listen(8080, function() {
     console.log('ready on %s', srv.url);
 });
