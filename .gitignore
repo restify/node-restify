@@ -12,3 +12,4 @@ docs/*.json
 nbproject
 deps/javascriptlint
 deps/jsstyle
+package-lock.json
