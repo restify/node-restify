@@ -112,8 +112,8 @@ test('gh-751 IPv4/IPv6 server URL', function(t) {
     t.equal(SERVER.url, 'http://127.0.0.1:' + PORT, 'ipv4 url');
 
     var server = restify.createServer();
-    server.listen(PORT + 1, '::1', function() {
-        t.equal(server.url, 'http://[::1]:' + (PORT + 1), 'ipv6 url');
+    server.listen(PORT + 1, '::', function() {
+        t.equal(server.url, 'http://[::]:' + (PORT + 1), 'ipv6 url');
 
         server.close(function() {
             t.end();
