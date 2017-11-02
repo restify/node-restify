@@ -40,7 +40,7 @@ permalink: /docs/request-api/
 **Extends http.IncomingMessage**
 
 Wraps all of the node
-[http.IncomingMessage](https://nodejs.org/api/http.html#http_http_incomingmessage)
+[http.IncomingMessage](https://nodejs.org/api/http.html)
 APIs, events and properties, plus the following.
 
 ### accepts
@@ -55,8 +55,8 @@ Otherwise the given type is matched by an exact match, and then subtypes.
 
 **Examples**
 
-_You may pass the subtype such as html which is then converted internally to
-text/html using the mime lookup table:_
+_You may pass the subtype such as html which is then converted internally
+to text/html using the mime lookup table:_
 
 ```javascript
 // Accept: text/html
@@ -95,8 +95,8 @@ Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### getContentType
 
-Returns the value of the content-type header. If a content-type is not set,
-this will return a default value of `application/octet-stream`
+Returns the value of the content-type header. If a content-type is not
+set, this will return a default value of `application/octet-stream`
 
 Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
@@ -300,8 +300,8 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 Start the timer for a request handler.
 By default, restify uses calls this automatically for all handlers
 registered in your handler chain.
-However, this can be called manually for nested functions inside the handler
-chain to record timing information.
+However, this can be called manually for nested functions inside the
+handler chain to record timing information.
 
 **Parameters**
 
@@ -310,8 +310,8 @@ chain to record timing information.
 **Examples**
 
 _You must explicitly invoke
-endHandlerTimer() after invoking this function. Otherwise timing information
-will be inaccurate._
+endHandlerTimer() after invoking this function. Otherwise timing
+information will be inaccurate._
 
 ```javascript
 server.get('/', function fooHandler(req, res, next) {

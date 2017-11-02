@@ -27,7 +27,7 @@ permalink: /docs/response-api/
 **Extends http.ServerResponse**
 
 Wraps all of the node
-[http.ServerResponse](https://nodejs.org/docs/latest/api/http.html#http.ServerResponse)
+[http.ServerResponse](https://nodejs.org/docs/latest/api/http.html)
 APIs, events and properties, plus the following.
 
 ### cache
@@ -154,10 +154,10 @@ formatter based on the `content-type` header.
 
 _You can use send() to wrap up all the usual writeHead(), write(), end()
 calls on the HTTP API of node.
-You can pass send either a `code` and `body`, or just a body. body can be an
-`Object`, a `Buffer`, or an `Error`.
-When you call `send()`, restify figures out how to format the response based
-on the `content-type`._
+You can pass send either a `code` and `body`, or just a body. body can be
+an `Object`, a `Buffer`, or an `Error`.
+When you call `send()`, restify figures out how to format the response
+based on the `content-type`._
 
 ```javascript
 res.send({hello: 'world'});
@@ -169,8 +169,8 @@ Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 
 ### sendRaw
 
-Like `res.send()`, but skips formatting. This can be useful when the payload
-has already been preformatted.
+Like `res.send()`, but skips formatting. This can be useful when the
+payload has already been preformatted.
 Sends the response object. pass through to internal `__send` that skips
 formatters entirely and sends the content as is.
 
@@ -189,7 +189,8 @@ Uses `header()` underneath the hood, enabling multi-value headers.
 
 **Parameters**
 
--   `name` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))** name of the header or `Object` of headers
+-   `name` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))** name of the header or
+                                   `Object` of headers
 -   `val` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
 
 **Examples**
@@ -236,13 +237,15 @@ Redirect is sugar method for redirecting.
     -   `options.hostname` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's hostname
     -   `options.pathname` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's pathname
     -   `options.port` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's port number
-    -   `options.query` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's query string parameters
-    -   `options.overrideQuery` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, `options.query` stomps over
-                                        any existing query parameters on current URL.
-                                        by default, will merge the two.
+    -   `options.query` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's query string
+                                        parameters
+    -   `options.overrideQuery` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, `options.query`
+                                                 stomps over any existing query
+                                                 parameters on current URL.
+                                                 by default, will merge the two.
     -   `options.permanent` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, sets 301. defaults to 302.
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger audit
-                           logger.
+-   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
+                           audit logger.
 
 **Examples**
 

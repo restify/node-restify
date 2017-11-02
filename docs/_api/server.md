@@ -116,6 +116,8 @@ Creates a new Server.
         response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
     -   `options.spdy` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-spdy](https://github.com/indutny/node-spdy).
+    -   `options.http2` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [http2.createSecureServer](https://nodejs.org/api/http2.html).
     -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
