@@ -1237,18 +1237,16 @@ test('GH-652 throw InvalidVersion on version mismatch', function(t) {
         return res.send(req.route.version);
     }
     SERVER.get({ path: '/ping', version: '1.0.1' }, response);
-    SERVER.listen(0, '127.0.0.1', function() {
-        var opts = {
-            path: '/ping',
-            headers: {
-                'accept-version': '1.0.2'
-            }
-        };
-        CLIENT.get(opts, function(err, req, res, data) {
-            t.equal(res.statusCode, 400);
-            t.equal(data.code, 'InvalidVersion');
-            t.done();
-        });
+    var opts = {
+        path: '/ping',
+        headers: {
+            'accept-version': '1.0.2'
+        }
+    };
+    CLIENT.get(opts, function(err, req, res, data) {
+        t.equal(res.statusCode, 400);
+        t.equal(data.code, 'InvalidVersion');
+        t.done();
     });
 });
 
@@ -1257,18 +1255,16 @@ test('GH-652 throw InvalidVersion on non-versioned route', function(t) {
         return res.send(req.route.version);
     }
     SERVER.get({ path: '/ping' }, response);
-    SERVER.listen(0, '127.0.0.1', function() {
-        var opts = {
-            path: '/ping',
-            headers: {
-                'accept-version': '1.0.1'
-            }
-        };
-        CLIENT.get(opts, function(err, req, res, data) {
-            t.equal(res.statusCode, 400);
-            t.equal(data.code, 'InvalidVersion');
-            t.done();
-        });
+    var opts = {
+        path: '/ping',
+        headers: {
+            'accept-version': '1.0.1'
+        }
+    };
+    CLIENT.get(opts, function(err, req, res, data) {
+        t.equal(res.statusCode, 400);
+        t.equal(data.code, 'InvalidVersion');
+        t.done();
     });
 });
 
@@ -1388,38 +1384,36 @@ test('content-type routing vendor', function(t) {
         }
     );
 
-    SERVER.listen(8080, function() {
-        var _done = 0;
+    var _done = 0;
 
-        function done() {
-            if (++_done === 2) {
-                t.end();
-            }
+    function done() {
+        if (++_done === 2) {
+            t.end();
         }
+    }
 
-        var opts = {
-            path: '/',
-            headers: {
-                'content-type': 'application/vnd.joyent.com.foo+json'
-            }
-        };
-        CLIENT.post(opts, {}, function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 201);
-            done();
-        });
+    var opts = {
+        path: '/',
+        headers: {
+            'content-type': 'application/vnd.joyent.com.foo+json'
+        }
+    };
+    CLIENT.post(opts, {}, function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 201);
+        done();
+    });
 
-        var opts2 = {
-            path: '/',
-            headers: {
-                'content-type': 'application/vnd.joyent.com.bar+json'
-            }
-        };
-        CLIENT.post(opts2, {}, function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 202);
-            done();
-        });
+    var opts2 = {
+        path: '/',
+        headers: {
+            'content-type': 'application/vnd.joyent.com.bar+json'
+        }
+    };
+    CLIENT.post(opts2, {}, function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 202);
+        done();
     });
 });
 

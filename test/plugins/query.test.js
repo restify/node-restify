@@ -225,12 +225,10 @@ describe('query parser', function() {
             res.send(req.params);
         });
 
-        SERVER.listen(8080, function() {
-            CLIENT.get('/hello/foo/?bar=baz', function(err, _, __, obj) {
-                assert.ifError(err);
-                assert.deepEqual(obj, { name: 'foo', bar: 'baz' });
-                done();
-            });
+        CLIENT.get('/hello/foo/?bar=baz', function(err, _, __, obj) {
+            assert.ifError(err);
+            assert.deepEqual(obj, { name: 'foo', bar: 'baz' });
+            done();
         });
     });
 
@@ -245,12 +243,10 @@ describe('query parser', function() {
             res.send(req.params);
         });
 
-        SERVER.listen(8080, function() {
-            CLIENT.get('/?bar=baz', function(err, _, __, obj) {
-                assert.ifError(err);
-                assert.deepEqual(obj, { bar: 'baz' });
-                done();
-            });
+        CLIENT.get('/?bar=baz', function(err, _, __, obj) {
+            assert.ifError(err);
+            assert.deepEqual(obj, { bar: 'baz' });
+            done();
         });
     });
 });
