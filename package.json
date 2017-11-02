@@ -130,7 +130,7 @@
     "istanbul": "^0.4.5",
     "mkdirp": "^0.5.1",
     "mocha": "^3.5.3",
-    "nodeunit": "^0.11.1",
+    "nodeunit": "^0.11.2",
     "nsp": "^2.8.1",
     "pre-commit": "^1.2.2",
     "prettier": "^1.7.4",
