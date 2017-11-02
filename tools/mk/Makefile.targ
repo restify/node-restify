@@ -128,11 +128,11 @@ check-eslint::
 
 .PHONY: check-lint
 check-lint::
-	NO_STYLE=true $(ESLINT) $(JS_FILES)
+	@(echo 'Running "make check-lint"'; NO_STYLE=true $(ESLINT) $(JS_FILES))
 
 .PHONY: check-style
 check-style::
-	NO_LINT=true $(ESLINT) $(JS_FILES)
+	 @(echo 'Running "make check-style"'; NO_LINT=true $(ESLINT) $(JS_FILES) || (echo 'Run "make fix-style" to auto-fix styling issues'; exit 1))
 
 .PHONY: fix-style
 fix-style::
