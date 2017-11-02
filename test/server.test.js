@@ -28,11 +28,15 @@ var after = helper.after;
 var before = helper.before;
 var test = helper.test;
 
+var SKIP_IP_V6 = (process.env.TEST_SKIP_IP_V6 === 'true');
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var FAST_CLIENT;
 var SERVER;
 
+if (SKIP_IP_V6) {
+    console.warning('IPv6 tests are skipped: No IPv6 network is available');
+}
 
 ///--- Tests
 
@@ -114,18 +118,21 @@ test('listen and close (socketPath)', function (t) {
 });
 
 
-test('gh-751 IPv4/IPv6 server URL', function (t) {
-    t.equal(SERVER.url, 'http://127.0.0.1:' + PORT, 'ipv4 url');
+// Run IPv6 tests only if IPv6 network is available
+if (!SKIP_IP_V6) {
+    test('gh-751 IPv4/IPv6 server URL', function (t) {
+        t.equal(SERVER.url, 'http://127.0.0.1:' + PORT, 'ipv4 url');
 
-    var server = restify.createServer();
-    server.listen(PORT + 1, '::1', function () {
-        t.equal(server.url, 'http://[::1]:' + (PORT + 1), 'ipv6 url');
+        var server = restify.createServer();
+        server.listen(PORT + 1, '::1', function () {
+            t.equal(server.url, 'http://[::1]:' + (PORT + 1), 'ipv6 url');
 
-        server.close(function () {
-            t.end();
+            server.close(function () {
+                t.end();
+            });
         });
     });
-});
+}
 
 
 test('get (path only)', function (t) {

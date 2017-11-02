@@ -6,6 +6,8 @@ node_js:
    - "7"
    - "8"
    - "stable"
+env:
+  - TEST_SKIP_IP_V6=true
 notifications:
   webhooks:
     urls:
