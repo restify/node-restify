@@ -1,3 +1,12 @@
+<a name="6.3.1"></a>
+### 6.3.1 (2017-11-03)
+
+
+#### Bug Fixes
+
+* **server:** avoid http2 experimental warning without http2 option (#1555) ([12da7fdf](git://github.com/restify/node-restify.git/commit/12da7fdf))
+
+
 <a name="6.3.0"></a>
 ## 6.3.0 (2017-11-02)
 
