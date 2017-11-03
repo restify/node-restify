@@ -42,6 +42,12 @@ make docs-build
 
 To add a new page, simply give it a [permalink](https://github.com/restify/node-restify/blob/94fe715173ffcebd8814bed7e17a22a24fac4ae8/docs/index.md) and then update [docs.yml](https://github.com/restify/restify.github.io/blob/master/_data/docs.yml) with the new permalink.
 
+## Running a benchmark
+
+```
+make benchmark
+```
+
 ## Cutting a release
 
 Cutting a release is currently a manual process. We use a [Conventional Changelog](http://conventionalcommits.org/) to simplify the process of managing semver on this project. Generally, the following series of commands will cut a release from the `master` branch:
