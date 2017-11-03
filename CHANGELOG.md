@@ -1,3 +1,12 @@
+<a name="6.3.0"></a>
+## 6.3.0 (2017-11-02)
+
+
+#### Features
+
+* **http2:** add native HTTP/2 support (#1489) ([6b202853](git://github.com/restify/node-restify.git/commit/6b202853))
+
+
 <a name="6.2.3"></a>
 ### 6.2.3 (2017-10-18)
 
