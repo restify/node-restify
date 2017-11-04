@@ -26,7 +26,7 @@
 
 ![restify](/../gh-images/logo/png/restify_logo_black_transp_288x288.png?raw=true "restify")
 
-[![Build Status](https://travis-ci.org/restify/node-restify.svg)](https://travis-ci.org/restify/node-restify)
+[![Build Status](https://travis-ci.org/restify/node-restify.svg?branch=master)](https://travis-ci.org/restify/node-restify)
 [![Dependency Status](https://david-dm.org/restify/node-restify.svg)](https://david-dm.org/restify/node-restify)
 [![devDependency Status](https://david-dm.org/restify/node-restify/dev-status.svg)](https://david-dm.org/restify/node-restify#info=devDependencies)
 [![bitHound Score](https://www.bithound.io/github/restify/node-restify/badges/score.svg)](https://www.bithound.io/github/restify/node-restify/master)
