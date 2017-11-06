@@ -115,7 +115,6 @@ describe('all other plugins', function() {
                 assert.ok(headers['response-time'] >= 0);
                 assert.equal(headers.server, 'restify');
                 assert.equal(headers.connection, 'Keep-Alive');
-                assert.equal(headers['api-version'], '2.0.0');
                 done();
             });
         });

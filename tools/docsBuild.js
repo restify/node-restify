@@ -65,6 +65,7 @@ var docsConfig = [
                 'plugins/inflightRequestThrottle.js'
             ),
             path.join(__dirname, LIB_PATH, 'plugins/cpuUsageThrottle.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/conditionalHandler.js'),
             path.join(__dirname, LIB_PATH, 'plugins/conditionalRequest.js'),
             path.join(__dirname, LIB_PATH, 'plugins/audit.js'),
             path.join(__dirname, LIB_PATH, 'plugins/metrics.js')

@@ -36,12 +36,12 @@ Sets the `cache-control` header.
 
 **Parameters**
 
--   `type` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
+-   `type` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
                                        (`"public"` or `"private"`) (optional, default `"public"`)
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.maxAge` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** max-age in seconds
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
+    -   `options.maxAge` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** max-age in seconds
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the value set to the header
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the value set to the header
 
 ### noCache
 
@@ -55,7 +55,7 @@ Appends the provided character set to the response's `Content-Type`.
 
 **Parameters**
 
--   `type` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** char-set value
+-   `type` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** char-set value
 
 **Examples**
 
@@ -71,8 +71,8 @@ Sets headers on the response.
 
 **Parameters**
 
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the header
--   `value` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the value of the header
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the header
+-   `value` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the value of the header
 
 **Examples**
 
@@ -102,7 +102,7 @@ res.header('x-foo', 'b');
 // => { 'x-foo': ['a', 'b'] }
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the retrieved value or the value that was set
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the retrieved value or the value that was set
 
 ### json
 
@@ -115,9 +115,9 @@ res.send({hello: 'world'});
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?**    http status code
--   `body` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?**    value to json.stringify
--   `headers` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** headers to set on the response
+-   `code` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?**    http status code
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?**    value to json.stringify
+-   `headers` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** headers to set on the response
 
 **Examples**
 
@@ -126,7 +126,7 @@ res.header('content-type', 'json');
 res.send({hello: 'world'});
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
 
 ### link
 
@@ -134,10 +134,10 @@ Sets the link header.
 
 **Parameters**
 
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**  the link key
--   `value` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the link value
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**  the link key
+-   `value` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the link value
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the header value set to res
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the header value set to res
 
 ### send
 
@@ -146,9 +146,9 @@ formatter based on the `content-type` header.
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** http status code
--   `body` **([Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Buffer](https://nodejs.org/api/buffer.html) \| [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error))?** the content to send
--   `headers` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** any add'l headers to set
+-   `code` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** http status code
+-   `body` **([Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Buffer](https://nodejs.org/api/buffer.html) \| [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))?** the content to send
+-   `headers` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** any add'l headers to set
 
 **Examples**
 
@@ -165,7 +165,7 @@ res.send(201, {hello: 'world'});
 res.send(new BadRequestError('meh'));
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
 
 ### sendRaw
 
@@ -176,11 +176,11 @@ formatters entirely and sends the content as is.
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** http status code
--   `body` **([Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Buffer](https://nodejs.org/api/buffer.html) \| [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error))?** the content to send
--   `headers` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** any add'l headers to set
+-   `code` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** http status code
+-   `body` **([Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Buffer](https://nodejs.org/api/buffer.html) \| [Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error))?** the content to send
+-   `headers` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** any add'l headers to set
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
 
 ### set
 
@@ -189,9 +189,9 @@ Uses `header()` underneath the hood, enabling multi-value headers.
 
 **Parameters**
 
--   `name` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))** name of the header or
+-   `name` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))** name of the header or
                                    `Object` of headers
--   `val` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
+-   `val` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** value of the header
 
 **Examples**
 
@@ -208,7 +208,7 @@ res.set({
 // }
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** self, the response object
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** self, the response object
 
 ### status
 
@@ -216,7 +216,7 @@ Sets the http status code on the response.
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** http status code
+-   `code` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** http status code
 
 **Examples**
 
@@ -224,7 +224,7 @@ Sets the http status code on the response.
 res.status(201);
 ```
 
-Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** the status code passed in
+Returns **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** the status code passed in
 
 ### redirect
 
@@ -232,19 +232,19 @@ Redirect is sugar method for redirecting.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** url or an options object to configure a redirect
-    -   `options.secure` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether to redirect to http or https
-    -   `options.hostname` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's hostname
-    -   `options.pathname` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's pathname
-    -   `options.port` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's port number
-    -   `options.query` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's query string
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** url or an options object to configure a redirect
+    -   `options.secure` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** whether to redirect to http or https
+    -   `options.hostname` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's hostname
+    -   `options.pathname` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's pathname
+    -   `options.port` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's port number
+    -   `options.query` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** redirect location's query string
                                         parameters
-    -   `options.overrideQuery` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, `options.query`
+    -   `options.overrideQuery` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, `options.query`
                                                  stomps over any existing query
                                                  parameters on current URL.
                                                  by default, will merge the two.
-    -   `options.permanent` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, sets 301. defaults to 302.
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
+    -   `options.permanent` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if true, sets 301. defaults to 302.
+-   `next` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
                            audit logger.
 
 **Examples**
@@ -270,7 +270,7 @@ res.redirect({
 }, next);  // => redirects to 301 https://www.foo.com/bar?a=1
 ```
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
 
 ### redirect
 
@@ -278,9 +278,9 @@ Redirect with code and url.
 
 **Parameters**
 
--   `code` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** http redirect status code
--   `url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
+-   `code` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** http redirect status code
+-   `url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
+-   `next` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
                            audit logger.
 
 **Examples**
@@ -289,7 +289,7 @@ Redirect with code and url.
 res.redirect(301, 'www.foo.com', next);
 ```
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
 
 ### redirect
 
@@ -297,8 +297,8 @@ Redirect with url.
 
 **Parameters**
 
--   `url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
--   `next` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
+-   `url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** redirect url
+-   `next` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** mandatory, to complete the response and trigger
                            audit logger.
 
 **Examples**
@@ -308,4 +308,4 @@ res.redirect('www.foo.com', next);
 res.redirect('/foo', next);
 ```
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** 

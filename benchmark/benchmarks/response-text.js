@@ -5,9 +5,17 @@ var restify = process.argv.includes('version=head')
     : require('restify');
 
 var server = restify.createServer();
+var path = '/';
+var port = 3000;
 
-server.get('/', function onRequest(req, res) {
+module.exports = {
+    url: 'http://localhost:' + port + path
+};
+
+server.get(path, function onRequest(req, res) {
     res.send('hello world');
 });
 
-server.listen(3000);
+if (!module.parent) {
+    server.listen(port);
+}

@@ -263,6 +263,20 @@ describe('audit logger', function() {
             })
         );
 
+        SERVER.pre(function(req, res, next) {
+            next();
+        });
+        SERVER.pre(function(req, res, next) {
+            next();
+        });
+
+        SERVER.use(function(req, res, next) {
+            next();
+        });
+        SERVER.use(function(req, res, next) {
+            next();
+        });
+
         SERVER.get(
             '/audit',
             function(req, res, next) {
@@ -291,6 +305,30 @@ describe('audit logger', function() {
                 ringbuffer.records.length,
                 1,
                 'should only have 1 log record'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['pre-0'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'pre-0'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['pre-1'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'pre-1'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['use-0'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'use-0'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['use-1'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'use-1'
             );
             assertIsAtLeastWithTolerate(
                 record.req.timers['handler-0'],
@@ -604,41 +642,6 @@ describe('audit logger', function() {
         CLIENT.get('/audit?foo=bar', function(err, req, res) {
             assert.ifError(err);
         });
-    });
-
-    it('should log 444 status code for aborted request', function(done) {
-        SERVER.once(
-            'after',
-            restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: process.stdout
-                        }
-                    ]
-                }),
-                server: SERVER,
-                event: 'after'
-            })
-        );
-
-        SERVER.once('audit', function(data) {
-            assert.ok(data);
-            assert.ok(data.req_id);
-            assert.isNumber(data.latency);
-            assert.equal(444, data.res.statusCode);
-            done();
-        });
-
-        SERVER.get('/audit', function(req, res, next) {
-            req.emit('aborted');
-            res.send();
-            next();
-        });
-
-        CLIENT.get('/audit', function(err, req, res) {});
     });
 
     it('should log 444 for closed request', function(done) {

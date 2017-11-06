@@ -21,7 +21,6 @@ permalink: /docs/server-api/
     -   [pre](#pre)
     -   [use](#use)
     -   [param](#param)
-    -   [versionedUse](#versioneduse)
     -   [rm](#rm)
     -   [address](#address)
     -   [inflightRequests](#inflightrequests)
@@ -39,40 +38,40 @@ routes and handlers for incoming requests.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
-    -   `options.name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server. (optional, default `"restify"`)
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
+    -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server. (optional, default `"restify"`)
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
-    -   `options.log` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan) instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
-    -   `options.version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))?** Default version(s) to use in all
-        routes.
-    -   `options.acceptable` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)?** String)|List of content-types this
+    -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan) instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
+    -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** String)|List of content-types this
         server can respond with.
-    -   `options.url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
+    -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
+    -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
+    -   `options.key` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
+    -   `options.formatters` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
+    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
         [bunyan](https://github.com/trentm/node-bunyan) instance.
-        response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
-    -   `options.spdy` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        response header, default is `restify`. Pass empty string to unset the header.
+        Comes with significant negative performance impact. (optional, default `false`)
+    -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-spdy](https://github.com/indutny/node-spdy).
-    -   `options.http2` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+    -   `options.http2` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [http2.createSecureServer](https://nodejs.org/api/http2.html).
-    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
+    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
+    -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
         will treat "/foo" and "/foo/" as different paths. (optional, default `false`)
 
 **Examples**
@@ -81,8 +80,8 @@ routes and handlers for incoming requests.
 var restify = require('restify');
 var server = restify.createServer();
 
-server.listen(8080, function () {
-  console.log('ready on %s', server.url);
+srv.listen(8080, function () {
+  console.log('ready on %s', srv.url);
 });
 ```
 
@@ -94,51 +93,55 @@ Creates a new Server.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
-    -   `options.name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server.
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
+    -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server.
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router
-    -   `options.log` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan)
+    -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan)
         instance.
-    -   `options.version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))?** Default version(s) to use in all
-        routes.
-    -   `options.acceptable` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>?** List of content-types this
+    -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>?** List of content-types this
         server can respond with.
-    -   `options.url` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
+    -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
+    -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
+    -   `options.key` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
+    -   `options.formatters` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
+    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
+        Comes with significant negative performance impact.
         [bunyan](https://github.com/trentm/node-bunyan) instance.
         response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
-    -   `options.spdy` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+    -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-spdy](https://github.com/indutny/node-spdy).
-    -   `options.http2` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+    -   `options.http2` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [http2.createSecureServer](https://nodejs.org/api/http2.html).
-    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
+    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
+         times (optional, default `false`)
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
+         called more than once, enabled onceNext option (optional, default `false`)
+    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
-        will treat "/foo" and "/foo/" as different paths. (optional, default `false`)
+    -   `options.noWriteContinue` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** prevents
+         `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
 
 **Examples**
 
 ```javascript
 var restify = require('restify');
-var server = new restify.Server();
+var server = restify.createServer();
 
-server.listen(8080, function () {
-  console.log('ready on %s', server.url);
+srv.listen(8080, function () {
+  console.log('ready on %s', srv.url);
 });
 ```
 
@@ -150,9 +153,9 @@ Wraps node's
 
 **Parameters**
 
--   `port` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Port
--   `host` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Host
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** optionally get notified when listening.
+-   `port` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Port
+-   `host` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Host
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** optionally get notified when listening.
 
 **Examples**
 
@@ -164,9 +167,9 @@ server.listen(80, '127.0.0.1')
 server.listen('/tmp/server.sock')
 ```
 
--   Throws **[TypeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** 
+-   Throws **[TypeError](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** 
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### close
 
@@ -176,9 +179,9 @@ Wraps node's
 
 **Parameters**
 
--   `callback` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)?** callback to invoke when done
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** callback to invoke when done
 
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### get
 
@@ -274,7 +277,7 @@ depends on.  Note that req.params will _not_ be set yet.
 
 **Parameters**
 
--   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that
+-   `handler` **...([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that
     run for all routes. _before_ routing occurs.
     This gives you a hook to change request headers and the like if you need to.
     Note that `req.params` will be undefined, as that's filled in _after_
@@ -298,7 +301,7 @@ URLs_
 server.pre(restify.pre.dedupeSlashes());
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### use
 
@@ -312,10 +315,10 @@ You can pass in any combination of functions or array of functions.
 
 **Parameters**
 
--   `handler` **...([Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
+-   `handler` **...([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
         variable number of nested arrays of handler functions
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### param
 
@@ -335,33 +338,10 @@ Exposes an API:
 
 **Parameters**
 
--   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the URL param to respond to
--   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)**   The middleware function to execute
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the URL param to respond to
+-   `fn` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)**   The middleware function to execute
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
-
-### versionedUse
-
-Piggy-backs on the `server.use` method. It attaches a new middleware
-function that only fires if the specified version matches the request.
-
-Note that if the client does not request a specific version, the middleware
-function always fires. If you don't want this set a default version with a
-pre handler on requests where the client omits one.
-
-Exposes an API:
-  server.versionedUse("version", function (req, res, next, ver) {
-    // do stuff that only applies to routes of this API version
-  });
-
-**Parameters**
-
--   `versions` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** the version(s) the URL to respond to
--   `fn` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)**       the middleware function to execute, the
-                                      fourth parameter will be the selected
-                                      version
-
-Returns **[undefined](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### rm
 
@@ -370,12 +350,12 @@ You pass in the route 'blob' you got from a mount call.
 
 **Parameters**
 
--   `route` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the route name.
+-   `routeName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the route name.
 
 
--   Throws **[TypeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** on bad input.
+-   Throws **[TypeError](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** on bad input.
 
-Returns **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** true if route was removed, false if not.
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** true if route was removed, false if not.
 
 ### address
 
@@ -395,13 +375,13 @@ _Output:_
 { address: '::', family: 'IPv6', port: 8080 }
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Address of server
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Address of server
 
 ### inflightRequests
 
 Returns the number of inflight requests currently being handled by the server
 
-Returns **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** number of inflight requests
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** number of inflight requests
 
 ### debugInfo
 
@@ -424,7 +404,6 @@ _Output:_
       input: '/',
       compiledRegex: /^[\/]*$/,
       compiledUrlParams: null,
-      versions: null,
       handlers: [Array]
      }
   ],
@@ -445,7 +424,7 @@ _Output:_
 }
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** debug info
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** debug info
 
 ### toString
 
@@ -480,7 +459,7 @@ Url: http://[::]:8080
 Version:
 ```
 
-Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** stringified server
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** stringified server
 
 ## Events
 
@@ -765,13 +744,13 @@ on this event, and if there are none, responds with a default 415 handler.
 
 Server method opts
 
-Type: ([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) \| [Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object))
+Type: ([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))
 
 **Properties**
 
--   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
--   `path` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp))** a string or regex matching the route
--   `version` **([String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>)** versions supported by this route
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
+-   `path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be any String accepted by
+    [find-my-way](https://github.com/delvedor/find-my-way)
 
 **Examples**
 
@@ -781,10 +760,9 @@ server.get('/foo', function(req, res, next) {});
 // a parameterized route
 server.get('/foo/:bar', function(req, res, next) {});
 // a regular expression
-server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {});
+server.get('/example/:file(^\\d+).png', function(req, res, next) {});
 // an options object
 server.get({
     path: '/foo',
-    version: ['1.0.0', '2.0.0']
 }, function(req, res, next) {});
 ```

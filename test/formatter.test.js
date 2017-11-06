@@ -210,23 +210,21 @@ test(
     }
 );
 
-test(
-    'default jsonp formatter should escape ' + 'line and paragraph separators',
-    function(t) {
-        // ensure client accepts only a type not specified by server
-        var opts = {
-            path: '/jsonpSeparators',
-            headers: {
-                accept: 'application/javascript'
-            }
-        };
+// eslint-disable-next-line
+test('default jsonp formatter should escape line and paragraph separators', function(t) {
+    // ensure client accepts only a type not specified by server
+    var opts = {
+        path: '/jsonpSeparators',
+        headers: {
+            accept: 'application/javascript'
+        }
+    };
 
-        CLIENT.get(opts, function(err, req, res, data) {
-            t.ifError(err);
-            t.ok(req);
-            t.ok(res);
-            t.equal(data, '"\\u2028\\u2029"');
-            t.end();
-        });
-    }
-);
+    CLIENT.get(opts, function(err, req, res, data) {
+        t.ifError(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(data, '"\\u2028\\u2029"');
+        t.end();
+    });
+});
