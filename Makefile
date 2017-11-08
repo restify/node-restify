@@ -24,6 +24,7 @@ NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
 DOCS_BUILD	:= ./tools/docsBuild.js
+BENCHMARK	:= ./benchmark/index.js
 NPM		:= npm
 NODE		:= node
 PRETTIER		:= ./node_modules/.bin/prettier
@@ -70,6 +71,10 @@ nsp: node_modules $(NSP)
 .PHONY: docs-build
 docs-build:
 	@($(NODE) $(DOCS_BUILD))
+
+.PHONY: benchmark
+benchmark:
+		@($(NODE) $(BENCHMARK))
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
