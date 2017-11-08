@@ -74,15 +74,15 @@ var docsConfig = [
 ];
 
 /**
-* @function build
-* @param {Object} options - Options
-* @param {Array} options.files - Array of file paths ["./foo.js"]
-* @param {String} options.config - Path to "config.yaml"
-* @param {String} options.output - Path to output dir
-* @param {String} options.title - Jekyll title
-* @param {String} options.permalink - Jekyll permalink
-* @returns {Promise} - Promise
-*/
+ * @function build
+ * @param {Object} options - Options
+ * @param {Array} options.files - Array of file paths ["./foo.js"]
+ * @param {String} options.config - Path to "config.yaml"
+ * @param {String} options.output - Path to output dir
+ * @param {String} options.title - Jekyll title
+ * @param {String} options.permalink - Jekyll permalink
+ * @returns {Promise} - Promise
+ */
 function build(options) {
     return documentation
         .build(options.files, {

@@ -303,7 +303,7 @@ Many options correspond directly to option defined for the underlying
     -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Only applies when if
         mapParams true.
         When true, will stomp on req.params field when existing value is found. (optional, default `false`)
-    -   `options.allowDots` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Transform `?foo.bar=baz` to a 
+    -   `options.allowDots` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Transform `?foo.bar=baz` to a
         nested object: `{foo: {bar: 'baz'}}`. (optional, default `false`)
     -   `options.arrayLimit` **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** Only transform `?a[$index]=b`
         to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
@@ -762,7 +762,7 @@ you would like to keep CPU bound tasks from piling up causing an increased
 per-request latency.
 
 The algorithm asks you for a maximum CPU utilization rate, which it uses to
-determine at what point it should be rejecting 100% of traffic. For a normal 
+determine at what point it should be rejecting 100% of traffic. For a normal
 Node.js service, this is 1 since Node is single threaded. It uses this,
 paired with a limit that you provide to determine the total % of traffic it
 should be rejecting. For example, if you specify a limit of .5 and a max of

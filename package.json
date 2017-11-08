@@ -133,7 +133,7 @@
     "nodeunit": "^0.11.2",
     "nsp": "^2.8.1",
     "pre-commit": "^1.2.2",
-    "prettier": "^1.7.4",
+    "prettier": "^1.8.1",
     "proxyquire": "^1.8.0",
     "restify-clients": "^1.5.2",
     "rimraf": "^2.6.2",
