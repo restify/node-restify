@@ -3,6 +3,7 @@
 
 var inquirer = require('inquirer');
 var bench = require('./lib/bench');
+var stableVersion = require('restify/package.json').version;
 
 var BENCHMARKS = ['response-json', 'response-text'];
 
@@ -47,7 +48,10 @@ inquirer
         {
             type: 'confirm',
             name: 'compare',
-            message: 'Do you want to compare HEAD with latest release?',
+            message:
+                'Do you want to compare HEAD with the stable release (' +
+                stableVersion +
+                ')?',
             default: true
         },
         {
@@ -59,7 +63,7 @@ inquirer
         {
             type: 'input',
             name: 'connection',
-            message: 'How many connection you need?',
+            message: 'How many connections do you need?',
             default: 100,
             validate: function validate(value) {
                 return (
@@ -71,7 +75,7 @@ inquirer
         {
             type: 'input',
             name: 'pipelining',
-            message: 'How many pipelining you need?',
+            message: 'How many pipelining do you need?',
             default: 10,
             validate: function validate(value) {
                 return (
@@ -83,7 +87,7 @@ inquirer
         {
             type: 'input',
             name: 'duration',
-            message: 'How long does it takes?',
+            message: 'How long does it take?',
             default: 30,
             validate: function validate(value) {
                 return (
