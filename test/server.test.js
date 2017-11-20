@@ -232,9 +232,8 @@ test('_routeErrorResponse does not cause uncaughtException when called when head
         var nextHasErrored;
         try {
             next();
-            // eslint-disable-next-line no-empty
         } catch (err) {
-            nextHasErrored = new Error('next Error');
+            nextHasErrored = err;
         }
 
         t.ifError(nextHasErrored);
