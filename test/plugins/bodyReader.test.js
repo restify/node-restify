@@ -1,6 +1,7 @@
 'use strict';
 
 // core requires
+var http = require('http');
 
 // external requires
 var assert = require('chai').assert;
@@ -110,6 +111,65 @@ describe('body reader', function () {
                 assert.equal(res.statusCode, 200);
                 done();
             });
+        });
+
+        it('should handle client timeout', function (done) {
+            SERVER.use(restify.plugins.bodyParser());
+
+            SERVER.post('/compressed', function (req, res, next) {
+                res.send(200, { inflightRequests: SERVER.inflightRequests() });
+                next();
+            });
+
+            // set timeout to 100ms so test runs faster, when client stops
+            // sending POST data
+            SERVER.on('connection', function (socket) {
+                socket.setTimeout(100);
+            });
+
+            var postData = 'hello world';
+
+            var options = {
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/compressed',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // report postData + 1 so that request isn't sent
+                    'Content-Length': Buffer.byteLength(postData) + 1
+                }
+            };
+
+            var req = http.request(options, function (res) {
+                // should never receive a response
+                assert.isNotOk(res);
+            });
+
+            // will get a req error after 100ms timeout
+            req.on('error', function (e) {
+                // make another request to verify in flight request is only 1
+                CLIENT = restifyClients.createJsonClient({
+                    url: 'http://127.0.0.1:' + PORT,
+                    retry: false
+                });
+
+                CLIENT.post(
+                    '/compressed',
+                    {
+                        apple: 'red'
+                    },
+                    function (err, _, res, obj) {
+                        assert.ifError(err);
+                        assert.equal(res.statusCode, 200);
+                        assert.equal(obj.inflightRequests, 1);
+                        done();
+                    }
+                );
+            });
+
+            // write data to request body, but don't req.send()
+            req.write(postData);
         });
     });
 
