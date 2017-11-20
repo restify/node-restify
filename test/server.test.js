@@ -224,6 +224,33 @@ test('rm route and clear cached route', function(t) {
     });
 });
 
+test('_routeErrorResponse does not cause uncaughtException when called when header has already been sent', function(
+    t
+) {
+    SERVER.on('MethodNotAllowed', function(req, res, error, next) {
+        res.json(405, { status: 'MethodNotAllowed' });
+        var nextHasErrored;
+        try {
+            next();
+            // eslint-disable-next-line no-empty
+        } catch (err) {
+            nextHasErrored = new Error('next Error');
+        }
+
+        t.ifError(nextHasErrored);
+        t.end();
+    });
+
+    SERVER.post('/routePostOnly', function tester(req, res, next) {
+        next();
+    });
+
+    CLIENT.get('/routePostOnly', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 405);
+    });
+});
+
 test('GH-1171: rm one version of the routes, other versions should still work', function(
     t
 ) {
