@@ -229,14 +229,13 @@ test('_routeErrorResponse does not cause uncaughtException when called when head
 ) {
     SERVER.on('MethodNotAllowed', function(req, res, error, next) {
         res.json(405, { status: 'MethodNotAllowed' });
-        var nextHasErrored;
         try {
             next();
         } catch (err) {
-            nextHasErrored = err;
+            t.fail(
+                'next() should not throw error when header has already been sent'
+            );
         }
-
-        t.ifError(nextHasErrored);
         t.end();
     });
 
