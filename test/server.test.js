@@ -2084,11 +2084,14 @@ test('gh-779 set-cookie fields should never have commas', function(t) {
     CLIENT.get('/set-cookie', function(err, _, res) {
         t.ifError(err);
         t.equal(
-            res.headers['set-cookie'].length,
-            1,
-            'set-cookie header should only have 1 element'
+            res.rawHeaders.filter(function(keyOrValue) {
+                return keyOrValue === 'set-cookie';
+            }).length,
+            2,
+            'multiple set-cookie headers should not be merged'
         );
-        t.equal(res.headers['set-cookie'], 'bar');
+        t.equal(res.headers['set-cookie'][0], 'foo');
+        t.equal(res.headers['set-cookie'][1], 'bar');
         t.end();
     });
 });

@@ -620,3 +620,16 @@ test('GH-1429: setting code with res.status not respected', function(t) {
         t.end();
     });
 });
+
+test('should support multiple set-cookie headers', function(t) {
+    SERVER.get('/set-cookie', function(req, res, next) {
+        res.header('Set-Cookie', 'a=1');
+        res.header('Set-Cookie', 'b=2');
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/set-cookie'), function(err, _, res) {
+        t.equal(res.headers['set-cookie'].length, 2);
+        t.end();
+    });
+});
