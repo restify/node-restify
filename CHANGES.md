@@ -1,8 +1,8 @@
 # restify Changelog
 
-## not yet released
+## 4.3.2
 
-(nothing yet)
+- #1473 Fix recursion issue with `res.getHeaders()` on node8+
 
 ## 4.3.1
 
