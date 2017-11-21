@@ -1,3 +1,13 @@
+<a name="6.3.4"></a>
+### 6.3.4 (2017-11-21)
+
+
+#### Bug Fixes
+
+* **bodyReader:** Fix memory leak (#1566) ([756b3f02](git://github.com/restify/node-restify.git/commit/756b3f02))
+* **server:** avoiding uncaughtException in _routeErrorResponse by only sending response when  ([cf65c65c](git://github.com/restify/node-restify.git/commit/cf65c65c))
+
+
 <a name="6.3.2"></a>
 ### 6.3.2 (2017-11-08)
 
