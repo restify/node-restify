@@ -1611,6 +1611,60 @@ test('gh-193 route ENOEXIST', function(t) {
     });
 });
 
+test('run param only with existing req.params', function(t) {
+    var count = 0;
+
+    SERVER.param('name', function(req, res, next) {
+        count++;
+        next();
+    });
+
+    SERVER.param('userId', function(req, res, next, param, name) {
+        t.equal(param, '1');
+        t.equal(name, 'userId');
+        count++;
+        next();
+    });
+
+    SERVER.get('/users/:userId', function(req, res, next) {
+        res.send(200);
+    });
+
+    CLIENT.get('/users/1', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(count, 1);
+        t.end();
+    });
+});
+
+test('run param with false value', function(t) {
+    var count = 0;
+
+    SERVER.param('name', function(req, res, next) {
+        count++;
+        next();
+    });
+
+    SERVER.param('userId', function(req, res, next, param, name) {
+        t.equal(param, '');
+        t.equal(name, 'userId');
+        count++;
+        next();
+    });
+
+    SERVER.get('/users/:userId', function(req, res, next) {
+        res.send(200);
+    });
+
+    CLIENT.get('/users//', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(count, 1);
+        t.end();
+    });
+});
+
 test('gh-193 route only run use once', function(t) {
     var count = 0;
 
