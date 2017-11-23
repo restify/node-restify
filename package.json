@@ -102,7 +102,7 @@
     "http-signature": "^1.2.0",
     "lodash": "^4.17.4",
     "lru-cache": "^4.1.1",
-    "mime": "^1.4.1",
+    "mime": "^1.5.0",
     "negotiator": "^0.6.1",
     "once": "^1.4.0",
     "pidusage": "^1.2.0",
