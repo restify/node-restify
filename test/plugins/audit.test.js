@@ -38,8 +38,7 @@ describe('audit logger', function() {
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
-                retry: false,
-                requestTimeout: 3000
+                retry: false
             });
 
             done();
