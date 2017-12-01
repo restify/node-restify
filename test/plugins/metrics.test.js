@@ -96,7 +96,7 @@ describe('request metrics plugin', function() {
                     assert.equal(err.name, 'RequestCloseError');
 
                     assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 202);
+                    assert.equal(metrics.statusCode, 444);
                     assert.isAtLeast(metrics.latency, 200);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
@@ -137,7 +137,7 @@ describe('request metrics plugin', function() {
                     assert.equal(err.name, 'RequestAbortedError');
 
                     assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 202);
+                    assert.equal(metrics.statusCode, 444);
                     assert.isAtLeast(metrics.latency, 200);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
@@ -155,7 +155,6 @@ describe('request metrics plugin', function() {
         });
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
-            assert.ifError(err);
             return done();
         });
     });
