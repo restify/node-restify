@@ -191,3 +191,35 @@ test('should provide route object', function(t) {
         t.end();
     });
 });
+
+test('should provide time when request started', function(t) {
+    SERVER.get('/ping/:name', function(req, res, next) {
+        t.equal(typeof req.time(), 'number');
+        t.ok(req.time() > Date.now() - 1000);
+        t.ok(req.time() <= Date.now());
+        res.send('ok');
+        return next();
+    });
+
+    CLIENT.get('/ping/lagavulin', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('should provide date when request started', function(t) {
+    SERVER.get('/ping/:name', function(req, res, next) {
+        t.ok(req.date() instanceof Date);
+        t.ok(req.date().getTime() > Date.now() - 1000);
+        t.ok(req.date().getTime() <= Date.now());
+        res.send('ok');
+        return next();
+    });
+
+    CLIENT.get('/ping/lagavulin', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
