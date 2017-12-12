@@ -194,7 +194,7 @@ describe('static resource plugin', function() {
         serveStaticTest(done, false, '.tmp', new RegExp('/.*'));
     });
 
-    it('static serves static files with a root, !greedy, regex', function(
+    it('static serves static files ' + 'with a root, !greedy, regex', function(
         done
     ) {
         serveStaticTest(done, false, '.tmp', new RegExp('/?.*'));
@@ -204,11 +204,12 @@ describe('static resource plugin', function() {
         serveStaticTest(done, true, '.tmp');
     });
 
-    it('restify-GH-379 static serves file with parentheses in path', function(
-        done
-    ) {
-        serveStaticTest(done, false, '.(tmp)');
-    });
+    it(
+        'restify-GH-379 static serves file ' + 'with parentheses in path',
+        function(done) {
+            serveStaticTest(done, false, '.(tmp)');
+        }
+    );
 
     it('restify-GH-719 serve a specific static file', function(done) {
         // serve the same default file .tmp/public/index.json
@@ -216,23 +217,27 @@ describe('static resource plugin', function() {
         serveStaticTest(done, false, '.tmp', null, true);
     });
 
-    it('static serves static file with appendRequestPath = false', function(
-        done
-    ) {
-        testNoAppendPath(done, false, '.tmp');
-    });
+    it(
+        'static serves static file with ' + 'appendRequestPath = false',
+        function(done) {
+            testNoAppendPath(done, false, '.tmp');
+        }
+    );
 
-    it('static serves default file with appendRequestPath = false', function(
-        done
-    ) {
-        testNoAppendPath(done, true, '.tmp');
-    });
+    it(
+        'static serves default file with ' + 'appendRequestPath = false',
+        function(done) {
+            testNoAppendPath(done, true, '.tmp');
+        }
+    );
 
-    it('restify serve a specific static file with appendRequestPath = false', function(
-        done
-    ) {
-        testNoAppendPath(done, false, '.tmp', null, true);
-    });
+    it(
+        'restify serve a specific static file ' +
+            'with appendRequestPath = false',
+        function(done) {
+            testNoAppendPath(done, false, '.tmp', null, true);
+        }
+    );
 
     it('static responds 404 for missing file', function(done) {
         var p = '/public/no-such-file.json';
@@ -251,24 +256,25 @@ describe('static resource plugin', function() {
         });
     });
 
-    it('GH-1382 static responds 404 for missing file with percent-codes', function(
-        done
-    ) {
-        var p = '/public/no-%22such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
+    it(
+        'GH-1382 static responds 404 for missing file ' + 'with percent-codes',
+        function(done) {
+            var p = '/public/no-%22such-file.json';
+            var tmpPath = path.join(process.cwd(), '.tmp');
 
-        SERVER.get(
-            new RegExp('/public/.*'),
-            restify.plugins.serveStatic({ directory: tmpPath })
-        );
+            SERVER.get(
+                new RegExp('/public/.*'),
+                restify.plugins.serveStatic({ directory: tmpPath })
+            );
 
-        CLIENT.get(p, function(err, req, res, obj) {
-            assert.ok(err);
-            assert.equal(err.statusCode, 404);
-            assert.equal(err.restCode, 'ResourceNotFound');
-            done();
-        });
-    });
+            CLIENT.get(p, function(err, req, res, obj) {
+                assert.ok(err);
+                assert.equal(err.statusCode, 404);
+                assert.equal(err.restCode, 'ResourceNotFound');
+                done();
+            });
+        }
+    );
 
     // To ensure this will always get properly restored (even in case of a test
     // failure) we do it here.
@@ -393,22 +399,23 @@ describe('static resource plugin', function() {
         });
     });
 
-    it('GH-1382 static responds 404 for missing file with percent-codes', function(
-        done
-    ) {
-        var p = '/public/no-%22such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
+    it(
+        'GH-1382 static responds 404 for missing file with ' + 'percent-codes',
+        function(done) {
+            var p = '/public/no-%22such-file.json';
+            var tmpPath = path.join(process.cwd(), '.tmp');
 
-        SERVER.get(
-            new RegExp('/public/.*'),
-            restify.plugins.serveStatic({ directory: tmpPath })
-        );
+            SERVER.get(
+                new RegExp('/public/.*'),
+                restify.plugins.serveStatic({ directory: tmpPath })
+            );
 
-        CLIENT.get(p, function(err, req, res, obj) {
-            assert.ok(err);
-            assert.equal(err.statusCode, 404);
-            assert.equal(err.restCode, 'ResourceNotFound');
-            return done();
-        });
-    });
+            CLIENT.get(p, function(err, req, res, obj) {
+                assert.ok(err);
+                assert.equal(err.statusCode, 404);
+                assert.equal(err.restCode, 'ResourceNotFound');
+                return done();
+            });
+        }
+    );
 });
