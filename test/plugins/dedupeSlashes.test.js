@@ -55,16 +55,17 @@ describe('dedupe forward slashes in URL', function() {
             });
         });
 
-        it('should not remove single slashes including trailing slashes', function(
-            done
-        ) {
-            CLIENT.get('/foo/bar/', function(err, _, res, data) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                assert.equal(data, '/foo/bar/');
-                done();
-            });
-        });
+        it(
+            'should not remove single slashes ' + 'including trailing slashes',
+            function(done) {
+                CLIENT.get('/foo/bar/', function(err, _, res, data) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    assert.equal(data, '/foo/bar/');
+                    done();
+                });
+            }
+        );
 
         it('should remove duplicate slashes', function(done) {
             CLIENT.get('//foo//bar', function(err, _, res, data) {
@@ -75,16 +76,17 @@ describe('dedupe forward slashes in URL', function() {
             });
         });
 
-        it('should remove duplicate slashes including trailing slashes', function(
-            done
-        ) {
-            CLIENT.get('//foo//bar//', function(err, _, res, data) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                assert.equal(data, '/foo/bar/');
-                done();
-            });
-        });
+        it(
+            'should remove duplicate slashes ' + 'including trailing slashes',
+            function(done) {
+                CLIENT.get('//foo//bar//', function(err, _, res, data) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    assert.equal(data, '/foo/bar/');
+                    done();
+                });
+            }
+        );
     });
 
     describe('strict routing', function() {
@@ -137,15 +139,16 @@ describe('dedupe forward slashes in URL', function() {
             });
         });
 
-        it('should remove duplicate slashes including trailing slashes', function(
-            done
-        ) {
-            CLIENT.get('//foo//bar//', function(err, _, res, data) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                assert.equal(data, '/foo/bar/');
-                done();
-            });
-        });
+        it(
+            'should remove duplicate slashes ' + 'including trailing slashes',
+            function(done) {
+                CLIENT.get('//foo//bar//', function(err, _, res, data) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    assert.equal(data, '/foo/bar/');
+                    done();
+                });
+            }
+        );
     });
 });

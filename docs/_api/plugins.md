@@ -929,6 +929,7 @@ server.on('after', restify.plugins.auditLogger({
     name: 'audit',
     stream: process.stdout
   }),
+  event: 'after',
   server: SERVER,
   logMetrics : logBuffer,
   printLog : true
