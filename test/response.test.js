@@ -191,8 +191,10 @@ test(
             );
         });
 
-        // use a relative URL here instead of request with full protocol and host.
-        // this causes node to receive different values for req.url, which affects
+        // use a relative URL here instead of request with full
+        // protocol and host.
+        // this causes node to receive different values for req.url,
+        // which affects
         // how reconstruction of the redirect URL is done. for example including
         // full host will result in a req.url value of:
         //         http://127.0.0.1:57824/5
@@ -395,21 +397,22 @@ test('redirect using default hostname with custom port', function(t) {
 });
 
 // jscs:disable maximumLineLength
-test('redirect should cause InternalError when invoked without next', function(
-    t
-) {
-    SERVER.get('/9', function(req, res, next) {
-        res.redirect();
-    });
+test(
+    'redirect should cause InternalError ' + 'when invoked without next',
+    function(t) {
+        SERVER.get('/9', function(req, res, next) {
+            res.redirect();
+        });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
-        t.equal(res.statusCode, 500);
+        CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
+            t.equal(res.statusCode, 500);
 
-        // json parse the response
-        t.equal(body.code, 'Internal');
-        t.end();
-    });
-});
+            // json parse the response
+            t.equal(body.code, 'Internal');
+            t.end();
+        });
+    }
+);
 
 // jscs:enable maximumLineLength
 

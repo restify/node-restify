@@ -81,8 +81,8 @@ routes and handlers for incoming requests.
 var restify = require('restify');
 var server = restify.createServer();
 
-srv.listen(8080, function () {
-  console.log('ready on %s', srv.url);
+server.listen(8080, function () {
+  console.log('ready on %s', server.url);
 });
 ```
 
@@ -135,10 +135,10 @@ Creates a new Server.
 
 ```javascript
 var restify = require('restify');
-var server = restify.createServer();
+var server = new restify.Server();
 
-srv.listen(8080, function () {
-  console.log('ready on %s', srv.url);
+server.listen(8080, function () {
+  console.log('ready on %s', server.url);
 });
 ```
 
