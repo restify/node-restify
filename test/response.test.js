@@ -517,7 +517,10 @@ test('should fail to set header due to missing formatter', function(t) {
     CLIENT.get(join(LOCALHOST, '/11'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(res.headers['content-type'], 'application/octet-stream');
+        t.equal(
+            res.headers['content-type'],
+            'application/octet-stream; charset=utf-8'
+        );
         t.end();
     });
 });
@@ -620,6 +623,33 @@ test('GH-1429: setting code with res.status not respected', function(t) {
 
     CLIENT.get(join(LOCALHOST, '/404'), function(err, _, res) {
         t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+test('should default Response content-type to charset=utf-8', function(t) {
+    SERVER.get('/200', function(req, res, next) {
+        res.status(200);
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/200'), function(err, _, res) {
+        t.equal(res.headers['content-type'], 'application/json; charset=utf-8');
+        t.end();
+    });
+});
+
+test('should not overwrite setting response content-type charset', function(t) {
+    SERVER.get('/200', function(req, res, next) {
+        res.charSet('ISO-8859-1');
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/200'), function(err, _, res) {
+        t.equal(
+            res.headers['content-type'],
+            'application/json; charset=ISO-8859-1'
+        );
         t.end();
     });
 });
