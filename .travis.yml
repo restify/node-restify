@@ -1,17 +1,15 @@
 sudo: false
 language: node_js
 node_js:
-   - "4"
-   - "6"
-   - "7"
-   - "8"
-   - "stable"
+   - "4"                    # Maintenance LTS release
+   - "lts/*"                # Active LTS release
+   - "node"                 # Latest stable release
 env:
-  - TEST_SKIP_IP_V6=true
+  - TEST_SKIP_IP_V6=true    # Current TravisCI (trusty) doesn't support IPv6
 notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/4a4dea774d3ac86cfef1
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: false     # default: false
+    on_success: change      # options: [always|never|change] default: always
+    on_failure: always      # options: [always|never|change] default: always
+    on_start: false         # default: false
