@@ -1052,7 +1052,7 @@ about that request.
 **Examples**
 
 ```javascript
-server.on('after', plugins.metrics(function onMetrics(err, metrics) {
+server.on('after', restify.plugins.metrics({ server: server }, function (err, metrics, req, res, route) {
      // metrics is an object containing information about the request
 }));
 ```
