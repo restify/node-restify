@@ -1,0 +1,15 @@
+toc:
+  - name: Usage
+    file: ../api/formatters-usage.md
+  - name: Types
+    children:
+      - formatter
+  - name: Included formatters
+    description: |
+      restify comes pre-loaded with a standard set of formatters for common
+      use cases.
+    children:
+      - formatText
+      - formatJSON
+      - formatJSONP
+      - formatBinary
