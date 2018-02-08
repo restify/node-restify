@@ -105,7 +105,7 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 Returns a Date object representing when the request was setup.
 Like `time()`, but returns a Date object.
 
-Returns **[Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)** date
+Returns **[Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date)** date when request began being processed
 
 ### href
 
@@ -182,7 +182,9 @@ Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refer
 The number of ms since epoch of when this request began being processed.
 Like date(), but returns a number.
 
-Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** time
+Returns **[Number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** time when request began being processed in epoch:
+                   ellapsed milliseconds since
+                   January 1, 1970, 00:00:00 UTC
 
 ### version
 
