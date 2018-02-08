@@ -464,4 +464,33 @@ describe('JSON body parser', function() {
 
         CLIENT.post('/body/foo', payload, done);
     });
+
+    it('should not throw uncaught "too few args to sprintf"', function(done) {
+        // https://github.com/restify/node-restify/issues/1411
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/', function(req, res, next) {
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/',
+            method: 'POST',
+            agent: false,
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/json'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 400);
+            res.once('end', done);
+            res.resume();
+        });
+        client.write('{"malformedJsonWithPercentSign":30%}');
+        client.end();
+    });
 });
