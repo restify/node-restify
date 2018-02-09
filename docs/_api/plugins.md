@@ -1038,7 +1038,7 @@ Returns **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Ref
 ### metrics
 
 The module includes the following plugins to be used with restify's `after`
-event, e.g., `server.on('after', plugins.metrics());`:
+event, e.g., `server.on('after', restify.plugins.metrics());`:
 
 A plugin that listens to the server's after event and emits information
 about that request.
@@ -1052,8 +1052,9 @@ about that request.
 **Examples**
 
 ```javascript
-server.on('after', plugins.metrics(function onMetrics(err, metrics) {
-     // metrics is an object containing information about the request
+server.on('after', restify.plugins.metrics({ server: server },
+    function (err, metrics, req, res, route) {
+        // metrics is an object containing information about the request
 }));
 ```
 
