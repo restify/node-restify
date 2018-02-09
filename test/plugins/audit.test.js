@@ -605,4 +605,74 @@ describe('audit logger', function() {
             assert.ifError(err);
         });
     });
+
+    it('should log 444 status code for aborted request', function(done) {
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            stream: process.stdout
+                        }
+                    ]
+                }),
+                server: SERVER,
+                event: 'after'
+            })
+        );
+
+        SERVER.once('audit', function(data) {
+            assert.ok(data);
+            assert.ok(data.req_id);
+            assert.isNumber(data.latency);
+            assert.equal(444, data.res.statusCode);
+            done();
+        });
+
+        SERVER.get('/audit', function(req, res, next) {
+            req.emit('aborted');
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {});
+    });
+
+    it('should log 444 for closed request', function(done) {
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            stream: process.stdout
+                        }
+                    ]
+                }),
+                server: SERVER,
+                event: 'after'
+            })
+        );
+
+        SERVER.once('audit', function(data) {
+            assert.ok(data);
+            assert.ok(data.req_id);
+            assert.isNumber(data.latency);
+            assert.equal(444, data.res.statusCode);
+            done();
+        });
+
+        SERVER.get('/audit', function(req, res, next) {
+            req.emit('close');
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {});
+    });
 });
