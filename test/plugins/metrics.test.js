@@ -57,7 +57,10 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.latency, 100);
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.isAtLeast(metrics.routeLatency, 50);
+                    assert.isAtLeast(metrics.latency, 150);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.connectionState, undefined);
                     assert.equal(metrics.method, 'GET');
@@ -70,17 +73,106 @@ describe('request metrics plugin', function() {
             )
         );
 
+        SERVER.pre(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
         SERVER.get('/foo', function(req, res, next) {
             setTimeout(function() {
                 res.send(202, 'hello world');
                 return next();
-            }, 100);
+            }, 50);
         });
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 202);
             return done();
+        });
+    });
+
+    it('should return metrics with pre error', function(done) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ok(err);
+        });
+
+        SERVER.on(
+            'after',
+            restify.plugins.metrics(
+                {
+                    server: SERVER
+                },
+                function(err, metrics, req, res, route) {
+                    assert.ok(err);
+
+                    assert.isObject(metrics, 'metrics');
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.equal(metrics.useLatency, null);
+                    assert.equal(metrics.routeLatency, null);
+                    assert.isAtLeast(metrics.latency, 50);
+
+                    return done();
+                }
+            )
+        );
+
+        SERVER.pre(function(req, res, next) {
+            setTimeout(function() {
+                return next(new Error('My Error'));
+            }, 50);
+        });
+
+        CLIENT.get('/foo?a=1', function(err, _, res) {
+            assert.ok(err);
+        });
+    });
+
+    it('should return metrics with use error', function(done) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ok(err);
+        });
+
+        SERVER.on(
+            'after',
+            restify.plugins.metrics(
+                {
+                    server: SERVER
+                },
+                function(err, metrics, req, res, route) {
+                    assert.ok(err);
+
+                    assert.isObject(metrics, 'metrics');
+                    assert.isAtLeast(metrics.preLatency, 0);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.equal(metrics.routeLatency, null);
+                    assert.isAtLeast(metrics.latency, 50);
+
+                    return done();
+                }
+            )
+        );
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next(new Error('My Error'));
+            }, 50);
+        });
+
+        SERVER.get('/foo', function(req, res, next) {
+            res.send(202, 'hello world');
+            return next();
+        });
+
+        CLIENT.get('/foo?a=1', function(err, _, res) {
+            assert.ok(err);
         });
     });
 
@@ -104,8 +196,13 @@ describe('request metrics plugin', function() {
                     assert.equal(err.name, 'RequestCloseError');
 
                     assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 444);
-                    // setTimeout is happening on the server, tolerate 10ms
+                    assert.equal(metrics.statusCode, 444); // router doesn't run
+                    // However the timeout value is 200,
+                    // it's calculated by the client,
+                    // but setTimeout is happening on the server, tolerate 10ms
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.equal(metrics.routeLatency, null);
                     assert.isAtLeast(metrics.latency, 200 - 10);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
@@ -115,6 +212,18 @@ describe('request metrics plugin', function() {
                 }
             )
         );
+
+        SERVER.pre(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
 
         SERVER.get('/foo', function(req, res, next) {
             setTimeout(function() {
@@ -155,6 +264,7 @@ describe('request metrics plugin', function() {
                     assert.equal(metrics.method, 'GET');
                     assert.equal(metrics.connectionState, undefined);
                     assert.isNumber(metrics.inflightRequests);
+                    return done();
                 }
             )
         );
@@ -165,7 +275,6 @@ describe('request metrics plugin', function() {
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
             assert.ok(err);
-            return done();
         });
     });
 });

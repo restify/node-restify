@@ -1146,6 +1146,9 @@ Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Sta
           undefined in the case of an uncaughtException
     -   `metrics.method` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** http request verb
     -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** request latency
+    -   `metrics.preLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** pre handlers latency
+    -   `metrics.useLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** use handlers latency
+    -   `metrics.routeLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** route handlers latency
     -   `metrics.path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** `req.path()` value
     -   `metrics.inflightRequests` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Number of inflight requests pending
           in restify.

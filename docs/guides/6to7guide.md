@@ -155,3 +155,14 @@ server.get('/hello/:name', restify.plugins.conditionalHandler([
 // 'accept-version': '^1.1.0' => 1.5.x, 2.x'
 // 'accept-version': '3.x', accept: 'application/json' => '3.x, json'
 ```
+
+### Metrics plugin latency
+
+In 7.x Metrics plugin's `latency` is calculated when the request is
+fully flushed. Earlier it was calculated when the last handler finished.
+
+To address the previous use-cases, new timings were added to the metrics plugin:
+
+ - `metrics.preLatency` pre handlers latency
+ - `metrics.useLatency` use handlers latency
+ - `metrics.routeLatency` route handlers latency
