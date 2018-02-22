@@ -1441,7 +1441,65 @@ test(
             }
         ]);
 
-        CLIENT.get('/audit', function(err, req, res, data) {
+        // set up audit logs
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        SERVER.on(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            type: 'raw',
+                            stream: ringbuffer
+                        }
+                    ]
+                }),
+                event: 'after'
+            })
+        );
+
+        SERVER.on('after', function(req, res, route, err) {
+            if (req.href() === '/audit?v=2') {
+                // should request timeout error
+                t.ok(err);
+                t.equal(err.name, 'RequestCloseError');
+
+                // check records
+                t.ok(ringbuffer.records[0], 'no log records');
+                t.equal(
+                    ringbuffer.records.length,
+                    1,
+                    'should only have 1 log record'
+                );
+                // TODO: fix this after plugin is fixed to use
+                // req.connectionState()
+                // t.equal(ringbuffer.records[0].req.clientClosed, true);
+
+                // check timers
+                var handlers = Object.keys(ringbuffer.records[0].req.timers);
+                t.equal(handlers.length, 2, 'should only have 2 req timers');
+                t.equal(
+                    handlers[0],
+                    'first',
+                    'first handler timer not in order'
+                );
+                t.equal(
+                    handlers[handlers.length - 1],
+                    'second',
+                    'second handler not last'
+                );
+                t.end();
+
+                // ensure third handler never ran
+                t.equal(numCount, 2);
+
+                t.end();
+            }
+        });
+
+        CLIENT.get('/audit?v=1', function(err, req, res, data) {
             t.ifError(err);
             t.deepEqual(data, { hello: 'world' });
             t.equal(numCount, 3);
@@ -1449,69 +1507,9 @@ test(
             // reset numCount
             numCount = 0;
 
-            // set up audit logs
-            var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
-            SERVER.once(
-                'after',
-                restify.plugins.auditLogger({
-                    log: bunyan.createLogger({
-                        name: 'audit',
-                        streams: [
-                            {
-                                level: 'info',
-                                type: 'raw',
-                                stream: ringbuffer
-                            }
-                        ]
-                    }),
-                    event: 'after'
-                })
-            );
-
-            FAST_CLIENT.get('/audit', function(err2, req2, res2, data2) {
-                setTimeout(function() {
-                    // should request timeout error
-                    t.ok(err2);
-                    t.equal(err2.name, 'RequestTimeoutError');
-                    t.deepEqual(data2, {});
-
-                    // check records
-                    t.ok(ringbuffer.records[0], 'no log records');
-                    t.equal(
-                        ringbuffer.records.length,
-                        1,
-                        'should only have 1 log record'
-                    );
-                    // TODO: fix this after plugin is fixed to use
-                    // req.connectionState()
-                    // t.equal(ringbuffer.records[0].req.clientClosed, true);
-
-                    // check timers
-                    var handlers = Object.keys(
-                        ringbuffer.records[0].req.timers
-                    );
-                    t.equal(
-                        handlers.length,
-                        2,
-                        'should only have 2 req timers'
-                    );
-                    t.equal(
-                        handlers[0],
-                        'first',
-                        'first handler timer not in order'
-                    );
-                    t.equal(
-                        handlers[handlers.length - 1],
-                        'second',
-                        'second handler not last'
-                    );
-                    t.end();
-
-                    // ensure third handler never ran
-                    t.equal(numCount, 2);
-                }, 500);
-                // don't start tests until a little after the request times out
-                //so that server can start the audit logs.
+            FAST_CLIENT.get('/audit?v=2', function(err2, req2, res2, data2) {
+                t.ok(err2);
+                t.equal(err2.name, 'RequestTimeoutError');
             });
         });
     }
@@ -1731,7 +1729,7 @@ test('calling next(false) should early exit from pre handlers', function(t) {
 });
 
 test('calling next(false) should early exit from use handlers', function(t) {
-    var afterFired = false;
+    var steps = 0;
 
     SERVER.use(function(req, res, next) {
         res.send('early exit');
@@ -1744,15 +1742,15 @@ test('calling next(false) should early exit from use handlers', function(t) {
     });
 
     SERVER.on('after', function() {
-        afterFired = true;
+        steps++;
+        t.equal(steps, 2);
+        t.end();
     });
 
     CLIENT.get('/1', function(err, req, res, data) {
         t.ifError(err);
         t.equal(data, 'early exit');
-        // ensure after event fired
-        t.ok(afterFired);
-        t.end();
+        steps++;
     });
 });
 
@@ -1959,11 +1957,15 @@ test('should increment/decrement inflight request count', function(t) {
         return next();
     });
 
+    SERVER.on('after', function() {
+        t.equal(SERVER.inflightRequests(), 0);
+        t.end();
+    });
+
     CLIENT.get('/foo', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
-        t.end();
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -1987,14 +1989,14 @@ test('should increment/decrement inflight request count for concurrent reqs', fu
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 1);
         t.end();
     });
 
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 2);
     });
 });
 
@@ -2016,16 +2018,22 @@ test('should cleanup inflight requests count for 404s', function(t) {
         return next();
     });
 
+    SERVER.on('after', function(req) {
+        if (req.path() === '/doesnotexist') {
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        }
+    });
+
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 1);
 
         CLIENT.get('/doesnotexist', function(err2, _2, res2) {
             t.ok(err2);
             t.equal(res2.statusCode, 404);
             t.equal(SERVER.inflightRequests(), 0);
-            t.end();
         });
     });
 });
@@ -2048,23 +2056,24 @@ test('should cleanup inflight requests count for timeouts', function(t) {
         return next();
     });
 
+    SERVER.on('after', function(req) {
+        if (req.path() === '/foo1') {
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        } else if (req.path() === '/foo2') {
+            t.equal(SERVER.inflightRequests(), 1);
+        }
+    });
+
     FAST_CLIENT.get('/foo1', function(err, _, res) {
         t.ok(err);
         t.equal(SERVER.inflightRequests(), 1);
-
-        setTimeout(function() {
-            // wait for server to flush response, 600 extra plus the already
-            // 500ms we waited should be enough to cover the 1000 response time
-            // of server.
-            t.equal(SERVER.inflightRequests(), 0);
-            t.end();
-        }, 600);
     });
 
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 2);
     });
 });
 

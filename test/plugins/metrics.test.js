@@ -202,8 +202,10 @@ describe('request metrics plugin', function() {
                     // but setTimeout is happening on the server, tolerate 10ms
                     assert.isAtLeast(metrics.preLatency, 50);
                     assert.isAtLeast(metrics.useLatency, 50);
-                    assert.equal(metrics.routeLatency, null);
+                    assert.isAtLeast(metrics.routeLatency, 250);
                     assert.isAtLeast(metrics.latency, 200 - 10);
+                    // latency should dbe lower as request timeouts
+                    assert.isAbove(metrics.routeLatency, metrics.latency);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
                     assert.equal(metrics.connectionState, 'close');
@@ -225,13 +227,19 @@ describe('request metrics plugin', function() {
             }, 50);
         });
 
-        SERVER.get('/foo', function(req, res, next) {
-            setTimeout(function() {
+        SERVER.get(
+            '/foo',
+            function(req, res, next) {
+                setTimeout(function() {
+                    return next();
+                }, 250);
+            },
+            function(req, res, next) {
                 assert.fail('Client has already closed request');
                 res.send(202, 'hello world');
                 return next();
-            }, 250);
-        });
+            }
+        );
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
             // request should timeout

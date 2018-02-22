@@ -199,9 +199,7 @@ describe('audit logger', function() {
             // don't sporadically fail due to timing issues.
         });
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             var record = ringbuffer.records && ringbuffer.records[0];
 
             // check timers
@@ -236,6 +234,10 @@ describe('audit logger', function() {
                 'aTestHandler not last'
             );
             done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -295,9 +297,7 @@ describe('audit logger', function() {
             }
         );
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             var record = ringbuffer.records && ringbuffer.records[0];
             assert.ok(record, 'no log records');
@@ -362,6 +362,10 @@ describe('audit logger', function() {
             );
             done();
         });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
+        });
     });
 
     it('restify-GH-1435 should accumulate log handler timers', function(done) {
@@ -401,9 +405,7 @@ describe('audit logger', function() {
             // don't sporadically fail due to timing issues.
         });
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             var record = ringbuffer.records && ringbuffer.records[0];
 
             // check timers
@@ -426,6 +428,10 @@ describe('audit logger', function() {
                 'aTestHandler-audit-acc'
             );
             done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -455,9 +461,7 @@ describe('audit logger', function() {
             next();
         });
 
-        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             assert.ok(ringbuffer.records[0], 'no log records');
             assert.equal(
@@ -467,6 +471,10 @@ describe('audit logger', function() {
             );
             assert.ok(ringbuffer.records[0].req.query, 'a=1&b=2');
             done();
+        });
+
+        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -499,9 +507,7 @@ describe('audit logger', function() {
             }
         ]);
 
-        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             assert.ok(ringbuffer.records[0], 'no log records');
             assert.equal(
@@ -514,6 +520,10 @@ describe('audit logger', function() {
                 b: '2'
             });
             done();
+        });
+
+        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 

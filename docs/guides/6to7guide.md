@@ -156,6 +156,11 @@ server.get('/hello/:name', restify.plugins.conditionalHandler([
 // 'accept-version': '3.x', accept: 'application/json' => '3.x, json'
 ```
 
+### After event fires when both request is flushed and last handler is finished
+
+In 7.x `after` event fires after both request is flushed
+and last handler is finished.
+
 ### Metrics plugin latency
 
 In 7.x Metrics plugin's `latency` is calculated when the request is
