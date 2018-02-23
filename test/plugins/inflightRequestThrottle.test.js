@@ -25,8 +25,9 @@ describe('inlfightRequestThrottle', function() {
             assert(body instanceof Error, 'Defaults to error body');
             done();
         }
-        function next(cont) {
-            assert.isFalse(cont, 'Should call next with false');
+        function next(err) {
+            assert.equal(err.name, 'ServiceUnavailableError');
+            done();
         }
         function trace() {
             logged = true;
@@ -43,10 +44,10 @@ describe('inlfightRequestThrottle', function() {
         var plugin = inflightRequestThrottle(opts);
         function send(body) {
             assert.equal(body, err, 'Overrides body');
-            done();
         }
-        function next() {
-            assert(false, 'Should not call next');
+        function next(nextErr) {
+            assert.equal(err, nextErr);
+            done();
         }
         var fakeReq = { log: { trace: function() {} } };
         plugin(fakeReq, { send: send }, next);

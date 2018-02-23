@@ -87,6 +87,7 @@ var log = new Logger({
 var server = restify.createServer({
     name: NAME,
     Logger: log,
+    dtrace: true,
     formatters: {
         'application/foo': function(req, res, body) {
             if (body instanceof Error) {

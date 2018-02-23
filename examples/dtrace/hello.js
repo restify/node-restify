@@ -1,7 +1,8 @@
 var restify = require('../../lib');
 
 var server = restify.createServer({
-    name: 'helloworld'
+    name: 'helloworld',
+    dtrace: true
 });
 
 server.use(restify.plugins.acceptParser(server.acceptable));

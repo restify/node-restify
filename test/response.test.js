@@ -396,57 +396,50 @@ test('redirect using default hostname with custom port', function(t) {
     });
 });
 
-// jscs:disable maximumLineLength
-test(
-    'redirect should cause InternalError ' + 'when invoked without next',
-    function(t) {
-        SERVER.get('/9', function(req, res, next) {
-            res.redirect();
-        });
+// eslint-disable-next-line
+test('redirect should cause InternalError when invoked without next', function(t) {
+    SERVER.get('/9', function(req, res, next) {
+        res.redirect();
+    });
 
-        CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
-            t.equal(res.statusCode, 500);
+    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
+        t.equal(res.statusCode, 500);
 
-            // json parse the response
-            t.equal(body.code, 'Internal');
-            t.end();
-        });
+        // json parse the response
+        t.equal(body.code, 'Internal');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('redirect should call next with false to stop handler stack execution', function(t) {
+    var wasRun = false;
+
+    function A(req, res, next) {
+        req.a = 1;
+        next();
     }
-);
-
-// jscs:enable maximumLineLength
-
-test(
-    'redirect should call next with false to stop ' + 'handler stack execution',
-    function(t) {
-        var wasRun = false;
-
-        function A(req, res, next) {
-            req.a = 1;
-            next();
-        }
-        function B(req, res, next) {
-            req.b = 2;
-            wasRun = true;
-            next();
-        }
-        function redirect(req, res, next) {
-            res.redirect('/10', next);
-        }
-
-        SERVER.get('/10', [A, redirect, B]);
-
-        CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 302);
-            t.equal(res.headers.location, '/10');
-
-            // handler B should not be executed
-            t.equal(wasRun, false);
-            t.end();
-        });
+    function B(req, res, next) {
+        req.b = 2;
+        wasRun = true;
+        next();
     }
-);
+    function redirect(req, res, next) {
+        res.redirect('/10', next);
+    }
+
+    SERVER.get('/10', [A, redirect, B]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, '/10');
+
+        // handler B should not be executed
+        t.equal(wasRun, false);
+        t.end();
+    });
+});
 
 test('redirect should emit a redirect event', function(t) {
     var wasEmitted = false;

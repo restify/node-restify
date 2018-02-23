@@ -70,26 +70,23 @@ describe('oauth2 token parser', function() {
         });
     });
 
-    it(
-        'should do nothing (token is null) ' +
-            'if there is no oauth2 token set',
-        function(done) {
-            var opts = {
-                path: '/test2/do/nothing'
-            };
-            SERVER.get(opts, function(req, res, next) {
-                assert.isNull(req.oauth2.accessToken);
-                assert.equal(res.statusCode, 200);
-                res.send();
-                next();
-            });
-            CLIENT.get(opts, function(err, _, res) {
-                assert.ifError(err);
-                assert.equal(res.statusCode, 200);
-                done();
-            });
-        }
-    );
+    // eslint-disable-next-line
+    it('should do nothing (token is null) if there is no oauth2 token set', function(done) {
+        var opts = {
+            path: '/test2/do/nothing'
+        };
+        SERVER.get(opts, function(req, res, next) {
+            assert.isNull(req.oauth2.accessToken);
+            assert.equal(res.statusCode, 200);
+            res.send();
+            next();
+        });
+        CLIENT.get(opts, function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
 
     it('should parse from request body', function(done) {
         var test3Url = '/test3/contenttype/ok';
@@ -119,36 +116,34 @@ describe('oauth2 token parser', function() {
         client.end();
     });
 
-    it(
-        'should parse oauth2 token from ' + 'request body(case-insensitive)',
-        function(done) {
-            var test4Url = '/test4/contenttype/mixedcase';
+    // eslint-disable-next-line
+    it('should parse oauth2 token from request body(case-insensitive)', function(done) {
+        var test4Url = '/test4/contenttype/mixedcase';
 
-            SERVER.post(test4Url, function(req, res, next) {
-                assert.isNotNull(req.oauth2.accessToken);
-                assert.equal(req.oauth2.accessToken, TEST_TOKEN);
-                res.send();
-                next();
-            });
+        SERVER.post(test4Url, function(req, res, next) {
+            assert.isNotNull(req.oauth2.accessToken);
+            assert.equal(req.oauth2.accessToken, TEST_TOKEN);
+            res.send();
+            next();
+        });
 
-            var opts = {
-                hostname: '127.0.0.1',
-                port: PORT,
-                path: test4Url,
-                agent: false,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'APPLICATION/x-www-form-urlencoded'
-                }
-            };
-            var client = http.request(opts, function(res) {
-                assert.equal(res.statusCode, 200);
-                done();
-            });
-            client.write('access_token=' + TEST_TOKEN);
-            client.end();
-        }
-    );
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: test4Url,
+            agent: false,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'APPLICATION/x-www-form-urlencoded'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+        client.write('access_token=' + TEST_TOKEN);
+        client.end();
+    });
 
     it('should ignore token from request body', function(done) {
         var test5Url = '/test5/contenttype/missing/1';
@@ -177,32 +172,25 @@ describe('oauth2 token parser', function() {
         client.end();
     });
 
-    it(
-        'should fail if more than one method ' +
-            'is used to set the oauth2 token',
-        function(done) {
-            SERVER.post('/test6/multi/method/fail', function(req, res, next) {
-                assert.isNull(req.oauth2.accessToken);
-                res.send();
-                next();
-            });
-            var opts = {
-                path: '/test6/multi/method/fail',
-                headers: {
-                    Authorization: 'Bearer ' + TEST_TOKEN,
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            };
+    // eslint-disable-next-line
+    it('should fail if more than one method is used to set the oauth2 token', function(done) {
+        SERVER.post('/test6/multi/method/fail', function(req, res, next) {
+            assert.isNull(req.oauth2.accessToken);
+            res.send();
+            next();
+        });
+        var opts = {
+            path: '/test6/multi/method/fail',
+            headers: {
+                Authorization: 'Bearer ' + TEST_TOKEN,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        };
 
-            CLIENT.post(opts, { access_token: TEST_TOKEN }, function(
-                err,
-                _,
-                res
-            ) {
-                assert.ok(err);
-                assert.equal(res.statusCode, 400);
-                done();
-            });
-        }
-    );
+        CLIENT.post(opts, { access_token: TEST_TOKEN }, function(err, _, res) {
+            assert.ok(err);
+            assert.equal(res.statusCode, 400);
+            done();
+        });
+    });
 });

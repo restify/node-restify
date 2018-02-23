@@ -23,8 +23,10 @@ function setupClientServer(ip, throttleOptions, done) {
     });
 
     server.use(function ghettoAuthenticate(req, res, next) {
-        if (req.params.name) {
-            req.username = req.params.name;
+        var username = req.url.match(/test\/([a-z]+)/)[1];
+
+        if (username) {
+            req.username = username;
         }
 
         next();
