@@ -127,7 +127,7 @@ describe('body reader', function() {
             SERVER.use(restify.plugins.bodyParser());
 
             SERVER.post('/compressed', function(req, res, next) {
-                res.send(200, { inflightRequests: SERVER.inflightRequests() });
+                res.send('ok');
                 next();
             });
 
@@ -142,7 +142,7 @@ describe('body reader', function() {
             var options = {
                 hostname: '127.0.0.1',
                 port: PORT,
-                path: '/compressed',
+                path: '/compressed?v=1',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,6 +156,13 @@ describe('body reader', function() {
                 assert.isNotOk(res);
             });
 
+            SERVER.on('after', function(req2) {
+                if (req2.href() === '/compressed?v=2') {
+                    assert.equal(SERVER.inflightRequests(), 0);
+                    done();
+                }
+            });
+
             // will get a req error after 100ms timeout
             req.on('error', function(e) {
                 // make another request to verify in flight request is only 1
@@ -165,15 +172,13 @@ describe('body reader', function() {
                 });
 
                 CLIENT.post(
-                    '/compressed',
+                    '/compressed?v=2',
                     {
                         apple: 'red'
                     },
                     function(err, _, res, obj) {
                         assert.ifError(err);
                         assert.equal(res.statusCode, 200);
-                        assert.equal(obj.inflightRequests, 1);
-                        done();
                     }
                 );
             });

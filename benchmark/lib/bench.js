@@ -14,6 +14,7 @@ function runBenchmark(opts, handler, version, cb) {
 
     var spinner = ora('Started ' + version + '/' + handler).start();
     var modulePath = path.join(__dirname, '../benchmarks', handler);
+    var url = require(modulePath).url;
     var forked = fork(modulePath, ['version=' + version]);
 
     pipeline(
@@ -24,8 +25,12 @@ function runBenchmark(opts, handler, version, cb) {
                     spinner.text =
                         'Warming ' + version + '/' + handler + ' for 5s';
 
+                    var fireOpts = Object.assign({}, opts, {
+                        duration: 5,
+                        url: url
+                    });
                     autocannon.fire(
-                        Object.assign({}, opts, { duration: 5 }),
+                        fireOpts,
                         handler,
                         version,
                         false,
@@ -48,7 +53,8 @@ function runBenchmark(opts, handler, version, cb) {
                             's';
                     }
 
-                    autocannon.fire(opts, handler, version, true, callback);
+                    var fireOpts = Object.assign({}, opts, { url: url });
+                    autocannon.fire(fireOpts, handler, version, true, callback);
                 }
             ]
         },

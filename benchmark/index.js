@@ -5,7 +5,12 @@ var inquirer = require('inquirer');
 var bench = require('./lib/bench');
 var stableVersion = require('restify/package.json').version;
 
-var BENCHMARKS = ['response-json', 'response-text'];
+var BENCHMARKS = [
+    'response-json',
+    'response-text',
+    'router-heavy',
+    'middleware'
+];
 
 function select(callback) {
     var choices = BENCHMARKS.map(function map(name) {

@@ -22,7 +22,7 @@ function writeResult(handler, version, result) {
 
 function fire(opts, handler, version, save, cb) {
     opts = opts || {};
-    opts.url = 'http://localhost:3000';
+    opts.url = opts.url || 'http://localhost:3000';
 
     var instance = autocannon(opts, function onResult(err, result) {
         if (err) {
