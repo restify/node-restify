@@ -19,7 +19,8 @@ describe('strictQueryParams', function() {
     beforeEach(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
-            log: helper.getLog('server')
+            log: helper.getLog('server'),
+            handleUncaughtExceptions: true
         });
 
         SERVER.listen(0, '127.0.0.1', function() {
@@ -163,42 +164,36 @@ describe('strictQueryParams', function() {
         });
     });
 
-    it(
-        'should respond to non-strict key/val query param ' + 'value with 400',
-        function(done) {
-            SERVER.pre(
-                restify.plugins.pre.strictQueryParams({
-                    message: MESSAGE
-                })
-            );
+    // eslint-disable-next-line
+    it('should respond to non-strict key/val query param value with 400', function(done) {
+        SERVER.pre(
+            restify.plugins.pre.strictQueryParams({
+                message: MESSAGE
+            })
+        );
 
-            SERVER.use(
-                restify.plugins.queryParser({
-                    mapParams: true,
-                    overrideParams: true
-                })
-            );
+        SERVER.use(
+            restify.plugins.queryParser({
+                mapParams: true,
+                overrideParams: true
+            })
+        );
 
-            SERVER.get('/query/:id', function(req, res, next) {
-                res.send();
-                next();
+        SERVER.get('/query/:id', function(req, res, next) {
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/query/foo?id=bar&name=josep&jorge', function(err, _, res) {
+            assert.equal(typeof err, 'object');
+            assert.equal(res.statusCode, 400);
+            assert.deepEqual(JSON.parse(res.body), {
+                code: 'BadRequest',
+                message: MESSAGE
             });
-
-            CLIENT.get('/query/foo?id=bar&name=josep&jorge', function(
-                err,
-                _,
-                res
-            ) {
-                assert.equal(typeof err, 'object');
-                assert.equal(res.statusCode, 400);
-                assert.deepEqual(JSON.parse(res.body), {
-                    code: 'BadRequest',
-                    message: MESSAGE
-                });
-                done();
-            });
-        }
-    );
+            done();
+        });
+    });
 
     it('should respond to valid query param value with 200', function(done) {
         SERVER.pre(
@@ -247,7 +242,7 @@ describe('strictQueryParams', function() {
             })
         );
 
-        SERVER.get('/query/:id', function(req, res, next) {
+        SERVER.get('/query', function(req, res, next) {
             assert.equal(req.params.id, 'bar');
             assert.equal(req.params.name, 'josep & jorge');
             assert.deepEqual(req.query, req.params);
@@ -255,7 +250,7 @@ describe('strictQueryParams', function() {
             next();
         });
 
-        CLIENT.get('/query/foo?id=bar&name=josep%20%26%20jorge', function(
+        CLIENT.get('/query?id=bar&name=josep%20%26%20jorge', function(
             err,
             _,
             res

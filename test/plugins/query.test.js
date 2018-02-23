@@ -239,7 +239,7 @@ describe('query parser', function() {
                 mapParams: true
             })
         );
-        SERVER.get(/\/.*/, function(req, res, next) {
+        SERVER.get('/', function(req, res, next) {
             res.send(req.params);
         });
 

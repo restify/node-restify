@@ -5,13 +5,16 @@ permalink: /docs/dtrace/
 
 One of the coolest features of restify is that it automatically
 creates DTrace probes for you whenever you add a new route/handler.
+To use DTrace you need to pass `dtrace` option to the server
+`restify.createServer({ dtrace: true })`.
 The easiest way to explain this is with an example:
 
 ```js
 var restify = require('restify');
 
 var server = restify.createServer({
-  name: 'helloworld'
+  name: 'helloworld',
+  dtrace: true
 });
 
 server.use(restify.acceptParser(server.acceptable));

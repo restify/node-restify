@@ -29,6 +29,7 @@ toc:
       - requestExpiry
       - inflightRequestThrottle
       - cpuUsageThrottle
+      - conditionalHandler
       - conditionalRequest
       - auditLogger
       - metrics

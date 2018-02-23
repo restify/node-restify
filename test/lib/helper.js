@@ -84,15 +84,6 @@ module.exports = {
     },
 
     get dtrace() {
-        var dtp;
-
-        try {
-            var d = require('dtrace-provider');
-            dtp = d.createDTraceProvider('restifyUnitTest');
-        } catch (e) {
-            dtp = null;
-        }
-
-        return dtp;
+        return true;
     }
 };

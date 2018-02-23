@@ -94,28 +94,26 @@ describe('request id headers', function() {
         });
     });
 
-    it(
-        'GH-1086: should use default uuid request id ' + 'if none provided',
-        function(done) {
-            SERVER.get('/1', function(req, res, next) {
-                assert.ok(req.getId());
-                assert.ok(validator.isUUID(req.getId()));
-                res.send('hello world');
-                return next();
-            });
+    // eslint-disable-next-line
+    it('GH-1086: should use default uuid request id if none provided', function(done) {
+        SERVER.get('/1', function(req, res, next) {
+            assert.ok(req.getId());
+            assert.ok(validator.isUUID(req.getId()));
+            res.send('hello world');
+            return next();
+        });
 
-            // create new client since we new specific headers
-            CLIENT = restifyClients.createJsonClient({
-                url: 'http://127.0.0.1:' + PORT
-            });
+        // create new client since we new specific headers
+        CLIENT = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + PORT
+        });
 
-            CLIENT.get('/1', function(err, req, res, data) {
-                assert.ifError(err);
-                assert.equal(data, 'hello world');
-                return done();
-            });
-        }
-    );
+        CLIENT.get('/1', function(err, req, res, data) {
+            assert.ifError(err);
+            assert.equal(data, 'hello world');
+            return done();
+        });
+    });
 
     it('GH-1086: empty request id should be ignored', function(done) {
         SERVER.get('/1', function(req, res, next) {
