@@ -122,10 +122,6 @@ check-bash: $(BASH_FILES:%=%.bashchk) $(BASH_FILES:%=%.bashstyle)
 %.bashstyle: %
 	$(BASHSTYLE) $^
 
-.PHONY: check-eslint-fix
-check-eslint-fix:
-	$(ESLINT) $(JS_FILES) --fix
-
 .PHONY: check-eslint
 check-eslint::
 	$(ESLINT) $(JS_FILES)
