@@ -1145,7 +1145,9 @@ Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Sta
     -   `metrics.statusCode` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** status code of the response. can be
           undefined in the case of an uncaughtException
     -   `metrics.method` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** http request verb
-    -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** request latency
+    -   `metrics.totalLatency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency includes both request is flushed
+                                             and all handlers finished
+    -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency when request is flushed
     -   `metrics.preLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** pre handlers latency
     -   `metrics.useLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** use handlers latency
     -   `metrics.routeLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** route handlers latency

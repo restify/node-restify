@@ -61,6 +61,7 @@ describe('request metrics plugin', function() {
                     assert.isAtLeast(metrics.useLatency, 50);
                     assert.isAtLeast(metrics.routeLatency, 50);
                     assert.isAtLeast(metrics.latency, 150);
+                    assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.connectionState, undefined);
                     assert.equal(metrics.method, 'GET');
