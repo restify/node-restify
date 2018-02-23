@@ -636,3 +636,54 @@ test('should support multiple set-cookie headers', function(t) {
         t.end();
     });
 });
+
+test('GH-1607: should send bools with explicit status code', function(t) {
+    SERVER.get('/bool/:value', function(req, res, next) {
+        res.send(200, req.params.value === 'true' ? true : false);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/bool/false'), function(
+        err,
+        req,
+        res,
+        data
+    ) {
+        t.equal(data, 'false');
+
+        STRING_CLIENT.get(join(LOCALHOST, '/bool/true'), function(
+            err2,
+            req2,
+            res2,
+            data2
+        ) {
+            t.equal(data2, 'true');
+            t.end();
+        });
+    });
+});
+
+test('GH-1607: should send numbers with explicit status code', function(t) {
+    SERVER.get('/zero', function(req, res, next) {
+        res.send(200, 0);
+        return next();
+    });
+
+    SERVER.get('/one', function(req, res, next) {
+        res.send(200, 1);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/zero'), function(err, req, res, data) {
+        t.equal(data, '0');
+        STRING_CLIENT.get(join(LOCALHOST, '/one'), function(
+            err2,
+            req2,
+            res2,
+            data2
+        ) {
+            t.equal(data2, '1');
+            t.end();
+        });
+    });
+});
