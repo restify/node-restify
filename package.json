@@ -95,7 +95,7 @@
     "assert-plus": "^1.0.0",
     "bunyan": "^1.8.12",
     "clone-regexp": "^1.0.0",
-    "csv": "^1.1.1",
+    "csv-parse": "^2.0.4",
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
     "formidable": "^1.1.1",
