@@ -111,7 +111,7 @@
     "semver": "^5.4.1",
     "spdy": "^3.4.7",
     "uuid": "^3.1.0",
-    "vasync": "^1.6.4",
+    "vasync": "^2.2.0",
     "verror": "^1.10.0"
   },
   "optionalDependencies": {
