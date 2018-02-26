@@ -107,7 +107,7 @@
     "once": "^1.4.0",
     "pidusage": "^1.2.0",
     "qs": "^6.5.1",
-    "restify-errors": "^5.0.0",
+    "restify-errors": "^6.0.0",
     "semver": "^5.4.1",
     "spdy": "^3.4.7",
     "uuid": "^3.1.0",
