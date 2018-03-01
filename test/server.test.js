@@ -8,9 +8,9 @@ var bunyan = require('bunyan');
 var childprocess = require('child_process');
 var http = require('http');
 var stream = require('stream');
+var fs = require('fs');
 
 var errors = require('restify-errors');
-var filed = require('filed');
 var restifyClients = require('restify-clients');
 var uuid = require('uuid');
 
@@ -561,9 +561,9 @@ test('get (path and version not ok)', function(t) {
     });
 });
 
-test('GH-56 streaming with filed (download)', function(t) {
+test('GH-56 streaming with fs (download)', function(t) {
     SERVER.get('/', function tester(req, res, next) {
-        filed(__filename).pipe(res);
+        fs.createReadStream(__filename).pipe(res);
     });
 
     var opts = {
