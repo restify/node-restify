@@ -534,7 +534,7 @@ _The serveStatic module is different than most of the other plugins, in that
 it is expected that you are going to map it to a route, as below:_
 
 ```javascript
-server.get(/\/docs\/current\/?.*\/, restify.plugins.serveStatic({
+server.get(/\/docs\/current\/?.*\//, restify.plugins.serveStatic({
   directory: './documentation/v1',
   default: 'index.html'
 }));
