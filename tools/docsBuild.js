@@ -1,5 +1,6 @@
 'use strict';
 
+var glob = require('glob');
 var path = require('path');
 var util = require('util');
 var fs = require('fs');
@@ -70,6 +71,13 @@ var docsConfig = [
             path.join(__dirname, LIB_PATH, 'plugins/metrics.js')
         ],
         config: path.join(__dirname, DOCS_PATH, 'config/plugins.yaml')
+    },
+    {
+        title: 'Formatters API',
+        permalink: '/docs/formatters-api/',
+        output: path.join(__dirname, OUTPUT_PATH, 'formatters.md'),
+        files: glob.sync(path.join(__dirname, LIB_PATH, 'formatters', '*')),
+        config: path.join(__dirname, DOCS_PATH, 'config/formatters.yaml')
     }
 ];
 
