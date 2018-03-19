@@ -327,4 +327,101 @@ describe('multipart parser', function() {
 
         client.end();
     });
+
+    it('Ensure maxFileSize change is enforced', function(done) {
+        var shine =
+            'Well you wore out your welcome with random precision, ' +
+            'rode on the steel breeze. Come on you raver, you seer of ' +
+            'visions, come on you painter, you piper, you prisoner, and shine!';
+        var echoes =
+            'Overhead the albatross hangs motionless upon the air ' +
+            'And deep beneath the rolling waves in labyrinths of coral ' +
+            'caves The echo of a distant tide Comes willowing across the ' +
+            'sand And everything is green and submarine';
+
+        var shortest = Math.min(shine.length, echoes.length);
+
+        SERVER.use(
+            restify.plugins.queryParser({
+                mapParams: true
+            })
+        );
+        SERVER.use(
+            restify.plugins.bodyParser({
+                mapFiles: true,
+                mapParams: true,
+                keepExtensions: true,
+                uploadDir: '/tmp/',
+                override: true,
+                // Set limit to shortest of the 'files',
+                //  longer will trigger an error.
+                maxFileSize: shortest
+            })
+        );
+        SERVER.post('/multipart/:id', function(req, res, next) {
+            assert.equal(req.params.id, 'foo');
+            assert.equal(req.params.mood, 'happy');
+            assert.equal(req.params.endorphins, '12');
+            assert.ok(req.params.shine);
+            assert.ok(req.params.echoes);
+            assert.equal(req.params.shine.toString('utf8'), shine);
+            assert.equal(req.params.echoes.toString('utf8'), echoes);
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/multipart/foo?mood=happy',
+            agent: false,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data; boundary=huff'
+            }
+        };
+
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 400);
+            var body = '';
+            res.on('data', function(d) {
+                body += d;
+            });
+            res.on('end', function() {
+                var rsp = JSON.parse(body);
+                assert.equal(rsp.code, 'BadRequest');
+                assert.equal(
+                    rsp.message.substring(0, 30),
+                    'maxFileSize exceeded, received'
+                );
+                done();
+            });
+        });
+
+        client.write('--huff\r\n');
+        client.write(
+            'Content-Disposition: form-data; name="endorphins"\r\n\r\n'
+        );
+        client.write('12\r\n');
+
+        client.write('--huff\r\n');
+
+        client.write(
+            'Content-Disposition: form-data; name="shine"; ' +
+                'filename="shine.txt"\r\n'
+        );
+        client.write('Content-Type: text/plain\r\n\r\n');
+        client.write(shine + '\r\n');
+        client.write('--huff\r\n');
+
+        client.write(
+            'Content-Disposition: form-data; name="echoes"; ' +
+                'filename="echoes.txt"\r\n'
+        );
+        client.write('Content-Type: text/plain\r\n\r\n');
+        client.write(echoes + '\r\n');
+        client.write('--huff--');
+
+        client.end();
+    });
 });
