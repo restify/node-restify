@@ -31,6 +31,7 @@ permalink: /docs/plugins-api/
         -   [Using an external storage mechanism for key/bucket mappings.](#using-an-external-storage-mechanism-for-keybucket-mappings)
     -   [inflightRequestThrottle](#inflightrequestthrottle)
     -   [cpuUsageThrottle](#cpuusagethrottle)
+    -   [conditionalHandler](#conditionalhandler)
     -   [conditionalRequest](#conditionalrequest)
     -   [auditLogger](#auditlogger)
     -   [metrics](#metrics)
@@ -534,7 +535,7 @@ _The serveStatic module is different than most of the other plugins, in that
 it is expected that you are going to map it to a route, as below:_
 
 ```javascript
-server.get(/\/docs\/current\/?.*\//, restify.plugins.serveStatic({
+server.get('/docs/current/*', restify.plugins.serveStatic({
   directory: './documentation/v1',
   default: 'index.html'
 }));
@@ -562,7 +563,12 @@ serveStatic method as an option. The following will serve index.html from
 the documentation/v1/ directory anytime a client requests `/home/`._
 
 ```javascript
-server.get(/\/home\//, restify.plugins.serveStatic({
+server.get('/home/*', restify.plugins.serveStatic({
+  directory: './documentation/v1',
+  file: 'index.html'
+}));
+// or
+server.get('/home/([a-z]+[.]html)', restify.plugins.serveStatic({
   directory: './documentation/v1',
   file: 'index.html'
 }));
@@ -853,6 +859,66 @@ plugin.update({ limit: .4, halfLife: 5000 });
 
 Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** middleware to be registered on server.pre
 
+### conditionalHandler
+
+Runs first handler that matches to the condition
+
+**Parameters**
+
+-   `candidates` **([Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>)** candidates
+    -   `candidates.handler` **([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)>)** handler(s)
+    -   `candidates.version` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>)?** '1.1.0', ['1.1.0', '1.2.0']
+    -   `candidates.contentType` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** accepted content type, '\*\\/json'
+
+**Examples**
+
+```javascript
+server.use(restify.plugins.conditionalHandler({
+   contentType: 'application/json',
+   version: '1.0.0',
+   handler: function (req, res, next) {
+       next();
+   })
+});
+
+server.get('/hello/:name', restify.plugins.conditionalHandler([
+  {
+     version: '1.0.0',
+     handler: function(req, res, next) { res.send('1.x'); }
+  },
+  {
+     version: ['1.5.0', '2.0.0'],
+     handler: function(req, res, next) { res.send('1.5.x, 2.x'); }
+  },
+  {
+     version: '3.0.0',
+     contentType: ['text/html', 'text/html']
+     handler: function(req, res, next) { res.send('3.x, text'); }
+  },
+  {
+     version: '3.0.0',
+     contentType: 'application/json'
+     handler: function(req, res, next) { res.send('3.x, json'); }
+  },
+  // Array of handlers
+  {
+     version: '4.0.0',
+     handler: [
+         function(req, res, next) { next(); },
+         function(req, res, next) { next(); },
+         function(req, res, next) { res.send('4.x') }
+     ]
+  },
+]);
+// 'accept-version': '^1.1.0' => 1.5.x, 2.x'
+// 'accept-version': '3.x', accept: 'application/json' => '3.x, json'
+```
+
+-   Throws **InvalidVersionError** 
+-   Throws **UnsupportedMediaTypeError** 
+
+Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+
 ### conditionalRequest
 
 Returns a set of plugins that will compare an already set `ETag` header with
@@ -1079,16 +1145,21 @@ Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Sta
     -   `metrics.statusCode` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** status code of the response. can be
           undefined in the case of an uncaughtException
     -   `metrics.method` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** http request verb
-    -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** request latency
+    -   `metrics.totalLatency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency includes both request is flushed
+                                             and all handlers finished
+    -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency when request is flushed
+    -   `metrics.preLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** pre handlers latency
+    -   `metrics.useLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** use handlers latency
+    -   `metrics.routeLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** route handlers latency
     -   `metrics.path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** `req.path()` value
     -   `metrics.inflightRequests` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Number of inflight requests pending
           in restify.
     -   `metrics.unifinishedRequests` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Same as `inflightRequests`
-    -   `metrics.connectionState` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be either `'close'`,
-          `'aborted'`, or `undefined`. If this value is set, err will be a
-          corresponding `RequestCloseError` or `RequestAbortedError`.
+    -   `metrics.connectionState` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be either `'close'` or
+         `undefined`. If this value is set, err will be a
+          corresponding `RequestCloseError`.
           If connectionState is either
-          `'close'` or `'aborted'`, then the `statusCode` is not applicable since the
+          `'close'`, then the `statusCode` is not applicable since the
           connection was severed before a response was written.
 -   `req` **[Request](https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request)** the request obj
 -   `res` **[Response](https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5)** the response obj
