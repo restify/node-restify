@@ -1,3 +1,18 @@
+<a name="6.4.0"></a>
+## 6.4.0 (2018-03-20)
+
+
+#### Bug Fixes
+
+* server should fire not acceptable event (#1627) ([8b11b71b](git://github.com/restify/node-restify.git/commit/8b11b71b))
+* send numbers or bools as payloads (#1609) ([0919f26d](git://github.com/restify/node-restify.git/commit/0919f26d))
+* Allow multiple unmerged set-cookie headers. (#1570) ([df040154](git://github.com/restify/node-restify.git/commit/df040154))
+* add support for secureOptions in createServer (#1575) ([656e60e0](git://github.com/restify/node-restify.git/commit/656e60e0))
+* use `Buffer.isBuffer` instead of `util.isBuffer`. (#1593) ([35bd1c2b](git://github.com/restify/node-restify.git/commit/35bd1c2b))
+* **jsonBodyParser:** fix percent sign causing server fail (#1411) ([bde8fda6](git://github.com/restify/node-restify.git/commit/bde8fda6))
+* **request:** date() and time() methods return value (#1576) ([4c2cb1a7](git://github.com/restify/node-restify.git/commit/4c2cb1a7))
+
+
 <a name="6.3.4"></a>
 ### 6.3.4 (2017-11-21)
 
