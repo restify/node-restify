@@ -1,3 +1,31 @@
+<a name="7.0.0"></a>
+## 7.0.0 (2018-03-20)
+
+
+#### Features
+
+* **server:** new router and middleware system (#1561) ([1161370b](git://github.com/restify/node-restify.git/commit/1161370b))
+
+
+#### Breaking Changes
+
+* 
+- Server returns `RequestCloseError` instead of `RequestAbortedError`
+- Non-strict routing is gone
+- Different `RegExp` usage in router path and wildcards
+- Remove already deprecated `next.ifError`
+- Disable DTrace probes by default
+- Change in calling `next` multiple times
+- Router versioning and content type as a separate plugin: `conditionalHandler`
+- After event fires when both request is flushed and the last handler is finished
+- Metrics plugin latency logic changes and new latencies were added
+
+For more info see the `/guides/6to7guide.md`.
+ ([1161370b](git://github.com/restify/node-restify.git/commit/1161370b))
+* dropping support below Node.js 4
+ ([0698f45c](git://github.com/restify/node-restify.git/commit/0698f45c))
+
+
 <a name="6.4.0"></a>
 ## 6.4.0 (2018-03-20)
 
