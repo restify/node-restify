@@ -64,8 +64,7 @@ describe('dedupe forward slashes in URL', function() {
     });
 
     // eslint-disable-next-line
-    it('should remove duplicate slashes including trailing slashes',
-    function(done) {
+    it('should remove duplicate slashes including trailing slashes', function(done) {
         CLIENT.get('//foo//bar//', function(err, _, res, data) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
