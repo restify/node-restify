@@ -168,6 +168,7 @@ fully flushed. Earlier it was calculated when the last handler finished.
 
 To address the previous use-cases, new timings were added to the metrics plugin:
 
+ - `metrics.totalLatency` both request is flushed and all handlers finished
  - `metrics.preLatency` pre handlers latency
  - `metrics.useLatency` use handlers latency
  - `metrics.routeLatency` route handlers latency
