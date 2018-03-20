@@ -21,7 +21,6 @@ permalink: /docs/server-api/
     -   [pre](#pre)
     -   [use](#use)
     -   [param](#param)
-    -   [versionedUse](#versioneduse)
     -   [rm](#rm)
     -   [address](#address)
     -   [inflightRequests](#inflightrequests)
@@ -39,12 +38,11 @@ routes and handlers for incoming requests.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
     -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server. (optional, default `"restify"`)
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
     -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan) instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
-    -   `options.version` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))?** Default version(s) to use in all
-        routes.
     -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** String)|List of content-types this
         server can respond with.
     -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
@@ -59,7 +57,8 @@ routes and handlers for incoming requests.
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
         [bunyan](https://github.com/trentm/node-bunyan) instance.
-        response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
+        response header, default is `restify`. Pass empty string to unset the header.
+        Comes with significant negative performance impact. (optional, default `false`)
     -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-spdy](https://github.com/indutny/node-spdy).
     -   `options.http2` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
@@ -96,11 +95,10 @@ Creates a new Server.
 
 -   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
     -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server.
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router
     -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan)
         instance.
-    -   `options.version` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))?** Default version(s) to use in all
-        routes.
     -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>?** List of content-types this
         server can respond with.
     -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
@@ -114,6 +112,7 @@ Creates a new Server.
     -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
+        Comes with significant negative performance impact.
         [bunyan](https://github.com/trentm/node-bunyan) instance.
         response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
     -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
@@ -123,13 +122,17 @@ Creates a new Server.
     -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
+         times (optional, default `false`)
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
+         called more than once, enabled onceNext option (optional, default `false`)
     -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
-        will treat "/foo" and "/foo/" as different paths. (optional, default `false`)
+    -   `options.noWriteContinue` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** prevents
+         `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
 
 **Examples**
 
@@ -340,29 +343,6 @@ Exposes an API:
 
 Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
-### versionedUse
-
-Piggy-backs on the `server.use` method. It attaches a new middleware
-function that only fires if the specified version matches the request.
-
-Note that if the client does not request a specific version, the middleware
-function always fires. If you don't want this set a default version with a
-pre handler on requests where the client omits one.
-
-Exposes an API:
-  server.versionedUse("version", function (req, res, next, ver) {
-    // do stuff that only applies to routes of this API version
-  });
-
-**Parameters**
-
--   `versions` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** the version(s) the URL to respond to
--   `fn` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)**       the middleware function to execute, the
-                                      fourth parameter will be the selected
-                                      version
-
-Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
-
 ### rm
 
 Removes a route from the server.
@@ -370,7 +350,7 @@ You pass in the route 'blob' you got from a mount call.
 
 **Parameters**
 
--   `route` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the route name.
+-   `routeName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the route name.
 
 
 -   Throws **[TypeError](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** on bad input.
@@ -424,7 +404,6 @@ _Output:_
       input: '/',
       compiledRegex: /^[\/]*$/,
       compiledUrlParams: null,
-      versions: null,
       handlers: [Array]
      }
   ],
@@ -770,8 +749,8 @@ Type: ([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 **Properties**
 
 -   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
--   `path` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp))** a string or regex matching the route
--   `version` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>)** versions supported by this route
+-   `path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be any String accepted by
+    [find-my-way](https://github.com/delvedor/find-my-way)
 
 **Examples**
 
@@ -781,10 +760,9 @@ server.get('/foo', function(req, res, next) {});
 // a parameterized route
 server.get('/foo/:bar', function(req, res, next) {});
 // a regular expression
-server.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function(req, res, next) {});
+server.get('/example/:file(^\\d+).png', function(req, res, next) {});
 // an options object
 server.get({
     path: '/foo',
-    version: ['1.0.0', '2.0.0']
 }, function(req, res, next) {});
 ```
