@@ -5,26 +5,6 @@
 #### Features
 
 * **router:** add ignoreTrailingSlash router option (#1632) ([92ffbf5c](git://github.com/restify/node-restify.git/commit/92ffbf5c))
-* **server:** new router and middleware system (#1561) ([82832771](git://github.com/restify/node-restify.git/commit/82832771))
-
-
-#### Breaking Changes
-
-* 
-- Server returns `RequestCloseError` instead of `RequestAbortedError`
-- Non-strict routing is gone
-- Different `RegExp` usage in router path and wildcards
-- Remove already deprecated `next.ifError`
-- Disable DTrace probes by default
-- Change in calling `next` multiple times
-- Router versioning and content type as a separate plugin: `conditionalHandler`
-- After event fires when both request is flushed and the last handler is finished
-- Metrics plugin latency logic changes and new latencies were added
-
-For more info see the `/guides/6to7guide.md`.
- ([82832771](git://github.com/restify/node-restify.git/commit/82832771))
-* dropping support below Node.js 4
- ([49eb008d](git://github.com/restify/node-restify.git/commit/49eb008d))
 
 
 <a name="7.0.0"></a>
@@ -38,7 +18,7 @@ For more info see the `/guides/6to7guide.md`.
 
 #### Breaking Changes
 
-* 
+*
 - Server returns `RequestCloseError` instead of `RequestAbortedError`
 - Non-strict routing is gone
 - Different `RegExp` usage in router path and wildcards
