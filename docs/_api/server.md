@@ -73,6 +73,8 @@ routes and handlers for incoming requests.
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
         will treat "/foo" and "/foo/" as different paths. (optional, default `false`)
+    -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
+        on paths (optional, default `false`)
 
 **Examples**
 
@@ -133,6 +135,8 @@ Creates a new Server.
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.noWriteContinue` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
+    -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
+        on paths (optional, default `false`)
 
 **Examples**
 
