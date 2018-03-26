@@ -46,7 +46,8 @@ before(function(cb) {
             dtrace: helper.dtrace,
             handleUncaughtExceptions: true,
             log: helper.getLog('server'),
-            version: ['2.0.0', '0.5.4', '1.4.3']
+            version: ['2.0.0', '0.5.4', '1.4.3'],
+            ignoreTrailingSlash: true
         });
         SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
@@ -154,6 +155,85 @@ test('get (path only)', function(t) {
         t.equal(res.statusCode, 200);
 
         if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+test('get (path only - with trailing slash)', function(t) {
+    SERVER.get('/foo/', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    var count = 0;
+
+    CLIENT.get('/foo/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+test('get (path only - with trailing slash and nested route)', function(t) {
+    SERVER.get('/foo/', function echoId(req, res, next) {
+        res.statusCode = 200;
+        res.send();
+        next();
+    });
+
+    SERVER.get('/foo/bar', function echoId(req, res, next) {
+        res.statusCode = 201;
+        res.send();
+        next();
+    });
+
+    var count = 0;
+
+    CLIENT.get('/foo/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 201);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 201);
+
+        if (++count === 4) {
             t.end();
         }
     });

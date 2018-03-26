@@ -346,3 +346,28 @@ test('toString()', function(t) {
     );
     t.end();
 });
+
+test('toString() with ignoreTrailingSlash', function(t) {
+    function handler(req, res, next) {
+        res.send('Hello world');
+    }
+
+    var router = new Router({
+        log: {},
+        ignoreTrailingSlash: true
+    });
+    router.mount({ method: 'GET', path: '/' }, [handler]);
+    router.mount({ method: 'GET', path: '/a' }, [handler]);
+    router.mount({ method: 'GET', path: '/a/b' }, [handler]);
+    router.mount({ method: 'POST', path: '/' }, [handler]);
+
+    t.deepEqual(
+        router.toString(),
+        '└── / (GET|POST)\n' +
+            '    └── a (GET)\n' +
+            '        └── / (GET)\n' +
+            '            └── b (GET)\n' +
+            '                └── / (GET)\n'
+    );
+    t.end();
+});
