@@ -73,7 +73,7 @@
     "express",
     "DTrace"
   ],
-  "version": "7.0.0",
+  "version": "7.1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/restify/node-restify.git"
