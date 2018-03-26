@@ -25,6 +25,12 @@ The new version of restify never returns `RequestAbortedError`.
 Option `strictRouting` is removed `createServer({ strictRouting: false })`.
 Strict routing is the new default.
 
+### Path trailing slash at the end
+
+`/path` and `/path/` are not the same thing in restify `v7.x`.
+Use `ignoreTrailingSlash: true` server option if you don't want to differentiate
+them from each other.
+
 ### Different `RegExp` usage in router path and wildcards
 
 restify's new router backend
