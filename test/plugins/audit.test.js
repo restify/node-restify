@@ -561,9 +561,7 @@ describe('audit logger', function() {
             }
         ]);
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             assert.ok(ringbuffer.records[0], 'no log records');
             assert.equal(
@@ -576,6 +574,10 @@ describe('audit logger', function() {
                 name: 'Name'
             });
             done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
