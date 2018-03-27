@@ -1,3 +1,55 @@
+<a name="7.1.0"></a>
+## 7.1.0 (2018-03-26)
+
+
+#### Features
+
+* **router:** add ignoreTrailingSlash router option (#1632) ([92ffbf5c](git://github.com/restify/node-restify.git/commit/92ffbf5c))
+
+
+<a name="7.0.0"></a>
+## 7.0.0 (2018-03-20)
+
+
+#### Features
+
+* **server:** new router and middleware system (#1561) ([1161370b](git://github.com/restify/node-restify.git/commit/1161370b))
+
+
+#### Breaking Changes
+
+*
+- Server returns `RequestCloseError` instead of `RequestAbortedError`
+- Non-strict routing is gone
+- Different `RegExp` usage in router path and wildcards
+- Remove already deprecated `next.ifError`
+- Disable DTrace probes by default
+- Change in calling `next` multiple times
+- Router versioning and content type as a separate plugin: `conditionalHandler`
+- After event fires when both request is flushed and the last handler is finished
+- Metrics plugin latency logic changes and new latencies were added
+
+For more info see the `/guides/6to7guide.md`.
+ ([1161370b](git://github.com/restify/node-restify.git/commit/1161370b))
+* dropping support below Node.js 4
+ ([0698f45c](git://github.com/restify/node-restify.git/commit/0698f45c))
+
+
+<a name="6.4.0"></a>
+## 6.4.0 (2018-03-20)
+
+
+#### Bug Fixes
+
+* server should fire not acceptable event (#1627) ([8b11b71b](git://github.com/restify/node-restify.git/commit/8b11b71b))
+* send numbers or bools as payloads (#1609) ([0919f26d](git://github.com/restify/node-restify.git/commit/0919f26d))
+* Allow multiple unmerged set-cookie headers. (#1570) ([df040154](git://github.com/restify/node-restify.git/commit/df040154))
+* add support for secureOptions in createServer (#1575) ([656e60e0](git://github.com/restify/node-restify.git/commit/656e60e0))
+* use `Buffer.isBuffer` instead of `util.isBuffer`. (#1593) ([35bd1c2b](git://github.com/restify/node-restify.git/commit/35bd1c2b))
+* **jsonBodyParser:** fix percent sign causing server fail (#1411) ([bde8fda6](git://github.com/restify/node-restify.git/commit/bde8fda6))
+* **request:** date() and time() methods return value (#1576) ([4c2cb1a7](git://github.com/restify/node-restify.git/commit/4c2cb1a7))
+
+
 <a name="6.3.4"></a>
 ### 6.3.4 (2017-11-21)
 

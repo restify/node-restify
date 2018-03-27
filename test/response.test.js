@@ -396,57 +396,50 @@ test('redirect using default hostname with custom port', function(t) {
     });
 });
 
-// jscs:disable maximumLineLength
-test(
-    'redirect should cause InternalError ' + 'when invoked without next',
-    function(t) {
-        SERVER.get('/9', function(req, res, next) {
-            res.redirect();
-        });
+// eslint-disable-next-line
+test('redirect should cause InternalError when invoked without next', function(t) {
+    SERVER.get('/9', function(req, res, next) {
+        res.redirect();
+    });
 
-        CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
-            t.equal(res.statusCode, 500);
+    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
+        t.equal(res.statusCode, 500);
 
-            // json parse the response
-            t.equal(body.code, 'Internal');
-            t.end();
-        });
+        // json parse the response
+        t.equal(body.code, 'Internal');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('redirect should call next with false to stop handler stack execution', function(t) {
+    var wasRun = false;
+
+    function A(req, res, next) {
+        req.a = 1;
+        next();
     }
-);
-
-// jscs:enable maximumLineLength
-
-test(
-    'redirect should call next with false to stop ' + 'handler stack execution',
-    function(t) {
-        var wasRun = false;
-
-        function A(req, res, next) {
-            req.a = 1;
-            next();
-        }
-        function B(req, res, next) {
-            req.b = 2;
-            wasRun = true;
-            next();
-        }
-        function redirect(req, res, next) {
-            res.redirect('/10', next);
-        }
-
-        SERVER.get('/10', [A, redirect, B]);
-
-        CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 302);
-            t.equal(res.headers.location, '/10');
-
-            // handler B should not be executed
-            t.equal(wasRun, false);
-            t.end();
-        });
+    function B(req, res, next) {
+        req.b = 2;
+        wasRun = true;
+        next();
     }
-);
+    function redirect(req, res, next) {
+        res.redirect('/10', next);
+    }
+
+    SERVER.get('/10', [A, redirect, B]);
+
+    CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, '/10');
+
+        // handler B should not be executed
+        t.equal(wasRun, false);
+        t.end();
+    });
+});
 
 test('redirect should emit a redirect event', function(t) {
     var wasEmitted = false;
@@ -621,5 +614,69 @@ test('GH-1429: setting code with res.status not respected', function(t) {
     CLIENT.get(join(LOCALHOST, '/404'), function(err, _, res) {
         t.equal(res.statusCode, 404);
         t.end();
+    });
+});
+
+test('should support multiple set-cookie headers', function(t) {
+    SERVER.get('/set-cookie', function(req, res, next) {
+        res.header('Set-Cookie', 'a=1');
+        res.header('Set-Cookie', 'b=2');
+        res.send(null);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/set-cookie'), function(err, _, res) {
+        t.equal(res.headers['set-cookie'].length, 2);
+        t.end();
+    });
+});
+
+test('GH-1607: should send bools with explicit status code', function(t) {
+    SERVER.get('/bool/:value', function(req, res, next) {
+        res.send(200, req.params.value === 'true' ? true : false);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/bool/false'), function(
+        err,
+        req,
+        res,
+        data
+    ) {
+        t.equal(data, 'false');
+
+        STRING_CLIENT.get(join(LOCALHOST, '/bool/true'), function(
+            err2,
+            req2,
+            res2,
+            data2
+        ) {
+            t.equal(data2, 'true');
+            t.end();
+        });
+    });
+});
+
+test('GH-1607: should send numbers with explicit status code', function(t) {
+    SERVER.get('/zero', function(req, res, next) {
+        res.send(200, 0);
+        return next();
+    });
+
+    SERVER.get('/one', function(req, res, next) {
+        res.send(200, 1);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/zero'), function(err, req, res, data) {
+        t.equal(data, '0');
+        STRING_CLIENT.get(join(LOCALHOST, '/one'), function(
+            err2,
+            req2,
+            res2,
+            data2
+        ) {
+            t.equal(data2, '1');
+            t.end();
+        });
     });
 });

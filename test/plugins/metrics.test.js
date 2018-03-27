@@ -42,6 +42,10 @@ describe('request metrics plugin', function() {
     });
 
     it('should return metrics for a given request', function(done) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ifError(err);
+        });
+
         SERVER.on(
             'after',
             restify.plugins.metrics(
@@ -53,7 +57,11 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.latency, 100);
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.isAtLeast(metrics.routeLatency, 50);
+                    assert.isAtLeast(metrics.latency, 150);
+                    assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.connectionState, undefined);
                     assert.equal(metrics.method, 'GET');
@@ -66,11 +74,23 @@ describe('request metrics plugin', function() {
             )
         );
 
+        SERVER.pre(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
         SERVER.get('/foo', function(req, res, next) {
             setTimeout(function() {
                 res.send(202, 'hello world');
                 return next();
-            }, 100);
+            }, 50);
         });
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
@@ -80,10 +100,91 @@ describe('request metrics plugin', function() {
         });
     });
 
+    it('should return metrics with pre error', function(done) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ok(err);
+        });
+
+        SERVER.on(
+            'after',
+            restify.plugins.metrics(
+                {
+                    server: SERVER
+                },
+                function(err, metrics, req, res, route) {
+                    assert.ok(err);
+
+                    assert.isObject(metrics, 'metrics');
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.equal(metrics.useLatency, null);
+                    assert.equal(metrics.routeLatency, null);
+                    assert.isAtLeast(metrics.latency, 50);
+
+                    return done();
+                }
+            )
+        );
+
+        SERVER.pre(function(req, res, next) {
+            setTimeout(function() {
+                return next(new Error('My Error'));
+            }, 50);
+        });
+
+        CLIENT.get('/foo?a=1', function(err, _, res) {
+            assert.ok(err);
+        });
+    });
+
+    it('should return metrics with use error', function(done) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ok(err);
+        });
+
+        SERVER.on(
+            'after',
+            restify.plugins.metrics(
+                {
+                    server: SERVER
+                },
+                function(err, metrics, req, res, route) {
+                    assert.ok(err);
+
+                    assert.isObject(metrics, 'metrics');
+                    assert.isAtLeast(metrics.preLatency, 0);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.equal(metrics.routeLatency, null);
+                    assert.isAtLeast(metrics.latency, 50);
+
+                    return done();
+                }
+            )
+        );
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next(new Error('My Error'));
+            }, 50);
+        });
+
+        SERVER.get('/foo', function(req, res, next) {
+            res.send(202, 'hello world');
+            return next();
+        });
+
+        CLIENT.get('/foo?a=1', function(err, _, res) {
+            assert.ok(err);
+        });
+    });
+
     it("should return 'RequestCloseError' err", function(done) {
         // we test that the client times out and closes the request. server
         // flushes request responsibly but connectionState should indicate it
         // was closed by the server.
+
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            assert.ifError(err);
+        });
 
         SERVER.on(
             'after',
@@ -96,8 +197,16 @@ describe('request metrics plugin', function() {
                     assert.equal(err.name, 'RequestCloseError');
 
                     assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.latency, 200);
+                    assert.equal(metrics.statusCode, 444); // router doesn't run
+                    // However the timeout value is 200,
+                    // it's calculated by the client,
+                    // but setTimeout is happening on the server, tolerate 10ms
+                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.isAtLeast(metrics.routeLatency, 250);
+                    assert.isAtLeast(metrics.latency, 200 - 10);
+                    // latency should dbe lower as request timeouts
+                    assert.isAbove(metrics.routeLatency, metrics.latency);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
                     assert.equal(metrics.connectionState, 'close');
@@ -107,56 +216,36 @@ describe('request metrics plugin', function() {
             )
         );
 
-        SERVER.get('/foo', function(req, res, next) {
+        SERVER.pre(function(req, res, next) {
             setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
+        SERVER.use(function(req, res, next) {
+            setTimeout(function() {
+                return next();
+            }, 50);
+        });
+
+        SERVER.get(
+            '/foo',
+            function(req, res, next) {
+                setTimeout(function() {
+                    return next();
+                }, 250);
+            },
+            function(req, res, next) {
+                assert.fail('Client has already closed request');
                 res.send(202, 'hello world');
                 return next();
-            }, 250);
-        });
+            }
+        );
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
             // request should timeout
             assert.ok(err);
             assert.equal(err.name, 'RequestTimeoutError');
-        });
-    });
-
-    it("should return 'RequestAbortedError' err", function(done) {
-        // we test that the client times out and closes the request. server
-        // flushes request responsibly but connectionState should indicate it
-        // was closed by the server.
-
-        SERVER.on(
-            'after',
-            restify.plugins.metrics(
-                {
-                    server: SERVER
-                },
-                function(err, metrics, req, res, route) {
-                    assert.ok(err);
-                    assert.equal(err.name, 'RequestAbortedError');
-
-                    assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.latency, 200);
-                    assert.equal(metrics.path, '/foo');
-                    assert.equal(metrics.method, 'GET');
-                    assert.equal(metrics.connectionState, 'aborted');
-                    assert.isNumber(metrics.inflightRequests);
-                }
-            )
-        );
-
-        SERVER.get('/foo', function(req, res, next) {
-            // simulate request being aborted by TCP socket being closed
-            req.emit('aborted');
-            res.send(202, 'hello world');
-            return next();
-        });
-
-        CLIENT.get('/foo?a=1', function(err, _, res) {
-            assert.ifError(err);
-            return done();
         });
     });
 
@@ -184,6 +273,7 @@ describe('request metrics plugin', function() {
                     assert.equal(metrics.method, 'GET');
                     assert.equal(metrics.connectionState, undefined);
                     assert.isNumber(metrics.inflightRequests);
+                    return done();
                 }
             )
         );
@@ -194,7 +284,6 @@ describe('request metrics plugin', function() {
 
         CLIENT.get('/foo?a=1', function(err, _, res) {
             assert.ok(err);
-            return done();
         });
     });
 });

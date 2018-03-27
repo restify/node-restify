@@ -199,9 +199,7 @@ describe('audit logger', function() {
             // don't sporadically fail due to timing issues.
         });
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             var record = ringbuffer.records && ringbuffer.records[0];
 
             // check timers
@@ -237,6 +235,10 @@ describe('audit logger', function() {
             );
             done();
         });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
+        });
     });
 
     it('should log anonymous handler timers', function(done) {
@@ -263,6 +265,20 @@ describe('audit logger', function() {
             })
         );
 
+        SERVER.pre(function(req, res, next) {
+            next();
+        });
+        SERVER.pre(function(req, res, next) {
+            next();
+        });
+
+        SERVER.use(function(req, res, next) {
+            next();
+        });
+        SERVER.use(function(req, res, next) {
+            next();
+        });
+
         SERVER.get(
             '/audit',
             function(req, res, next) {
@@ -281,9 +297,7 @@ describe('audit logger', function() {
             }
         );
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             var record = ringbuffer.records && ringbuffer.records[0];
             assert.ok(record, 'no log records');
@@ -291,6 +305,30 @@ describe('audit logger', function() {
                 ringbuffer.records.length,
                 1,
                 'should only have 1 log record'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['pre-0'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'pre-0'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['pre-1'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'pre-1'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['use-0'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'use-0'
+            );
+            assertIsAtLeastWithTolerate(
+                record.req.timers['use-1'],
+                0,
+                TOLERATED_MICROSECONDS,
+                'use-1'
             );
             assertIsAtLeastWithTolerate(
                 record.req.timers['handler-0'],
@@ -323,6 +361,10 @@ describe('audit logger', function() {
                 'handler-1 not last'
             );
             done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -363,9 +405,7 @@ describe('audit logger', function() {
             // don't sporadically fail due to timing issues.
         });
 
-        CLIENT.get('/audit', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             var record = ringbuffer.records && ringbuffer.records[0];
 
             // check timers
@@ -388,6 +428,10 @@ describe('audit logger', function() {
                 'aTestHandler-audit-acc'
             );
             done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -417,9 +461,7 @@ describe('audit logger', function() {
             next();
         });
 
-        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             assert.ok(ringbuffer.records[0], 'no log records');
             assert.equal(
@@ -429,6 +471,10 @@ describe('audit logger', function() {
             );
             assert.ok(ringbuffer.records[0].req.query, 'a=1&b=2');
             done();
+        });
+
+        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -461,9 +507,7 @@ describe('audit logger', function() {
             }
         ]);
 
-        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
-            assert.ifError(err);
-
+        SERVER.on('after', function() {
             // check timers
             assert.ok(ringbuffer.records[0], 'no log records');
             assert.equal(
@@ -476,6 +520,10 @@ describe('audit logger', function() {
                 b: '2'
             });
             done();
+        });
+
+        CLIENT.get('/audit?a=1&b=2', function(err, req, res) {
+            assert.ifError(err);
         });
     });
 
@@ -656,5 +704,40 @@ describe('audit logger', function() {
         CLIENT.get('/audit?foo=bar', function(err, req, res) {
             assert.ifError(err);
         });
+    });
+
+    it('should log 444 for closed request', function(done) {
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            stream: process.stdout
+                        }
+                    ]
+                }),
+                server: SERVER,
+                event: 'after'
+            })
+        );
+
+        SERVER.once('audit', function(data) {
+            assert.ok(data);
+            assert.ok(data.req_id);
+            assert.isNumber(data.latency);
+            assert.equal(444, data.res.statusCode);
+            done();
+        });
+
+        SERVER.get('/audit', function(req, res, next) {
+            req.emit('close');
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {});
     });
 });

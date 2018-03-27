@@ -93,41 +93,39 @@ describe('userAgent pre-route handler', function() {
     // the userAgentConnection should not remove the content-length header from
     // the response, and it should not replace the value of the 'connection'
     // header by 'close'.
-    it(
-        'sets proper headers for HEAD requests ' + 'from non-curl clients',
-        function(done) {
-            var req = http.request(
-                {
-                    hostname: SERVER_ADDRESS,
-                    port: SERVER_PORT,
-                    path: TEST_PATH,
-                    method: 'HEAD',
-                    headers: {
-                        'user-agent': 'foobar',
-                        connection: 'keep-alive'
-                    }
-                },
-                function onResponse(res) {
-                    var responseHeaders = res.headers;
-
-                    assert.ok(responseHeaders.hasOwnProperty('content-length'));
-                    assert.equal(responseHeaders.connection, 'keep-alive');
-
-                    // destroy the socket explicitly now since the request was
-                    // explicitly requesting to not destroy the socket by
-                    // setting its connection header to 'keep-alive'.
-                    req.abort();
-
-                    done();
+    // eslint-disable-next-line
+    it('sets proper headers for HEAD requests from non-curl clients', function(done) {
+        var req = http.request(
+            {
+                hostname: SERVER_ADDRESS,
+                port: SERVER_PORT,
+                path: TEST_PATH,
+                method: 'HEAD',
+                headers: {
+                    'user-agent': 'foobar',
+                    connection: 'keep-alive'
                 }
-            );
+            },
+            function onResponse(res) {
+                var responseHeaders = res.headers;
 
-            req.on('error', function onReqError(err) {
-                assert.ifError(err);
+                assert.ok(responseHeaders.hasOwnProperty('content-length'));
+                assert.equal(responseHeaders.connection, 'keep-alive');
+
+                // destroy the socket explicitly now since the request was
+                // explicitly requesting to not destroy the socket by setting
+                // its connection header to 'keep-alive'.
+                req.abort();
+
                 done();
-            });
+            }
+        );
 
-            req.end();
-        }
-    );
+        req.on('error', function onReqError(err) {
+            assert.ifError(err);
+            done();
+        });
+
+        req.end();
+    });
 });

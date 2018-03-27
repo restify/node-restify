@@ -68,4 +68,27 @@ describe('accept parser', function() {
             done();
         });
     });
+
+    it('GH-1619: should fire NotAcceptable event on server', function(done) {
+        var opts = {
+            path: '/',
+            headers: {
+                accept: 'foo/bar'
+            }
+        };
+        var evtFired = false;
+
+        SERVER.on('NotAcceptable', function(req, res, err, cb) {
+            evtFired = true;
+            return cb();
+        });
+
+        CLIENT.get(opts, function(err, _, res) {
+            assert.ok(err);
+            assert.equal(err.name, 'NotAcceptableError');
+            assert.equal(res.statusCode, 406);
+            assert.isTrue(evtFired);
+            return done();
+        });
+    });
 });

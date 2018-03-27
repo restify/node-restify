@@ -141,6 +141,7 @@ describe('JSON body parser', function() {
         });
     });
 
+    // TODO: router param mapping runs later
     it('should map req.body onto req.params', function(done) {
         SERVER.use(
             restify.plugins.jsonBodyParser({
@@ -267,45 +268,40 @@ describe('JSON body parser', function() {
         });
     });
 
-    it(
-        'restify-GH-318 get request with body ' + '(requestBodyOnGet=true)',
-        function(done) {
-            SERVER.use(
-                restify.plugins.bodyParser({
-                    mapParams: true,
-                    requestBodyOnGet: true
-                })
-            );
+    // eslint-disable-next-line
+    it('restify-GH-318 get request with body (requestBodyOnGet=true)', function(done) {
+        SERVER.use(
+            restify.plugins.bodyParser({
+                mapParams: true,
+                requestBodyOnGet: true
+            })
+        );
 
-            SERVER.get('/getWithBody', function(req, res, next) {
-                assert.equal(req.params.foo, 'bar');
-                res.send();
-                next();
-            });
+        SERVER.get('/getWithBody', function(req, res, next) {
+            assert.equal(req.params.foo, 'bar');
+            res.send();
+            next();
+        });
 
-            var request =
-                'GET /getWithBody HTTP/1.1\r\n' +
-                'Content-Type: application/json\r\n' +
-                'Content-Length: 13\r\n' +
-                '\r\n' +
-                '{"foo":"bar"}';
+        var request =
+            'GET /getWithBody HTTP/1.1\r\n' +
+            'Content-Type: application/json\r\n' +
+            'Content-Length: 13\r\n' +
+            '\r\n' +
+            '{"foo":"bar"}';
 
-            var client = net.connect(
-                { host: '127.0.0.1', port: PORT },
-                function() {
-                    client.write(request);
-                }
-            );
+        var client = net.connect({ host: '127.0.0.1', port: PORT }, function() {
+            client.write(request);
+        });
 
-            client.once('data', function(data) {
-                client.end();
-            });
+        client.once('data', function(data) {
+            client.end();
+        });
 
-            client.once('end', function() {
-                done();
-            });
-        }
-    );
+        client.once('end', function() {
+            done();
+        });
+    });
 
     it('restify-GH-111 JSON Parser not right for arrays', function(done) {
         SERVER.use(
@@ -463,5 +459,34 @@ describe('JSON body parser', function() {
         });
 
         CLIENT.post('/body/foo', payload, done);
+    });
+
+    it('should not throw uncaught "too few args to sprintf"', function(done) {
+        // https://github.com/restify/node-restify/issues/1411
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/', function(req, res, next) {
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/',
+            method: 'POST',
+            agent: false,
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/json'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 400);
+            res.once('end', done);
+            res.resume();
+        });
+        client.write('{"malformedJsonWithPercentSign":30%}');
+        client.end();
     });
 });

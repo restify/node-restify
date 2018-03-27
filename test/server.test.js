@@ -46,7 +46,8 @@ before(function(cb) {
             dtrace: helper.dtrace,
             handleUncaughtExceptions: true,
             log: helper.getLog('server'),
-            version: ['2.0.0', '0.5.4', '1.4.3']
+            version: ['2.0.0', '0.5.4', '1.4.3'],
+            ignoreTrailingSlash: true
         });
         SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
@@ -159,6 +160,85 @@ test('get (path only)', function(t) {
     });
 });
 
+test('get (path only - with trailing slash)', function(t) {
+    SERVER.get('/foo/', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    var count = 0;
+
+    CLIENT.get('/foo/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 2) {
+            t.end();
+        }
+    });
+});
+
+test('get (path only - with trailing slash and nested route)', function(t) {
+    SERVER.get('/foo/', function echoId(req, res, next) {
+        res.statusCode = 200;
+        res.send();
+        next();
+    });
+
+    SERVER.get('/foo/bar', function echoId(req, res, next) {
+        res.statusCode = 201;
+        res.send();
+        next();
+    });
+
+    var count = 0;
+
+    CLIENT.get('/foo/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 201);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+
+    CLIENT.get('/foo/bar', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 201);
+
+        if (++count === 4) {
+            t.end();
+        }
+    });
+});
+
 test('use + get (path only)', function(t) {
     SERVER.use(function(req, res, next) {
         next();
@@ -178,7 +258,7 @@ test('use + get (path only)', function(t) {
 });
 
 test('rm', function(t) {
-    var route = SERVER.get('/foo/:id', function foosy(req, res, next) {
+    var routeName = SERVER.get('/foo/:id', function foosy(req, res, next) {
         next();
     });
 
@@ -189,7 +269,7 @@ test('rm', function(t) {
         next();
     });
 
-    t.ok(SERVER.rm(route));
+    t.ok(SERVER.rm(routeName));
 
     CLIENT.get('/foo/bar', function(err, _, res) {
         t.ok(err);
@@ -202,31 +282,9 @@ test('rm', function(t) {
     });
 });
 
-test('rm route and clear cached route', function(t) {
-    t.equal(SERVER.router.cache.dump().length, 0);
-
-    var route = SERVER.get('/cached/route', function cachey(req, res, next) {
-        res.send({ foo: 'bar' });
-        next();
-    });
-
-    CLIENT.get('/cached/route', function(err, _, res) {
-        t.equal(SERVER.router.cache.dump().length, 1);
-        t.equal(SERVER.router.cache.dump()[0].v.name, route);
-        t.equal(res.statusCode, 200);
-        t.ok(SERVER.rm(route));
-        CLIENT.get('/cached/route', function(err2, _2, res2) {
-            t.ok(err2);
-            t.equal(SERVER.router.cache.dump().length, 0);
-            t.equal(res2.statusCode, 404);
-            t.end();
-        });
-    });
-});
-
 test(
-    '_routeErrorResponse does not cause uncaughtException' +
-        'when called when header has already been sent',
+    '_routeErrorResponse does not cause uncaughtException when called when' +
+        'header has already been sent',
     function(t) {
         SERVER.on('MethodNotAllowed', function(req, res, error, next) {
             res.json(405, { status: 'MethodNotAllowed' });
@@ -248,73 +306,6 @@ test(
         CLIENT.get('/routePostOnly', function(err, _, res) {
             t.ok(err);
             t.equal(res.statusCode, 405);
-        });
-    }
-);
-
-test(
-    'GH-1171: rm one version of the routes, ' +
-        'other versions should still work',
-    function(t) {
-        var routeOne = SERVER.get(
-            { path: '/hello/:name', version: '1.0.0' },
-            function(req, res, next) {
-                res.send('hello ' + req.params.name);
-                next();
-            }
-        );
-        var routeTwo = SERVER.get(
-            { path: '/hello/:name', version: '2.0.0' },
-            function(req, res, next) {
-                res.send('hello ' + req.params.name);
-                next();
-            }
-        );
-
-        var routeThree = SERVER.get(
-            { path: '/hello/:name', version: '3.0.0' },
-            function(req, res, next) {
-                res.send('hello ' + req.params.name);
-                next();
-            }
-        );
-
-        t.ok(SERVER.rm(routeThree));
-
-        var opts = {
-            path: '/hello/friend',
-            headers: {
-                'accept-version': '3.0.0'
-            }
-        };
-        CLIENT.get(opts, function(err, _, res) {
-            t.ok(err);
-            t.equal(res.statusCode, 400);
-
-            opts.headers = {
-                'accept-version': '1.0.0'
-            };
-            CLIENT.get(opts, function(err2, _2, res2) {
-                t.ifError(err2);
-                t.equal(res2.statusCode, 200);
-
-                opts.headers = {
-                    'accept-version': '2.0.0'
-                };
-                CLIENT.get(opts, function(err3, _3, res3) {
-                    t.ifError(err3);
-                    t.equal(res3.statusCode, 200);
-
-                    t.ok(SERVER.rm(routeOne));
-                    t.ok(SERVER.rm(routeTwo));
-
-                    CLIENT.get('/hello/friend', function(err4, _4, res4) {
-                        t.ok(err4);
-                        t.equal(res4.statusCode, 404);
-                        t.end();
-                    });
-                });
-            });
         });
     }
 );
@@ -498,12 +489,15 @@ test('OPTIONS', function(t) {
 });
 
 test('RegExp ok', function(t) {
-    SERVER.get(/\/foo/, function tester(req, res, next) {
+    SERVER.get('/example/:file(^\\d+).png', function tester(req, res, next) {
+        t.deepEqual(req.params, {
+            file: '12'
+        });
         res.send('hi there');
         next();
     });
 
-    CLIENT.get('/foo', function(err, _, res, obj) {
+    CLIENT.get('/example/12.png', function(err, _, res, obj) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(obj, 'hi there');
@@ -534,29 +528,6 @@ test('get (path and version ok)', function(t) {
     CLIENT.get(opts, function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-test('get (path and version not ok)', function(t) {
-    function respond(req, res, next) {
-        res.send();
-        next();
-    }
-
-    SERVER.get({ url: '/foo/:id', version: '1.2.3' }, respond);
-    SERVER.get({ url: '/foo/:id', version: '3.2.1' }, respond);
-
-    var opts = {
-        path: '/foo/bar',
-        headers: {
-            'accept-version': '~2.1'
-        }
-    };
-    CLIENT.get(opts, function(err, _, res) {
-        t.ok(err);
-        t.equal(err.body.message, '~2.1 is not supported by GET /foo/bar');
-        t.equal(res.statusCode, 400);
         t.end();
     });
 });
@@ -732,136 +703,6 @@ test('GH-77 uncaughtException (with custom handler)', function(t) {
     });
 });
 
-test('GH-97 malformed URI breaks server', function(t) {
-    SERVER.get('/echo/:name', function(req, res, next) {
-        res.send(200);
-        next();
-    });
-
-    CLIENT.get('/echo/mark%', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 400);
-        t.end();
-    });
-});
-
-test('GH-109 RegExp flags not honored', function(t) {
-    SERVER.get(/\/echo\/(\w+)/i, function(req, res, next) {
-        res.send(200, req.params[0]);
-        next();
-    });
-
-    CLIENT.get('/ECHO/mark', function(err, _, res, obj) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(obj, 'mark');
-        t.end();
-    });
-});
-
-test('upload routing based on content-type ok', function(t) {
-    var opts = {
-        path: '/',
-        contentType: '*/json'
-    };
-    SERVER.put(opts, function(req, res, next) {
-        res.send(204);
-        next();
-    });
-
-    CLIENT.put('/', { foo: 'foo' }, function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 204);
-        t.end();
-    });
-});
-
-test('upload routing based on content-type fail', function(t) {
-    var opts = {
-        path: '/',
-        contentType: 'text/*'
-    };
-    SERVER.put(opts, function(req, res, next) {
-        res.send(204);
-        next();
-    });
-
-    CLIENT.put('/', { foo: 'foo' }, function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 415);
-        t.end();
-    });
-});
-
-test('path+flags ok', function(t) {
-    SERVER.get({ path: '/foo', flags: 'i' }, function(req, res, next) {
-        res.send('hi');
-        next();
-    });
-
-    CLIENT.get('/FoO', function(err, _, res, obj) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(obj, 'hi');
-        t.end();
-    });
-});
-
-test('test matches params with custom regex', function(t) {
-    var Router = require('../lib/router');
-    var router = new Router({
-        log: helper.getLog()
-    });
-    t.ok(router);
-    router.mount({
-        method: 'GET',
-        name: 'test',
-        url: '/foo/:bar',
-        urlParamPattern: '[a-zA-Z0-9-_~%!;@=+\\$\\*\\.]+'
-    });
-
-    var count = 0;
-    var done = 0;
-
-    function find(p, exp) {
-        count++;
-        var obj = {
-            headers: {},
-            method: 'GET',
-            contentType: function() {},
-            path: function() {
-                return p;
-            },
-            version: function() {
-                return '*';
-            },
-            url: p
-        };
-
-        process.nextTick(function() {
-            router.find(obj, {}, function(err, r, ctx) {
-                if (exp) {
-                    t.ifError(err);
-                    t.ok(r);
-                    t.ok(ctx);
-                    t.deepEqual(ctx, { bar: exp });
-                } else {
-                    t.ok(err);
-                }
-
-                if (++done === count) {
-                    t.end();
-                }
-            });
-        });
-    }
-
-    find('/foo/a%40b.com', 'a@b.com');
-    find('/foo/a@b.com', 'a@b.com');
-    find('/foo/a*b.com', 'a*b.com');
-    find('/foo/a%40b.com/bar', false);
-});
-
 test('GH-180 can parse DELETE body', function(t) {
     SERVER.use(restify.plugins.bodyParser({ mapParams: false }));
 
@@ -984,347 +825,6 @@ test('gh-278 missing router error events (405)', function(t) {
     });
 });
 
-test('gh-278 missing router error events invalid version', function(t) {
-    var p = '/' + uuid.v4();
-    SERVER.get(
-        {
-            path: p,
-            version: '1.2.3'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-    SERVER.once('VersionNotAllowed', function(req, res) {
-        res.send(449, 'foo');
-    });
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '3.2.1'
-        }
-    };
-    CLIENT.get(opts, function(err, _, res) {
-        t.ok(err);
-        t.equal(err.message, '"foo"');
-        t.equal(res.statusCode, 449);
-        t.end();
-    });
-});
-
-test('gh-278 missing router error events (415)', function(t) {
-    var p = '/' + uuid.v4();
-    SERVER.post(
-        {
-            path: p,
-            contentType: 'text/xml'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    SERVER.once('UnsupportedMediaType', function(req, res) {
-        res.send(415, 'foo');
-    });
-
-    CLIENT.post(p, {}, function(err, _, res) {
-        t.ok(err);
-        t.equal(err.message, '"foo"');
-        t.equal(res.statusCode, 415);
-        t.end();
-    });
-});
-
-test('next.ifError', function(t) {
-    var port = 3000;
-    var myServer = restify.createServer({
-        handleUncaughtExceptions: true
-    });
-
-    myServer.use(function(req, res, next) {
-        next.ifError(null);
-        next();
-    });
-
-    myServer.get('/foo/:id', function tester(req, res, next) {
-        process.nextTick(function() {
-            var e = new RestError({
-                statusCode: 400,
-                restCode: 'Foo',
-                message: 'screw you client'
-            });
-            next.ifError(e);
-            t.notOk(true);
-            res.send(200);
-            next();
-        });
-    });
-
-    myServer.listen(port, function() {
-        var myClient = restifyClients.createJsonClient({
-            url: 'http://127.0.0.1:' + port,
-            headers: {
-                connection: 'close'
-            }
-        });
-
-        myClient.get('/foo/bar', function(err) {
-            t.ok(err);
-            t.equal(err.message, '');
-            myServer.close(function() {
-                t.end();
-            });
-        });
-    });
-});
-
-test('next.ifError is not available by default', function(t) {
-    var port = 3000;
-    var myServer = restify.createServer();
-
-    myServer.get('/', function(req, res, next) {
-        t.throws(
-            function() {
-                next.ifError(new Error('boom'));
-            },
-            'TypeError',
-            'next.ifError is not a function'
-        );
-
-        res.send('hi');
-        t.end();
-    });
-
-    myServer.listen(port, function() {
-        var myClient = restifyClients.createStringClient({
-            url: 'http://127.0.0.1:' + port,
-            headers: {
-                connection: 'close'
-            }
-        });
-
-        myClient.get('/', function(err) {
-            t.ifError(err);
-            myServer.close(function() {
-                t.end();
-            });
-        });
-    });
-});
-
-test('gh-283 maximum available versioned route matching', function(t) {
-    var p = '/' + uuid.v4();
-    var versions = ['1.0.0', '1.1.0'];
-    var i;
-
-    function mnt(v) {
-        SERVER.get(
-            {
-                path: p,
-                version: v
-            },
-            function(req, res, next) {
-                res.json(200, { version: v });
-                next();
-            }
-        );
-    }
-
-    for (i = 0; i < versions.length; i++) {
-        mnt(versions[i]);
-    }
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '~1'
-        }
-    };
-
-    CLIENT.get(opts, function(err, _, res, obj) {
-        t.equal(obj.version, '1.1.0');
-        t.end();
-    });
-});
-
-test('gh-635 routes match the maximum version', function(t) {
-    var p = '/' + uuid.v4();
-
-    SERVER.get(
-        {
-            path: p,
-            version: ['1.2.0', '1.2.1', '1.2.2']
-        },
-        function(req, res, next) {
-            res.json(200, {
-                requestedVersion: req.version(),
-                matchedVersion: req.matchedVersion()
-            });
-            next();
-        }
-    );
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '<1.2.2'
-        }
-    };
-
-    CLIENT.get(opts, function(err, _, res, obj) {
-        t.equal(obj.requestedVersion, '<1.2.2');
-        t.equal(obj.matchedVersion, '1.2.1');
-        t.end();
-    });
-});
-
-test('versioned route matching should prefer \
-    first match if equal versions', function(t) {
-    var p = '/' + uuid.v4();
-
-    SERVER.get(
-        {
-            path: p,
-            version: ['1.1.0', '1.2.0']
-        },
-        function(req, res, next) {
-            res.json(200, { route: p });
-            next();
-        }
-    );
-
-    SERVER.get(
-        {
-            path: '/:id',
-            version: ['1.1.0', '1.2.0']
-        },
-        function(req, res, next) {
-            res.json(200, { route: 'id' });
-            next();
-        }
-    );
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '~1'
-        }
-    };
-
-    CLIENT.get(opts, function(err, _, res, obj) {
-        t.equal(obj.route, p);
-        t.end();
-    });
-});
-
-test('versioned route matching should not throw TypeError', function(t) {
-    var p = '/path/' + uuid.v4();
-
-    SERVER.post(
-        {
-            path: p,
-            version: ['1.1.0', '1.2.0'],
-            contentType: 'application/json'
-        },
-        function(req, res, next) {
-            res.json(200, { route: p });
-            next();
-        }
-    );
-
-    SERVER.post(
-        {
-            path: '/path/:id',
-            version: ['1.1.0', '1.2.0']
-        },
-        function(req, res, next) {
-            res.json(200, { route: 'id' });
-            next();
-        }
-    );
-
-    var opts = {
-        path: p,
-        headers: {
-            'accept-version': '~1'
-        }
-    };
-
-    CLIENT.post(opts, function(err, _, res, obj) {
-        t.equal(obj.route, p);
-        t.end();
-    });
-});
-
-test('GH-652 throw InvalidVersion on version mismatch', function(t) {
-    function response(req, res, next) {
-        return res.send(req.route.version);
-    }
-    SERVER.get({ path: '/ping', version: '1.0.1' }, response);
-    var opts = {
-        path: '/ping',
-        headers: {
-            'accept-version': '1.0.2'
-        }
-    };
-    CLIENT.get(opts, function(err, req, res, data) {
-        t.equal(res.statusCode, 400);
-        t.equal(data.code, 'InvalidVersion');
-        t.done();
-    });
-});
-
-test('GH-652 throw InvalidVersion on non-versioned route', function(t) {
-    function response(req, res, next) {
-        return res.send(req.route.version);
-    }
-    SERVER.get({ path: '/ping' }, response);
-    var opts = {
-        path: '/ping',
-        headers: {
-            'accept-version': '1.0.1'
-        }
-    };
-    CLIENT.get(opts, function(err, req, res, data) {
-        t.equal(res.statusCode, 400);
-        t.equal(data.code, 'InvalidVersion');
-        t.done();
-    });
-});
-
-test('GH-959 matchedVersion() should return on cached routes', function(t) {
-    SERVER.get(
-        {
-            path: '/test',
-            version: '0.5.0'
-        },
-        function(req, res, next) {
-            res.send({
-                version: req.version(),
-                matchedVersion: req.matchedVersion()
-            });
-            return next();
-        }
-    );
-
-    CLIENT.get('/test', function(err, _, res, body) {
-        t.ifError(err);
-        t.equal(body.version, '*');
-        t.equal(body.matchedVersion, '0.5.0');
-
-        CLIENT.get('/test', function(err2, _2, res2, body2) {
-            t.ifError(err2);
-            t.equal(body.version, '*');
-            t.equal(body.matchedVersion, '0.5.0');
-            t.end();
-        });
-    });
-});
-
 test('gh-329 wrong values in res.methods', function(t) {
     function route(req, res, next) {
         res.send(200);
@@ -1339,7 +839,7 @@ test('gh-329 wrong values in res.methods', function(t) {
 
     SERVER.once('MethodNotAllowed', function(req, res, cb) {
         t.ok(res.methods);
-        t.deepEqual(res.methods, ['GET', 'PUT', 'DELETE']);
+        t.deepEqual(res.methods, ['DELETE', 'GET', 'PUT']);
         res.send(405);
     });
 
@@ -1369,7 +869,7 @@ test('GH #704: Route with a valid RegExp params', function(t) {
     });
 });
 
-test('GH #704: Route with an unvalid RegExp params', function(t) {
+test('GH #704: Route with an invalid RegExp params', function(t) {
     SERVER.get(
         {
             name: 'regexp_param2',
@@ -1385,144 +885,6 @@ test('GH #704: Route with an unvalid RegExp params', function(t) {
     CLIENT.get('/foo/A__M', function(err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
-        t.end();
-    });
-});
-
-test('content-type routing vendor', function(t) {
-    SERVER.post(
-        {
-            name: 'foo',
-            path: '/',
-            contentType: 'application/vnd.joyent.com.foo+json'
-        },
-        function(req, res, next) {
-            res.send(201);
-        }
-    );
-
-    SERVER.post(
-        {
-            name: 'bar',
-            path: '/',
-            contentType: 'application/vnd.joyent.com.bar+json'
-        },
-        function(req, res, next) {
-            res.send(202);
-        }
-    );
-
-    var _done = 0;
-
-    function done() {
-        if (++_done === 2) {
-            t.end();
-        }
-    }
-
-    var opts = {
-        path: '/',
-        headers: {
-            'content-type': 'application/vnd.joyent.com.foo+json'
-        }
-    };
-    CLIENT.post(opts, {}, function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 201);
-        done();
-    });
-
-    var opts2 = {
-        path: '/',
-        headers: {
-            'content-type': 'application/vnd.joyent.com.bar+json'
-        }
-    };
-    CLIENT.post(opts2, {}, function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 202);
-        done();
-    });
-});
-
-test('content-type routing params only', function(t) {
-    SERVER.post(
-        {
-            name: 'foo',
-            path: '/',
-            contentType: 'application/json; type=foo'
-        },
-        function(req, res, next) {
-            res.send(201);
-        }
-    );
-
-    SERVER.post(
-        {
-            name: 'bar',
-            path: '/',
-            contentType: 'application/json; type=bar'
-        },
-        function(req, res, next) {
-            res.send(202);
-        }
-    );
-
-    var _done = 0;
-
-    function done() {
-        if (++_done === 2) {
-            t.end();
-        }
-    }
-
-    var opts = {
-        path: '/',
-        headers: {
-            'content-type': 'application/json; type=foo'
-        }
-    };
-    CLIENT.post(opts, {}, function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 201);
-        done();
-    });
-
-    var opts2 = {
-        path: '/',
-        headers: {
-            'content-type': 'application/json; type=bar'
-        }
-    };
-    CLIENT.post(opts2, {}, function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 202);
-        done();
-    });
-});
-
-test('malformed content type', function(t) {
-    SERVER.post(
-        {
-            name: 'foo',
-            path: '/',
-            contentType: 'application/json'
-        },
-        function(req, res, next) {
-            res.send(201);
-        }
-    );
-
-    var opts = {
-        path: '/',
-        headers: {
-            'content-type': 'boom'
-        }
-    };
-
-    CLIENT.post(opts, {}, function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 415);
         t.end();
     });
 });
@@ -1622,9 +984,7 @@ test('run param only with existing req.params', function(t) {
         next();
     });
 
-    SERVER.param('userId', function(req, res, next, param, name) {
-        t.equal(param, '1');
-        t.equal(name, 'userId');
+    SERVER.param('userId', function(req, res, next) {
         count++;
         next();
     });
@@ -1641,7 +1001,7 @@ test('run param only with existing req.params', function(t) {
     });
 });
 
-test('run param with false value', function(t) {
+test('run param only with existing req.params', function(t) {
     var count = 0;
 
     SERVER.param('name', function(req, res, next) {
@@ -1650,7 +1010,7 @@ test('run param with false value', function(t) {
     });
 
     SERVER.param('userId', function(req, res, next, param, name) {
-        t.equal(param, '');
+        t.equal(param, '1');
         t.equal(name, 'userId');
         count++;
         next();
@@ -1660,7 +1020,7 @@ test('run param with false value', function(t) {
         res.send(200);
     });
 
-    CLIENT.get('/users//', function(err, _, res) {
+    CLIENT.get('/users/1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(count, 1);
@@ -1745,8 +1105,8 @@ test('gh-193 route chained', function(t) {
     );
 
     CLIENT.get('/foo', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
         t.equal(count, 1);
         t.end();
     });
@@ -1778,45 +1138,6 @@ test('gh-193 route params basic', function(t) {
         },
         function(req, res, next) {
             t.notOk(req.params.baz);
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo/blah', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(count, 1);
-        t.end();
-    });
-});
-
-test('gh-193 same url w/params', function(t) {
-    var count = 0;
-
-    SERVER.use(function(req, res, next) {
-        count++;
-        next();
-    });
-
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo/:id'
-        },
-        function(req, res, next) {
-            t.equal(req.params.id, 'blah');
-            next('foo2');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'foo2',
-            path: '/foo/:baz'
-        },
-        function(req, res, next) {
-            t.equal(req.params.baz, 'blah');
             res.send(200);
             next();
         }
@@ -1915,30 +1236,6 @@ test('GH-384 res.json(200, {}) broken', function(t) {
     });
 });
 
-test('GH-401 regex routing broken', function(t) {
-    function handle(req, res, next) {
-        res.send(204);
-        next();
-    }
-
-    var done = 0;
-
-    function client_cb(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 204);
-
-        if (++done === 2) {
-            t.end();
-        }
-    }
-
-    SERVER.get('/image', handle);
-    SERVER.get(/^(\/image\/)(.*)/, handle);
-
-    CLIENT.get('/image', client_cb);
-    CLIENT.get('/image/1.jpg', client_cb);
-});
-
 test('explicitly sending a 403 with custom error', function(t) {
     function MyCustomError() {}
 
@@ -2017,34 +1314,32 @@ test('error handler defers "after" event', function(t) {
     });
 });
 
-test(
-    'gh-757 req.absoluteUri() ' + 'defaults path segment to req.path()',
-    function(t) {
-        SERVER.get('/the-original-path', function(req, res, next) {
-            var prefix = 'http://127.0.0.1:' + PORT;
-            t.equal(
-                req.absoluteUri('?key=value'),
-                prefix + '/the-original-path/?key=value'
-            );
-            t.equal(
-                req.absoluteUri('#fragment'),
-                prefix + '/the-original-path/#fragment'
-            );
-            t.equal(
-                req.absoluteUri('?key=value#fragment'),
-                prefix + '/the-original-path/?key=value#fragment'
-            );
-            res.send();
-            next();
-        });
+// eslint-disable-next-line
+test('gh-757 req.absoluteUri() defaults path segment to req.path()', function(t) {
+    SERVER.get('/the-original-path', function(req, res, next) {
+        var prefix = 'http://127.0.0.1:' + PORT;
+        t.equal(
+            req.absoluteUri('?key=value'),
+            prefix + '/the-original-path/?key=value'
+        );
+        t.equal(
+            req.absoluteUri('#fragment'),
+            prefix + '/the-original-path/#fragment'
+        );
+        t.equal(
+            req.absoluteUri('?key=value#fragment'),
+            prefix + '/the-original-path/?key=value#fragment'
+        );
+        res.send();
+        next();
+    });
 
-        CLIENT.get('/the-original-path', function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 200);
-            t.end();
-        });
-    }
-);
+    CLIENT.get('/the-original-path', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
 
 test('GH-693 sending multiple response header values', function(t) {
     SERVER.get('/', function(req, res, next) {
@@ -2088,11 +1383,14 @@ test('gh-779 set-cookie fields should never have commas', function(t) {
     CLIENT.get('/set-cookie', function(err, _, res) {
         t.ifError(err);
         t.equal(
-            res.headers['set-cookie'].length,
-            1,
-            'set-cookie header should only have 1 element'
+            res.rawHeaders.filter(function(keyOrValue) {
+                return keyOrValue === 'set-cookie';
+            }).length,
+            2,
+            'multiple set-cookie headers should not be merged'
         );
-        t.equal(res.headers['set-cookie'], 'bar');
+        t.equal(res.headers['set-cookie'][0], 'foo');
+        t.equal(res.headers['set-cookie'][1], 'bar');
         t.end();
     });
 });
@@ -2142,13 +1440,6 @@ test(
         });
     }
 );
-
-test('gh-630 handle server versions as an array or string', function(t) {
-    t.ok(SERVER.toString().indexOf('0.5.4,1.4.3,2.0.0') > -1);
-    SERVER.versions = '3.0.0';
-    t.ok(SERVER.toString().indexOf('3.0.0') > -1);
-    t.end();
-});
 
 test('GH-877 content-type should be case insensitive', function(t) {
     SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
@@ -2216,9 +1507,9 @@ test(
             },
             function second(req, res, next) {
                 req.startHandlerTimer('second');
+                numCount++;
+                req.endHandlerTimer('second');
                 setTimeout(function() {
-                    numCount++;
-                    req.endHandlerTimer('second');
                     return next();
                 }, 300);
             },
@@ -2230,7 +1521,65 @@ test(
             }
         ]);
 
-        CLIENT.get('/audit', function(err, req, res, data) {
+        // set up audit logs
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        SERVER.on(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            type: 'raw',
+                            stream: ringbuffer
+                        }
+                    ]
+                }),
+                event: 'after'
+            })
+        );
+
+        SERVER.on('after', function(req, res, route, err) {
+            if (req.href() === '/audit?v=2') {
+                // should request timeout error
+                t.ok(err);
+                t.equal(err.name, 'RequestCloseError');
+
+                // check records
+                t.ok(ringbuffer.records[0], 'no log records');
+                t.equal(
+                    ringbuffer.records.length,
+                    1,
+                    'should only have 1 log record'
+                );
+                // TODO: fix this after plugin is fixed to use
+                // req.connectionState()
+                // t.equal(ringbuffer.records[0].req.clientClosed, true);
+
+                // check timers
+                var handlers = Object.keys(ringbuffer.records[0].req.timers);
+                t.equal(handlers.length, 2, 'should only have 2 req timers');
+                t.equal(
+                    handlers[0],
+                    'first',
+                    'first handler timer not in order'
+                );
+                t.equal(
+                    handlers[handlers.length - 1],
+                    'second',
+                    'second handler not last'
+                );
+                t.end();
+
+                // ensure third handler never ran
+                t.equal(numCount, 2);
+
+                t.end();
+            }
+        });
+
+        CLIENT.get('/audit?v=1', function(err, req, res, data) {
             t.ifError(err);
             t.deepEqual(data, { hello: 'world' });
             t.equal(numCount, 3);
@@ -2238,69 +1587,9 @@ test(
             // reset numCount
             numCount = 0;
 
-            // set up audit logs
-            var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
-            SERVER.once(
-                'after',
-                restify.plugins.auditLogger({
-                    log: bunyan.createLogger({
-                        name: 'audit',
-                        streams: [
-                            {
-                                level: 'info',
-                                type: 'raw',
-                                stream: ringbuffer
-                            }
-                        ]
-                    }),
-                    event: 'after'
-                })
-            );
-
-            FAST_CLIENT.get('/audit', function(err2, req2, res2, data2) {
-                setTimeout(function() {
-                    // should request timeout error
-                    t.ok(err2);
-                    t.equal(err2.name, 'RequestTimeoutError');
-                    t.deepEqual(data2, {});
-
-                    // check records
-                    t.ok(ringbuffer.records[0], 'no log records');
-                    t.equal(
-                        ringbuffer.records.length,
-                        1,
-                        'should only have 1 log record'
-                    );
-                    // TODO: fix this after plugin is fixed to use
-                    // req.connectionState()
-                    // t.equal(ringbuffer.records[0].req.clientClosed, true);
-
-                    // check timers
-                    var handlers = Object.keys(
-                        ringbuffer.records[0].req.timers
-                    );
-                    t.equal(
-                        handlers.length,
-                        2,
-                        'should only have 2 req timers'
-                    );
-                    t.equal(
-                        handlers[0],
-                        'first',
-                        'first handler timer not in order'
-                    );
-                    t.equal(
-                        handlers[handlers.length - 1],
-                        'second',
-                        'second handler not last'
-                    );
-                    t.end();
-
-                    // ensure third handler never ran
-                    t.equal(numCount, 2);
-                }, 500);
-                // don't start tests until a little after the request times
-                // out so that server can start the audit logs.
+            FAST_CLIENT.get('/audit?v=2', function(err2, req2, res2, data2) {
+                t.ok(err2);
+                t.equal(err2.name, 'RequestTimeoutError');
             });
         });
     }
@@ -2364,26 +1653,24 @@ test('GH-667 emit error event for generic Errors', function(t) {
     /*eslint-enable no-shadow*/
 });
 
-test(
-    'GH-667 returning error in error handler ' + 'should not do anything',
-    function(t) {
-        SERVER.on('ImATeapot', function(req, res, err, cb) {
-            // attempt to pass a new error back
-            return cb(new errors.LockedError('oh noes'));
-        });
+// eslint-disable-next-line
+test('GH-667 returning error in error handler should not do anything', function(t) {
+    SERVER.on('ImATeapot', function(req, res, err, cb) {
+        // attempt to pass a new error back
+        return cb(new errors.LockedError('oh noes'));
+    });
 
-        SERVER.get('/1', function(req, res, next) {
-            return next(new errors.ImATeapotError('foobar'));
-        });
+    SERVER.get('/1', function(req, res, next) {
+        return next(new errors.ImATeapotError('foobar'));
+    });
 
-        CLIENT.get('/1', function(err, req, res, data) {
-            t.ok(err);
-            // should still get the original error
-            t.equal(err.name, 'ImATeapotError');
-            t.end();
-        });
-    }
-);
+    CLIENT.get('/1', function(err, req, res, data) {
+        t.ok(err);
+        // should still get the original error
+        t.equal(err.name, 'ImATeapotError');
+        t.end();
+    });
+});
 
 test('GH-958 RCS does not write triggering record', function(t) {
     var passThrough = new stream.PassThrough();
@@ -2521,6 +1808,32 @@ test('calling next(false) should early exit from pre handlers', function(t) {
     });
 });
 
+test('calling next(false) should early exit from use handlers', function(t) {
+    var steps = 0;
+
+    SERVER.use(function(req, res, next) {
+        res.send('early exit');
+        return next(false);
+    });
+
+    SERVER.get('/1', function(req, res, next) {
+        res.send('hello world');
+        return next();
+    });
+
+    SERVER.on('after', function() {
+        steps++;
+        t.equal(steps, 2);
+        t.end();
+    });
+
+    CLIENT.get('/1', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 'early exit');
+        steps++;
+    });
+});
+
 test('calling next(err) from pre should still emit after event', function(t) {
     setTimeout(function() {
         t.fail('Timed out');
@@ -2592,35 +1905,33 @@ test('GH-1078: server name should be customizable', function(t) {
     });
 });
 
-test(
-    'GH-1078: server name should be overridable ' + 'and not sent down',
-    function(t) {
-        var myServer = restify.createServer({
-            name: ''
-        });
-        var port = 3000;
+// eslint-disable-next-line
+test('GH-1078: server name should be overridable and not sent down', function(t) {
+    var myServer = restify.createServer({
+        name: ''
+    });
+    var port = 3000;
 
-        myServer.get('/', function(req, res, next) {
-            res.send('hi');
-            return next();
-        });
+    myServer.get('/', function(req, res, next) {
+        res.send('hi');
+        return next();
+    });
 
-        var myClient = restifyClients.createStringClient({
-            url: 'http://127.0.0.1:' + port,
-            headers: {
-                connection: 'close'
-            }
-        });
+    var myClient = restifyClients.createStringClient({
+        url: 'http://127.0.0.1:' + port,
+        headers: {
+            connection: 'close'
+        }
+    });
 
-        myServer.listen(port, function() {
-            myClient.get('/', function(err, req, res, data) {
-                t.ifError(err);
-                t.equal(res.headers.hasOwnProperty('server'), false);
-                myServer.close(t.end);
-            });
+    myServer.listen(port, function() {
+        myClient.get('/', function(err, req, res, data) {
+            t.ifError(err);
+            t.equal(res.headers.hasOwnProperty('server'), false);
+            myServer.close(t.end);
         });
-    }
-);
+    });
+});
 
 test("should emit 'after' on successful request", function(t) {
     SERVER.on('after', function(req, res, route, err) {
@@ -2719,33 +2030,6 @@ test(
     }
 );
 
-test(
-    "should 'emit' after on aborted request " +
-        "(req.connectionState(): 'aborted')",
-    function(t) {
-        SERVER.on('after', function(req, res, route, err) {
-            t.ok(err);
-            t.equal(req.connectionState(), 'aborted');
-            t.equal(err.name, 'RequestAbortedError');
-        });
-
-        SERVER.get('/foobar', function(req, res, next) {
-            req.emit('aborted');
-            // fast client times out at 500ms, wait for 800ms which should cause
-            // client to timeout
-            setTimeout(function() {
-                return next();
-            }, 800);
-        });
-
-        FAST_CLIENT.get('/foobar', function(err, _, res) {
-            t.ok(err);
-            t.equal(err.name, 'RequestTimeoutError');
-            t.end();
-        });
-    }
-);
-
 test('should increment/decrement inflight request count', function(t) {
     SERVER.get('/foo', function(req, res, next) {
         t.equal(SERVER.inflightRequests(), 1);
@@ -2753,46 +2037,48 @@ test('should increment/decrement inflight request count', function(t) {
         return next();
     });
 
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
+    SERVER.on('after', function() {
         t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.inflightRequests(), 1);
+    });
 });
 
-test(
-    'should increment/decrement inflight request count ' +
-        'for concurrent reqs',
-    function(t) {
-        SERVER.get('/foo1', function(req, res, next) {
-            t.equal(SERVER.inflightRequests(), 1);
-            setTimeout(function() {
-                res.send();
-                return next();
-            }, 250);
-        });
-
-        SERVER.get('/foo2', function(req, res, next) {
-            t.equal(SERVER.inflightRequests(), 2);
+// eslint-disable-next-line
+test('should increment/decrement inflight request count for concurrent reqs', function(t) {
+    SERVER.get('/foo1', function(req, res, next) {
+        // other request is already sent
+        t.equal(SERVER.inflightRequests() >= 1, true);
+        setTimeout(function() {
             res.send();
             return next();
-        });
+        }, 250);
+    });
 
-        CLIENT.get('/foo1', function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 200);
-            t.equal(SERVER.inflightRequests(), 0);
-            t.end();
-        });
+    SERVER.get('/foo2', function(req, res, next) {
+        t.equal(SERVER.inflightRequests(), 2);
+        res.send();
+        return next();
+    });
 
-        CLIENT.get('/foo2', function(err, _, res) {
-            t.ifError(err);
-            t.equal(res.statusCode, 200);
-            t.equal(SERVER.inflightRequests(), 1);
-        });
-    }
-);
+    CLIENT.get('/foo1', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.inflightRequests(), 1);
+        t.end();
+    });
+
+    CLIENT.get('/foo2', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.equal(SERVER.inflightRequests(), 2);
+    });
+});
 
 test("should emit 'close' on server close", function(t) {
     var server = restify.createServer();
@@ -2812,23 +2098,32 @@ test('should cleanup inflight requests count for 404s', function(t) {
         return next();
     });
 
+    SERVER.on('after', function(req) {
+        if (req.path() === '/doesnotexist') {
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        }
+    });
+
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
+        t.equal(SERVER.inflightRequests(), 1);
 
         CLIENT.get('/doesnotexist', function(err2, _2, res2) {
             t.ok(err2);
             t.equal(res2.statusCode, 404);
             t.equal(SERVER.inflightRequests(), 0);
-            t.end();
         });
     });
 });
 
 test('should cleanup inflight requests count for timeouts', function(t) {
+    t.equal(SERVER.inflightRequests(), 0);
+
     SERVER.get('/foo1', function(req, res, next) {
-        t.equal(SERVER.inflightRequests(), 1);
+        // othr request is already sent
+        t.equal(SERVER.inflightRequests() >= 1, true);
         setTimeout(function() {
             res.send();
             return next();
@@ -2841,45 +2136,44 @@ test('should cleanup inflight requests count for timeouts', function(t) {
         return next();
     });
 
+    SERVER.on('after', function(req) {
+        if (req.path() === '/foo1') {
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        } else if (req.path() === '/foo2') {
+            t.equal(SERVER.inflightRequests(), 1);
+        }
+    });
+
     FAST_CLIENT.get('/foo1', function(err, _, res) {
         t.ok(err);
         t.equal(SERVER.inflightRequests(), 1);
-
-        setTimeout(function() {
-            // wait for server to flush response, 600 extra plus the already
-            // 500ms we waited should be enough to cover the 1000 response time
-            // of server.
-            t.equal(SERVER.inflightRequests(), 0);
-            t.end();
-        }, 600);
     });
 
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 2);
     });
 });
 
-test(
-    'should cleanup inflight requests ' + 'count on uncaughtExceptions',
-    function(t) {
-        SERVER.on('uncaughtException', function(req, res, route, err) {
-            res.send(500, 'asplode');
-        });
+// eslint-disable-next-line
+test('should cleanup inflight requests count on uncaughtExceptions', function(t) {
+    SERVER.on('uncaughtException', function(req, res, route, err) {
+        res.send(500, 'asplode');
+    });
 
-        SERVER.get('/foo1', function(req, res, next) {
-            t.equal(SERVER.inflightRequests(), 1);
-            throw new Error('oh noes');
-        });
+    SERVER.get('/foo1', function(req, res, next) {
+        t.equal(SERVER.inflightRequests(), 1);
+        throw new Error('oh noes');
+    });
 
-        CLIENT.get('/foo1', function(err, _, res) {
-            t.ok(err);
-            t.equal(SERVER.inflightRequests(), 0);
-            t.end();
-        });
-    }
-);
+    CLIENT.get('/foo1', function(err, _, res) {
+        t.ok(err);
+        t.equal(SERVER.inflightRequests(), 0);
+        t.end();
+    });
+});
 
 test('should show debug information', function(t) {
     SERVER.pre(function pre(req, res, next) {
@@ -2913,11 +2207,7 @@ test('should show debug information', function(t) {
         return next();
     });
 
-    SERVER.get(/^\/([a-zA-Z0-9_\.~-]+)\/(.*)/, function freeform(
-        req,
-        res,
-        next
-    ) {
+    SERVER.get('/example/:file(^\\d+).png', function freeform(req, res, next) {
         res.end();
         return next();
     });
@@ -2931,16 +2221,6 @@ test('should show debug information', function(t) {
         t.ok(route);
         t.equal(typeof route.name, 'string');
         t.equal(typeof route.method, 'string');
-        t.ok(
-            typeof route.input === 'string' ||
-                route.input instanceof RegExp === true
-        );
-        t.equal(typeof route.compiledRegex, 'object');
-
-        t.equal(route.versions instanceof Array, true);
-        route.versions.forEach(function(v) {
-            t.equal(typeof v, 'string');
-        });
 
         t.equal(route.handlers instanceof Array, true);
         route.handlers.forEach(function(handlerFn) {
@@ -2948,7 +2228,8 @@ test('should show debug information', function(t) {
         });
     });
 
-    // check /foo
+    // // check /foo
+    // TODO: should it contain use handlers?
     t.equal(debugInfo.routes[0].handlers[0], 'use');
     t.equal(debugInfo.routes[0].handlers[1], 'use2');
     t.equal(debugInfo.routes[0].handlers[2], 'anonymous');
@@ -2974,25 +2255,12 @@ test('should show debug information', function(t) {
 
     // detailed test for compiled regex
     // verify url parameter regex
-    t.deepEqual(debugInfo.routes[1].name, 'getbarab054143200');
+    t.deepEqual(debugInfo.routes[1].name, 'getbarab');
     t.deepEqual(debugInfo.routes[1].method, 'get');
-    t.deepEqual(debugInfo.routes[1].input, '/bar/:a/:b');
-    t.ok(debugInfo.routes[1].compiledRegex instanceof RegExp);
-    t.deepEqual(debugInfo.routes[1].compiledUrlParams, {
-        0: 'a',
-        1: 'b'
-    });
+
     // verify freeform regex
-    t.deepEqual(debugInfo.routes[2].name, 'getazaz09_054143200');
+    t.deepEqual(debugInfo.routes[2].name, 'getexamplefiledpng');
     t.deepEqual(debugInfo.routes[2].method, 'get');
-    t.ok(debugInfo.routes[2].input instanceof RegExp);
-    t.ok(debugInfo.routes[2].compiledRegex instanceof RegExp);
-    // freeform regex input should equal output
-    t.equal(
-        debugInfo.routes[2].input.toString(),
-        debugInfo.routes[2].compiledRegex.toString()
-    );
-    t.deepEqual(debugInfo.routes[2].compiledUrlParams, null);
 
     // verify other server details
     t.deepEqual(Object.keys(debugInfo.server.formatters), [
@@ -3122,20 +2390,43 @@ test('should emit restifyError even for router errors', function(t) {
     });
 });
 
-test('calling next twice should throw', function(t) {
-    SERVER.get('/', function(req, res, next) {
-        res.send(200);
-        next();
-        next();
+test('should emit error with multiple next calls with strictNext', function(t) {
+    var server = restify.createServer({
+        dtrace: helper.dtrace,
+        strictNext: true,
+        handleUncaughtExceptions: true,
+        log: helper.getLog('server')
     });
+    var client;
+    var port;
 
-    SERVER.on('uncaughtException', function(req, res, route, err) {
-        t.ok(err);
-        t.equal(err.message, "next shouldn't be called more than once");
-        t.end();
-    });
+    server.listen(PORT + 1, '127.0.0.1', function() {
+        port = server.address().port;
+        client = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + port,
+            dtrace: helper.dtrace,
+            retry: false
+        });
 
-    CLIENT.get('/', function(err, req, res, data) {
-        t.ifError(err);
+        server.get('/strict-next', function(req, res, next) {
+            next();
+            next();
+        });
+
+        server.on('uncaughtException', function(req, res, route, err) {
+            t.ok(err);
+            t.equal(err.message, "next shouldn't be called more than once");
+            res.send(err);
+        });
+
+        client.get('/strict-next', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+
+            client.close();
+            server.close(function() {
+                t.end();
+            });
+        });
     });
 });
