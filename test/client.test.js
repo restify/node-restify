@@ -6,6 +6,8 @@ var http = require('http');
 
 var crypto = require('crypto');
 
+var zlib = require('zlib');
+
 var uuid = require('uuid');
 
 var restify = require('../lib');
@@ -112,9 +114,15 @@ function sendJsonNull(req, res, next) {
 }
 
 function sendMultibyte(req, res, next) {
-    var payload = require('./files/multibyte.json');
-    res.send(payload);
-    return next();
+    var payload = JSON.stringify(require('./files/multibyte.json'));
+    var hash = crypto.createHash('md5');
+
+    zlib.gzip(payload, function (err, result) {
+        hash.update(result);
+        res.header('content-md5', hash.digest('base64'));
+        res.send(payload);
+        return next();
+    });
 }
 
 
