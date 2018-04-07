@@ -6,6 +6,8 @@ var http = require('http');
 
 var crypto = require('crypto');
 
+var zlib = require('zlib');
+
 var uuid = require('uuid');
 
 var restify = require('../lib');
@@ -111,6 +113,18 @@ function sendJsonNull(req, res, next) {
     next();
 }
 
+function sendMultibyte(req, res, next) {
+    var payload = JSON.stringify(require('./files/multibyte.json'));
+    var hash = crypto.createHash('md5');
+
+    zlib.gzip(payload, function (err, result) {
+        hash.update(result);
+        res.header('content-md5', hash.digest('base64'));
+        res.send(payload);
+        return next();
+    });
+}
+
 
 ///--- Tests
 
@@ -127,6 +141,7 @@ before(function (callback) {
         SERVER.use(restify.authorizationParser());
         SERVER.use(restify.queryParser());
         SERVER.use(restify.bodyParser());
+        SERVER.use(restify.gzipResponse());
 
         SERVER.get('/signed', sendSignature);
         SERVER.get('/whitespace/:flavor', sendWhitespace);
@@ -154,6 +169,8 @@ before(function (callback) {
         SERVER.put('/json/:name', sendJson);
         SERVER.post('/json/:name', sendJson);
         SERVER.patch('/json/:name', sendJson);
+
+        SERVER.get('/multibyte', sendMultibyte);
 
         SERVER.get('/str/request_timeout', requestThatTimesOut);
         SERVER.del('/str/:name', sendText);
@@ -972,4 +989,20 @@ test('GH-738 respect NO_PROXY while setting proxy', function (t) {
         process.env.https_proxy = origProxy;
     }
     process.env.NO_PROXY = origNoProxy;
+});
+
+
+test('should support decoding gzipped utf8 multibyte responses', function (t) {
+    var opts = {
+        path: '/multibyte',
+        headers: {
+            'accept-encoding': 'gzip'
+        }
+    };
+
+    STR_CLIENT.get(opts, function (err, req, res, data) {
+        t.ifError(err);
+        t.deepEqual(JSON.parse(data), require('./files/multibyte.json'));
+        t.end();
+    });
 });
