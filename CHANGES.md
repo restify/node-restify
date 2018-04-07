@@ -1,5 +1,10 @@
 # restify Changelog
 
+## 4.3.3
+
+- #1638 Backport fix from main line to handle multibyte chars properly in the
+  gzip decoder
+
 ## 4.3.2
 
 - #1473 Fix recursion issue with `res.getHeaders()` on node8+
