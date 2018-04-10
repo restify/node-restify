@@ -1,3 +1,12 @@
+<a name="7.1.1"></a>
+### 7.1.1 (2018-04-10)
+
+
+#### Bug Fixes
+
+* **plugins:** save req._matchedVersion (#1642) ([69f917a3](git://github.com/restify/node-restify.git/commit/69f917a3))
+
+
 <a name="7.1.0"></a>
 ## 7.1.0 (2018-03-26)
 
