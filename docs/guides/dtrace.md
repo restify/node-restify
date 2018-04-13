@@ -17,11 +17,11 @@ var server = restify.createServer({
   dtrace: true
 });
 
-server.use(restify.acceptParser(server.acceptable));
-server.use(restify.authorizationParser());
-server.use(restify.dateParser());
-server.use(restify.queryParser());
-server.use(restify.urlEncodedBodyParser());
+server.use(restify.plugins.acceptParser(server.acceptable));
+server.use(restify.plugins.authorizationParser());
+server.use(restify.plugins.dateParser());
+server.use(restify.plugins.queryParser());
+server.use(restify.plugins.urlEncodedBodyParser());
 
 server.use(function slowHandler(req, res, next) {
   setTimeout(function() {
