@@ -339,12 +339,12 @@ function createServer(options) {
     );
 
     // Use the common stuff you probably want
-    server.use(restify.acceptParser(server.acceptable));
-    server.use(restify.dateParser());
-    server.use(restify.authorizationParser());
-    server.use(restify.queryParser());
-    server.use(restify.gzipResponse());
-    server.use(restify.bodyParser());
+    server.use(restify.plugins.acceptParser(server.acceptable));
+    server.use(restify.plugins.dateParser());
+    server.use(restify.plugins.authorizationParser());
+    server.use(restify.plugins.queryParser());
+    server.use(restify.plugins.gzipResponse());
+    server.use(restify.plugins.bodyParser());
 
     // Now our own handlers for authentication/authorization
     // Here we only use basic auth, but really you should look
