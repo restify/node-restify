@@ -86,10 +86,11 @@ cutarelease: versioncheck
 	    echo "** Enter to continue, Ctrl+C to abort." && \
 	    read _cutarelease_confirm
 	ver=$(shell cat package.json | $(JSON) version) && \
+	    majorVer=$(shell cat package.json | $(JSON) version | cut -d. -f1) && \
 	    date=$(shell date -u "+%Y-%m-%d") && \
 	    git tag -a "v$$ver" -m "version $$ver ($$date)" && \
 	    git push --tags origin && \
-	    npm publish
+	    npm publish --tag=latest-$$majorVer
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ

@@ -80,14 +80,16 @@ See <https://github.com/restify/node-restify/issues>.
 
 ## Release process
 
-Here is how to cut a release:
+Here is how to cut a release for a new "$version"
 
 1. Update the version in "package.json" and change `## not yet released` at
-   the top of "CHANGES.md" to:
+   the top of "CHANGES.md" to the following. In other words, add a
+   section for the new release.
 
     ```
     ## not yet released
 
+    (nothing yet)
 
     ## $version
     ```
