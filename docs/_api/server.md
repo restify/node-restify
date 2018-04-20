@@ -7,29 +7,29 @@ permalink: /docs/server-api/
 
 ### Table of Contents
 
--   [createServer][1]
--   [Server][2]
-    -   [listen][3]
-    -   [close][4]
-    -   [get][5]
-    -   [head][6]
-    -   [post][7]
-    -   [put][8]
-    -   [patch][9]
-    -   [del][10]
-    -   [opts][11]
-    -   [pre][12]
-    -   [use][13]
-    -   [param][14]
-    -   [rm][15]
-    -   [address][16]
-    -   [inflightRequests][17]
-    -   [debugInfo][18]
-    -   [toString][19]
--   [Events][20]
--   [Errors][21]
--   [Types][22]
-    -   [Server~methodOpts][23]
+-   [createServer](#createserver)
+-   [Server](#server)
+    -   [listen](#listen)
+    -   [close](#close)
+    -   [get](#get)
+    -   [head](#head)
+    -   [post](#post)
+    -   [put](#put)
+    -   [patch](#patch)
+    -   [del](#del)
+    -   [opts](#opts)
+    -   [pre](#pre)
+    -   [use](#use)
+    -   [param](#param)
+    -   [rm](#rm)
+    -   [address](#address)
+    -   [inflightRequests](#inflightrequests)
+    -   [debugInfo](#debuginfo)
+    -   [toString](#tostring)
+-   [Events](#events)
+-   [Errors](#errors)
+-   [Types](#types)
+    -   [Server~methodOpts](#servermethodopts)
 
 ## createServer
 
@@ -38,42 +38,42 @@ routes and handlers for incoming requests.
 
 **Parameters**
 
--   `options` **[Object][24]?** an options object
-    -   `options.name` **[String][25]** Name of the server. (optional, default `"restify"`)
-    -   `options.dtrace` **[Boolean][26]** enable DTrace support (optional, default `false`)
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
+    -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server. (optional, default `"restify"`)
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
-    -   `options.log` **[Object][24]** [bunyan][27] instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
-    -   `options.url` **[String][25]?** Once listen() is called, this will be filled
+    -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan) instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
+    -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS
+    -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS server,
+    -   `options.key` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object][24]?** Custom response formatters for
+    -   `options.formatters` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
+    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
-        [bunyan][27] instance.
+        [bunyan](https://github.com/trentm/node-bunyan) instance.
         response header, default is `restify`. Pass empty string to unset the header.
         Comes with significant negative performance impact. (optional, default `false`)
-    -   `options.spdy` **[Object][24]?** Any options accepted by
-        [node-spdy][29].
-    -   `options.http2` **[Object][24]?** Any options accepted by
-        [http2.createSecureServer][30].
-    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
+    -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [node-spdy](https://github.com/indutny/node-spdy).
+    -   `options.http2` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [http2.createSecureServer](https://nodejs.org/api/http2.html).
+    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
-        [node-https Server][31].
+    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.onceNext` **[Boolean][26]** Prevents calling next multiple
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
          times (optional, default `false`)
-    -   `options.strictNext` **[Boolean][26]** Throws error when next() is
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
          called more than once, enabled onceNext option (optional, default `false`)
-    -   `options.ignoreTrailingSlash` **[Boolean][26]** ignore trailing slash
+    -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
 
 **Examples**
@@ -87,7 +87,7 @@ server.listen(8080, function () {
 });
 ```
 
-Returns **[Server][32]** server
+Returns **[Server](#server)** server
 
 ## Server
 
@@ -95,45 +95,45 @@ Creates a new Server.
 
 **Parameters**
 
--   `options` **[Object][24]** an options object
-    -   `options.name` **[String][25]** Name of the server.
-    -   `options.dtrace` **[Boolean][26]** enable DTrace support (optional, default `false`)
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
+    -   `options.name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Name of the server.
+    -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router
-    -   `options.log` **[Object][24]** [bunyan][27]
+    -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan)
         instance.
-    -   `options.url` **[String][25]?** Once listen() is called, this will be filled
+    -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS
+    -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS server,
+    -   `options.key` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object][24]?** Custom response formatters for
+    -   `options.formatters` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
+    -   `options.handleUncaughtExceptions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in it's handler stack.
         Comes with significant negative performance impact.
-        [bunyan][27] instance.
+        [bunyan](https://github.com/trentm/node-bunyan) instance.
         response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
-    -   `options.spdy` **[Object][24]?** Any options accepted by
-        [node-spdy][29].
-    -   `options.http2` **[Object][24]?** Any options accepted by
-        [http2.createSecureServer][30].
-    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
+    -   `options.spdy` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [node-spdy](https://github.com/indutny/node-spdy).
+    -   `options.http2` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [http2.createSecureServer](https://nodejs.org/api/http2.html).
+    -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.onceNext` **[Boolean][26]** Prevents calling next multiple
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
          times (optional, default `false`)
-    -   `options.strictNext` **[Boolean][26]** Throws error when next() is
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
          called more than once, enabled onceNext option (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
-        [node-https Server][31].
+    -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
+        [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.noWriteContinue` **[Boolean][26]** prevents
+    -   `options.noWriteContinue` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
-    -   `options.ignoreTrailingSlash` **[Boolean][26]** ignore trailing slash
+    -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
 
 **Examples**
@@ -151,13 +151,13 @@ server.listen(8080, function () {
 
 Gets the server up and listening.
 Wraps node's
-[listen()][33].
+[listen()](http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback).
 
 **Parameters**
 
--   `port` **[Number][34]** Port
--   `host` **[Number][34]?** Host
--   `callback` **[Function][35]?** optionally get notified when listening.
+-   `port` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Port
+-   `host` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** Host
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** optionally get notified when listening.
 
 **Examples**
 
@@ -169,21 +169,21 @@ server.listen(80, '127.0.0.1')
 server.listen('/tmp/server.sock')
 ```
 
--   Throws **[TypeError][36]** 
+-   Throws **[TypeError](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** 
 
-Returns **[undefined][37]** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### close
 
 Shuts down this server, and invokes callback (optionally) when done.
 Wraps node's
-[close()][38].
+[close()](http://nodejs.org/docs/latest/api/net.html#net_event_close).
 
 **Parameters**
 
--   `callback` **[Function][35]?** callback to invoke when done
+-   `callback` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** callback to invoke when done
 
-Returns **[undefined][37]** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### get
 
@@ -191,7 +191,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 **Examples**
@@ -211,7 +211,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -222,7 +222,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `post` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `post` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -233,7 +233,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `put` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `put` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -244,7 +244,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `patch` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `patch` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -255,7 +255,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -266,7 +266,7 @@ Mounts a chain on the given path against this HTTP verb
 
 **Parameters**
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts](#servermethodopts)** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -279,7 +279,7 @@ depends on.  Note that req.params will _not_ be set yet.
 
 **Parameters**
 
--   `handler` **...([Function][35] \| [Array][40])** Allows you to add handlers that
+-   `handler` **...([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** Allows you to add handlers that
     run for all routes. _before_ routing occurs.
     This gives you a hook to change request headers and the like if you need to.
     Note that `req.params` will be undefined, as that's filled in _after_
@@ -303,7 +303,7 @@ URLs_
 server.pre(restify.pre.dedupeSlashes());
 ```
 
-Returns **[Object][24]** returns self
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### use
 
@@ -317,14 +317,14 @@ You can pass in any combination of functions or array of functions.
 
 **Parameters**
 
--   `handler` **...([Function][35] \| [Array][40])** A variable number of handler functions-   and/or a
+-   `handler` **...([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** A variable number of handler functions-   and/or a
         variable number of nested arrays of handler functions
 
-Returns **[Object][24]** returns self
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### param
 
--   **See: [http://expressjs.com/guide.html#route-param%20pre-conditions][41]**
+-   **See: <http://expressjs.com/guide.html#route-param%20pre-conditions>**
 
 Minimal port of the functionality offered by Express.js Route Param
 Pre-conditions
@@ -340,10 +340,10 @@ Exposes an API:
 
 **Parameters**
 
--   `name` **[String][25]** The name of the URL param to respond to
--   `fn` **[Function][35]**   The middleware function to execute
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the URL param to respond to
+-   `fn` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)**   The middleware function to execute
 
-Returns **[Object][24]** returns self
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns self
 
 ### rm
 
@@ -352,18 +352,18 @@ You pass in the route 'blob' you got from a mount call.
 
 **Parameters**
 
--   `routeName` **[String][25]** the route name.
+-   `routeName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the route name.
 
 
--   Throws **[TypeError][36]** on bad input.
+-   Throws **[TypeError](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError)** on bad input.
 
-Returns **[Boolean][26]** true if route was removed, false if not.
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** true if route was removed, false if not.
 
 ### address
 
 Returns the server address.
 Wraps node's
-[address()][42].
+[address()](http://nodejs.org/docs/latest/api/net.html#net_server_address).
 
 **Examples**
 
@@ -377,13 +377,13 @@ _Output:_
 { address: '::', family: 'IPv6', port: 8080 }
 ```
 
-Returns **[Object][24]** Address of server
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Address of server
 
 ### inflightRequests
 
 Returns the number of inflight requests currently being handled by the server
 
-Returns **[number][34]** number of inflight requests
+Returns **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** number of inflight requests
 
 ### debugInfo
 
@@ -426,7 +426,7 @@ _Output:_
 }
 ```
 
-Returns **[Object][24]** debug info
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** debug info
 
 ### toString
 
@@ -461,12 +461,12 @@ Url: http://[::]:8080
 Version:
 ```
 
-Returns **[String][25]** stringified server
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** stringified server
 
 ## Events
 
 In additional to emitting all the events from node's
-[http.Server][43],
+[http.Server](http://nodejs.org/docs/latest/api/http.html#http_class_http_server),
 restify servers also emit a number of additional events that make building REST
 and web applications much easier.
 
@@ -559,7 +559,7 @@ routable, i.e. one that would result in a `404`.
 ### uncaughtException
 
 If the restify server was created with `handleUncaughtExceptions: true`,
-restify will leverage [domains][44] to handle
+restify will leverage [domains](https://nodejs.org/api/domain.html) to handle
 thrown errors in the handler chain. Thrown errors are a result of an explicit
 `throw` statement, or as a result of programmer errors like a typo or a null
 ref. These thrown errors are caught by the domain, and will be emitted via this
@@ -666,7 +666,7 @@ function(req, res, err, callback) { }
 -   `callback` - a callback function to invoke
 
 When using this feature in conjunction with
-[restify-errors][45], restify will emit events
+[restify-errors](https://github.com/restify/errors), restify will emit events
 for all of the basic http errors:
 
 -   `400` - `BadRequestError`
@@ -746,13 +746,13 @@ on this event, and if there are none, responds with a default 415 handler.
 
 Server method opts
 
-Type: ([String][25] \| [Regexp][46] \| [Object][24])
+Type: ([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Regexp](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp) \| [Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object))
 
 **Properties**
 
--   `name` **[String][25]** a name for the route
--   `path` **[String][25]** can be any String accepted by
-    [find-my-way][47]
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
+-   `path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be any String accepted by
+    [find-my-way](https://github.com/delvedor/find-my-way)
 
 **Examples**
 
@@ -768,97 +768,3 @@ server.get({
     path: '/foo',
 }, function(req, res, next) {});
 ```
-
-[1]: #createserver
-
-[2]: #server
-
-[3]: #listen
-
-[4]: #close
-
-[5]: #get
-
-[6]: #head
-
-[7]: #post
-
-[8]: #put
-
-[9]: #patch
-
-[10]: #del
-
-[11]: #opts
-
-[12]: #pre
-
-[13]: #use
-
-[14]: #param
-
-[15]: #rm
-
-[16]: #address
-
-[17]: #inflightrequests
-
-[18]: #debuginfo
-
-[19]: #tostring
-
-[20]: #events
-
-[21]: #errors
-
-[22]: #types
-
-[23]: #servermethodopts
-
-[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
-
-[27]: https://github.com/trentm/node-bunyan
-
-[28]: https://nodejs.org/api/buffer.html
-
-[29]: https://github.com/indutny/node-spdy
-
-[30]: https://nodejs.org/api/http2.html
-
-[31]: http://nodejs.org/api/https.html#https_https
-
-[32]: #server
-
-[33]: http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback
-
-[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
-
-[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-
-[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError
-
-[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
-
-[38]: http://nodejs.org/docs/latest/api/net.html#net_event_close
-
-[39]: #servermethodopts
-
-[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
-
-[41]: http://expressjs.com/guide.html#route-param%20pre-conditions
-
-[42]: http://nodejs.org/docs/latest/api/net.html#net_server_address
-
-[43]: http://nodejs.org/docs/latest/api/http.html#http_class_http_server
-
-[44]: https://nodejs.org/api/domain.html
-
-[45]: https://github.com/restify/errors
-
-[46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-
-[47]: https://github.com/delvedor/find-my-way

@@ -7,14 +7,14 @@ permalink: /docs/formatters-api/
 
 ### Table of Contents
 
--   [Usage][1]
--   [Types][2]
-    -   [formatter][3]
--   [Included formatters][4]
-    -   [formatText][5]
-    -   [formatJSON][6]
-    -   [formatJSONP][7]
-    -   [formatBinary][8]
+-   [Usage](#usage)
+-   [Types](#types)
+    -   [formatter](#formatter)
+-   [Included formatters](#included-formatters)
+    -   [formatText](#formattext)
+    -   [formatJSON](#formatjson)
+    -   [formatJSONP](#formatjsonp)
+    -   [formatBinary](#formatbinary)
 
 ## Usage
 
@@ -48,15 +48,15 @@ var server = restify.createServer({
 
 Format a response for being sent over the wire
 
-Type: [Function][9]
+Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)
 
 **Parameters**
 
--   `req` **[Object][10]** the request object (not used)
--   `res` **[Object][10]** the response object
--   `body` **[Object][10]** response body to format
+-   `req` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the request object (not used)
+-   `res` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** response body to format
 
-Returns **[String][11]** formatted response data
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** formatted response data
 
 ## Included formatters
 
@@ -71,12 +71,12 @@ exists. If it doesn't, then the response is a zero-length string.
 
 **Parameters**
 
--   `req` **[Object][10]** the request object (not used)
--   `res` **[Object][10]** the response object
--   `body` **[Object][10]** response body. If it has a toString() method this
+-   `req` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the request object (not used)
+-   `res` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** response body. If it has a toString() method this
                               will be used to make the string representation
 
-Returns **[String][11]** data
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** data
 
 ### formatJSON
 
@@ -85,11 +85,11 @@ exist then a JSON.stringify will be attempted.
 
 **Parameters**
 
--   `req` **[Object][10]** the request object (not used)
--   `res` **[Object][10]** the response object
--   `body` **[Object][10]** response body
+-   `req` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the request object (not used)
+-   `res` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** response body
 
-Returns **[String][11]** data
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** data
 
 ### formatJSONP
 
@@ -98,11 +98,11 @@ Unicode escapes line and paragraph separators.
 
 **Parameters**
 
--   `req` **[Object][10]** the request object
--   `res` **[Object][10]** the response object
--   `body` **[Object][10]** response body
+-   `req` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the request object
+-   `res` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** response body
 
-Returns **[String][11]** data
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** data
 
 ### formatBinary
 
@@ -110,32 +110,8 @@ Binary formatter.
 
 **Parameters**
 
--   `req` **[Object][10]** the request object
--   `res` **[Object][10]** the response object
--   `body` **[Object][10]** response body
+-   `req` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the request object
+-   `res` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the response object
+-   `body` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** response body
 
-Returns **[Buffer][12]** body
-
-[1]: #usage
-
-[2]: #types
-
-[3]: #formatter
-
-[4]: #included-formatters
-
-[5]: #formattext
-
-[6]: #formatjson
-
-[7]: #formatjsonp
-
-[8]: #formatbinary
-
-[9]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
-
-[10]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-
-[11]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-
-[12]: https://nodejs.org/api/buffer.html
+Returns **[Buffer](https://nodejs.org/api/buffer.html)** body

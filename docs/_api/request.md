@@ -7,40 +7,40 @@ permalink: /docs/request-api/
 
 ### Table of Contents
 
--   [Request][1]
-    -   [accepts][2]
-    -   [acceptsEncoding][3]
-    -   [contentLength][4]
-    -   [getContentType][5]
-    -   [date][6]
-    -   [href][7]
-    -   [id][8]
-    -   [getPath][9]
-    -   [getQuery][10]
-    -   [time][11]
-    -   [version][12]
-    -   [header][13]
-    -   [trailer][14]
-    -   [is][15]
-    -   [isChunked][16]
-    -   [isKeepAlive][17]
-    -   [isSecure][18]
-    -   [isUpgradeRequest][19]
-    -   [isUpload][20]
-    -   [toString][21]
-    -   [userAgent][22]
-    -   [startHandlerTimer][23]
-    -   [endHandlerTimer][24]
-    -   [connectionState][25]
-    -   [getRoute][26]
--   [Log][27]
+-   [Request](#request)
+    -   [accepts](#accepts)
+    -   [acceptsEncoding](#acceptsencoding)
+    -   [contentLength](#contentlength)
+    -   [getContentType](#getcontenttype)
+    -   [date](#date)
+    -   [href](#href)
+    -   [id](#id)
+    -   [getPath](#getpath)
+    -   [getQuery](#getquery)
+    -   [time](#time)
+    -   [version](#version)
+    -   [header](#header)
+    -   [trailer](#trailer)
+    -   [is](#is)
+    -   [isChunked](#ischunked)
+    -   [isKeepAlive](#iskeepalive)
+    -   [isSecure](#issecure)
+    -   [isUpgradeRequest](#isupgraderequest)
+    -   [isUpload](#isupload)
+    -   [toString](#tostring)
+    -   [userAgent](#useragent)
+    -   [startHandlerTimer](#starthandlertimer)
+    -   [endHandlerTimer](#endhandlertimer)
+    -   [connectionState](#connectionstate)
+    -   [getRoute](#getroute)
+-   [Log](#log)
 
 ## Request
 
 **Extends http.IncomingMessage**
 
 Wraps all of the node
-[http.IncomingMessage][28]
+[http.IncomingMessage](https://nodejs.org/api/http.html)
 APIs, events and properties, plus the following.
 
 ### accepts
@@ -51,7 +51,7 @@ Otherwise the given type is matched by an exact match, and then subtypes.
 
 **Parameters**
 
--   `types` **([String][29] \| [Array][30]&lt;[String][29]>)** an array of accept type headers
+-   `types` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>)** an array of accept type headers
 
 **Examples**
 
@@ -75,7 +75,7 @@ req.accepts('png');
 // => false
 ```
 
-Returns **[Boolean][31]** is accepteed
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is accepteed
 
 ### acceptsEncoding
 
@@ -83,29 +83,29 @@ Checks if the request accepts the encoding type(s) specified.
 
 **Parameters**
 
--   `types` **([String][29] \| [Array][30]&lt;[String][29]>)** an array of accept type headers
+-   `types` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>)** an array of accept type headers
 
-Returns **[Boolean][31]** is accepted encoding
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is accepted encoding
 
 ### contentLength
 
 Returns the value of the content-length header.
 
-Returns **[Number][32]** 
+Returns **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
 
 ### getContentType
 
 Returns the value of the content-type header. If a content-type is not
 set, this will return a default value of `application/octet-stream`
 
-Returns **[String][29]** content type
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** content type
 
 ### date
 
 Returns a Date object representing when the request was setup.
 Like `time()`, but returns a Date object.
 
-Returns **[Date][33]** date when request began being processed
+Returns **[Date](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)** date when request began being processed
 
 ### href
 
@@ -121,7 +121,7 @@ server.get('/:x/bar', function(req, res, next) {
 });
 ```
 
-Returns **[String][29]** 
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ### id
 
@@ -132,9 +132,9 @@ once will cause restify to throw.
 
 **Parameters**
 
--   `reqId` **[String][29]** request id
+-   `reqId` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** request id
 
-Returns **[String][29]** id
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** id
 
 ### getPath
 
@@ -150,7 +150,7 @@ server.get('/:x/bar', function(req, res, next) {
 });
 ```
 
-Returns **[String][29]** 
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ### getQuery
 
@@ -175,14 +175,14 @@ req.query;
 // => { a: 1 }
 ```
 
-Returns **[String][29]** query
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** query
 
 ### time
 
 The number of ms since epoch of when this request began being processed.
 Like date(), but returns a number.
 
-Returns **[Number][32]** time when request began being processed in epoch:
+Returns **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** time when request began being processed in epoch:
                    ellapsed milliseconds since
                    January 1, 1970, 00:00:00 UTC
 
@@ -190,7 +190,7 @@ Returns **[Number][32]** time when request began being processed in epoch:
 
 Returns the accept-version header.
 
-Returns **[String][29]** 
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ### header
 
@@ -201,8 +201,8 @@ correctly spelled 'referrer' header to the actual spelling used.
 
 **Parameters**
 
--   `key` **[String][29]** the key of the header
--   `defaultValue` **[String][29]?** default value if header isn't
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the key of the header
+-   `defaultValue` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** default value if header isn't
                                       found on the req
 
 **Examples**
@@ -213,7 +213,7 @@ req.header('HOST');
 req.header('Accept', '*\/*');
 ```
 
-Returns **[String][29]** header value
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** header value
 
 ### trailer
 
@@ -222,10 +222,10 @@ correctly spelled 'referrer' header to the actual spelling used.
 
 **Parameters**
 
--   `name` **[String][29]** the name of the header
--   `value` **[String][29]** default value if header isn't found on the req
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the header
+-   `value` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** default value if header isn't found on the req
 
-Returns **[String][29]** trailer value
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** trailer value
 
 ### is
 
@@ -234,7 +234,7 @@ and if it contains the given mime type.
 
 **Parameters**
 
--   `type` **[String][29]** a content-type header value
+-   `type` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a content-type header value
 
 **Examples**
 
@@ -253,49 +253,49 @@ req.is('html');
 // => false
 ```
 
-Returns **[Boolean][31]** is content-type header
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is content-type header
 
 ### isChunked
 
 Check if the incoming request is chunked.
 
-Returns **[Boolean][31]** is chunked
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is chunked
 
 ### isKeepAlive
 
 Check if the incoming request is kept alive.
 
-Returns **[Boolean][31]** is keep alive
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is keep alive
 
 ### isSecure
 
 Check if the incoming request is encrypted.
 
-Returns **[Boolean][31]** is secure
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is secure
 
 ### isUpgradeRequest
 
 Check if the incoming request has been upgraded.
 
-Returns **[Boolean][31]** is upgraded
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is upgraded
 
 ### isUpload
 
 Check if the incoming request is an upload verb.
 
-Returns **[Boolean][31]** is upload
+Returns **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** is upload
 
 ### toString
 
 toString serialization
 
-Returns **[String][29]** serialized request
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** serialized request
 
 ### userAgent
 
 Returns the user-agent header.
 
-Returns **[String][29]** user agent
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** user agent
 
 ### startHandlerTimer
 
@@ -307,7 +307,7 @@ handler chain to record timing information.
 
 **Parameters**
 
--   `handlerName` **[String][29]** The name of the handler.
+-   `handlerName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the handler.
 
 **Examples**
 
@@ -337,7 +337,7 @@ server.get('/', function fooHandler(req, res, next) {
 });
 ```
 
-Returns **[undefined][34]** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### endHandlerTimer
 
@@ -347,9 +347,9 @@ handler. Otherwise the time recorded will be incorrect.
 
 **Parameters**
 
--   `handlerName` **[String][29]** The name of the handler.
+-   `handlerName` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The name of the handler.
 
-Returns **[undefined][34]** no return value
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
 
 ### connectionState
 
@@ -357,7 +357,7 @@ Returns the connection state of the request. Current possible values are:
 
 -   `close` - when the request has been closed by the clien
 
-Returns **[String][29]** connection state (`"close"`)
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** connection state (`"close"`)
 
 ### getRoute
 
@@ -376,11 +376,11 @@ _Route info object structure:_
 }
 ```
 
-Returns **[Object][35]** route
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** route
 
 ## Log
 
-If you are using the [RequestLogger][36] plugin, the child logger
+If you are using the [RequestLogger](#bundled-plugins) plugin, the child logger
 will be available on `req.log`:
 
 ```js
@@ -396,75 +396,3 @@ each log statement. Since the logger lasts for the life of the request, you can
 use this to correlate statements for an individual request across any number of
 separate handlers.
 
-
-[1]: #request
-
-[2]: #accepts
-
-[3]: #acceptsencoding
-
-[4]: #contentlength
-
-[5]: #getcontenttype
-
-[6]: #date
-
-[7]: #href
-
-[8]: #id
-
-[9]: #getpath
-
-[10]: #getquery
-
-[11]: #time
-
-[12]: #version
-
-[13]: #header
-
-[14]: #trailer
-
-[15]: #is
-
-[16]: #ischunked
-
-[17]: #iskeepalive
-
-[18]: #issecure
-
-[19]: #isupgraderequest
-
-[20]: #isupload
-
-[21]: #tostring
-
-[22]: #useragent
-
-[23]: #starthandlertimer
-
-[24]: #endhandlertimer
-
-[25]: #connectionstate
-
-[26]: #getroute
-
-[27]: #log
-
-[28]: https://nodejs.org/api/http.html
-
-[29]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-
-[30]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
-
-[31]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
-
-[32]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
-
-[33]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
-
-[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
-
-[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-
-[36]: #bundled-plugins
