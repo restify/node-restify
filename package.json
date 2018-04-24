@@ -118,7 +118,7 @@
     "dtrace-provider": "^0.8.1"
   },
   "devDependencies": {
-    "autocannon": "^0.16.5",
+    "autocannon": "^2.2.0",
     "autocannon-compare": "^0.3.0",
     "chai": "^4.1.2",
     "cover": "^0.2.9",
