@@ -72,7 +72,7 @@
     "qs": "^6.2.1",
     "semver": "^4.3.3",
     "spdy": "^3.3.3",
-    "tunnel-agent": "^0.4.0",
+    "tunnel-agent": "^0.6.0",
     "uuid": "^3.0.1",
     "vasync": "1.6.3",
     "verror": "^1.4.0"
