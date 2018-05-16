@@ -1,3 +1,12 @@
+<a name="7.1.2"></a>
+### 7.1.2 (2018-05-15)
+
+
+#### Bug Fixes
+
+* **dtrace:** route probes (#1659) ([84bcded7](git://github.com/restify/node-restify.git/commit/84bcded7))
+
+
 <a name="7.1.1"></a>
 ### 7.1.1 (2018-04-10)
 
