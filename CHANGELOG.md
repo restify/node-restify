@@ -1,3 +1,12 @@
+<a name="7.2.0"></a>
+## 7.2.0 (2018-05-16)
+
+
+#### Features
+
+* **helpers:** add compose feature (#1660) ([eb60ef40](git://github.com/restify/node-restify.git/commit/eb60ef40))
+
+
 <a name="7.1.2"></a>
 ### 7.1.2 (2018-05-15)
 
