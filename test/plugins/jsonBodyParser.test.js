@@ -490,7 +490,7 @@ describe('JSON body parser', function() {
         client.end();
     });
 
-    it('should handle */*+json to application/json', function(done) {
+    it('should handle application/*+json as application/json', function(done) {
         SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
 
         SERVER.post('/', function(req, res, next) {
