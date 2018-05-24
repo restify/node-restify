@@ -4,6 +4,10 @@
 
 (nothing yet)
 
+## 4.3.4
+
+- #1656 update tunnel-agent to 0.6.0
+
 ## 4.3.3
 
 - #1638 Backport fix from main line to handle multibyte chars properly in the
