@@ -489,4 +489,33 @@ describe('JSON body parser', function() {
         client.write('{"malformedJsonWithPercentSign":30%}');
         client.end();
     });
+
+    it('should handle application/*+json as application/json', function(done) {
+        SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
+
+        SERVER.post('/', function(req, res, next) {
+            res.send(200, { length: req.body.length });
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/',
+            method: 'POST',
+            agent: false,
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/hal+json',
+                'transfer-encoding': 'chunked'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 413);
+            res.once('end', done);
+            res.resume();
+        });
+        client.write('{"a":[' + new Array(512).join('1,') + '0]}');
+        client.end();
+    });
 });
