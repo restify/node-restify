@@ -43,8 +43,6 @@ routes and handlers for incoming requests.
     -   `options.dtrace` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
     -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan) instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
-    -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** String)|List of content-types this
-        server can respond with.
     -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
     -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS
@@ -71,8 +69,10 @@ routes and handlers for incoming requests.
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.strictRouting` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If set, Restify
-        will treat "/foo" and "/foo/" as different paths. (optional, default `false`)
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
+         times (optional, default `false`)
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
+         called more than once, enabled onceNext option (optional, default `false`)
     -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
 
@@ -101,8 +101,6 @@ Creates a new Server.
     -   `options.router` **Router** Router
     -   `options.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** [bunyan](https://github.com/trentm/node-bunyan)
         instance.
-    -   `options.acceptable` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>?** List of content-types this
-        server can respond with.
     -   `options.url` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Once listen() is called, this will be filled
         in with where the server is running.
     -   `options.certificate` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Buffer](https://nodejs.org/api/buffer.html))?** If you want to create an HTTPS

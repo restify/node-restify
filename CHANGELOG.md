@@ -1,3 +1,30 @@
+<a name="7.2.0"></a>
+## 7.2.0 (2018-05-16)
+
+
+#### Features
+
+* **helpers:** add compose feature (#1660) ([eb60ef40](git://github.com/restify/node-restify.git/commit/eb60ef40))
+
+
+<a name="7.1.2"></a>
+### 7.1.2 (2018-05-15)
+
+
+#### Bug Fixes
+
+* **dtrace:** route probes (#1659) ([84bcded7](git://github.com/restify/node-restify.git/commit/84bcded7))
+
+
+<a name="7.1.1"></a>
+### 7.1.1 (2018-04-10)
+
+
+#### Bug Fixes
+
+* **plugins:** save req._matchedVersion (#1642) ([69f917a3](git://github.com/restify/node-restify.git/commit/69f917a3))
+
+
 <a name="7.1.0"></a>
 ## 7.1.0 (2018-03-26)
 

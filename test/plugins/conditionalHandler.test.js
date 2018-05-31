@@ -14,9 +14,12 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-function handlerFactory(response) {
+function handlerFactory(response, version) {
     return function handler(req, res, next) {
         res.send(response);
+        if (version) {
+            assert.equal(req.matchedVersion(), version);
+        }
         next();
     };
 }
@@ -51,11 +54,11 @@ describe('conditional request', function() {
                 '/',
                 restify.plugins.conditionalHandler([
                     {
-                        handler: handlerFactory('v1.1.0'),
+                        handler: handlerFactory('v1.1.0', 'v1.1.0'),
                         version: 'v1.1.0'
                     },
                     {
-                        handler: handlerFactory('v1.2.0'),
+                        handler: handlerFactory('v1.2.0', 'v1.2.0'),
                         version: 'v1.2.0'
                     }
                 ])
