@@ -257,9 +257,12 @@ describe('JSON body parser', function() {
             '\r\n' +
             '{"foo":"bar"}';
 
-        var client = net.connect({ host: '127.0.0.1', port: PORT }, function() {
-            client.write(request);
-        });
+        var client = net.connect(
+            { host: '127.0.0.1', port: PORT },
+            function() {
+                client.write(request);
+            }
+        );
         client.once('data', function(data) {
             client.end();
         });
@@ -290,9 +293,12 @@ describe('JSON body parser', function() {
             '\r\n' +
             '{"foo":"bar"}';
 
-        var client = net.connect({ host: '127.0.0.1', port: PORT }, function() {
-            client.write(request);
-        });
+        var client = net.connect(
+            { host: '127.0.0.1', port: PORT },
+            function() {
+                client.write(request);
+            }
+        );
 
         client.once('data', function(data) {
             client.end();

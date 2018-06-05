@@ -53,9 +53,12 @@ before(function(cb) {
         });
         SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
-            CLIENT = http2.connect('https://127.0.0.1:' + PORT, {
-                rejectUnauthorized: false
-            });
+            CLIENT = http2.connect(
+                'https://127.0.0.1:' + PORT,
+                {
+                    rejectUnauthorized: false
+                }
+            );
 
             cb();
         });

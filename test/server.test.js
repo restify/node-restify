@@ -396,15 +396,13 @@ test('PATCH ok', function(t) {
         method: 'PATCH',
         agent: false
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            res.on('end', function() {
-                t.end();
-            });
-            res.resume();
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        res.on('end', function() {
+            t.end();
+        });
+        res.resume();
+    }).end();
 });
 
 test('HEAD ok', function(t) {
@@ -423,17 +421,15 @@ test('HEAD ok', function(t) {
         method: 'HEAD',
         agent: false
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            res.on('data', function(chunk) {
-                t.fail('Data was sent on HEAD');
-            });
-            res.on('end', function() {
-                t.end();
-            });
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        res.on('data', function(chunk) {
+            t.fail('Data was sent on HEAD');
+        });
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
 });
 
 test('DELETE ok', function(t) {
@@ -452,15 +448,13 @@ test('DELETE ok', function(t) {
         method: 'DELETE',
         agent: false
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 204);
-            res.on('data', function(chunk) {
-                t.fail('Data was sent on 204');
-            });
-            t.end();
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 204);
+        res.on('data', function(chunk) {
+            t.fail('Data was sent on 204');
+        });
+        t.end();
+    }).end();
 });
 
 test('OPTIONS', function(t) {
@@ -480,12 +474,10 @@ test('OPTIONS', function(t) {
         method: 'OPTIONS',
         agent: false
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            t.end();
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        t.end();
+    }).end();
 });
 
 test('RegExp ok', function(t) {
@@ -544,20 +536,18 @@ test('GH-56 streaming with filed (download)', function(t) {
         method: 'GET',
         agent: false
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            var body = '';
-            res.setEncoding('utf8');
-            res.on('data', function(chunk) {
-                body += chunk;
-            });
-            res.on('end', function() {
-                t.ok(body.length > 0);
-                t.end();
-            });
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body += chunk;
+        });
+        res.on('end', function() {
+            t.ok(body.length > 0);
+            t.end();
+        });
+    }).end();
 });
 
 test('GH-63 res.send 204 is sending a body', function(t) {
@@ -577,20 +567,18 @@ test('GH-63 res.send 204 is sending a body', function(t) {
         }
     };
 
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 204);
-            var body = '';
-            res.setEncoding('utf8');
-            res.on('data', function(chunk) {
-                body += chunk;
-            });
-            res.on('end', function() {
-                t.notOk(body);
-                t.end();
-            });
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 204);
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body += chunk;
+        });
+        res.on('end', function() {
+            t.notOk(body);
+            t.end();
+        });
+    }).end();
 });
 
 test('GH-64 prerouting chain', function(t) {
@@ -615,20 +603,18 @@ test('GH-64 prerouting chain', function(t) {
             accept: 'text/plain'
         }
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            var body = '';
-            res.setEncoding('utf8');
-            res.on('data', function(chunk) {
-                body += chunk;
-            });
-            res.on('end', function() {
-                t.equal(body, '"mark"');
-                t.end();
-            });
-        })
-        .end();
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            body += chunk;
+        });
+        res.on('end', function() {
+            t.equal(body, '"mark"');
+            t.end();
+        });
+    }).end();
 });
 
 test('GH-64 prerouting chain with error', function(t) {
@@ -723,20 +709,18 @@ test('GH-180 can parse DELETE body', function(t) {
             'transfer-encoding': 'chunked'
         }
     };
-    http
-        .request(opts, function(res) {
-            t.equal(res.statusCode, 200);
-            res.setEncoding('utf8');
-            res.body = '';
-            res.on('data', function(chunk) {
-                res.body += chunk;
-            });
-            res.on('end', function() {
-                t.equal(res.body, '{"param1":1234}');
-                t.end();
-            });
-        })
-        .end('{"param1": 1234}');
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        res.setEncoding('utf8');
+        res.body = '';
+        res.on('data', function(chunk) {
+            res.body += chunk;
+        });
+        res.on('end', function() {
+            t.equal(res.body, '{"param1":1234}');
+            t.end();
+        });
+    }).end('{"param1": 1234}');
 });
 
 test('returning error from a handler (with domains)', function(t) {
