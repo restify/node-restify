@@ -1924,8 +1924,12 @@ test("should emit 'after' on successful request", function(t) {
     });
 
     SERVER.get('/foobar', function(req, res, next) {
-        res.send('hello world');
-        next();
+        setTimeout(function() {
+            res.send('hello world');
+            setTimeout(function() {
+                next();
+            }, 500);
+        }, 500);
     });
 
     CLIENT.get('/foobar', function(err, _, res) {
