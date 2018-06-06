@@ -112,7 +112,10 @@ describe('cpuUsageThrottle', function() {
         server.listen(0, '127.0.0.1', function() {
             client = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + server.address().port,
-                retry: false
+                agent: false,
+                headers: {
+                    connection: 'close'
+                }
             });
             client.get({ path: '/foo' }, function(e, _, res) {
                 assert(e, 'Second request is shed');
@@ -122,7 +125,7 @@ describe('cpuUsageThrottle', function() {
                     'Default shed status code returned'
                 );
                 clearTimeout(plugin._timeout);
-                done();
+                server.close(done);
             });
         });
     });

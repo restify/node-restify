@@ -1,5 +1,3 @@
-.coverage_data
-cover_html
 node_modules
 docs/*.html
 docs/pkg
@@ -10,7 +8,7 @@ examples/todoapp/node_modules
 build
 docs/*.json
 nbproject
-deps/javascriptlint
-deps/jsstyle
 package-lock.json
 benchmark/results
+.nyc_output
+coverage

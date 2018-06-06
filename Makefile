@@ -1,79 +1,130 @@
 #
-# Copyright (c) 2012, Joyent, Inc. All rights reserved.
+# Directories
 #
-# Makefile: basic Makefile for template API service
-#
-# This Makefile is a template for new repos. It contains only repo-specific
-# logic and uses included makefiles to supply common targets (javascriptlint,
-# jsstyle, restdown, etc.), which are used by other repos as well. You may well
-# need to rewrite most of this file, but you shouldn't need to touch the
-# included makefiles.
-#
-# If you find yourself adding support for new targets that could be useful for
-# other projects too, you should add these to the original versions of the
-# included Makefiles (in eng.git) so that other teams can use them too.
-#
+ROOT_SLASH	:= $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+ROOT		:= $(patsubst %/,%,$(ROOT_SLASH))
+TEST		:= $(ROOT)/test
+TOOLS		:= $(ROOT)/tools
+GITHOOKS_SRC	:= $(TOOLS)/githooks
+GITHOOKS_DEST	:= $(ROOT)/.git/hooks
+
 
 #
-# Tools
+# Generated Files & Directories
 #
-ESLINT		:= ./node_modules/.bin/eslint
-DOCUMENTATION		:= ./node_modules/.bin/documentation
-NSP		:= ./node_modules/.bin/nsp
-NODEUNIT	:= ./node_modules/.bin/nodeunit
-MOCHA		:= ./node_modules/.bin/mocha
-NODECOVER	:= ./node_modules/.bin/cover
-DOCS_BUILD	:= ./tools/docsBuild.js
+NODE_MODULES	:= $(ROOT)/node_modules
+NODE_BIN	:= $(NODE_MODULES)/.bin
+COVERAGE	:= $(ROOT)/.nyc_output
+COVERAGE_RES	:= $(ROOT)/coverage
+PACKAGE_LOCK	:= $(ROOT)/package-lock.json
+LCOV		:= $(COVERAGE)/lcov.info
+
+
+#
+# Tools and binaries
+#
 NPM		:= npm
-NODE		:= node
-PRETTIER		:= ./node_modules/.bin/prettier
+COVERALLS	:= $(NODE_BIN)/coveralls
+ESLINT		:= $(NODE_BIN)/eslint
+MOCHA		:= $(NODE_BIN)/mocha
+NODEUNIT	:= $(NODE_BIN)/nodeunit
+NYC		:= $(NODE_BIN)/nyc
+PRETTIER	:= $(NODE_BIN)/prettier
+DOCS_BUILD	:= $(TOOLS)/docsBuild.js
+
 
 #
-# Files
+# Files and globs
 #
-JS_FILES	 = '.'
-
-CLEAN_FILES	+= node_modules cscope.files
-
-include ./tools/mk/Makefile.defs
+PACKAGE_JSON	:= $(ROOT)/package.json
+GITHOOKS	:= $(wildcard $(GITHOOKS_SRC)/*)
+ALL_FILES	:= $(shell find $(ROOT) \
+			-not \( -path $(NODE_MODULES) -prune \) \
+			-not \( -path $(COVERAGE) -prune \) \
+			-not \( -path $(COVERAGE_RES) -prune \) \
+			-name '*.js' -type f)
+TEST_FILES	:= $(shell find $(TEST) -name '*.js' -type f)
 
 #
-# Repo-specific targets
+# Targets
 #
-.PHONY: all
-all: $(NODEUNIT) $(REPO_DEPS)
-	$(NPM) rebuild
 
-$(NODEUNIT): | $(NPM_EXEC)
-	$(NPM) install
+$(NODE_MODULES): $(PACKAGE_JSON) ## Install node_modules
+	@$(NPM) install
+	@touch $(NODE_MODULES)
 
-$(NODECOVER): | $(NPM_EXEC)
-	$(NPM) install
 
-.PHONY: cover
-cover: $(NODECOVER)
-	@rm -fr ./.coverage_data
-	$(NODECOVER) run $(NODEUNIT) ./test/*.js
-	$(NODECOVER) report html
+.PHONY: help
+help:
+	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) \
+		| sort | awk 'BEGIN {FS = ":.*?## "}; \
+		{printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 
-.PHONY: test
-test: $(NODEUNIT)
-	$(NODEUNIT) test/*.test.js
-	$(MOCHA) test/plugins/*.test.js
+.PHONY: githooks
+githooks: $(GITHOOKS) ## Symlink githooks
+	@$(foreach hook,\
+		$(GITHOOKS),\
+		ln -sf $(hook) $(GITHOOKS_DEST)/$(hook##*/);\
+	)
 
-.PHONY: nsp
-nsp: node_modules $(NSP)
-	@($(NSP) check) | true
+
+.PHONY: lint
+lint: $(NODE_MODULES) $(ESLINT) $(ALL_FILES) ## Run lint checker (eslint).
+	@NO_STYLE=true $(ESLINT) $(ALL_FILES)
+
+
+.PHONY: style
+style: $(NODE_MODULES) $(ESLINT) $(ALL_FILES) ## Run lint checker (eslint).
+	@NO_LINT=true $(ESLINT) $(ALL_FILES)
+
+
+.PHONY: fix-style
+fix-style: $(NODE_MODULES) $(PRETTIER) ## Run prettier to auto fix style issues.
+	@$(PRETTIER) --write "**/*.js"
+
+
+.PHONY: security
+security: $(NODE_MODULES) ## Check for dependency vulnerabilities.
+	@$(NPM) audit
+
 
 .PHONY: docs-build
-docs-build:
+docs-build: $(NODE_MODULES) $(DOCS_BUILD) ## Build documentation from JSDocs
 	@($(NODE) $(DOCS_BUILD))
 
+
 .PHONY: benchmark
-benchmark:
+benchmark: $(NODE_MODULES)
 	@(cd ./benchmark && $(NPM) i && $(NODE) index.js)
 
-include ./tools/mk/Makefile.deps
-include ./tools/mk/Makefile.targ
+
+.PHONY: prepush
+prepush: $(NODE_MODULES) lint style test ## Git pre-push hook task. Run before committing and pushing.
+
+
+.PHONY: test
+test: $(NODE_MODULES) $(NODEUNIT) $(MOCHA) ## Run tests
+	@$(NODEUNIT) test/*.test.js
+	@$(MOCHA) -R spec test/plugins
+
+
+.PHONY: coverage
+coverage: $(NODE_MODULES) $(NYC) ## Run unit tests with coverage reporting. Generates reports into /coverage.
+	@$(NYC) --reporter=lcov --report=json-summary make test
+
+
+.PHONY: report-coverage
+report-coverage: coverage ## Report test coverage to Coveralls
+	@cat $(LCOV) | $(COVERALLS)
+
+
+.PHONY: clean
+clean: ## Cleans unit test coverage files and node_modules.
+	@rm -rf $(NODE_MODULES) $(COVERAGE) $(COVERAGE_RES) $(PACKAGE_LOCK)
+
+
+#
+## Debug -- print out a a variable via `make print-FOO`
+#
+print-%  : ; @echo $* = $($*)
