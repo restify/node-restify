@@ -62,7 +62,11 @@ describe('request metrics plugin', function() {
                     assert.isAtLeast(metrics.latency, 150);
                     assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
-                    assert.equal(metrics.connectionState, 'close');
+                    // close in Node >= 10
+                    assert.include(
+                        [undefined, 'close'],
+                        metrics.connectionState
+                    );
                     assert.equal(metrics.method, 'GET');
                     assert.isNumber(metrics.inflightRequests);
 
@@ -267,6 +271,7 @@ describe('request metrics plugin', function() {
                 {
                     server: SERVER
                 },
+                // TODO: test timeouts if any of the following asserts fails
                 function(err, metrics, req, res, route) {
                     assert.ok(err);
                     assert.equal(err.name, 'Error');
@@ -278,7 +283,11 @@ describe('request metrics plugin', function() {
                     assert.isNumber(metrics.latency, 200);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
-                    assert.equal(metrics.connectionState, 'close');
+                    // close in Node >= 10
+                    assert.include(
+                        [undefined, 'close'],
+                        metrics.connectionState
+                    );
                     assert.isNumber(metrics.inflightRequests);
                     return done();
                 }
