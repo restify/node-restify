@@ -27,8 +27,7 @@ describe('request metrics plugin', function() {
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
-                retry: false,
-                requestTimeout: 200
+                retry: false
             });
 
             done();
@@ -63,7 +62,7 @@ describe('request metrics plugin', function() {
                     assert.isAtLeast(metrics.latency, 150);
                     assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
-                    assert.equal(metrics.connectionState, undefined);
+                    assert.equal(metrics.connectionState, 'close');
                     assert.equal(metrics.method, 'GET');
                     assert.isNumber(metrics.inflightRequests);
 
@@ -103,6 +102,7 @@ describe('request metrics plugin', function() {
     it('should return metrics with pre error', function(done) {
         SERVER.on('uncaughtException', function(req, res, route, err) {
             assert.ok(err);
+            res.send(err);
         });
 
         SERVER.on(
@@ -139,6 +139,7 @@ describe('request metrics plugin', function() {
     it('should return metrics with use error', function(done) {
         SERVER.on('uncaughtException', function(req, res, route, err) {
             assert.ok(err);
+            res.send(err);
         });
 
         SERVER.on(
@@ -242,11 +243,17 @@ describe('request metrics plugin', function() {
             }
         );
 
-        CLIENT.get('/foo?a=1', function(err, _, res) {
-            // request should timeout
-            assert.ok(err);
-            assert.equal(err.name, 'RequestTimeoutError');
-        });
+        CLIENT.get(
+            {
+                path: '/foo?a=1',
+                requestTimeout: 200
+            },
+            function(err, _, res) {
+                // request should timeout
+                assert.ok(err);
+                assert.equal(err.name, 'RequestTimeoutError');
+            }
+        );
     });
 
     it('should handle uncaught exceptions', function(done) {
@@ -271,7 +278,7 @@ describe('request metrics plugin', function() {
                     assert.isNumber(metrics.latency, 200);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
-                    assert.equal(metrics.connectionState, undefined);
+                    assert.equal(metrics.connectionState, 'close');
                     assert.isNumber(metrics.inflightRequests);
                     return done();
                 }

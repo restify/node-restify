@@ -1999,6 +1999,7 @@ test(
         SERVER.on('after', function(req, res, route, err) {
             t.ok(err);
             t.equal(req.connectionState(), 'close');
+            t.equal(res.statusCode, 444);
             t.equal(err.name, 'RequestCloseError');
             t.end();
         });
