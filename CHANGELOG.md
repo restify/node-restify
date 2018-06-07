@@ -1,3 +1,18 @@
+<a name="7.2.1"></a>
+### 7.2.1 (2018-06-07)
+
+
+#### Bug Fixes
+
+* proxy events into instance var and add test script (#1661) ([de72f49e](git://github.com/restify/node-restify.git/commit/de72f49e))
+* **server:** address req and res close event changes in Node v10.x (#1672) ([6be3fb7c](git://github.com/restify/node-restify.git/commit/6be3fb7c))
+
+
+#### Features
+
+* jsonBodyParser handles extended content types *+json (#1663) ([45375144](git://github.com/restify/node-restify.git/commit/45375144))
+
+
 <a name="7.2.0"></a>
 ## 7.2.0 (2018-05-16)
 
