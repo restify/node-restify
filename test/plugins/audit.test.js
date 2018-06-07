@@ -676,16 +676,23 @@ describe('audit logger', function() {
             assert.ok(data);
             assert.ok(data.req_id);
             assert.isNumber(data.latency);
-            assert.equal(444, data.res.statusCode);
+            assert.equal(data.res.statusCode, 444);
             done();
         });
 
         SERVER.get('/audit', function(req, res, next) {
-            req.emit('close');
-            res.send();
-            next();
+            setTimeout(function() {
+                res.send();
+                next();
+            }, 100);
         });
 
-        CLIENT.get('/audit', function(err, req, res) {});
+        CLIENT.get(
+            {
+                path: '/audit',
+                requestTimeout: 50
+            },
+            function(err, req, res) {}
+        );
     });
 });

@@ -1934,6 +1934,29 @@ test("should emit 'after' on successful request", function(t) {
     });
 });
 
+test("should emit 'after' on successful request with work", function(t) {
+    SERVER.on('after', function(req, res, route, err) {
+        t.ifError(err);
+        t.end();
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        // with timeouts we are testing that request lifecycle
+        // events are firing in the correct order
+        setTimeout(function() {
+            res.send('hello world');
+            setTimeout(function() {
+                next();
+            }, 500);
+        }, 500);
+    });
+
+    CLIENT.get('/foobar', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
 test("should emit 'after' on errored request", function(t) {
     SERVER.on('after', function(req, res, route, err) {
         t.ok(err);
@@ -1995,6 +2018,7 @@ test(
         SERVER.on('after', function(req, res, route, err) {
             t.ok(err);
             t.equal(req.connectionState(), 'close');
+            t.equal(res.statusCode, 444);
             t.equal(err.name, 'RequestCloseError');
             t.end();
         });

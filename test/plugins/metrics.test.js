@@ -3,6 +3,7 @@
 
 // external requires
 var assert = require('chai').assert;
+
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
@@ -27,8 +28,7 @@ describe('request metrics plugin', function() {
             CLIENT = restifyClients.createJsonClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
-                retry: false,
-                requestTimeout: 200
+                retry: false
             });
 
             done();
@@ -103,6 +103,7 @@ describe('request metrics plugin', function() {
     it('should return metrics with pre error', function(done) {
         SERVER.on('uncaughtException', function(req, res, route, err) {
             assert.ok(err);
+            res.send(err);
         });
 
         SERVER.on(
@@ -139,6 +140,7 @@ describe('request metrics plugin', function() {
     it('should return metrics with use error', function(done) {
         SERVER.on('uncaughtException', function(req, res, route, err) {
             assert.ok(err);
+            res.send(err);
         });
 
         SERVER.on(
@@ -242,11 +244,17 @@ describe('request metrics plugin', function() {
             }
         );
 
-        CLIENT.get('/foo?a=1', function(err, _, res) {
-            // request should timeout
-            assert.ok(err);
-            assert.equal(err.name, 'RequestTimeoutError');
-        });
+        CLIENT.get(
+            {
+                path: '/foo?a=1',
+                requestTimeout: 200
+            },
+            function(err, _, res) {
+                // request should timeout
+                assert.ok(err);
+                assert.equal(err.name, 'RequestTimeoutError');
+            }
+        );
     });
 
     it('should handle uncaught exceptions', function(done) {
@@ -260,6 +268,7 @@ describe('request metrics plugin', function() {
                 {
                     server: SERVER
                 },
+                // TODO: test timeouts if any of the following asserts fails
                 function(err, metrics, req, res, route) {
                     assert.ok(err);
                     assert.equal(err.name, 'Error');
