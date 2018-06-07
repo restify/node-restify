@@ -3,6 +3,8 @@
 
 // external requires
 var assert = require('chai').assert;
+var semver = require('semver');
+
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
@@ -13,6 +15,8 @@ var helper = require('../lib/helper');
 var SERVER;
 var CLIENT;
 var PORT;
+
+var isOlderNode = semver.lte(process.version, 'v10.0.0');
 
 describe('request metrics plugin', function() {
     beforeEach(function(done) {
@@ -63,9 +67,9 @@ describe('request metrics plugin', function() {
                     assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
                     // close doesn't always fire in Node < 10
-                    assert.include(
-                        [undefined, 'close'],
-                        metrics.connectionState
+                    assert.equal(
+                        metrics.connectionState,
+                        isOlderNode ? undefined : 'close'
                     );
                     assert.equal(metrics.method, 'GET');
                     assert.isNumber(metrics.inflightRequests);
@@ -284,9 +288,9 @@ describe('request metrics plugin', function() {
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
                     // close doesn't always fire in Node < 10
-                    assert.include(
-                        [undefined, 'close'],
-                        metrics.connectionState
+                    assert.equal(
+                        metrics.connectionState,
+                        isOlderNode ? undefined : 'close'
                     );
                     assert.isNumber(metrics.inflightRequests);
                     return done();
