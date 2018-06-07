@@ -1924,6 +1924,25 @@ test("should emit 'after' on successful request", function(t) {
     });
 
     SERVER.get('/foobar', function(req, res, next) {
+        res.send('hello world');
+        next();
+    });
+
+    CLIENT.get('/foobar', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+test("should emit 'after' on successful request with work", function(t) {
+    SERVER.on('after', function(req, res, route, err) {
+        t.ifError(err);
+        t.end();
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        // with timeouts we are testing that request lifecycle
+        // events are firing in the correct order
         setTimeout(function() {
             res.send('hello world');
             setTimeout(function() {

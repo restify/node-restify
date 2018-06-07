@@ -57,60 +57,6 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.preLatency, 0);
-                    assert.isAtLeast(metrics.useLatency, 0);
-                    assert.isAtLeast(metrics.routeLatency, 0);
-                    assert.isAtLeast(metrics.latency, 0);
-                    assert.isAtLeast(metrics.totalLatency, 0);
-                    assert.equal(metrics.path, '/foo');
-                    assert.equal(metrics.connectionState, undefined);
-                    assert.equal(metrics.method, 'GET');
-                    assert.isNumber(metrics.inflightRequests);
-
-                    assert.isObject(req, 'req');
-                    assert.isObject(res, 'res');
-                    assert.isObject(route, 'route');
-                }
-            )
-        );
-
-        SERVER.pre(function(req, res, next) {
-            return next();
-        });
-
-        SERVER.use(function(req, res, next) {
-            return next();
-        });
-
-        SERVER.get('/foo', function(req, res, next) {
-            res.send(202, 'hello world');
-            return next();
-        });
-
-        CLIENT.get('/foo?a=1', function(err, _, res) {
-            assert.ifError(err);
-            assert.equal(res.statusCode, 202);
-            return done();
-        });
-    });
-
-    it('should return metrics for a given request with work', function(done) {
-        SERVER.on('uncaughtException', function(req, res, route, err) {
-            assert.ifError(err);
-        });
-
-        // with timeouts we are sure that request lifecycle metrics are correct
-        SERVER.on(
-            'after',
-            restify.plugins.metrics(
-                {
-                    server: SERVER
-                },
-                function(err, metrics, req, res, route) {
-                    assert.ifError(err);
-
-                    assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 202);
                     assert.isAtLeast(metrics.preLatency, 50);
                     assert.isAtLeast(metrics.useLatency, 50);
                     assert.isAtLeast(metrics.routeLatency, 50);
