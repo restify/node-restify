@@ -62,7 +62,7 @@ describe('request metrics plugin', function() {
                     assert.isAtLeast(metrics.latency, 150);
                     assert.isAtLeast(metrics.totalLatency, 150);
                     assert.equal(metrics.path, '/foo');
-                    // close in Node >= 10
+                    // close doesn't always fire in Node < 10
                     assert.include(
                         [undefined, 'close'],
                         metrics.connectionState
@@ -283,7 +283,7 @@ describe('request metrics plugin', function() {
                     assert.isNumber(metrics.latency, 200);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
-                    // close in Node >= 10
+                    // close doesn't always fire in Node < 10
                     assert.include(
                         [undefined, 'close'],
                         metrics.connectionState
