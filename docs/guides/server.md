@@ -307,13 +307,14 @@ function sendV1(req, res, next) {
 }
 
 function sendV2(req, res, next) {
-  res.send({hello: req.params.name});
+  res.send({ hello: req.params.name });
   return next();
 }
 
-var PATH = '/hello/:name';
-server.get({path: PATH, version: '1.1.3'}, sendV1);
-server.get({path: PATH, version: '2.0.0'}, sendV2);
+server.get('/hello/:name', restify.plugins.conditionalHandler([
+  { version: '1.1.3', handler: sendV1 },
+  { version: '2.0.0', handler: sendV2 }
+]));
 
 server.listen(8080);
 ```
@@ -347,7 +348,9 @@ creation time.  Lastly, you can support multiple versions in the API by using
 an array:
 
 ```js
-server.get({path: PATH, version: ['2.0.0', '2.1.0', '2.2.0']}, sendV2);
+server.get('/hello/:name' restify.plugins.conditionalHandler([
+  { version: ['2.0.0', '2.1.0', '2.2.0'], handler: sendV2 }
+]));
 ```
 
 In this case you may need to know more information such as what the original
@@ -355,17 +358,18 @@ requested version string was, and what the matching version from the routes
 supported version array was. Two methods make this info available:
 
 ```js
-var PATH = '/version/test';
-server.get({
-  path: PATH,
-  version: ['2.0.0', '2.1.0', '2.2.0']
-}, function (req, res, next) {
-  res.send(200, {
-    requestedVersion: req.version(),
-    matchedVersion: req.matchedVersion()
-  });
-  return next();
-});
+server.get('/version/test', restify.plugins.conditionalHandler([
+  {
+    version: ['2.0.0', '2.1.0', '2.2.0'],
+    handler: function (req, res, next) {
+      res.send(200, {
+        requestedVersion: req.version(),
+        matchedVersion: req.matchedVersion()
+      });
+      return next();
+    }
+  }
+]));
 ```
 
 Hitting this route will respond as below:

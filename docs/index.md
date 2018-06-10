@@ -317,7 +317,7 @@ function sendV1(req, res, next) {
 }
 
 function sendV2(req, res, next) {
-  res.send({hello: req.params.name});
+  res.send({ hello: req.params.name });
   return next();
 }
 
@@ -368,7 +368,6 @@ requested version string was, and what the matching version from the routes
 supported version array was. Two methods make this info available:
 
 ```js
-var PATH = '/version/test';
 server.get('/version/test', restify.plugins.conditionalHandler([
   {
     version: ['2.0.0', '2.1.0', '2.2.0'],
