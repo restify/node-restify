@@ -64,15 +64,17 @@ routes and handlers for incoming requests.
     -   `options.handleUpgrades` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
+    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
+         times (optional, default `false`)
+    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
+         called more than once, enabled onceNext option (optional, default `false`)
     -   `options.httpsServerOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** Any options accepted by
         [node-https Server](http://nodejs.org/api/https.html#https_https).
         If provided the following restify server options will be ignored:
         spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.onceNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Prevents calling next multiple
-         times (optional, default `false`)
-    -   `options.strictNext` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Throws error when next() is
-         called more than once, enabled onceNext option (optional, default `false`)
+    -   `options.noWriteContinue` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** prevents
+         `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
     -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
 
