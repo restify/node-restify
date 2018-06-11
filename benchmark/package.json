@@ -9,7 +9,12 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "restify": "*"
+    "autocannon": "^2.2.0",
+    "autocannon-compare": "^0.3.0",
+    "inquirer": "^3.3.0",
+    "ora": "^1.3.0",
+    "restify": "*",
+    "vasync": "^2.2.0"
   },
   "devDependencies": {},
   "license": "MIT",
