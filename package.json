@@ -119,8 +119,6 @@
     "dtrace-provider": "^0.8.1"
   },
   "devDependencies": {
-    "autocannon": "^2.2.0",
-    "autocannon-compare": "^0.3.0",
     "chai": "^4.1.2",
     "coveralls": "^3.0.1",
     "documentation": "^5.3.3",
@@ -130,12 +128,10 @@
     "eslint-plugin-prettier": "^2.6.0",
     "filed": "^0.1.0",
     "glob": "^7.1.2",
-    "inquirer": "^3.3.0",
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
     "nodeunit": "^0.11.2",
     "nyc": "^12.0.2",
-    "ora": "^1.3.0",
     "pre-commit": "^1.2.2",
     "prettier": "^1.13.4",
     "proxyquire": "^1.8.0",

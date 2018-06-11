@@ -9,6 +9,7 @@ build
 docs/*.json
 nbproject
 package-lock.json
+yarn.lock
 benchmark/results
 .nyc_output
 coverage

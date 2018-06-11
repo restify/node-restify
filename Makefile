@@ -3,6 +3,7 @@
 #
 ROOT_SLASH	:= $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 ROOT		:= $(patsubst %/,%,$(ROOT_SLASH))
+BENCHMARK	:= $(ROOT)/benchmark
 TEST		:= $(ROOT)/test
 TOOLS		:= $(ROOT)/tools
 GITHOOKS_SRC	:= $(TOOLS)/githooks
@@ -13,10 +14,12 @@ GITHOOKS_DEST	:= $(ROOT)/.git/hooks
 # Generated Files & Directories
 #
 NODE_MODULES	:= $(ROOT)/node_modules
+BM_NODE_MODULES	:= $(BENCHMARK)/node_modules
 NODE_BIN	:= $(NODE_MODULES)/.bin
 COVERAGE	:= $(ROOT)/.nyc_output
 COVERAGE_RES	:= $(ROOT)/coverage
 PACKAGE_LOCK	:= $(ROOT)/package-lock.json
+YARN_LOCK	:= $(ROOT)/yarn.lock
 LCOV		:= $(COVERAGE)/lcov.info
 
 
@@ -24,6 +27,8 @@ LCOV		:= $(COVERAGE)/lcov.info
 # Tools and binaries
 #
 NPM		:= npm
+YARN		:= yarn
+NODE		:= node
 COVERALLS	:= $(NODE_BIN)/coveralls
 ESLINT		:= $(NODE_BIN)/eslint
 MOCHA		:= $(NODE_BIN)/mocha
@@ -50,7 +55,7 @@ TEST_FILES	:= $(shell find $(TEST) -name '*.js' -type f)
 #
 
 $(NODE_MODULES): $(PACKAGE_JSON) ## Install node_modules
-	@$(NPM) install
+	@$(YARN) install
 	@touch $(NODE_MODULES)
 
 
@@ -96,6 +101,7 @@ docs-build: $(NODE_MODULES) $(DOCS_BUILD) ## Build documentation from JSDocs
 
 .PHONY: benchmark
 benchmark: $(NODE_MODULES)
+	@# use npm instead of yarn for benchmark due to lax engine field enforcement
 	@(cd ./benchmark && $(NPM) i && $(NODE) index.js)
 
 
@@ -121,7 +127,7 @@ report-coverage: coverage ## Report test coverage to Coveralls
 
 .PHONY: clean
 clean: ## Cleans unit test coverage files and node_modules.
-	@rm -rf $(NODE_MODULES) $(COVERAGE) $(COVERAGE_RES) $(PACKAGE_LOCK)
+	@rm -rf $(NODE_MODULES) $(COVERAGE) $(COVERAGE_RES) $(PACKAGE_LOCK) $(YARN_LOCK) $(BM_NODE_MODULES)
 
 
 #
