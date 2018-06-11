@@ -527,6 +527,60 @@ describe('audit logger', function() {
         });
     });
 
+    it('restify-GH-1343 audit logger custom fields in request', function(done) {
+        // Dirty hack to capture the log record using a ring buffer.
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            type: 'raw',
+                            stream: ringbuffer
+                        }
+                    ]
+                }),
+                event: 'after',
+                customFields: ['user']
+            })
+        );
+
+        SERVER.get('/audit', [
+            restify.plugins.queryParser(),
+            function(req, res, next) {
+                req.user = {
+                    id: 1,
+                    name: 'Name'
+                };
+                res.send();
+                next();
+            }
+        ]);
+
+        SERVER.on('after', function() {
+            // check timers
+            assert.ok(ringbuffer.records[0], 'no log records');
+            assert.equal(
+                ringbuffer.records.length,
+                1,
+                'should only have 1 log record'
+            );
+            assert.deepEqual(ringbuffer.records[0].req.user, {
+                id: 1,
+                name: 'Name'
+            });
+            done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
+        });
+    });
+
     it('should work with pre events', function(done) {
         var ptStream = new PassThrough();
 
