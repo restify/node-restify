@@ -696,7 +696,7 @@ describe('audit logger', function() {
         );
     });
 
-    it('allow overriding serializers', function(done) {
+    it('should allow overriding serializers', function(done) {
         var MOCK_REQ = 'REQ';
         var MOCK_RES = 'RES';
         var MOCK_ERR = 'ERR';
