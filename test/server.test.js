@@ -2454,3 +2454,25 @@ test('should have proxy event handlers as instance', function(t) {
         t.end();
     });
 });
+
+test('should respond with VError and serialized error body', function(t) {
+    SERVER.on('after', function(req, res, route, err) {
+        // ensure this is an instance of VError
+        assert.ok(err.jse_info);
+        assert.ok(err.jse_shortmsg);
+    });
+
+    CLIENT.get(
+        {
+            headers: { connection: 'close' },
+            path: '/foo'
+        },
+        function(err, req, res, data) {
+            t.ok(err);
+            t.equal(data.code, 'ResourceNotFound');
+            SERVER.close(function() {
+                t.end();
+            });
+        }
+    );
+});
