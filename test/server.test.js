@@ -1181,7 +1181,7 @@ test('res.charSet', function(t) {
         next();
     });
 
-    CLIENT.get('/foo', function(err, _, res) {
+    CLIENT.get('/foo', function(err, _, res, data) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(res.headers['content-type'], 'text/plain; charset=ISO-8859-1');

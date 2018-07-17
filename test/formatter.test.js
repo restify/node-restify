@@ -20,6 +20,7 @@ var test = helper.test;
 
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
+var JSONCLIENT;
 var SERVER;
 
 ///--- Tests
@@ -49,6 +50,12 @@ before(function(callback) {
         });
         SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
+            JSONCLIENT = restifyClients.createJSONClient({
+                url: 'http://127.0.0.1:' + PORT,
+                dtrace: helper.dtrace,
+                retry: false,
+                agent: false
+            });
             CLIENT = restifyClients.createStringClient({
                 url: 'http://127.0.0.1:' + PORT,
                 dtrace: helper.dtrace,
@@ -72,6 +79,21 @@ before(function(callback) {
                 );
                 return next();
             });
+            SERVER.get('/null', function(req, res, next) {
+                res.header('content-type', 'application/json');
+                res.send(200, null);
+                return next();
+            });
+            SERVER.get('/zero', function(req, res, next) {
+                res.header('content-type', 'application/json');
+                res.send(200, 0);
+                return next();
+            });
+            SERVER.get('/false', function(req, res, next) {
+                res.header('content-type', 'application/json');
+                res.send(200, false);
+                return next();
+            });
             process.nextTick(callback);
         });
     } catch (e) {
@@ -82,6 +104,8 @@ before(function(callback) {
 
 after(function(callback) {
     try {
+        CLIENT.close();
+        JSONCLIENT.close();
         SERVER.close(callback);
     } catch (e) {
         console.error(e.stack);
@@ -226,5 +250,34 @@ test('default jsonp formatter should escape line and paragraph separators', func
         t.ok(res);
         t.equal(data, '"\\u2028\\u2029"');
         t.end();
+    });
+});
+
+test('should support null, 0, false as valid JSON payloads', function(t) {
+    var count = 3;
+
+    function done() {
+        count--;
+        if (count === 0) {
+            t.end();
+        }
+    }
+
+    JSONCLIENT.get('/null', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, null);
+        done();
+    });
+
+    JSONCLIENT.get('/zero', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, 0);
+        done();
+    });
+
+    JSONCLIENT.get('/false', function(err, req, res, data) {
+        t.ifError(err);
+        t.equal(data, false);
+        done();
     });
 });

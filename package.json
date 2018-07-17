@@ -141,7 +141,7 @@
     "pre-commit": "^1.2.2",
     "prettier": "^1.13.4",
     "proxyquire": "^1.8.0",
-    "restify-clients": "^1.5.2",
+    "restify-clients": "^2.3.0",
     "rimraf": "^2.6.2",
     "validator": "^7.2.0",
     "watershed": "^0.4.0"
