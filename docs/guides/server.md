@@ -198,7 +198,7 @@ Server API for more details.
 restify routing, in 'basic' mode, is pretty much identical to express/sinatra,
 in that HTTP verbs are used with a parameterized resource to determine what
 chain of handlers to run. Values associated with named placeholders are
-available in `req.params`. That values will be URL-decoded before being
+available in `req.params`. Those values will be URL-decoded before being
 passed to you.
 
 ```js
