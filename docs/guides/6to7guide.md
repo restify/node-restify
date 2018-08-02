@@ -31,7 +31,7 @@ Strict routing is the new default.
 Use `ignoreTrailingSlash: true` server option if you don't want to differentiate
 them from each other.
 
-### Path must to start with `/`
+### Path must start with `/`
 
 In restify 7.x path must start with a `/`.
 For example `server.get('foo')` is invalid, change it to `server.get('/foo')`.
@@ -101,8 +101,8 @@ Fore more info see: https://github.com/delvedor/find-my-way
 
 ### Disable DTrace probes by default
 
-DTrace probes comes with some performance impact that's fine for the sake of
-observability but you may don't use it at all.
+DTrace probes come with some performance impact that's fine for the sake of
+observability but you don't have to use them: they are disabled by default.
 
 ### Change in calling `next` multiple times
 
