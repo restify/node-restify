@@ -101,7 +101,7 @@ Fore more info see: https://github.com/delvedor/find-my-way
 
 ### Disable DTrace probes by default
 
-DTrace probes comes with some performance impact that's fine for the sake of
+DTrace probes come with some performance impact that's fine for the sake of
 observability but you don't have to use them: they are disabled by default.
 
 ### Change in calling `next` multiple times
