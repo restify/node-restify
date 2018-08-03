@@ -695,4 +695,63 @@ describe('audit logger', function() {
             function(err, req, res) {}
         );
     });
+
+    it('should allow overriding serializers', function(done) {
+        var MOCK_REQ = 'REQ';
+        var MOCK_RES = 'RES';
+        var MOCK_ERR = 'ERR';
+
+        var ringbuffer = new bunyan.RingBuffer({ limit: 100 });
+
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            stream: ringbuffer
+                        }
+                    ],
+                    serializers: {
+                        req: function() {
+                            return MOCK_REQ;
+                        },
+                        res: function() {
+                            return MOCK_RES;
+                        },
+                        err: function() {
+                            return MOCK_ERR;
+                        }
+                    }
+                }),
+                server: SERVER,
+                event: 'after'
+            })
+        );
+
+        SERVER.once('audit', function(data) {
+            var log = JSON.parse(ringbuffer.records[0]);
+
+            assert.ok(log);
+            assert.equal(log.req, MOCK_REQ);
+            assert.equal(log.res, MOCK_RES);
+            assert.equal(log.err, MOCK_ERR);
+
+            done();
+        });
+
+        SERVER.get('/audit', function(req, res, next) {
+            res.send();
+            next(new Error('This does not get logged'));
+        });
+
+        CLIENT.get(
+            {
+                path: '/audit'
+            },
+            function(err, req, res) {}
+        );
+    });
 });
