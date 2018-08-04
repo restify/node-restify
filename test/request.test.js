@@ -223,3 +223,35 @@ test('should provide date when request started', function(t) {
         t.end();
     });
 });
+
+test('GH-1639: should bind server to this context', function(t) {
+    var called_pre = false;
+    var called_use = false;
+    var called_get = false;
+
+    SERVER.pre(function(_, res, next) {
+        t.ok(this === SERVER);
+        called_pre = true;
+        return next();
+    });
+
+    SERVER.use(function(_, res, next) {
+        t.ok(this === SERVER);
+        called_use = true;
+        return next();
+    });
+
+    SERVER.get('/ping', function(_, res, next) {
+        t.ok(this === SERVER);
+        called_get = true;
+        res.send('ok');
+        return next();
+    });
+
+    CLIENT.get('/ping', function(err, _, res) {
+          t.ifError(err);
+          t.equal(res.statusCode, 200);
+          t.ok(called_get && called_use && called_pre);
+          t.end();
+    });
+});
