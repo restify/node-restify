@@ -65,7 +65,7 @@ very expensive in term of performance!
 
 ```js
 // parametric with RegExp
-server.get('GET', '/example/:file(^\\d+).png', () => {}))
+server.get('GET', '/example/:file(\\d+).png', () => {}))
 ```
 
 RegExp path chunks needs to be between parentheses.
@@ -74,7 +74,7 @@ It's possible to define more than one parameter within the same couple of slash
 ("/"). Such as:
 
 ```js
-server.get('/example/near/:lat-:lng/radius/:r', (req, res, next) => {}))
+server.get('/example/near/:lat:lng/radius/:r', (req, res, next) => {}))
 ```
 
 *Remember in this case to use the dash ("-") as parameters separator.*
