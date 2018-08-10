@@ -39,6 +39,10 @@ For example `server.get('foo')` is invalid, change it to `server.get('/foo')`.
 If you use [enroute](https://github.com/restify/enroute) be sure
 that you updated it to the latest version.
 
+### Route properties available differently
+
+When an object is provided as an argument to a server method, the properties are now available under `req.route.spec` instead of `req.route`
+
 ### Different `RegExp` usage in router path and wildcards
 
 restify's new router backend
