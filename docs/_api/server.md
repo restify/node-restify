@@ -754,7 +754,7 @@ Type: ([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 -   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
 -   `path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be any String accepted by
-    [find-my-way](https://github.com/delvedor/find-my-way)
+    [Anumargak](https://github.com/NaturalIntelligence/anumargak)
 
 **Examples**
 
@@ -764,7 +764,7 @@ server.get('/foo', function(req, res, next) {});
 // a parameterized route
 server.get('/foo/:bar', function(req, res, next) {});
 // a regular expression
-server.get('/example/:file(^\\d+).png', function(req, res, next) {});
+server.get('/example/:file(\\d+).png', function(req, res, next) {});
 // an options object
 server.get({
     path: '/foo',

@@ -93,6 +93,7 @@
     "node": ">=4.0"
   },
   "dependencies": {
+    "anumargak": "^1.8.1",
     "assert-plus": "^1.0.0",
     "bunyan": "^1.8.12",
     "csv": "^1.1.1",

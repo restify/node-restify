@@ -481,7 +481,7 @@ test('OPTIONS', function(t) {
 });
 
 test('RegExp ok', function(t) {
-    SERVER.get('/example/:file(^\\d+).png', function tester(req, res, next) {
+    SERVER.get('/example/:file(\\d+).png', function tester(req, res, next) {
         t.deepEqual(req.params, {
             file: '12'
         });

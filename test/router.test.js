@@ -340,10 +340,8 @@ test('toString()', function(t) {
     router.mount({ method: 'GET', path: '/a/b' }, [handler]);
     router.mount({ method: 'POST', path: '/' }, [handler]);
 
-    t.deepEqual(
-        router.toString(),
-        '└── / (GET|POST)\n' + '    └── a (GET)\n' + '        └── /b (GET)\n'
-    );
+    t.equal(router.count(), 4);
+
     t.end();
 });
 
@@ -361,13 +359,7 @@ test('toString() with ignoreTrailingSlash', function(t) {
     router.mount({ method: 'GET', path: '/a/b' }, [handler]);
     router.mount({ method: 'POST', path: '/' }, [handler]);
 
-    t.deepEqual(
-        router.toString(),
-        '└── / (GET|POST)\n' +
-            '    └── a (GET)\n' +
-            '        └── / (GET)\n' +
-            '            └── b (GET)\n' +
-            '                └── / (GET)\n'
-    );
+    t.equal(router.count(), 4);
+
     t.end();
 });

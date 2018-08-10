@@ -42,7 +42,7 @@ that you updated it to the latest version.
 ### Different `RegExp` usage in router path and wildcards
 
 restify's new router backend
-[find-my-way](https://github.com/delvedor/find-my-way) has limited RegExp
+[Anumargak](https://github.com/NaturalIntelligence/anumargak) has limited RegExp
 support.
 
 #### Guide to define paths
@@ -82,7 +82,7 @@ server.get('/example/near/:lat-:lng/radius/:r', (req, res, next) => {}))
 Finally it's possible to have multiple parameters with RegExp.
 
 ```js
-server.get('/example/at/:hour(^\\d{2})h:minute(^\\d{2})m', (req, res, next) => {
+server.get('/example/at/:hour(\\d{2})h:minute(\\d{2})m', (req, res, next) => {
   // req.params => { hour: 12, minute: 15 }
 }))
 ```
@@ -93,7 +93,7 @@ Having a route with multiple parameters may affect negatively the performance,
 so prefer single parameter approach whenever possible, especially on routes
 which are on the hot path of your application.
 
-Fore more info see: https://github.com/delvedor/find-my-way
+Fore more info see: https://github.com/NaturalIntelligence/anumargak
 
 ### Remove already deprecated `next.ifError`
 
