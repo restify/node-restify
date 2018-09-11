@@ -26,16 +26,18 @@ var mockRes = {
     setHeader: function() {},
     send: function() {}
 };
-
+var mockResponse = function respond(req, res, next) {
+    res.send(200);
+};
 ///--- Tests
 
 test('render route', function(t) {
     var server = restify.createServer();
-    server.get({ name: 'countries', path: '/countries' }, mockRes);
-    server.get({ name: 'country', path: '/countries/:name' }, mockRes);
+    server.get({ name: 'countries', path: '/countries' }, mockResponse);
+    server.get({ name: 'country', path: '/countries/:name' }, mockResponse);
     server.get(
         { name: 'cities', path: '/countries/:name/states/:state/cities' },
-        mockRes
+        mockResponse
     );
 
     var countries = server.router.render('countries', {});
@@ -57,7 +59,7 @@ test('render route (missing params)', function(t) {
     var server = restify.createServer();
     server.get(
         { name: 'cities', path: '/countries/:name/states/:state/cities' },
-        mockRes
+        mockResponse
     );
 
     try {
@@ -71,7 +73,7 @@ test('render route (missing params)', function(t) {
 
 test('GH #704: render route (special charaters)', function(t) {
     var server = restify.createServer();
-    server.get({ name: 'my-route', path: '/countries/:name' }, mockRes);
+    server.get({ name: 'my-route', path: '/countries/:name' }, mockResponse);
 
     var link = server.router.render('my-route', { name: 'Australia' });
     t.equal(link, '/countries/Australia');
@@ -86,7 +88,7 @@ test('GH #704: render route (with sub-regex param)', function(t) {
             name: 'my-route',
             path: '/countries/:code([A-Z]{2,3})'
         },
-        mockRes
+        mockResponse
     );
 
     var link = server.router.render('my-route', { code: 'FR' });
@@ -104,7 +106,7 @@ test('GH-796: render route (with multiple sub-regex param)', function(t) {
             name: 'my-route',
             path: '/countries/:code([A-Z]{2,3})/:area([0-9]+)'
         },
-        mockRes
+        mockResponse
     );
 
     var link = server.router.render('my-route', { code: '111', area: 42 });
@@ -114,7 +116,7 @@ test('GH-796: render route (with multiple sub-regex param)', function(t) {
 
 test('render route (with encode)', function(t) {
     var server = restify.createServer();
-    server.get({ name: 'my-route', path: '/countries/:name' }, mockRes);
+    server.get({ name: 'my-route', path: '/countries/:name' }, mockResponse);
 
     var link = server.router.render('my-route', { name: 'Trinidad & Tobago' });
     t.equal(link, '/countries/Trinidad%20%26%20Tobago');
@@ -124,7 +126,7 @@ test('render route (with encode)', function(t) {
 
 test('render route (query string)', function(t) {
     var server = restify.createServer();
-    server.get({ name: 'country', path: '/countries/:name' }, mockRes);
+    server.get({ name: 'country', path: '/countries/:name' }, mockResponse);
 
     var country1 = server.router.render(
         'country',
