@@ -754,7 +754,7 @@ Type: ([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 -   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** a name for the route
 -   `path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be any String accepted by
-    [Anumargak](https://github.com/NaturalIntelligence/anumargak)
+    [Anumargak](https://github.com/node-muneem/anumargak)
 
 **Examples**
 

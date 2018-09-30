@@ -7,8 +7,8 @@ permalink: /docs/6to7/
 
 restify `7.x` comes with a completely new router and middleware logic that
 brings significant performance improvement to your application.
-From `v7.0.0` restify uses the Radix Tree based
-[find-my-way](https://github.com/delvedor/find-my-way) package as a router
+From `v7.0.0` restify uses 
+[anumargak](https://github.com/node-muneem/anumargak) package as a router
 backend.
 
 ## Breaking Changes
@@ -42,7 +42,7 @@ that you updated it to the latest version.
 ### Different `RegExp` usage in router path and wildcards
 
 restify's new router backend
-[Anumargak](https://github.com/NaturalIntelligence/anumargak) has limited RegExp
+[Anumargak](https://github.com/node-muneem/anumargak) has limited RegExp
 support.
 
 #### Guide to define paths
@@ -93,7 +93,7 @@ Having a route with multiple parameters may affect negatively the performance,
 so prefer single parameter approach whenever possible, especially on routes
 which are on the hot path of your application.
 
-Fore more info see: https://github.com/NaturalIntelligence/anumargak
+Fore more info see: https://github.com/node-muneem/anumargak
 
 ### Remove already deprecated `next.ifError`
 
