@@ -7,7 +7,7 @@ permalink: /docs/6to7/
 
 restify `7.x` comes with a completely new router and middleware logic that
 brings significant performance improvement to your application.
-From `v7.0.0` restify uses 
+From `v7.2.2` restify uses 
 [anumargak](https://github.com/node-muneem/anumargak) package as a router
 backend.
 
