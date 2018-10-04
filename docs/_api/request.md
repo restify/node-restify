@@ -14,6 +14,7 @@ permalink: /docs/request-api/
     -   [getContentType](#getcontenttype)
     -   [date](#date)
     -   [href](#href)
+    -   [absoluteUri](#absoluteUri)
     -   [id](#id)
     -   [getPath](#getpath)
     -   [getQuery](#getquery)
@@ -122,6 +123,26 @@ server.get('/:x/bar', function(req, res, next) {
 ```
 
 Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+### absoluteUri
+
+Construct an absolute uri given a path. Path must be a string
+
+**Examples**
+
+```javascript
+// incoming request is http://user:password@localhost:3000/foo/bar?a=1
+req.absoluteUri('/test');
+// => 'http://localhost:3000/test'
+
+req.absoluteUri('test');
+// => 'http://localhost:3000/foo/bar/test'
+
+req.absoluteUri('');
+// => 'http://localhost:3000/foo/bar/'
+```
+
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ### id
 
