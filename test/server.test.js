@@ -674,6 +674,42 @@ test('GH-77 uncaughtException (default behavior)', function(t) {
     });
 });
 
+// eslint-disable-next-line
+test('handleUncaughtExceptions should not call handler for internal errors', function(t) {
+    SERVER.get('/', function(req, res, next) {
+        res.send('Hello');
+    });
+
+    SERVER.on('uncaughtException', function throwError(err) {
+        t.ifError(err);
+        t.end();
+    });
+
+    CLIENT.head('/', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 405);
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('handleUncaughtExceptions should not call handler for next(new Error())', function(t) {
+    SERVER.get('/', function(req, res, next) {
+        next(new Error('I am not fatal'));
+    });
+
+    SERVER.on('uncaughtException', function throwError(err) {
+        t.ifError(err);
+        t.end();
+    });
+
+    CLIENT.get('/', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
 test('GH-77 uncaughtException (with custom handler)', function(t) {
     SERVER.on('uncaughtException', function(req, res, route, err) {
         res.send(204);
