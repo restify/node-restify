@@ -677,7 +677,9 @@ test('GH-77 uncaughtException (default behavior)', function(t) {
 // eslint-disable-next-line
 test('handleUncaughtExceptions should not call handler for internal errors', function(t) {
     SERVER.get('/', function(req, res, next) {
-        res.send('Hello');
+        // This route is not used for the test but at least one route needs to
+        // be registered to Restify in order for routing logic to be run
+        assert.fail('should not run');
     });
 
     SERVER.on('uncaughtException', function throwError(err) {
