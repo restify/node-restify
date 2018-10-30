@@ -1,3 +1,12 @@
+<a name="7.2.2"></a>
+### 7.2.2 (2018-10-29)
+
+
+#### Bug Fixes
+
+* documentation typo fix (#1688) ([0fa71328](git://github.com/restify/node-restify.git/commit/0fa71328))
+
+
 <a name="7.2.1"></a>
 ### 7.2.1 (2018-06-07)
 
