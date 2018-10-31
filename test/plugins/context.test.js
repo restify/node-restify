@@ -14,8 +14,8 @@ var SERVER;
 var CLIENT;
 var PORT;
 
-describe('accept parser', function() {
-    before(function(done) {
+describe('request context', function() {
+    beforeEach(function(done) {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             log: helper.getLog('server')
@@ -62,6 +62,17 @@ describe('accept parser', function() {
                     b: 2
                 });
                 assert.deepEqual(req.get('bar'), [1]);
+                return next();
+            },
+            function four(req, res, next) {
+                // ensure all context is retrieved
+                assert.deepStrictEqual(req.getAll(), {
+                    foo: {
+                        a: 1,
+                        b: 2
+                    },
+                    bar: [1]
+                });
                 res.send();
                 return next();
             }
@@ -86,6 +97,134 @@ describe('accept parser', function() {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
             return done();
+        });
+    });
+
+    it('set and get request context', function(done) {
+        var asserted = false;
+        var expectedData = {
+            pink: 'floyd'
+        };
+
+        SERVER.get('/context', [
+            function(req, res, next) {
+                req.set('pink', 'floyd');
+                return next();
+            },
+            function(req, res, next) {
+                assert.equal('floyd', req.get('pink'));
+                assert.deepEqual(expectedData, req.getAll());
+                asserted = true;
+                res.send(200);
+                return next();
+            }
+        ]);
+
+        CLIENT.get('/context', function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.ok(asserted);
+            done();
+        });
+    });
+
+    it('should throw if set key is not string', function(done) {
+        SERVER.pre(restify.plugins.pre.context());
+
+        var asserted = false;
+
+        SERVER.get('/context', [
+            function(req, res, next) {
+                try {
+                    req.set({}, 'floyd');
+                } catch (e) {
+                    asserted = true;
+                    res.send(200);
+                }
+                return next();
+            }
+        ]);
+
+        CLIENT.get('/context', function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.ok(asserted);
+            done();
+        });
+    });
+
+    it('should throw if set key is empty string', function(done) {
+        SERVER.pre(restify.plugins.pre.context());
+
+        var asserted = false;
+
+        SERVER.get('/context', [
+            function(req, res, next) {
+                try {
+                    req.set('', 'floyd');
+                } catch (e) {
+                    asserted = true;
+                    res.send(200);
+                }
+                return next();
+            }
+        ]);
+
+        CLIENT.get('/context', function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.ok(asserted);
+            done();
+        });
+    });
+
+    it('should throw if get key is not string', function(done) {
+        SERVER.pre(restify.plugins.pre.context());
+
+        var asserted = false;
+
+        SERVER.get('/context', [
+            function(req, res, next) {
+                try {
+                    req.get({});
+                } catch (e) {
+                    asserted = true;
+                    res.send(200);
+                }
+                return next();
+            }
+        ]);
+
+        CLIENT.get('/context', function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.ok(asserted);
+            done();
+        });
+    });
+
+    it('should throw if get key is empty string', function(done) {
+        SERVER.pre(restify.plugins.pre.context());
+
+        var asserted = false;
+
+        SERVER.get('/context', [
+            function(req, res, next) {
+                try {
+                    req.get('');
+                } catch (e) {
+                    asserted = true;
+                    res.send(200);
+                }
+                return next();
+            }
+        ]);
+
+        CLIENT.get('/context', function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.ok(asserted);
+            done();
         });
     });
 });
