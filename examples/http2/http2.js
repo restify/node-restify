@@ -7,7 +7,8 @@ var srv = restify.createServer({
     http2: {
         cert: fs.readFileSync(path.join(__dirname, './keys/http2-cert.pem')),
         key: fs.readFileSync(path.join(__dirname, './keys/http2-key.pem')),
-        ca: fs.readFileSync(path.join(__dirname, 'keys/http2-csr.pem'))
+        ca: fs.readFileSync(path.join(__dirname, 'keys/http2-csr.pem')),
+        allowHTTP1: true //allow incoming connections that do not support HTTP/2 to be downgraded to HTTP/1.x
     }
 });
 
