@@ -116,7 +116,7 @@
     "verror": "^1.10.0"
   },
   "optionalDependencies": {
-    "dtrace-provider": "^0.8.1"
+    "dtrace-provider": "~0.8"
   },
   "devDependencies": {
     "autocannon": "^2.2.0",
