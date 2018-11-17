@@ -437,10 +437,18 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 
 ## Content Negotiation
 
-If you're using `res.send()` restify will automatically select the content-type
-to respond with, by finding the first registered `formatter` defined.  Note in
-the examples above we've not defined any formatters, so we've been leveraging
-the fact that restify ships with `application/json`, `text/plain` and
+If you're using `res.send()` restify will determine the content-type to respond
+with by:
+
+1. negotiating the content-type by matching available formatters with the
+   request's `accept` header
+1. otherwise, using `application/json` if the body is an object that is not a
+   Buffer instance
+1. otherwise, using the value of `res.contentType` if present
+1. otherwise, using the value of the `Content-Type` response header if set
+
+Note in the examples above we've not defined any formatters, so we've been
+leveraging the fact that restify ships with `application/json`, `text/plain` and
 `application/octet-stream` formatters. You can add additional formatters to
 restify by passing in a hash of content-type -> parser at server creation time:
 
@@ -460,9 +468,14 @@ var server = restify.createServer({
 });
 ```
 
-If a content-type can't be negotiated, then restify will default to using the
-`application/octet-stream` formatter. For example, attempting to send a
-content-type that does not have a defined formatter:
+If a content-type can't be determined, then restify will respond with an error.
+
+If a content-type can be negotiated, but that content-type doesn't have a
+corresponding formatter, restify will not format the response with any
+formatter.
+
+For example, attempting to send a content-type that does not have a defined
+formatter:
 
 ```js
 server.get('/foo', function(req, res, next) {
@@ -472,12 +485,13 @@ server.get('/foo', function(req, res, next) {
 });
 ```
 
-Will result in a response with a content-type of `application/octet-stream`:
+Will result in a response with a content-type of `text/css` even though no
+`'text/css'` formatter is present:
 
 ```sh
 $ curl -i localhost:3000/
 HTTP/1.1 200 OK
-Content-Type: application/octet-stream
+Content-Type: text/css
 Content-Length: 2
 Date: Thu, 02 Jun 2016 06:50:54 GMT
 Connection: keep-alive

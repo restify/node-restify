@@ -497,10 +497,9 @@ test('writeHead should emit a header event', function(t) {
     });
 });
 
-test('should fail to set header due to missing formatter', function(t) {
-    // when a formatter is not set up for a specific content-type, restify will
-    // default to octet-stream.
-
+test('should send 200 when formatter missing', function(t) {
+    // res.send still sends a response even when a formatter is not set up for a
+    // specific content-type.
     SERVER.get('/11', function handle(req, res, next) {
         res.header('content-type', 'application/hal+json');
         res.send(200, JSON.stringify({ hello: 'world' }));
@@ -510,7 +509,7 @@ test('should fail to set header due to missing formatter', function(t) {
     CLIENT.get(join(LOCALHOST, '/11'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(res.headers['content-type'], 'application/octet-stream');
+        t.equal(res.headers['content-type'], 'application/hal+json');
         t.end();
     });
 });
