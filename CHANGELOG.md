@@ -1,3 +1,12 @@
+<a name="7.2.3"></a>
+### 7.2.3 (2018-11-16)
+
+
+#### Bug Fixes
+
+* **server:** fix uncaught exceptions triggering route lookups (#1717) ([e49cb3b2](git://github.com/restify/node-restify.git/commit/e49cb3b2))
+
+
 <a name="7.2.2"></a>
 ### 7.2.2 (2018-10-29)
 
