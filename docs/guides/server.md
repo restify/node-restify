@@ -425,17 +425,31 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 });
 ```
 
-## Content Negotiation
+## Responses' Content Negotiation And Formatting
 
 If you're using `res.send()` restify will determine the content-type to respond
-with by:
+with by, from highest priority to lowest priority:
 
-1. negotiating the content-type by matching available formatters with the
-   request's `accept` header
+1. using the value of `res.contentType` if present
+1. otherwise, using the value of the `Content-Type` response header if set
 1. otherwise, using `application/json` if the body is an object that is not a
    Buffer instance
-1. otherwise, using the value of `res.contentType` if present
-1. otherwise, using the value of the `Content-Type` response header if set
+1. otherwise, negotiating the content-type by matching available formatters with
+   the request's `accept` header
+
+If a content-type can't be determined, then restify will respond with an error.
+
+If a content-type can be negotiated, restify then determines what formatter to
+use to format the response's content.
+
+If no formatter matching the content-type can be found, restify will by default
+override the response's content-type to `'application/octet-stream'` and then
+error if no formatter is found for that content-type.
+
+This default behavior can be changed by passing `optionalFormatters: true`
+(default is false) when creating the restify server instance. In that case, if
+no formatter is found for the negotiated content-type, the response is flushed
+without applying any formatter.
 
 Note in the examples above we've not defined any formatters, so we've been
 leveraging the fact that restify ships with `application/json`, `text/plain` and
@@ -458,12 +472,6 @@ var server = restify.createServer({
 });
 ```
 
-If a content-type can't be determined, then restify will respond with an error.
-
-If a content-type can be negotiated, but that content-type doesn't have a
-corresponding formatter, restify will not format the response with any
-formatter.
-
 For example, attempting to send a content-type that does not have a defined
 formatter:
 
@@ -475,8 +483,27 @@ server.get('/foo', function(req, res, next) {
 });
 ```
 
-Will result in a response with a content-type of `text/css` even though no
-`'text/css'` formatter is present:
+Will result in a response with a content-type of `application/octet-stream`:
+
+```sh
+$ curl -i localhost:3000/
+HTTP/1.1 200 OK
+Content-Type: application/octet-stream
+Content-Length: 2
+Date: Thu, 02 Jun 2016 06:50:54 GMT
+Connection: keep-alive
+```
+
+However, if the server instance is created with `optionalFormatters: true`:
+
+```js
+var server = restify.createServer({
+  optionalFormatters: true
+});
+```
+
+The response has a content-type of `text/css` even though no `'text/css'`
+formatter is present:
 
 ```sh
 $ curl -i localhost:3000/

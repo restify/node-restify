@@ -189,8 +189,8 @@ test(
 );
 
 test(
-    'GH-937 should return 200 even when no formatter matching client found ' +
-        'but content-type set manually',
+    'GH-937 should return 500 when no default formatter found ' +
+        'and octet-stream is not available',
     function(t) {
         // ensure client accepts only a type not specified by server
         var opts = {
@@ -201,11 +201,10 @@ test(
         };
 
         CLIENT.get(opts, function(err, req, res, data) {
-            t.ifError(err);
+            t.ok(err);
             t.ok(req);
             t.ok(res);
-            t.equal(res.statusCode, 200);
-            t.equal(res.contentType(), 'text/html');
+            t.equal(res.statusCode, 500);
             t.end();
         });
     }
