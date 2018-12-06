@@ -28,7 +28,7 @@ before(function(callback) {
         SERVER = restify.createServer({
             handleUncaughtExceptions: true,
             log: helper.getLog('server'),
-            optionalFormatters: true
+            strictFormatters: false
         });
         SERVER.listen(PORT, '127.0.0.1', function() {
             PORT = SERVER.address().port;
@@ -56,10 +56,10 @@ after(function(callback) {
     }
 });
 
-test('should send 200 on formatter missing but optional', function(t) {
-    // When server is passed "optionalFormatters: true" at creation time,
-    // res.send still sends a successful response even when a formatter is not
-    // set up for a specific content-type.
+test('send 200 on formatter missing and strictFormatters false', function(t) {
+    // When server is passed "strictFormatters: false" at creation time,
+    // res.send still sends a successful response even when a formatter is
+    // not set up for a specific content-type.
     SERVER.get('/11', function handle(req, res, next) {
         res.header('content-type', 'application/hal+json');
         res.send(200, JSON.stringify({ hello: 'world' }));

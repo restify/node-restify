@@ -456,7 +456,7 @@ If no formatter matching the content-type can be found, restify will by default
 override the response's content-type to `'application/octet-stream'` and then
 error if no formatter is found for that content-type.
 
-This default behavior can be changed by passing `optionalFormatters: true`
+This default behavior can be changed by passing `strictFormatters: false`
 (default is false) when creating the restify server instance. In that case, if
 no formatter is found for the negotiated content-type, the response is flushed
 without applying any formatter.
@@ -504,11 +504,11 @@ Date: Thu, 02 Jun 2016 06:50:54 GMT
 Connection: keep-alive
 ```
 
-However, if the server instance is created with `optionalFormatters:true`:
+However, if the server instance is created with `strictFormatters:false`:
 
 ```js
 var server = restify.createServer({
-  optionalFormatters: true
+  strictFormatters: false
 });
 ```
 
