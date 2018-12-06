@@ -61,14 +61,12 @@ test('should send 200 on formatter missing but optional', function(t) {
     // res.send still sends a successful response even when a formatter is not
     // set up for a specific content-type.
     SERVER.get('/11', function handle(req, res, next) {
-        console.log('got request');
         res.header('content-type', 'application/hal+json');
         res.send(200, JSON.stringify({ hello: 'world' }));
         return next();
     });
 
     CLIENT.get(LOCALHOST + '/11', function(err, _, res) {
-        console.log('got response:', err);
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(res.headers['content-type'], 'application/hal+json');
