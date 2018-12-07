@@ -204,14 +204,14 @@ describe('request metrics plugin', function() {
                     // it's calculated by the client,
                     // but setTimeout is happening on the server, tolerate 10ms
 
-                    // Expected pre-latency has been adjusted from 50 to 49
-                    // to work around timer issues in Node.js <11
+                    // Expected latencies have been adjusted to the integer just
+                    // below to work around timer issues in Node.js <11
                     // https://github.com/nodejs/node/issues/10154
-                    assert.isAtLeast(metrics.preLatency, 49);
+                    assert.isAtLeast(metrics.preLatency, 50 - 1);
+                    assert.isAtLeast(metrics.useLatency, 50 - 1);
+                    assert.isAtLeast(metrics.routeLatency, 250 - 1);
+                    assert.isAtLeast(metrics.latency, 200 - 10 - 1);
 
-                    assert.isAtLeast(metrics.useLatency, 50);
-                    assert.isAtLeast(metrics.routeLatency, 250);
-                    assert.isAtLeast(metrics.latency, 200 - 10);
                     // latency should be lower as request timeouts
                     assert.isAbove(metrics.routeLatency, metrics.latency);
                     assert.equal(metrics.path, '/foo');
