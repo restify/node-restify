@@ -1,3 +1,12 @@
+<a name="7.3.0"></a>
+## 7.3.0 (2018-12-07)
+
+
+#### Features
+
+* add support for non-strict formatters (#1721) ([de1833a4](git://github.com/restify/node-restify.git/commit/de1833a4))
+
+
 <a name="7.2.3"></a>
 ### 7.2.3 (2018-11-16)
 
