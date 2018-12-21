@@ -365,14 +365,16 @@ describe('static resource plugin', function() {
                     }
 
                     // closed before serve
-                    if (req.closed) {
+                    if (req.closed()) {
                         doServe();
                     } else {
                         req.on('close', doServe);
                     }
                 });
                 SERVER.on('after', function(req, res, route, afterErr) {
-                    assert(afterErr.name, 'RequestCloseError');
+                    if (afterErr) {
+                        assert(afterErr.name, 'RequestCloseError');
+                    }
                     done();
                 });
 
