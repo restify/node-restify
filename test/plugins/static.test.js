@@ -357,11 +357,19 @@ describe('static resource plugin', function() {
                 });
 
                 SERVER.get('/index.html', function(req, res, next) {
+                    function doServe() {
+                        serve(req, res, function(nextRoute) {
+                            assert.strictEqual(nextRoute, false);
+                            done();
+                        });
+                    }
+
                     // closed before serve
-                    serve(req, res, function(nextRoute) {
-                        assert.strictEqual(nextRoute, false);
-                        done();
-                    });
+                    if (req.closed) {
+                        doServe();
+                    } else {
+                        req.on('close', doServe);
+                    }
                 });
                 SERVER.on('after', function(req, res, route, afterErr) {
                     assert(afterErr.name, 'RequestCloseError');
