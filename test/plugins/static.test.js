@@ -365,11 +365,7 @@ describe('static resource plugin', function() {
                     }
 
                     // closed before serve
-                    if (req.closed()) {
-                        doServe();
-                    } else {
-                        req.on('close', doServe);
-                    }
+                    req.on('close', doServe);
                 });
                 SERVER.on('after', function(req, res, route, afterErr) {
                     if (afterErr) {
