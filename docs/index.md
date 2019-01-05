@@ -110,7 +110,7 @@ incoming request before routing it.
 
 ```js
 // dedupe slashes in URL before routing
-server.pre(restify.plugins.dedupeSlashes());
+server.pre(restify.plugins.pre.dedupeSlashes());
 ```
 
 
