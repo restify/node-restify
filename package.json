@@ -41,7 +41,7 @@
   "name": "restify",
   "homepage": "http://restifyjs.com",
   "description": "REST framework",
-  "version": "4.3.4",
+  "version": "4.3.4-fixed-dependencies.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/restify/node-restify.git"
@@ -63,7 +63,7 @@
     "csv": "^0.4.0",
     "escape-regexp-component": "^1.0.2",
     "formidable": "^1.0.14",
-    "http-signature": "^0.11.0",
+    "http-signature": "1.20.0",
     "keep-alive-agent": "^0.0.1",
     "lru-cache": "^4.0.1",
     "mime": "^1.2.11",
