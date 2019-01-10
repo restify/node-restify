@@ -37,6 +37,9 @@ permalink: /docs/plugins-api/
     -   [metrics](#metrics)
 -   [Types](#types)
     -   [metrics~callback](#metricscallback)
+-   [req.set](#reqset)
+-   [req.get](#reqget)
+-   [req.getAll](#reqgetall)
 
 ## Usage
 
@@ -1164,3 +1167,33 @@ Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Sta
 -   `req` **[Request](https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request)** the request obj
 -   `res` **[Response](https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5)** the response obj
 -   `route` **Route** the route obj that serviced the request
+
+## req.set
+
+Set context value by key
+Requires the context plugin.
+
+**Parameters**
+
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** key
+-   `value` **any** value
+
+Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
+
+## req.get
+
+Get context value by key.
+Requires the context plugin.
+
+**Parameters**
+
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** key
+
+Returns **any** value stored in context
+
+## req.getAll
+
+Get all context
+Requires the context plugin.
+
+Returns **any** value stored in context
