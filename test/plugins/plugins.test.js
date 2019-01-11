@@ -135,7 +135,7 @@ describe('all other plugins', function() {
                 },
                 function(req, res, next) {
                     assert.equal('floyd', req.get('pink'));
-                    assert.deepEqual(expectedData, req._getAllContext());
+                    assert.deepEqual(expectedData, req.getAll());
                     asserted = true;
                     res.send(200);
                     return next();

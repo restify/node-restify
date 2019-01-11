@@ -1,3 +1,31 @@
+<a name="7.5.0"></a>
+## 7.5.0 (2019-01-09)
+
+
+#### Bug Fixes
+
+* emit after event with proper error param for node versions >= 11.4.0 (#1732) ([7a1378b0](git://github.com/restify/node-restify.git/commit/7a1378b0))
+
+
+#### Features
+
+* **plugins:** context, req.get() returns the whole context (#1739) ([6e35e01e](git://github.com/restify/node-restify.git/commit/6e35e01e))
+
+
+<a name="7.4.0"></a>
+## 7.4.0 (2019-01-02)
+
+
+#### Bug Fixes
+
+* more flaky metrics.test.js fixes (#1730) ([71aac428](git://github.com/restify/node-restify.git/commit/71aac428))
+
+
+#### Features
+
+* **plugins:** do not include user-input in UnsupportedMediaTypeError message (VError fails), m ([06c220d2](git://github.com/restify/node-restify.git/commit/06c220d2))
+
+
 <a name="7.3.0"></a>
 ## 7.3.0 (2018-12-07)
 
