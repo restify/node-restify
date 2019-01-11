@@ -1,3 +1,17 @@
+<a name="7.5.0"></a>
+## 7.5.0 (2019-01-09)
+
+
+#### Bug Fixes
+
+* emit after event with proper error param for node versions >= 11.4.0 (#1732) ([7a1378b0](git://github.com/restify/node-restify.git/commit/7a1378b0))
+
+
+#### Features
+
+* **plugins:** context, req.get() returns the whole context (#1739) ([6e35e01e](git://github.com/restify/node-restify.git/commit/6e35e01e))
+
+
 <a name="7.4.0"></a>
 ## 7.4.0 (2019-01-02)
 
