@@ -15,6 +15,13 @@ var SERVER;
 var CLIENT;
 var PORT;
 
+function adjustExpectedLatency(expectedLatency, nbTimers) {
+    // Expected latencies are adjusted to substract 1 ms per timer, because each
+    // timer may have fired 1ms earlier for Node.js versions < 11.0. See
+    // https://github.com/nodejs/node/issues/10154 for more info.
+    return expectedLatency - nbTimers;
+}
+
 describe('request metrics plugin', function() {
     beforeEach(function(done) {
         SERVER = restify.createServer({
@@ -57,11 +64,26 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.equal(metrics.statusCode, 202);
-                    assert.isAtLeast(metrics.preLatency, 50);
-                    assert.isAtLeast(metrics.useLatency, 50);
-                    assert.isAtLeast(metrics.routeLatency, 50);
-                    assert.isAtLeast(metrics.latency, 150);
-                    assert.isAtLeast(metrics.totalLatency, 150);
+                    assert.isAtLeast(
+                        metrics.preLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
+                    assert.isAtLeast(
+                        metrics.useLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
+                    assert.isAtLeast(
+                        metrics.routeLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
+                    assert.isAtLeast(
+                        metrics.latency,
+                        adjustExpectedLatency(150, 3)
+                    );
+                    assert.isAtLeast(
+                        metrics.totalLatency,
+                        adjustExpectedLatency(150, 3)
+                    );
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.connectionState, undefined);
                     assert.equal(metrics.method, 'GET');
@@ -116,10 +138,16 @@ describe('request metrics plugin', function() {
                     assert.ok(err);
 
                     assert.isObject(metrics, 'metrics');
-                    assert.isAtLeast(metrics.preLatency, 50);
+                    assert.isAtLeast(
+                        metrics.preLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
                     assert.equal(metrics.useLatency, null);
                     assert.equal(metrics.routeLatency, null);
-                    assert.isAtLeast(metrics.latency, 50);
+                    assert.isAtLeast(
+                        metrics.latency,
+                        adjustExpectedLatency(50, 1)
+                    );
 
                     return done();
                 }
@@ -154,9 +182,15 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.isAtLeast(metrics.preLatency, 0);
-                    assert.isAtLeast(metrics.useLatency, 50);
+                    assert.isAtLeast(
+                        metrics.useLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
                     assert.equal(metrics.routeLatency, null);
-                    assert.isAtLeast(metrics.latency, 50);
+                    assert.isAtLeast(
+                        metrics.latency,
+                        adjustExpectedLatency(50, 1)
+                    );
 
                     return done();
                 }
@@ -199,15 +233,28 @@ describe('request metrics plugin', function() {
                     assert.equal(err.name, 'RequestCloseError');
 
                     assert.isObject(metrics, 'metrics');
-                    assert.equal(metrics.statusCode, 444); // router doesn't run
-                    // However the timeout value is 200,
-                    // it's calculated by the client,
-                    // but setTimeout is happening on the server, tolerate 10ms
-                    assert.isAtLeast(metrics.preLatency, 50);
-                    assert.isAtLeast(metrics.useLatency, 50);
-                    assert.isAtLeast(metrics.routeLatency, 250);
+                    // router doesn't run
+                    assert.equal(metrics.statusCode, 444);
+
+                    assert.isAtLeast(
+                        metrics.preLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
+                    assert.isAtLeast(
+                        metrics.useLatency,
+                        adjustExpectedLatency(50, 1)
+                    );
+                    assert.isAtLeast(
+                        metrics.routeLatency,
+                        adjustExpectedLatency(250, 1)
+                    );
+
+                    // The request timeout value is 200 client side, but the
+                    // overall latency is computed on the server, so we're
+                    // tolerating a 10ms difference. This is inherently flaky.
                     assert.isAtLeast(metrics.latency, 200 - 10);
-                    // latency should dbe lower as request timeouts
+
+                    // latency should be lower as request timeouts
                     assert.isAbove(metrics.routeLatency, metrics.latency);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
@@ -277,7 +324,7 @@ describe('request metrics plugin', function() {
 
                     assert.isObject(metrics, 'metrics');
                     assert.equal(metrics.statusCode, 500);
-                    assert.isNumber(metrics.latency, 200);
+                    assert.isNumber(metrics.latency);
                     assert.equal(metrics.path, '/foo');
                     assert.equal(metrics.method, 'GET');
                     assert.equal(metrics.connectionState, undefined);

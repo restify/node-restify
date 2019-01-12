@@ -2477,6 +2477,96 @@ test('should emit error with multiple next calls with strictNext', function(t) {
     });
 });
 
+test('uncaughtException should not trigger named routeHandler', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw 'bar'; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('uncaughtException should handle thrown undefined literal', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw undefined; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('uncaughtException should handle thrown Number', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw 1; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
 test('should have proxy event handlers as instance', function(t) {
     var server = restify.createServer({
         handleUpgrades: false

@@ -110,7 +110,7 @@ incoming request before routing it.
 
 ```js
 // dedupe slashes in URL before routing
-server.pre(restify.plugins.dedupeSlashes());
+server.pre(restify.plugins.pre.dedupeSlashes());
 ```
 
 
@@ -358,7 +358,7 @@ creation time.  Lastly, you can support multiple versions in the API by using
 an array:
 
 ```js
-server.get('/hello/:name' restify.plugins.conditionalHandler([
+server.get('/hello/:name', restify.plugins.conditionalHandler([
   { version: ['2.0.0', '2.1.0', '2.2.0'], handler: sendV2 }
 ]));
 ```
@@ -435,12 +435,34 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 });
 ```
 
-## Content Negotiation
+## Responses' Content Negotiation And Formatting
 
-If you're using `res.send()` restify will automatically select the content-type
-to respond with, by finding the first registered `formatter` defined.  Note in
-the examples above we've not defined any formatters, so we've been leveraging
-the fact that restify ships with `application/json`, `text/plain` and
+If you're using `res.send()` restify will determine the content-type to respond
+with by, from highest priority to lowest priority:
+
+1. using the value of `res.contentType` if present
+1. otherwise, using the value of the `Content-Type` response header if set
+1. otherwise, using `application/json` if the body is an object that is not a
+   Buffer instance
+1. otherwise, negotiating the content-type by matching available formatters with
+   the request's `accept` header
+
+If a content-type can't be determined, then restify will respond with an error.
+
+If a content-type can be negotiated, restify then determines what formatter to
+use to format the response's content.
+
+If no formatter matching the content-type can be found, restify will by default
+override the response's content-type to `'application/octet-stream'` and then
+error if no formatter is found for that content-type.
+
+This default behavior can be changed by passing `strictFormatters: false`
+(default is false) when creating the restify server instance. In that case, if
+no formatter is found for the negotiated content-type, the response is flushed
+without applying any formatter.
+
+Note in the examples above we've not defined any formatters, so we've been
+leveraging the fact that restify ships with `application/json`, `text/plain` and
 `application/octet-stream` formatters. You can add additional formatters to
 restify by passing in a hash of content-type -> parser at server creation time:
 
@@ -460,9 +482,8 @@ var server = restify.createServer({
 });
 ```
 
-If a content-type can't be negotiated, then restify will default to using the
-`application/octet-stream` formatter. For example, attempting to send a
-content-type that does not have a defined formatter:
+For example, attempting to send a content-type that does not have a defined
+formatter:
 
 ```js
 server.get('/foo', function(req, res, next) {
@@ -478,6 +499,26 @@ Will result in a response with a content-type of `application/octet-stream`:
 $ curl -i localhost:3000/
 HTTP/1.1 200 OK
 Content-Type: application/octet-stream
+Content-Length: 2
+Date: Thu, 02 Jun 2016 06:50:54 GMT
+Connection: keep-alive
+```
+
+However, if the server instance is created with `strictFormatters:false`:
+
+```js
+var server = restify.createServer({
+  strictFormatters: false
+});
+```
+
+The response would has a content-type of `text/css` even though no `'text/css'`
+formatter is present:
+
+```sh
+$ curl -i localhost:3000/
+HTTP/1.1 200 OK
+Content-Type: text/css
 Content-Length: 2
 Date: Thu, 02 Jun 2016 06:50:54 GMT
 Connection: keep-alive
@@ -504,6 +545,14 @@ restify.createServer({
   }
 });
 ```
+
+Restify ships with the following default formatters, which can be overridden
+when passing a formatters options to `createServer()`:
+
+* application/javascript
+* application/json
+* text/plain
+* application/octet-stream
 
 The restify response object retains has all the "raw" methods of a node
 [ServerResponse](http://nodejs.org/docs/latest/api/http.html#http.ServerResponse)

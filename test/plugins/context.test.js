@@ -62,6 +62,15 @@ describe('accept parser', function() {
                     b: 2
                 });
                 assert.deepEqual(req.get('bar'), [1]);
+
+                assert.deepEqual(req.getAll(), {
+                    foo: {
+                        a: 1,
+                        b: 2
+                    },
+                    bar: [1]
+                });
+
                 res.send();
                 return next();
             }
