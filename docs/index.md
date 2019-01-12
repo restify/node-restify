@@ -358,7 +358,7 @@ creation time.  Lastly, you can support multiple versions in the API by using
 an array:
 
 ```js
-server.get('/hello/:name' restify.plugins.conditionalHandler([
+server.get('/hello/:name', restify.plugins.conditionalHandler([
   { version: ['2.0.0', '2.1.0', '2.2.0'], handler: sendV2 }
 ]));
 ```
