@@ -77,6 +77,11 @@ routes and handlers for incoming requests.
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
     -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
+    -   `options.strictFormatters` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enables strict formatters
+        behavior: a formatter matching the response's content-type is required. If
+        not found, the response's content-type is automatically set to
+        'application/octet-stream'. If a formatter for that content-type is not
+        found, sending the response errors. (optional, default `true`)
 
 **Examples**
 
@@ -137,6 +142,11 @@ Creates a new Server.
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
     -   `options.ignoreTrailingSlash` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** ignore trailing slash
         on paths (optional, default `false`)
+    -   `options.strictFormatters` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** enables strict formatters
+        behavior: a formatter matching the response's content-type is required. If
+        not found, the response's content-type is automatically set to
+        'application/octet-stream'. If a formatter for that content-type is not
+        found, sending the response errors. (optional, default `true`)
 
 **Examples**
 
