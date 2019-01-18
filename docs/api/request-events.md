@@ -7,7 +7,7 @@ restify considers a request to be fully serviced when either:
 2) An error was returned to `next()`, and the corresponding error events have
    been fired for that error type
 
-The signature is for the `restifyDone` event is as follows:
+The signature for the `restifyDone` event is as follows:
 
 ```js
 function(route, error) { }
