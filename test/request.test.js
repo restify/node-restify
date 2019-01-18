@@ -223,3 +223,24 @@ test('should provide date when request started', function(t) {
         t.end();
     });
 });
+
+// restifyDone is emitted at the same time when server's after event is emitted,
+// you can find more comprehensive testing for `after` lives in server tests.
+test('should emit restifyDone event when request is fully served', function(t) {
+    var clientDone = false;
+
+    SERVER.get('/', function(req, res, next) {
+        res.send('hello');
+        req.on('restifyDone', function() {
+            t.ok(clientDone);
+            t.end();
+        });
+        return next();
+    });
+
+    CLIENT.get('/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        clientDone = true;
+    });
+});
