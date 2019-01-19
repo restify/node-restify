@@ -1,3 +1,12 @@
+<a name="7.6.0"></a>
+## 7.6.0 (2019-01-18)
+
+
+#### Features
+
+* **req:** add restifyDone event (#1740) ([4900d6bd](git://github.com/restify/node-restify.git/commit/4900d6bd))
+
+
 <a name="7.5.0"></a>
 ## 7.5.0 (2019-01-09)
 

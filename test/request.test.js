@@ -223,3 +223,55 @@ test('should provide date when request started', function(t) {
         t.end();
     });
 });
+
+// restifyDone is emitted at the same time when server's after event is emitted,
+// you can find more comprehensive testing for `after` lives in server tests.
+test('should emit restifyDone event when request is fully served', function(t) {
+    var clientDone = false;
+
+    SERVER.get('/', function(req, res, next) {
+        req.on('restifyDone', function(route, err) {
+            t.ifError(err);
+            t.ok(route);
+            setImmediate(function() {
+                t.ok(clientDone);
+                t.end();
+            });
+        });
+
+        res.send('hello');
+        return next();
+    });
+
+    CLIENT.get('/', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        clientDone = true;
+    });
+});
+
+// eslint-disable-next-line max-len
+test('should emit restifyDone event when request is fully served with error', function(t) {
+    var clientDone = false;
+
+    SERVER.get('/', function(req, res, next) {
+        var myErr = new Error('My Error');
+
+        req.on('restifyDone', function(route, err) {
+            t.ok(route);
+            t.deepEqual(err, myErr);
+            setImmediate(function() {
+                t.ok(clientDone);
+                t.end();
+            });
+        });
+
+        return next(myErr);
+    });
+
+    CLIENT.get('/', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        clientDone = true;
+    });
+});

@@ -1,4 +1,6 @@
 toc:
   - Request
+  - name: Events
+    file: ../api/server-events.md
   - name: Log
     file: ../api/request-log.md
