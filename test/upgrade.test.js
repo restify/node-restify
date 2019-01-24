@@ -304,12 +304,7 @@ test('GET with upgrade headers', function(t) {
             t.equal(typeof socket, 'object');
             t.ok(Buffer.isBuffer(head), 'head is Buffer');
             t.doesNotThrow(function() {
-                var shed = WATERSHED.connect(
-                    res,
-                    socket,
-                    head,
-                    wskey
-                );
+                var shed = WATERSHED.connect(res, socket, head, wskey);
                 SHEDLIST.push(shed);
                 shed.end('ok, done');
                 shed.on('error', function(err3) {
@@ -380,12 +375,7 @@ test('GET with some websocket traffic', function(t) {
             t.equal(typeof socket, 'object');
             t.ok(Buffer.isBuffer(head), 'head is Buffer');
             t.doesNotThrow(function() {
-                var shed = WATERSHED.connect(
-                    res,
-                    socket,
-                    head,
-                    wskey
-                );
+                var shed = WATERSHED.connect(res, socket, head, wskey);
                 SHEDLIST.push(shed);
                 shed.on('error', function(err3) {
                     t.ifError(err3);
