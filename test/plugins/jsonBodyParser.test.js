@@ -413,6 +413,44 @@ describe('JSON body parser', function() {
         client.end();
     });
 
+    it('dynamic max body size', function(done) {
+        // Set this to a value that shouldn't shed load
+        var bodyParserOpts = {
+            maxBodySize: 100000
+        };
+
+        SERVER.use(restify.plugins.bodyParser(bodyParserOpts));
+
+        // Update the value to something that will shed load and validate the
+        // plugin honors the new value
+        bodyParserOpts.maxBodySize = 1024;
+
+        SERVER.post('/', function(req, res, next) {
+            res.send(200, { length: req.body.length });
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/',
+            method: 'POST',
+            agent: false,
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/x-www-form-urlencoded',
+                'transfer-encoding': 'chunked'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 413);
+            res.once('end', done);
+            res.resume();
+        });
+        client.write(new Array(1028).join('x'));
+        client.end();
+    });
+
     it('restify-GH-149 limit request body size (json)', function(done) {
         SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
 
