@@ -19,7 +19,6 @@
 #
 ESLINT		:= ./node_modules/.bin/eslint
 DOCUMENTATION		:= ./node_modules/.bin/documentation
-NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
@@ -62,10 +61,6 @@ CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 test: $(NODEUNIT)
 	$(NODEUNIT) test/*.test.js
 	$(MOCHA) test/plugins/*.test.js
-
-.PHONY: nsp
-nsp: node_modules $(NSP)
-	@($(NSP) check) | true
 
 .PHONY: docs-build
 docs-build:
