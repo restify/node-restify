@@ -19,7 +19,6 @@
 #
 ESLINT		:= ./node_modules/.bin/eslint
 DOCUMENTATION		:= ./node_modules/.bin/documentation
-NSP		:= ./node_modules/.bin/nsp
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
 NODECOVER	:= ./node_modules/.bin/cover
@@ -63,10 +62,6 @@ test: $(NODEUNIT)
 	$(NODEUNIT) test/*.test.js
 	$(MOCHA) test/plugins/*.test.js
 
-.PHONY: nsp
-nsp: node_modules $(NSP)
-	@($(NSP) check) | true
-
 .PHONY: docs-build
 docs-build:
 	@($(NODE) $(DOCS_BUILD))
@@ -74,6 +69,10 @@ docs-build:
 .PHONY: benchmark
 benchmark:
 	@(cd ./benchmark && $(NPM) i && $(NODE) index.js)
+
+.PHONY: audit
+audit:
+	@($(NPM) audit || true)
 
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ
