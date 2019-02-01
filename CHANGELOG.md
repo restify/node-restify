@@ -1,3 +1,19 @@
+<a name="7.7.0"></a>
+## 7.7.0 (2019-02-01)
+
+
+#### Bug Fixes
+
+* **dev:**
+  * remove nsp since the project merged with npm ([1dc34b48](git://github.com/restify/node-restify.git/commit/1dc34b48))
+  * pin to exact versions of linting tools and fix lint errors ([3740a6b7](git://github.com/restify/node-restify.git/commit/3740a6b7))
+
+
+#### Features
+
+* **audit:** Add the ability to specify a custom audit log serializer (for err, req and res)  ([6231acda](git://github.com/restify/node-restify.git/commit/6231acda))
+
+
 <a name="7.6.0"></a>
 ## 7.6.0 (2019-01-18)
 
