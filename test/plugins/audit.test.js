@@ -165,6 +165,52 @@ describe('audit logger', function() {
         });
     });
 
+    it('test custom serializers', function(done) {
+        // Dirty hack to capture the log record using a ring buffer.
+        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: bunyan.createLogger({
+                    name: 'audit',
+                    streams: [
+                        {
+                            level: 'info',
+                            type: 'raw',
+                            stream: ringbuffer
+                        }
+                    ]
+                }),
+                event: 'after',
+                serializers: {
+                    req: function(req) {
+                        return { fooReq: 'barReq' };
+                    },
+                    res: function(res) {
+                        return { fooRes: 'barRes' };
+                    }
+                }
+            })
+        );
+
+        SERVER.get('/audit', function aTestHandler(req, res, next) {
+            res.send('');
+            return next();
+        });
+
+        SERVER.on('after', function() {
+            var record = ringbuffer.records && ringbuffer.records[0];
+            assert.equal(record.req.fooReq, 'barReq');
+            assert.equal(record.res.fooRes, 'barRes');
+            done();
+        });
+
+        CLIENT.get('/audit', function(err, req, res) {
+            assert.ifError(err);
+        });
+    });
+
     it('should log handler timers', function(done) {
         // Dirty hack to capture the log record using a ring buffer.
         var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
