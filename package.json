@@ -41,7 +41,7 @@
     "async": "0.1.22",
     "bunyan": "0.10.0",
     "byline": "2.0.2",
-    "formidable": "1.0.11",
+    "formidable": "1.0.17",
     "dtrace-provider": "0.2.8",
     "http-signature": "0.9.9",
     "lru-cache": "1.1.0",
