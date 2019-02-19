@@ -321,17 +321,11 @@ describe('static resource plugin', function() {
                     });
                 });
 
-                socket.connect(
-                    { host: '127.0.0.1', port: PORT },
-                    function() {
-                        socket.write(RAW_REQUEST, 'utf-8', function(
-                            err2,
-                            data
-                        ) {
-                            assert.ifError(err2);
-                        });
-                    }
-                );
+                socket.connect({ host: '127.0.0.1', port: PORT }, function() {
+                    socket.write(RAW_REQUEST, 'utf-8', function(err2, data) {
+                        assert.ifError(err2);
+                    });
+                });
             });
         }
     );
@@ -369,18 +363,12 @@ describe('static resource plugin', function() {
                 });
 
                 var socket = new net.Socket();
-                socket.connect(
-                    { host: '127.0.0.1', port: PORT },
-                    function() {
-                        socket.write(RAW_REQUEST, 'utf-8', function(
-                            err2,
-                            data
-                        ) {
-                            assert.ifError(err2);
-                            socket.end();
-                        });
-                    }
-                );
+                socket.connect({ host: '127.0.0.1', port: PORT }, function() {
+                    socket.write(RAW_REQUEST, 'utf-8', function(err2, data) {
+                        assert.ifError(err2);
+                        socket.end();
+                    });
+                });
             });
         }
     );
