@@ -1,7 +1,8 @@
 sudo: false
 language: node_js
 node_js:
-   - "4"                    # Maintenance LTS release
+   - '8'
+   - '10'
    - "lts/*"                # Active LTS release
    - "node"                 # Latest stable release
 env:

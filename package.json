@@ -90,7 +90,7 @@
     "report-latency": "./bin/report-latency"
   },
   "engines": {
-    "node": ">=4.0"
+    "node": ">=8.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
@@ -98,10 +98,10 @@
     "csv": "^1.1.1",
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
-    "find-my-way": "^1.13.0",
+    "find-my-way": "^2.0.1",
     "formidable": "^1.2.1",
     "http-signature": "^1.2.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "lru-cache": "^4.1.3",
     "mime": "^1.5.0",
     "negotiator": "^0.6.1",

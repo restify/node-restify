@@ -82,6 +82,19 @@ client.get('/echo/mark', function (err, req, res, obj) {
 ```bash
 $ npm install restify
 ```
+
+## Supported Node Versions
+
+Restify aims to support the Node.js LTS (Active and Maintenance) versions along with Node.js current stable version.
+
+| Node Release  | Supported in Current Version | Notes    |
+| :--:     | :---: | :---:       | 
+| 11.x | **Yes**      | Current stable | 
+| 10.x | **Yes**      | Active LTS | 
+| 8.x  | **Yes** | Maintenance LTS  | 
+| 6.x  | **No** | Use restify v7.x, team will backport critical issues only   | 
+| 4.x  | **No** | Use restify v7.x, team will backport critical issues only  | 
+
 ## License
 
 The MIT License (MIT)
