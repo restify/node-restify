@@ -1,5 +1,8 @@
 <a name="8.0.0"></a>
 ## 8.0.0 (2019-02-20)
+#### Breaking Changes
+
+* Dropped Support for Node v4.x and Node v6.x
 
 
 <a name="7.7.0"></a>
