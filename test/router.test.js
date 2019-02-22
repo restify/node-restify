@@ -373,7 +373,7 @@ test('toString() with ignoreTrailingSlash', function(t) {
 });
 
 // Tests router.render()
-let mockResponse = function respond(req, res, next) {
+var mockResponse = function respond(req, res, next) {
     res.send(200);
 };
 
