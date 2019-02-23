@@ -7,39 +7,40 @@ permalink: /docs/plugins-api/
 
 ### Table of Contents
 
--   [Usage](#usage)
--   [server.pre() plugins](#serverpre-plugins)
-    -   [context](#context)
-    -   [dedupeSlashes](#dedupeslashes)
-    -   [pause](#pause)
-    -   [sanitizePath](#sanitizepath)
-    -   [reqIdHeaders](#reqidheaders)
-    -   [strictQueryParams](#strictqueryparams)
-    -   [userAgentConnection](#useragentconnection)
--   [server.use() plugins](#serveruse-plugins)
-    -   [acceptParser](#acceptparser)
-    -   [authorizationParser](#authorizationparser)
-    -   [dateParser](#dateparser)
-    -   [queryParser](#queryparser)
-    -   [jsonp](#jsonp)
-    -   [bodyParser](#bodyparser)
-    -   [requestLogger](#requestlogger)
-    -   [gzipResponse](#gzipresponse)
-    -   [serveStatic](#servestatic)
-    -   [throttle](#throttle)
-    -   [requestExpiry](#requestexpiry)
-        -   [Using an external storage mechanism for key/bucket mappings.](#using-an-external-storage-mechanism-for-keybucket-mappings)
-    -   [inflightRequestThrottle](#inflightrequestthrottle)
-    -   [cpuUsageThrottle](#cpuusagethrottle)
-    -   [conditionalHandler](#conditionalhandler)
-    -   [conditionalRequest](#conditionalrequest)
-    -   [auditLogger](#auditlogger)
-    -   [metrics](#metrics)
--   [Types](#types)
-    -   [metrics~callback](#metricscallback)
--   [req.set](#reqset)
--   [req.get](#reqget)
--   [req.getAll](#reqgetall)
+-   [Usage][1]
+-   [server.pre() plugins][2]
+    -   [context][3]
+    -   [dedupeSlashes][4]
+    -   [pause][5]
+    -   [sanitizePath][6]
+    -   [reqIdHeaders][7]
+    -   [strictQueryParams][8]
+    -   [userAgentConnection][9]
+-   [server.use() plugins][10]
+    -   [acceptParser][11]
+    -   [authorizationParser][12]
+    -   [dateParser][13]
+    -   [queryParser][14]
+    -   [jsonp][15]
+    -   [bodyParser][16]
+    -   [requestLogger][17]
+    -   [gzipResponse][18]
+    -   [serveStatic][19]
+    -   [serveStaticFiles][20]
+    -   [throttle][21]
+    -   [requestExpiry][22]
+        -   [Using an external storage mechanism for key/bucket mappings.][23]
+    -   [inflightRequestThrottle][24]
+    -   [cpuUsageThrottle][25]
+    -   [conditionalHandler][26]
+    -   [conditionalRequest][27]
+    -   [auditLogger][28]
+    -   [metrics][29]
+-   [Types][30]
+    -   [metrics~callback][31]
+-   [req.set][32]
+-   [req.get][33]
+-   [req.getAll][34]
 
 ## Usage
 
@@ -99,7 +100,7 @@ server.get('/', [
 ]);
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### dedupeSlashes
 
@@ -118,24 +119,24 @@ server.get('/hello/:one', function(req, res, next) {
 // the server will now convert requests to /hello//jake => /hello/jake
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### pause
 
 This pre handler fixes issues with node hanging when an `asyncHandler` is
 used prior to `bodyParser`.
-<https://github.com/restify/node-restify/issues/287>
-<https://github.com/restify/node-restify/issues/409>
-<https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips>
+[https://github.com/restify/node-restify/issues/287][36]
+[https://github.com/restify/node-restify/issues/409][37]
+[https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips][38]
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### sanitizePath
 
 Cleans up sloppy URLs on the request object,
 like `/foo////bar///` to `/foo/bar`.
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### reqIdHeaders
 
@@ -145,12 +146,12 @@ will return the header values.
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
-    -   `opts.headers` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** array of headers from where to pull existing
+-   `opts` **[Object][39]** an options object
+    -   `opts.headers` **[Array][40]&lt;[String][41]>** array of headers from where to pull existing
                                        request id headers. Lookup precedence
                                        is left to right (lowest index first)
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### strictQueryParams
 
@@ -168,12 +169,12 @@ RFC 2616 Fielding, et al.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.message` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** a custom error message
+-   `options` **[Object][39]?** an options object
+    -   `options.message` **[String][41]?** a custom error message
                                      default value:
                                      "Url query params does not meet strict format"
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### userAgentConnection
 
@@ -192,11 +193,11 @@ agent regexp, however.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.userAgentRegExp` **[RegExp](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp)** matching any
+-   `options` **[Object][39]?** an options object
+    -   `options.userAgentRegExp` **[RegExp][42]** matching any
                                                                user-agents applicable (optional, default `/^curl.+/`)
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ## server.use() plugins
 
@@ -216,7 +217,7 @@ Note you can get the set of types allowed from a restify server by doing
 
 **Parameters**
 
--   `accepts` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>** array of accept types.
+-   `accepts` **[Array][40]&lt;[String][41]>** array of accept types.
 
 **Examples**
 
@@ -226,25 +227,28 @@ server.use(restify.plugins.acceptParser(server.acceptable));
 
 -   Throws **NotAcceptableError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** restify handler.
+Returns **[Function][35]** restify handler.
 
 ### authorizationParser
 
 Parses out the `Authorization` header as best restify can.
 Currently only HTTP Basic Auth and
-[HTTP Signature](https://github.com/joyent/node-http-signature)
+[HTTP Signature][43]
 schemes are supported.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an optional options object that is
+-   `options` **[Object][39]?** an optional options object that is
                                    passed to http-signature
 
 **Examples**
 
-_Subsequent handlers will see `req.authorization`, which looks like above.`req.username` will also be set, and defaults to 'anonymous'.  If the scheme
+Subsequent handlers will see `req.authorization`, which looks like above.
+
+`req.username` will also be set, and defaults to 'anonymous'.  If the scheme
 is unrecognized, the only thing available in `req.authorization` will be
-`scheme` and `credentials` - it will be up to you to parse out the rest._
+`scheme` and `credentials` - it will be up to you to parse out the rest.
+
 
 ```javascript
 {
@@ -259,7 +263,7 @@ is unrecognized, the only thing available in `req.authorization` will be
 
 -   Throws **InvalidArgumentError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### dateParser
 
@@ -274,7 +278,7 @@ Kerberos!)
 
 **Parameters**
 
--   `clockSkew` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** allowed clock skew in seconds. (optional, default `300`)
+-   `clockSkew` **[Number][44]** allowed clock skew in seconds. (optional, default `300`)
 
 **Examples**
 
@@ -286,7 +290,7 @@ server.use(restify.plugins.dateParser(60));
 -   Throws **RequestExpiredError** 
 -   Throws **InvalidHeaderError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** restify handler.
+Returns **[Function][35]** restify handler.
 
 ### queryParser
 
@@ -296,32 +300,32 @@ additionally params are merged into `req.params`.
 You can disable by passing in `mapParams: false` in the options object.
 
 Many options correspond directly to option defined for the underlying
-[`qs.parse`](https://github.com/ljharb/qs).
+[`qs.parse`][45].
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.mapParams` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** disable passing (optional, default `true`)
-    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Copies parsed query parameters
+-   `options` **[Object][39]?** an options object
+    -   `options.mapParams` **[Object][39]** disable passing (optional, default `true`)
+    -   `options.mapParams` **[Boolean][46]** Copies parsed query parameters
         into`req.params`. (optional, default `false`)
-    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Only applies when if
+    -   `options.overrideParams` **[Boolean][46]** Only applies when if
         mapParams true.
         When true, will stomp on req.params field when existing value is found. (optional, default `false`)
-    -   `options.allowDots` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Transform `?foo.bar=baz` to a
+    -   `options.allowDots` **[Boolean][46]** Transform `?foo.bar=baz` to a
         nested object: `{foo: {bar: 'baz'}}`. (optional, default `false`)
-    -   `options.arrayLimit` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Only transform `?a[$index]=b`
+    -   `options.arrayLimit` **[Number][44]** Only transform `?a[$index]=b`
         to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
-    -   `options.depth` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** The depth limit for parsing
+    -   `options.depth` **[Number][44]** The depth limit for parsing
         nested objects, e.g. `?a[b][c][d][e][f][g][h][i]=j`. (optional, default `5`)
-    -   `options.parameterLimit` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Maximum number of query
+    -   `options.parameterLimit` **[Number][44]** Maximum number of query
         params parsed. Additional params are silently dropped. (optional, default `1000`)
-    -   `options.parseArrays` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether to parse
+    -   `options.parseArrays` **[Boolean][46]** Whether to parse
         `?a[]=b&a[1]=c` to an array, e.g. `{a: ['b', 'c']}`. (optional, default `true`)
-    -   `options.plainObjects` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether `req.query` is a
+    -   `options.plainObjects` **[Boolean][46]** Whether `req.query` is a
         "plain" object -- does not inherit from `Object`.
         This can be used to allow query params whose names collide with Object
         methods, e.g. `?hasOwnProperty=blah`. (optional, default `false`)
-    -   `options.strictNullHandling` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If true, `?a&b=`
+    -   `options.strictNullHandling` **[Boolean][46]** If true, `?a&b=`
         results in `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`. (optional, default `false`)
 
 **Examples**
@@ -330,7 +334,7 @@ Many options correspond directly to option defined for the underlying
 server.use(restify.plugins.queryParser({ mapParams: false }));
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### jsonp
 
@@ -349,7 +353,7 @@ var server = restify.createServer();
 server.use(restify.plugins.jsonp());
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### bodyParser
 
@@ -375,57 +379,57 @@ All bodyParsers support the following options:
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an option object
-    -   `options.maxBodySize` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The maximum size in bytes allowed in
+-   `options` **[Object][39]?** an option object
+    -   `options.maxBodySize` **[Number][44]?** The maximum size in bytes allowed in
         the HTTP body. Useful for limiting clients from hogging server memory.
-    -   `options.mapParams` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with
+    -   `options.mapParams` **[Boolean][46]?** if `req.params` should be filled with
         parsed parameters from HTTP body.
-    -   `options.mapFiles` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if `req.params` should be filled with
+    -   `options.mapFiles` **[Boolean][46]?** if `req.params` should be filled with
         the contents of files sent through a multipart request.
-        [formidable](https://github.com/felixge/node-formidable) is used internally
+        [formidable][47] is used internally
         for parsing, and a file is denoted as a multipart part with the `filename`
         option set in its `Content-Disposition`. This will only be performed if
         `mapParams` is true.
-    -   `options.overrideParams` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if an entry in `req.params`
+    -   `options.overrideParams` **[Boolean][46]?** if an entry in `req.params`
         should be overwritten by the value in the body if the names are the same.
         For instance, if you have the route `/:someval`,
         and someone posts an `x-www-form-urlencoded`
         Content-Type with the body `someval=happy` to `/sad`, the value will be
         `happy` if `overrideParams` is `true`, `sad` otherwise.
-    -   `options.multipartHandler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any
+    -   `options.multipartHandler` **[Function][35]?** a callback to handle any
         multipart part which is not a file.
         If this is omitted, the default handler is invoked which may
         or may not map the parts into `req.params`, depending on
         the `mapParams`-option.
-    -   `options.multipartFileHandler` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** a callback to handle any
+    -   `options.multipartFileHandler` **[Function][35]?** a callback to handle any
         multipart file.
         It will be a file if the part has a `Content-Disposition` with the
         `filename` parameter set. This typically happens when a browser sends a
         form and there is a parameter similar to `<input type="file" />`.
         If this is not provided, the default behaviour is to map the contents
         into `req.params`.
-    -   `options.keepExtensions` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want the uploaded
+    -   `options.keepExtensions` **[Boolean][46]?** if you want the uploaded
         files to include the extensions of the original files
         (multipart uploads only).
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.uploadDir` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** Where uploaded files are
+    -   `options.uploadDir` **[String][41]?** Where uploaded files are
         intermediately stored during transfer before the contents is mapped
         into `req.params`.
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.multiples` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** if you want to support html5 multiple
+    -   `options.multiples` **[Boolean][46]?** if you want to support html5 multiple
         attribute in upload fields.
-    -   `options.hash` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** If you want checksums calculated for
+    -   `options.hash` **[String][41]?** If you want checksums calculated for
         incoming files, set this to either `sha1` or `md5`.
-    -   `options.rejectUnknown` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** Set to `true` if you want to end
+    -   `options.rejectUnknown` **[Boolean][46]?** Set to `true` if you want to end
         the request with a `UnsupportedMediaTypeError` when none of
         the supported content types was given.
-    -   `options.requestBodyOnGet` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)**  Parse body of a GET
+    -   `options.requestBodyOnGet` **[Boolean][46]**  Parse body of a GET
         request. (optional, default `false`)
-    -   `options.reviver` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** `jsonParser` only. If a function,
+    -   `options.reviver` **[Function][35]?** `jsonParser` only. If a function,
         this prescribes how the value originally produced by parsing is transformed,
         before being returned. For more information check out
         `JSON.parse(text[, reviver])`.
-    -   `options.maxFieldsSize` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** `multipartParser`
+    -   `options.maxFieldsSize` **[Number][44]** `multipartParser`
         only.
         Limits the amount of memory all fields together (except files)
         can allocate in bytes.
@@ -462,25 +466,25 @@ server.use(restify.plugins.bodyParser({
 
 -   Throws **UnsupportedMediaTypeError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### requestLogger
 
-Sets up a child [bunyan](https://github.com/trentm/node-bunyan) logger with
+Sets up a child [bunyan][48] logger with
 the current request id filled in, along with any other parameters you define.
 
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
-This logger can be used normally, with [req.log](#request-api).
+This logger can be used normally, with [req.log][49].
 
 This plugin does _not_ log each individual request. Use the Audit Logging
 plugin or a custom middleware for that use.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object
-    -   `options.headers` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)?** A list of headers to transfer from
+-   `options` **[Object][39]?** an options object
+    -   `options.headers` **[Array][40]?** A list of headers to transfer from
                                          the request to top level props on the log.
 
 **Examples**
@@ -494,7 +498,7 @@ server.use(restify.plugins.requestLogger({
 }));
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### gzipResponse
 
@@ -510,11 +514,11 @@ that the `content-length` header cannot be known, and so
 This plugin has no impact if the client does not send
 `accept-encoding: gzip`.
 
-<https://github.com/restify/node-restify/issues/284>
+[https://github.com/restify/node-restify/issues/284][50]
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** an options object, see: zlib.createGzip
+-   `opts` **[Object][39]?** an options object, see: zlib.createGzip
 
 **Examples**
 
@@ -522,7 +526,7 @@ This plugin has no impact if the client does not send
 server.use(restify.plugins.gzipResponse());
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### serveStatic
 
@@ -530,12 +534,13 @@ Serves static files.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
+-   `options` **[Object][39]** an options object
 
 **Examples**
 
-_The serveStatic module is different than most of the other plugins, in that
-it is expected that you are going to map it to a route, as below:_
+The serveStatic module is different than most of the other plugins, in that
+it is expected that you are going to map it to a route, as below:
+
 
 ```javascript
 server.get('/docs/current/*', restify.plugins.serveStatic({
@@ -544,13 +549,15 @@ server.get('/docs/current/*', restify.plugins.serveStatic({
 }));
 ```
 
-_The above `route` and `directory` combination will serve a file located in
+The above `route` and `directory` combination will serve a file located in
 `./documentation/v1/docs/current/index.html` when you attempt to hit
 `http://localhost:8080/docs/current/`. If you want the serveStatic module to
 serve files directly from the `/documentation/v1` directory
 (and not append the request path `/docs/current/`),
 you can set the `appendRequestPath` option to `false`, and the served file
-would be `./documentation/v1/index.html`, in the previous example.The plugin will enforce that all files under `directory` are served.
+would be `./documentation/v1/index.html`, in the previous example.
+
+The plugin will enforce that all files under `directory` are served.
 The `directory` served is relative to the process working directory.
 You can also provide a `default` parameter such as index.html for any
 directory that lacks a direct file match.
@@ -561,9 +568,12 @@ character set to the content-type detected by the plugin.
 For example, `charSet: 'utf-8'` will result in HTML being served with a
 `Content-Type` of `text/html; charset=utf-8`.
 Lastly, you can pass in a `maxAge` numeric, which will set the
-`Cache-Control` header. Default is `3600` (1 hour).An additional option for serving a static file is to pass `file` in to the
+`Cache-Control` header. Default is `3600` (1 hour).
+
+An additional option for serving a static file is to pass `file` in to the
 serveStatic method as an option. The following will serve index.html from
-the documentation/v1/ directory anytime a client requests `/home/`._
+the documentation/v1/ directory anytime a client requests `/home/`.
+
 
 ```javascript
 server.get('/home/*', restify.plugins.serveStatic({
@@ -581,7 +591,65 @@ server.get('/home/([a-z]+[.]html)', restify.plugins.serveStatic({
 -   Throws **NotAuthorizedError** 
 -   Throws **ResourceNotFoundError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
+
+### serveStaticFiles
+
+Serves static files, with API similar to expressjs
+
+**Parameters**
+
+-   `directory` **[String][41]** the directory to serve files from
+-   `opts` **[Object][39]** an options object, which is optional
+    -   `opts.maxAge` **[Number][44]** specify max age in millisecs (optional, default `0`)
+    -   `opts.etag` **[Boolean][46]** enable/disable etag, default = true (optional, default `true`)
+    -   `opts.setHeaders` **[Function][35]?** set custom headers for the Files
+        (synchronously), The function is called as `fn(res, path, stat)`,
+        where the arguments are:
+             `res` the response object
+             `path` the file path that is being sent
+             `stat` the stat object of the file that is being sent
+
+**Examples**
+
+The serveStaticFiles plugin allows you to map a GET route to a
+directory on the disk
+
+
+```javascript
+server.get('/public/*', // don't forget the `/*`
+     restify.plugins.serveStaticFiles('./documentation/v1')
+);
+```
+
+The GET `route` and `directory` combination will serve a file
+located in `./documentation/v1/index.html` when you attempt to hit
+`http://localhost:8080/public/index.html`
+
+The plugin uses [send][51] under the hood
+which is also used by `expressjs` to serve static files. Most of the options
+that work with `send` will work with this plugin.
+
+The default file the plugin looks for is `index.html`
+
+
+```javascript
+server.get('/public/*',
+     restify.plugins.serveStaticFiles('./documentation/v1', {
+     maxAge: 3600000, // this is in millisecs
+     etag: false,
+     setHeaders: function setCustomHeaders(response, requestedPath, stat) {
+             response.setHeader('restify-plugin-x', 'awesome');
+         }
+     })
+);
+```
+
+-   Throws **MethodNotAllowedError** 
+-   Throws **NotAuthorizedError** 
+-   Throws **ResourceNotFoundError** 
+
+Returns **[Function][35]** Handler
 
 ### throttle
 
@@ -589,7 +657,7 @@ Creates an API rate limiter that can be plugged into the standard
 restify request handling pipeline.
 
 `restify` ships with a fairly comprehensive implementation of
-[Token bucket](http://en.wikipedia.org/wiki/Token_bucket), with the ability
+[Token bucket][52], with the ability
 to throttle on IP (or x-forwarded-for) and username (from `req.username`).
 You define "global" request rate and burst rate, and you can define
 overrides for specific keys.
@@ -600,7 +668,7 @@ than `/my/fast/memcache`).
 
 If a client has consumed all of their available rate/burst, an HTTP response
 code of `429`
-[Too Many Requests](http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4)
+[Too Many Requests][53]
 is returned.
 
 This throttle gives you three options on which to throttle:
@@ -622,28 +690,29 @@ On the `options` object ip and username are treated as an XOR.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** required options with:
-    -   `options.burst` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** burst
-    -   `options.rate` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** rate
-    -   `options.ip` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** ip
-    -   `options.username` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** username
-    -   `options.xff` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)?** xff
-    -   `options.setHeaders` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Set response headers for rate,
+-   `options` **[Object][39]** required options with:
+    -   `options.burst` **[Number][44]** burst
+    -   `options.rate` **[Number][44]** rate
+    -   `options.ip` **[Boolean][46]?** ip
+    -   `options.username` **[Boolean][46]?** username
+    -   `options.xff` **[Boolean][46]?** xff
+    -   `options.setHeaders` **[Boolean][46]** Set response headers for rate,
                                       limit (burst) and remaining. (optional, default `false`)
-    -   `options.overrides` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** overrides
-    -   `options.tokensTable` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a storage engine this plugin will
+    -   `options.overrides` **[Object][39]?** overrides
+    -   `options.tokensTable` **[Object][39]** a storage engine this plugin will
                                      use to store throttling keys -> bucket mappings.
                                      If you don't specify this, the default is to
                                      use an in-memory O(1) LRU, with 10k distinct
                                      keys.  Any implementation just needs to support
                                      put/get.
-    -   `options.maxKeys` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** If using the default
+    -   `options.maxKeys` **[Number][44]** If using the default
                                      implementation, you can specify how large you
                                      want the table to be. (optional, default `10000`)
 
 **Examples**
 
-_An example options object with overrides:_
+An example options object with overrides:
+
 
 ```javascript
 {
@@ -660,7 +729,7 @@ _An example options object with overrides:_
 
 -   Throws **TooManyRequestsError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### requestExpiry
 
@@ -700,19 +769,20 @@ and/or uniform request distribution.  To enable this, you can pass in
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options object
-    -   `opts.absoluteHeader` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** The header key to be used for
+-   `opts` **[Object][39]** an options object
+    -   `opts.absoluteHeader` **[String][41]?** The header key to be used for
                                           the expiry time of each request.
-    -   `opts.startHeader` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The header key for the start time
+    -   `opts.startHeader` **[String][41]** The header key for the start time
                                           of the request.
-    -   `opts.timeoutHeader` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The header key for the time in
+    -   `opts.timeoutHeader` **[String][41]** The header key for the time in
                                           milliseconds that should ellapse before
                                           the request is considered expired.
 
 **Examples**
 
-_The only option provided is `header` which is the request header used
-to specify the client timeout._
+The only option provided is `header` which is the request header used
+to specify the client timeout.
+
 
 ```javascript
 server.use(restify.plugins.requestExpiry({
@@ -720,7 +790,7 @@ server.use(restify.plugins.requestExpiry({
 });
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### inflightRequestThrottle
 
@@ -738,12 +808,12 @@ using `pre` to avoid performing unnecessary work.
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** configure this plugin
-    -   `opts.limit` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** maximum number of inflight requests the server
+-   `opts` **[Object][39]** configure this plugin
+    -   `opts.limit` **[Number][44]** maximum number of inflight requests the server
            will handle before returning an error
-    -   `opts.err` **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** A restify error used as a response when the
+    -   `opts.err` **[Error][54]** A restify error used as a response when the
            inflight request limit is exceeded
-    -   `opts.server` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** the instance of the restify server this
+    -   `opts.server` **[Function][35]** the instance of the restify server this
            plugin will throttle.
 
 **Examples**
@@ -758,7 +828,7 @@ options.res = new errors.InternalServerError();
 server.pre(restify.plugins.inflightRequestThrottle(options));
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** middleware to be registered on server.pre
+Returns **[Function][35]** middleware to be registered on server.pre
 
 ### cpuUsageThrottle
 
@@ -804,18 +874,18 @@ for the ewma module.
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Configure this plugin.
-    -   `opts.limit` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will begin
+-   `opts` **[Object][39]** Configure this plugin.
+    -   `opts.limit` **[Number][44]?** The point at which restify will begin
            rejecting a % of all requests at the front door.
            This value is a percentage.
            For example 0.8 === 80% average CPU utilization. Defaults to 0.75.
-    -   `opts.max` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** The point at which restify will reject 100% of
+    -   `opts.max` **[Number][44]?** The point at which restify will reject 100% of
            all requests at the front door. This is used in conjunction with limit to
            determine what % of traffic restify needs to reject when attempting to
            bring the average load back to the user requested values. Since Node.js is
            single threaded, the default for this is 1. In some rare cases, a Node.js
            process can exceed 100% CPU usage and you will want to update this value.
-    -   `opts.interval` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** How frequently we calculate the average CPU
+    -   `opts.interval` **[Number][44]?** How frequently we calculate the average CPU
            utilization. When we calculate an average CPU utilization, we calculate it
            over this interval, and this drives whether or not we should be shedding
            load. This can be thought of as a "resolution" where the lower this value,
@@ -823,7 +893,7 @@ for the ewma module.
            we will recalculate the % of traffic we should be shedding. This check
            is rather lightweight, while the default is 250ms, you should be able to
            decrease this value without seeing a significant impact to performance.
-    -   `opts.halfLife` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** When we sample the CPU usage on an
+    -   `opts.halfLife` **[Number][44]?** When we sample the CPU usage on an
            interval, we create a series of data points.
            We take these points and calculate a
            moving average. The halfLife indicates how quickly a point "decays" to
@@ -850,8 +920,9 @@ const options = {
 server.pre(restify.plugins.cpuUsageThrottle(options));
 ```
 
-_You can also update the plugin during runtime using the `.update()` function.
-This function accepts the same `opts` object as a constructor._
+You can also update the plugin during runtime using the `.update()` function.
+This function accepts the same `opts` object as a constructor.
+
 
 ```javascript
 var plugin = restify.plugins.cpuUsageThrottle(options);
@@ -860,7 +931,7 @@ server.pre(plugin);
 plugin.update({ limit: .4, halfLife: 5000 });
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** middleware to be registered on server.pre
+Returns **[Function][35]** middleware to be registered on server.pre
 
 ### conditionalHandler
 
@@ -868,10 +939,10 @@ Runs first handler that matches to the condition
 
 **Parameters**
 
--   `candidates` **([Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>)** candidates
-    -   `candidates.handler` **([Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)>)** handler(s)
-    -   `candidates.version` **([String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) \| [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)>)?** '1.1.0', ['1.1.0', '1.2.0']
-    -   `candidates.contentType` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** accepted content type, '\*\\/json'
+-   `candidates` **([Object][39] \| [Array][40]&lt;[Object][39]>)** candidates
+    -   `candidates.handler` **([Function][35] \| [Array][40]&lt;[Function][35]>)** handler(s)
+    -   `candidates.version` **([String][41] \| [Array][40]&lt;[String][41]>)?** '1.1.0', ['1.1.0', '1.2.0']
+    -   `candidates.contentType` **[String][41]?** accepted content type, '\*\\/json'
 
 **Examples**
 
@@ -920,7 +991,7 @@ server.get('/hello/:name', restify.plugins.conditionalHandler([
 -   Throws **InvalidVersionError** 
 -   Throws **UnsupportedMediaTypeError** 
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### conditionalRequest
 
@@ -967,30 +1038,33 @@ server.get('/hello/:name', function(req, res, next) {
 -   Throws **BadRequestError** 
 -   Throws **PreconditionFailedError** 
 
-Returns **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)>** Handlers
+Returns **[Array][40]&lt;[Function][35]>** Handlers
 
 ### auditLogger
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** The options object.
-    -   `opts.log` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** The logger.
-    -   `opts.event` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The event from the server which initiates the
+-   `opts` **[Object][39]** The options object.
+    -   `opts.log` **[Object][39]** The logger.
+    -   `opts.event` **[String][41]** The event from the server which initiates the
         log, one of 'pre', 'routed', or 'after'
-    -   `opts.context` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)?** The optional context function of signature
+    -   `opts.context` **[Function][35]?** The optional context function of signature
         f(req, res, route, err).  Invoked each time an audit log is generated. This
         function can return an object that customizes the format of anything off the
         req, res, route, and err objects. The output of this function will be
         available on the `context` key in the audit object.
-    -   `opts.server` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** The restify server, used to emit
+    -   `opts.server` **[Object][39]?** The restify server, used to emit
         the audit log object programmatically
-    -   `opts.printLog` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** Whether to print the log
+    -   `opts.printLog` **[boolean][46]** Whether to print the log
         via the logger. (optional, default `true`)
+    -   `opts.serializers` **[Object][39]?** Override the default logger serializers
+        for err, req and res
 
 **Examples**
 
-_Audit logging is a special plugin, as you don't use it with `.use()`
-but with the `after` event:_
+Audit logging is a special plugin, as you don't use it with `.use()`
+but with the `after` event:
+
 
 ```javascript
 server.on('after', restify.plugins.auditLogger({
@@ -1005,10 +1079,11 @@ server.on('after', restify.plugins.auditLogger({
 }));
 ```
 
-_You pass in the auditor a bunyan logger, optionally server object,
+You pass in the auditor a bunyan logger, optionally server object,
 Ringbuffer and a flag printLog indicate if log needs to be print out at info
 level or not.  By default, without specify printLog flag, it will write out
-record lookling like this:_
+record lookling like this:
+
 
 ```javascript
 {
@@ -1087,14 +1162,15 @@ record lookling like this:_
 }
 ```
 
-_The `timers` field shows the time each handler took to run in microseconds.
+The `timers` field shows the time each handler took to run in microseconds.
 Restify by default will record this information for every handler for each
 route. However, if you decide to include nested handlers, you can track the
 timing yourself by utilizing the Request
-[startHandlerTimer](#starthandlertimerhandlername) and
-[endHandlerTimer](#endhandlertimerhandlername) API.
+[startHandlerTimer][55] and
+[endHandlerTimer][56] API.
 You can also listen to auditlog event and get same above log object when
-log event emits. For example_
+log event emits. For example
+
 
 ```javascript
 SERVER.on('auditlog', function (data) {
@@ -1102,7 +1178,7 @@ SERVER.on('auditlog', function (data) {
 });
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** Handler
+Returns **[Function][35]** Handler
 
 ### metrics
 
@@ -1114,7 +1190,7 @@ about that request.
 
 **Parameters**
 
--   `opts` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an options obj
+-   `opts` **[Object][39]** an options obj
     -   `opts.server` **Server** restify server
 -   `callback` **createMetrics~callback** a callback fn
 
@@ -1127,7 +1203,7 @@ server.on('after', restify.plugins.metrics({ server: server },
 }));
 ```
 
-Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** returns a function suitable to be used
+Returns **[Function][35]** returns a function suitable to be used
   with restify server's `after` event
 
 ## Types
@@ -1139,33 +1215,33 @@ Returns **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference
 
 Callback used by metrics plugin
 
-Type: [Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)
+Type: [Function][35]
 
 **Parameters**
 
--   `err` **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** 
--   `metrics` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** metrics about the request
-    -   `metrics.statusCode` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** status code of the response. can be
+-   `err` **[Error][54]** 
+-   `metrics` **[Object][39]** metrics about the request
+    -   `metrics.statusCode` **[Number][44]** status code of the response. can be
           undefined in the case of an uncaughtException
-    -   `metrics.method` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** http request verb
-    -   `metrics.totalLatency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency includes both request is flushed
+    -   `metrics.method` **[String][41]** http request verb
+    -   `metrics.totalLatency` **[Number][44]** latency includes both request is flushed
                                              and all handlers finished
-    -   `metrics.latency` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** latency when request is flushed
-    -   `metrics.preLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** pre handlers latency
-    -   `metrics.useLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** use handlers latency
-    -   `metrics.routeLatency` **([Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number) | null)** route handlers latency
-    -   `metrics.path` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** `req.path()` value
-    -   `metrics.inflightRequests` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Number of inflight requests pending
+    -   `metrics.latency` **[Number][44]** latency when request is flushed
+    -   `metrics.preLatency` **([Number][44] | null)** pre handlers latency
+    -   `metrics.useLatency` **([Number][44] | null)** use handlers latency
+    -   `metrics.routeLatency` **([Number][44] | null)** route handlers latency
+    -   `metrics.path` **[String][41]** `req.path()` value
+    -   `metrics.inflightRequests` **[Number][44]** Number of inflight requests pending
           in restify.
-    -   `metrics.unifinishedRequests` **[Number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** Same as `inflightRequests`
-    -   `metrics.connectionState` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** can be either `'close'` or
+    -   `metrics.unifinishedRequests` **[Number][44]** Same as `inflightRequests`
+    -   `metrics.connectionState` **[String][41]** can be either `'close'` or
          `undefined`. If this value is set, err will be a
           corresponding `RequestCloseError`.
           If connectionState is either
           `'close'`, then the `statusCode` is not applicable since the
           connection was severed before a response was written.
--   `req` **[Request](https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request)** the request obj
--   `res` **[Response](https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5)** the response obj
+-   `req` **[Request][57]** the request obj
+-   `res` **[Response][58]** the response obj
 -   `route` **Route** the route obj that serviced the request
 
 ## req.set
@@ -1175,10 +1251,10 @@ Requires the context plugin.
 
 **Parameters**
 
--   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** key
+-   `key` **[String][41]** key
 -   `value` **any** value
 
-Returns **[undefined](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined)** no return value
+Returns **[undefined][59]** no return value
 
 ## req.get
 
@@ -1187,7 +1263,7 @@ Requires the context plugin.
 
 **Parameters**
 
--   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** key
+-   `key` **[String][41]** key
 
 Returns **any** value stored in context
 
@@ -1197,3 +1273,121 @@ Get all context
 Requires the context plugin.
 
 Returns **any** value stored in context
+
+[1]: #usage
+
+[2]: #serverpre-plugins
+
+[3]: #context
+
+[4]: #dedupeslashes
+
+[5]: #pause
+
+[6]: #sanitizepath
+
+[7]: #reqidheaders
+
+[8]: #strictqueryparams
+
+[9]: #useragentconnection
+
+[10]: #serveruse-plugins
+
+[11]: #acceptparser
+
+[12]: #authorizationparser
+
+[13]: #dateparser
+
+[14]: #queryparser
+
+[15]: #jsonp
+
+[16]: #bodyparser
+
+[17]: #requestlogger
+
+[18]: #gzipresponse
+
+[19]: #servestatic
+
+[20]: #servestaticfiles
+
+[21]: #throttle
+
+[22]: #requestexpiry
+
+[23]: #using-an-external-storage-mechanism-for-keybucket-mappings
+
+[24]: #inflightrequestthrottle
+
+[25]: #cpuusagethrottle
+
+[26]: #conditionalhandler
+
+[27]: #conditionalrequest
+
+[28]: #auditlogger
+
+[29]: #metrics
+
+[30]: #types
+
+[31]: #metricscallback
+
+[32]: #reqset
+
+[33]: #reqget
+
+[34]: #reqgetall
+
+[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[36]: https://github.com/restify/node-restify/issues/287
+
+[37]: https://github.com/restify/node-restify/issues/409
+
+[38]: https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips
+
+[39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[41]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[42]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+
+[43]: https://github.com/joyent/node-http-signature
+
+[44]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[45]: https://github.com/ljharb/qs
+
+[46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[47]: https://github.com/felixge/node-formidable
+
+[48]: https://github.com/trentm/node-bunyan
+
+[49]: #request-api
+
+[50]: https://github.com/restify/node-restify/issues/284
+
+[51]: https://github.com/pillarjs/send
+
+[52]: http://en.wikipedia.org/wiki/Token_bucket
+
+[53]: http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4
+
+[54]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[55]: #starthandlertimerhandlername
+
+[56]: #endhandlertimerhandlername
+
+[57]: https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request
+
+[58]: https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5
+
+[59]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined

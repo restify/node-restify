@@ -58,6 +58,7 @@ var docsConfig = [
             path.join(__dirname, LIB_PATH, 'plugins/bunyan.js'),
             path.join(__dirname, LIB_PATH, 'plugins/gzip.js'),
             path.join(__dirname, LIB_PATH, 'plugins/static.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/staticFiles.js'),
             path.join(__dirname, LIB_PATH, 'plugins/throttle.js'),
             path.join(__dirname, LIB_PATH, 'plugins/requestExpiry.js'),
             path.join(

@@ -25,6 +25,7 @@ toc:
       - requestLogger
       - gzipResponse
       - serveStatic
+      - serveStaticFiles
       - throttle
       - requestExpiry
       - inflightRequestThrottle
