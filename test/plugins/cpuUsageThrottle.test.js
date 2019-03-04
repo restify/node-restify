@@ -122,6 +122,8 @@ describe('cpuUsageThrottle', function() {
                     'Default shed status code returned'
                 );
                 clearTimeout(plugin._timeout);
+                // we should close the server else mocha wont exit
+                server.close();
                 done();
             });
         });
