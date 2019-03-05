@@ -10,7 +10,6 @@ var http = require('http');
 var stream = require('stream');
 
 var errors = require('restify-errors');
-// var filed = require('filed');
 var restifyClients = require('restify-clients');
 var uuid = require('uuid');
 
@@ -523,34 +522,6 @@ test('get (path and version ok)', function(t) {
         t.end();
     });
 });
-
-// `filed` library hasnt been updated for last 6 years
-// This test fails on upgrading the libs (like mime)
-// test('GH-56 streaming with filed (download)', function(t) {
-//     SERVER.get('/', function tester(req, res, next) {
-//         filed(__filename).pipe(res);
-//     });
-
-//     var opts = {
-//         hostname: '127.0.0.1',
-//         port: PORT,
-//         path: '/',
-//         method: 'GET',
-//         agent: false
-//     };
-//     http.request(opts, function(res) {
-//         t.equal(res.statusCode, 200);
-//         var body = '';
-//         res.setEncoding('utf8');
-//         res.on('data', function(chunk) {
-//             body += chunk;
-//         });
-//         res.on('end', function() {
-//             t.ok(body.length > 0);
-//             t.end();
-//         });
-//     }).end();
-// });
 
 test('GH-63 res.send 204 is sending a body', function(t) {
     SERVER.del('/hello/:name', function tester(req, res, next) {
