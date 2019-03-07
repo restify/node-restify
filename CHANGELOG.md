@@ -1,3 +1,18 @@
+<a name="8.1.0"></a>
+## 8.1.0 (2019-03-06)
+
+
+#### Bug Fixes
+
+* **dev:** upgrading modules including restify-errors (#1755) ([3b712298](git://github.com/restify/node-restify.git/commit/3b712298))
+
+
+#### Features
+
+* add router.render() back to support hypermedia usecase (#1752) ([0700cfd4](git://github.com/restify/node-restify.git/commit/0700cfd4), closes [#1684](git://github.com/restify/node-restify.git/issues/1684))
+* **plugin:** plugin to serve static files (#1753) ([a67b25f4](git://github.com/restify/node-restify.git/commit/a67b25f4))
+
+
 <a name="8.0.0"></a>
 ## 8.0.0 (2019-02-20)
 #### Breaking Changes
