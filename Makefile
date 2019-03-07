@@ -60,7 +60,7 @@ CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 .PHONY: test
 test: $(NODEUNIT)
 	$(NODEUNIT) test/*.test.js
-	$(MOCHA) test/plugins/*.test.js
+	$(MOCHA) --full-trace --no-exit test/plugins/*.test.js
 
 .PHONY: docs-build
 docs-build:
