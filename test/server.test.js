@@ -2683,24 +2683,3 @@ test('should have proxy event handlers as instance', function(t) {
         t.end();
     });
 });
-
-test('handle should invoke restify', function(t) {
-    var RESTIFY_SERVER = SERVER;
-    SERVER = http.createServer();
-    SERVER.on('request', function(req, res) {
-        return RESTIFY_SERVER.handle(req, res);
-    });
-    RESTIFY_SERVER.get('/', function(req, res, next) {
-        res.send(413);
-        next();
-    });
-    RESTIFY_SERVER.close(function() {
-        SERVER.listen(PORT, function() {
-            CLIENT.get('/', function(err, _, res) {
-                t.ok(err);
-                t.equal(res.statusCode, 413);
-                t.done();
-            });
-        });
-    });
-});
