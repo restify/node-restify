@@ -2505,9 +2505,10 @@ test('uncaughtException should handle thrown undefined literal', function(t) {
         }
     );
 
-    CLIENT.get('/foo', function(err, _, res) {
+    CLIENT.get('/foo', function(err, _, res, data) {
         t.ok(err);
         t.equal(res.statusCode, 500);
+        t.equal(data.message, '');
         t.end();
     });
 });
@@ -2535,8 +2536,9 @@ test('uncaughtException should handle thrown Number', function(t) {
         }
     );
 
-    CLIENT.get('/foo', function(err, _, res) {
+    CLIENT.get('/foo', function(err, _, res, data) {
         t.ok(err);
+        t.equal(data.message, '1');
         t.equal(res.statusCode, 500);
         t.end();
     });
