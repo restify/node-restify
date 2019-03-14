@@ -55,6 +55,11 @@ Cutting a release is currently a manual process. We use a [Conventional Changelo
 ```
 $ git fetch
 $ git pull origin master # ensure you have the latest changes
-$ npx unleash [-p for patch, -m for minor, -M for major] -d # do a dry run to verify
-$ npx unleash [-p for patch, -m for minor, -M for major]
+$ npx unleash [-p for patch, -m for minor, -M for major] --no-publish -d # do a dry run to verify
+$ npx unleash [-p for patch, -m for minor, -M for major] --no-publish 
+# Unleash doesnt support 2FA, hence we use --no-publish flag here.
+# This ensures we have the package.json updated, changelog generated, tag created
+# and all the changes into origin
+# Next, publish to npm manually and do not forget to provide the 2FA code.
+$ npm publish
 ```

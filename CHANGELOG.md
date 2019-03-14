@@ -1,6 +1,9 @@
 <a name="8.1.1"></a>
 ### 8.1.1 (2019-03-14)
 
+#### Bug Fixes
+
+* Published NPM package had a bad dependency on `npm` causing new irrelevant packages to get installed
 
 <a name="8.1.0"></a>
 ## 8.1.0 (2019-03-06)
