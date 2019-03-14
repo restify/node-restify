@@ -2689,10 +2689,10 @@ test('earliest chain should get to reject requests', function(t) {
         t.fail('should not call handler');
     });
 
-    SERVER.earliest(function(req, res) {
+    SERVER.earliest(function(req, res, next) {
         res.statusCode = 413; // I'm a teapot!
         res.end();
-        return false;
+        return next(false);
     });
 
     CLIENT.get('/foobar', function(_, __, res) {
@@ -2707,8 +2707,8 @@ test('earliest chain should get to allow requests', function(t) {
         return next();
     });
 
-    SERVER.earliest(function(req, res) {
-        return true;
+    SERVER.earliest(function(req, res, next) {
+        return next();
     });
 
     CLIENT.get('/foobar', function(_, __, res) {
@@ -2724,8 +2724,9 @@ test('earliest chain should allow multiple handlers', function(t) {
     });
 
     var count = 0;
-    var handler = function() {
-        return count++;
+    var handler = function(_, __, next) {
+        count++;
+        return next();
     };
 
     SERVER.earliest(handler, handler, handler);
