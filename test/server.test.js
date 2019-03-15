@@ -2684,12 +2684,12 @@ test('should have proxy event handlers as instance', function(t) {
     });
 });
 
-test('earliest chain should get to reject requests', function(t) {
+test('first chain should get to reject requests', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         t.fail('should not call handler');
     });
 
-    SERVER.earliest(function(req, res) {
+    SERVER.first(function(req, res) {
         res.statusCode = 413; // I'm a teapot!
         res.end();
         return false;
@@ -2701,13 +2701,13 @@ test('earliest chain should get to reject requests', function(t) {
     });
 });
 
-test('earliest chain should get to allow requests', function(t) {
+test('first chain should get to allow requests', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         res.send(413, 'Im a teapot');
         return next();
     });
 
-    SERVER.earliest(function(req, res) {
+    SERVER.first(function(req, res) {
         return true;
     });
 
@@ -2717,7 +2717,7 @@ test('earliest chain should get to allow requests', function(t) {
     });
 });
 
-test('earliest chain should allow multiple handlers', function(t) {
+test('first chain should allow multiple handlers', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         res.send(413, 'Im a teapot');
         return next();
@@ -2728,8 +2728,8 @@ test('earliest chain should allow multiple handlers', function(t) {
         count++;
     };
 
-    SERVER.earliest(handler, handler, handler);
-    SERVER.earliest(handler, handler, handler);
+    SERVER.first(handler, handler, handler);
+    SERVER.first(handler, handler, handler);
 
     CLIENT.get('/foobar', function(_, __, res) {
         t.equal(res.statusCode, 413);
