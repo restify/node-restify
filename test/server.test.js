@@ -2482,6 +2482,37 @@ test('uncaughtException should not trigger named routeHandler', function(t) {
     });
 });
 
+test('uncaughtException should handle thrown null', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw null; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res, data) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.equal(data.message, 'null');
+        t.end();
+    });
+});
+
 test('uncaughtException should handle thrown undefined literal', function(t) {
     SERVER.get(
         {
@@ -2508,12 +2539,43 @@ test('uncaughtException should handle thrown undefined literal', function(t) {
     CLIENT.get('/foo', function(err, _, res, data) {
         t.ok(err);
         t.equal(res.statusCode, 500);
-        t.equal(data.message, '');
+        t.equal(data.message, 'undefined');
         t.end();
     });
 });
 
-test('uncaughtException should handle thrown Number', function(t) {
+test('uncaughtException should handle thrown falsy number', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw 0; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res, data) {
+        t.ok(err);
+        t.equal(data.message, '0');
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('uncaughtException should handle thrown non falsy number', function(t) {
     SERVER.get(
         {
             name: 'foo',
@@ -2539,6 +2601,68 @@ test('uncaughtException should handle thrown Number', function(t) {
     CLIENT.get('/foo', function(err, _, res, data) {
         t.ok(err);
         t.equal(data.message, '1');
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('uncaughtException should handle thrown boolean', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw true; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res, data) {
+        t.ok(err);
+        t.equal(data.message, 'true');
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('uncaughtException should handle thrown falsy boolean', function(t) {
+    SERVER.get(
+        {
+            name: 'foo',
+            path: '/foo'
+        },
+        function(req, res, next) {
+            throw false; //eslint-disable-line no-throw-literal
+        }
+    );
+
+    SERVER.get(
+        {
+            name: 'bar',
+            path: '/bar'
+        },
+        function(req, res, next) {
+            // This code should not run, but we can test against the status code
+            res.send(200);
+            next();
+        }
+    );
+
+    CLIENT.get('/foo', function(err, _, res, data) {
+        t.ok(err);
+        t.equal(data.message, 'false');
         t.equal(res.statusCode, 500);
         t.end();
     });
