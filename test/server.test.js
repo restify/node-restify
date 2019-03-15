@@ -2725,7 +2725,7 @@ test('earliest chain should allow multiple handlers', function(t) {
 
     var count = 0;
     var handler = function() {
-        return count++;
+        count++;
     };
 
     SERVER.earliest(handler, handler, handler);
