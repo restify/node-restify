@@ -1,3 +1,18 @@
+<a name="8.2.0"></a>
+## 8.2.0 (2019-03-18)
+
+
+#### Bug Fixes
+
+* properly handle non-errors thrown in domains (#1757) ([cb2e7177](git://github.com/restify/node-restify.git/commit/cb2e7177))
+* **cpuUsageThrottle:** support breaking change in pidusage module ([7460064f](git://github.com/restify/node-restify.git/commit/7460064f))
+
+
+#### Features
+
+* **first:** Handlers that execute ASAP in the req/res lifecycle (#1756) ([8178098d](git://github.com/restify/node-restify.git/commit/8178098d))
+
+
 <a name="8.1.1"></a>
 ### 8.1.1 (2019-03-14)
 
