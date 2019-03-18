@@ -2683,3 +2683,159 @@ test('should have proxy event handlers as instance', function(t) {
         t.end();
     });
 });
+
+test('first chain should get to reject requests', function(t) {
+    SERVER.get('/foobar', function(req, res, next) {
+        t.fail('should not call handler');
+    });
+
+    SERVER.first(function(req, res) {
+        res.statusCode = 413; // I'm a teapot!
+        res.end();
+        return false;
+    });
+
+    CLIENT.get('/foobar', function(_, __, res) {
+        t.equal(res.statusCode, 413);
+        t.end();
+    });
+});
+
+test('first chain should get to allow requests', function(t) {
+    SERVER.get('/foobar', function(req, res, next) {
+        res.send(413, 'Im a teapot');
+        return next();
+    });
+
+    SERVER.first(function(req, res) {
+        return true;
+    });
+
+    CLIENT.get('/foobar', function(_, __, res) {
+        t.equal(res.statusCode, 413);
+        t.end();
+    });
+});
+
+test('first chain should allow multiple handlers', function(t) {
+    SERVER.get('/foobar', function(req, res, next) {
+        res.send(413, 'Im a teapot');
+        return next();
+    });
+
+    var count = 0;
+    var handler = function() {
+        count++;
+    };
+
+    SERVER.first(handler, handler, handler);
+    SERVER.first(handler, handler, handler);
+
+    CLIENT.get('/foobar', function(_, __, res) {
+        t.equal(res.statusCode, 413);
+        t.equal(count, 6, 'invoked 6 handlers');
+        t.end();
+    });
+});
+
+test('first chain should allow any handler to reject', function(t) {
+    SERVER.get('/foobar', function(req, res, next) {
+        res.send(200, 'Handled');
+        return next();
+    });
+
+    var count = 0;
+    var handler = function() {
+        count++;
+    };
+
+    var handlerAbort = function(req, res) {
+        count++;
+        res.statusCode = 413;
+        res.end();
+        return false;
+    };
+
+    SERVER.first(handler, handler, handler);
+    // Should append these handlers and abort the chain on the second
+    SERVER.first(handler, handlerAbort, handler);
+    // These should never run
+    SERVER.first(handler, handlerAbort);
+
+    CLIENT.get('/foobar', function(_, __, res) {
+        t.equal(res.statusCode, 413);
+        t.equal(count, 5, 'invoked 5 handlers');
+        t.end();
+    });
+});
+
+test('inflightRequest accounting stable with firstChain', function(t) {
+    // Make 3 requests, shed the second, and ensure inflightRequest accounting
+    // for all the requests
+    var request = 0;
+    SERVER.first(function(req, res) {
+        request++;
+
+        if (request === 1) {
+            t.equal(SERVER._inflightRequests, 1);
+            return true;
+        }
+        if (request === 2) {
+            t.equal(SERVER._inflightRequests, 2);
+            res.statusCode = 413;
+            res.end();
+            return false;
+        }
+        if (request === 3) {
+            // Since the second request was shed, and inflightRequest accounting
+            // should be happening synchronously, this should still be 2 for
+            // the third request
+            t.equal(SERVER._inflightRequests, 2);
+            return true;
+        }
+
+        t.fail('Too many requests for test');
+        return false;
+    });
+    var nexts = [];
+    SERVER.get('/foobar', function(req, res, next) {
+        res.send(200, 'success');
+        nexts.push(next);
+        if (nexts.length === 2) {
+            nexts.forEach(function(finishRequest) {
+                finishRequest();
+            });
+        }
+    });
+
+    var results = [];
+    function getDone(_, __, res) {
+        results.push(res);
+        if (results.length < 3) {
+            return;
+        }
+        for (var i = 0; i < results.length; i++) {
+            // The shed request should always be returned first, since it isn't
+            // handled by SERVER.get
+            if (i === 0) {
+                t.equal(
+                    results[i].statusCode,
+                    413,
+                    'results[' + i + '] === 413'
+                );
+            } else {
+                t.equal(
+                    results[i].statusCode,
+                    200,
+                    'results[' + i + '] === 200'
+                );
+            }
+        }
+        t.end();
+    }
+
+    // kick off all 3 at the same time to see if we can trigger a race condition
+    CLIENT.get('/foobar', getDone);
+    CLIENT.get('/foobar', getDone);
+    CLIENT.get('/foobar', getDone);
+});
