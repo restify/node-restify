@@ -5,15 +5,14 @@ var assert = require('chai').assert;
 var proxyquire = require('proxyquire');
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
+var pidusage = require('pidusage');
 
 // Allow tests to set the CPU usage returned by pidUsage
 var CPU = 50;
 
 var cpuUsageThrottle = proxyquire('../../lib/plugins/cpuUsageThrottle.js', {
-    pidusage: {
-        stat: function(pid, cb) {
-            return cb(null, { cpu: CPU });
-        }
+    pidusage: function(pid, cb) {
+        return cb(null, { cpu: CPU });
     }
 });
 
@@ -126,6 +125,16 @@ describe('cpuUsageThrottle', function() {
                 server.close();
                 done();
             });
+        });
+    });
+
+    it('Integration: pidusage should report CPU usage', function(done) {
+        assert.isFunction(pidusage, 'pidusage can be invoked');
+        pidusage(process.pid, function(e, stat) {
+            assert.ifError(e);
+            assert.isObject(stat);
+            assert.isNumber(stat.cpu);
+            done();
         });
     });
 
