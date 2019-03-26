@@ -2051,6 +2051,34 @@ test(
     }
 );
 
+// eslint-disable-next-line max-len
+test("should emit 'after' on client closed request with an uncaughtException", function(t) {
+    SERVER.on('after', function(req, res, route, err) {
+        t.ok(err);
+        t.equal(req.connectionState(), 'close');
+        t.equal(res.statusCode, 444);
+        t.equal(err.name, 'Error');
+        t.end();
+    });
+
+    SERVER.on('uncaughtException', function(req, res, route, err, next) {
+        next();
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        // fast client times out at 500ms, wait for 800ms which should cause
+        // client to timeout
+        setTimeout(function() {
+            throw new Error('foo');
+        }, 800);
+    });
+
+    FAST_CLIENT.get('/foobar', function(err, _, res) {
+        t.ok(err);
+        t.equal(err.name, 'RequestTimeoutError');
+    });
+});
+
 test('should increment/decrement inflight request count', function(t) {
     SERVER.get('/foo', function(req, res, next) {
         t.equal(SERVER.inflightRequests(), 1);
