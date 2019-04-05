@@ -107,15 +107,21 @@ server.get('/', function(req, res, next) {
     return next();
 });
 
-server.on('uncaughtException', function(req, res, route, err) {
+server.on('uncaughtException', function(req, res, route, err, callback) {
     // this event will be fired, with the error object from above:
     // ReferenceError: x is not defined
+    res.send(504, 'boom');
+    callback();
 });
 ```
 
-If you listen to this event, you __must__ send a response to the client. This
-behavior is different from the standard error events. If you do not listen to
-this event, restify's default behavior is to call `res.send()` with the error
+If you listen to this event, you __must__:
+
+1. send a response to the client _and_
+2. call the callback function passed as the fourth argument of the event listener
+
+This behavior is different from the standard error events. If you do not listen
+to this event, restify's default behavior is to call `res.send()` with the error
 that was thrown.
 
 The signature is for the after event is as follows:
