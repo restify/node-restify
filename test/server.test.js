@@ -2051,6 +2051,77 @@ test(
     }
 );
 
+// eslint-disable-next-line max-len
+test("should emit 'after' on uncaughtException (no custom uncaughtException listener)", function(t) {
+    var ERR_MSG = 'foo';
+    var gotAfter = false;
+    var gotReqCallback = false;
+
+    SERVER.on('after', function(req, res, route, err) {
+        gotAfter = true;
+        t.ok(err);
+        t.equal(req.connectionState(), undefined);
+        t.equal(res.statusCode, 500);
+        t.equal(err.name, 'Error');
+        t.equal(err.message, ERR_MSG);
+        if (gotReqCallback) {
+            t.end();
+        }
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        throw new Error(ERR_MSG);
+    });
+
+    FAST_CLIENT.get('/foobar', function(err, _, res) {
+        gotReqCallback = true;
+        t.ok(err);
+        t.equal(err.name, 'InternalError');
+        if (gotAfter) {
+            t.end();
+        }
+    });
+});
+
+// eslint-disable-next-line max-len
+test("should emit 'after' on uncaughtException (response closed, no custom uncaughtException listener)", function(t) {
+    // This test specifically exercises the use case of *not* setting a custom
+    // uncaughtException handler *and* aborting the request. We make sure that
+    // although the error that is passed to the 'after' listener is the thrown
+    // error, the response's status code reflects that the request was aborted
+    // (=== 444).
+    var ERR_MSG = 'foo';
+    var gotAfter = false;
+    var gotReqCallback = false;
+
+    SERVER.on('after', function(req, res, route, err) {
+        gotAfter = true;
+        t.ok(err);
+        t.equal(req.connectionState(), 'close');
+        t.equal(res.statusCode, 444);
+        t.equal(err.name, 'Error');
+        t.equal(err.message, ERR_MSG);
+        if (gotReqCallback) {
+            t.end();
+        }
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        res.on('close', function onResClose() {
+            throw new Error(ERR_MSG);
+        });
+    });
+
+    FAST_CLIENT.get('/foobar', function(err, _, res) {
+        gotReqCallback = true;
+        t.ok(err);
+        t.equal(err.name, 'RequestTimeoutError');
+        if (gotAfter) {
+            t.end();
+        }
+    });
+});
+
 // This test reproduces https://github.com/restify/node-restify/issues/1765. It
 // specifically tests the edge case of an exception being thrown from a route
 // handler _after_ the response is considered to be "flushed" (for instance when
