@@ -1,3 +1,12 @@
+<a name="8.3.0"></a>
+## 8.3.0 (2019-04-11)
+
+
+#### Features
+
+* provide callback to uncaughtException handler (#1766) ([5e8b5e2b](git://github.com/restify/node-restify.git/commit/5e8b5e2b))
+
+
 <a name="8.2.0"></a>
 ## 8.2.0 (2019-03-18)
 
