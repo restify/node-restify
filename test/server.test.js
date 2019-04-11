@@ -2051,6 +2051,51 @@ test(
     }
 );
 
+// This test reproduces https://github.com/restify/node-restify/issues/1765. It
+// specifically tests the edge case of an exception being thrown from a route
+// handler _after_ the response is considered to be "flushed" (for instance when
+// the request is aborted before a response is sent and an exception is thrown).
+// eslint-disable-next-line max-len
+test("should emit 'after' on uncaughtException after response closed with custom uncaughtException listener", function(t) {
+    var ERR_MSG = 'foo';
+    var gotAfter = false;
+    var gotReqCallback = false;
+
+    SERVER.on('after', function(req, res, route, err) {
+        gotAfter = true;
+        t.ok(err);
+        t.equal(req.connectionState(), 'close');
+        t.equal(res.statusCode, 444);
+        t.equal(err.name, 'Error');
+        t.equal(err.message, ERR_MSG);
+        if (gotReqCallback) {
+            t.end();
+        }
+    });
+
+    SERVER.on('uncaughtException', function(req, res, route, err, callback) {
+        callback();
+    });
+
+    SERVER.get('/foobar', function(req, res, next) {
+        res.on('close', function onResClose() {
+            // We throw this error in the response's close event handler on
+            // purpose to exercise the code path where we mark the route
+            // handlers as finished _after_ the response is marked as flushed.
+            throw new Error(ERR_MSG);
+        });
+    });
+
+    FAST_CLIENT.get('/foobar', function(err, _, res) {
+        gotReqCallback = true;
+        t.ok(err);
+        t.equal(err.name, 'RequestTimeoutError');
+        if (gotAfter) {
+            t.end();
+        }
+    });
+});
+
 test('should increment/decrement inflight request count', function(t) {
     SERVER.get('/foo', function(req, res, next) {
         t.equal(SERVER.inflightRequests(), 1);
