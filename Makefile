@@ -70,9 +70,5 @@ docs-build:
 benchmark:
 	@(cd ./benchmark && $(NPM) i && $(NODE) index.js)
 
-.PHONY: audit
-audit:
-	@($(NPM) audit || true)
-
 include ./tools/mk/Makefile.deps
 include ./tools/mk/Makefile.targ

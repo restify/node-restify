@@ -160,8 +160,7 @@ test('GET without upgrade headers', function(t) {
 
 test('Dueling upgrade and response handling 1', function(t) {
     var done = finish_latch(t, {
-        'expected requestUpgrade error': 1,
-        'client response': 1
+        'expected requestUpgrade error': 1
     });
 
     SERVER.get('/attach', function(req, res, next) {
@@ -175,6 +174,7 @@ test('Dueling upgrade and response handling 1', function(t) {
 
         try {
             var upg = res.claimUpgrade();
+            // TODO we never reach this destroy() call. do we still need it?
             upg.socket.destroy();
         } catch (ex) {
             done('expected requestUpgrade error');
@@ -202,10 +202,6 @@ test('Dueling upgrade and response handling 1', function(t) {
                 t.ifError(err2);
             }
             t.equal(res.statusCode, 400);
-            res.on('end', function() {
-                done('client response');
-            });
-            res.resume();
         });
         req.on('upgradeResult', function(err2, res) {
             done('server upgraded unexpectedly');
