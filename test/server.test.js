@@ -34,7 +34,7 @@ var FAST_CLIENT;
 var SERVER;
 
 if (SKIP_IP_V6) {
-    console.warning('IPv6 tests are skipped: No IPv6 network is available');
+    console.warn('IPv6 tests are skipped: No IPv6 network is available');
 }
 
 ///--- Tests

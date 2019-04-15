@@ -174,8 +174,7 @@ test('Dueling upgrade and response handling 1', function(t) {
         }
 
         try {
-            var upg = res.claimUpgrade();
-            upg.socket.destroy();
+            res.claimUpgrade();
         } catch (ex) {
             done('expected requestUpgrade error');
         }
@@ -205,6 +204,8 @@ test('Dueling upgrade and response handling 1', function(t) {
             res.on('end', function() {
                 done('client response');
             });
+            // noop data listener required for resume to take effect
+            res.on('data', function() {});
             res.resume();
         });
         req.on('upgradeResult', function(err2, res) {
