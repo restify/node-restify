@@ -134,6 +134,7 @@ describe('cpuUsageThrottle', function() {
             assert.ifError(e);
             assert.isObject(stat);
             assert.isNumber(stat.cpu);
+            pidusage.clear();
             done();
         });
     });
