@@ -1,3 +1,12 @@
+<a name="8.3.1"></a>
+### 8.3.1 (2019-04-25)
+
+
+#### Bug Fixes
+
+* **test:** make upgrade test pass (#1772) ([d30b7483](git://github.com/restify/node-restify.git/commit/d30b7483))
+
+
 <a name="8.3.0"></a>
 ## 8.3.0 (2019-04-11)
 
