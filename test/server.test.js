@@ -2333,7 +2333,8 @@ test('should show debug information', function(t) {
         'application/javascript',
         'application/json',
         'text/plain',
-        'application/octet-stream'
+        'application/octet-stream',
+        'application/problem+json'
     ]);
     t.equal(debugInfo.server.address, '127.0.0.1');
     t.equal(typeof debugInfo.server.port, 'number');
