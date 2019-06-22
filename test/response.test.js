@@ -680,3 +680,83 @@ test('GH-1607: should send numbers with explicit status code', function(t) {
         });
     });
 });
+
+test('GH-1791: should send 0 as 0 with application/json', function(t) {
+    SERVER.get('/zero', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, 0);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/zero'), function(err, req, res, data) {
+        t.equal(data, '0');
+        t.end();
+    });
+});
+
+test('GH-1791: should send false as false with application/json', function(t) {
+    SERVER.get('/false', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, false);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/false'), function(err, req, res, data) {
+        t.equal(data, 'false');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('GH-1791: should send empty string as "" with application/json', function(t) {
+    SERVER.get('/empty', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, '');
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/empty'), function(err, req, res, data) {
+        t.equal(data, '""');
+        t.end();
+    });
+});
+
+test('GH-1791: should send null as null with application/json', function(t) {
+    SERVER.get('/null', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, null);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/null'), function(err, req, res, data) {
+        t.equal(data, 'null');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('GH-1791: should send undefined as empty with application/json', function(t) {
+    SERVER.get('/undef', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, undefined);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/undef'), function(err, req, res, data) {
+        t.equal(data, '');
+        t.end();
+    });
+});
+
+test('GH-1791: should send NaN as null with application/json', function(t) {
+    SERVER.get('/nan', function(req, res, next) {
+        res.contentType = 'application/json';
+        res.send(200, NaN);
+        return next();
+    });
+
+    STRING_CLIENT.get(join(LOCALHOST, '/nan'), function(err, req, res, data) {
+        t.equal(data, 'null');
+        t.end();
+    });
+});
