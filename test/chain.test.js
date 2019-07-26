@@ -1,6 +1,7 @@
 'use strict';
 /* eslint-disable func-names */
 
+var domain = require('domain');
 var Chain = require('../lib/chain');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
@@ -184,7 +185,7 @@ test('onceNext prevents double next calls', function(t) {
 });
 
 test('throws error for double next calls in strictNext mode', function(t) {
-    var doneCalled = 0;
+    t.expect(1);
     var chain = new Chain({
         strictNext: true
     });
@@ -194,7 +195,15 @@ test('throws error for double next calls in strictNext mode', function(t) {
         next();
     });
 
-    try {
+    var testDomain = domain.create();
+
+    testDomain.on('error', function onError(err) {
+        t.equal(err.message, "next shouldn't be called more than once");
+        testDomain.exit();
+        t.done();
+    });
+
+    testDomain.run(function run() {
         chain.run(
             {
                 startHandlerTimer: function() {},
@@ -206,14 +215,9 @@ test('throws error for double next calls in strictNext mode', function(t) {
             {},
             function(err) {
                 t.ifError(err);
-                doneCalled++;
-                t.equal(doneCalled, 1);
-                t.done();
             }
         );
-    } catch (err) {
-        t.equal(err.message, "next shouldn't be called more than once");
-    }
+    });
 });
 
 test('calls req.startHandlerTimer', function(t) {
