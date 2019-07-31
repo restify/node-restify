@@ -1,3 +1,12 @@
+<a name="8.4.0"></a>
+## 8.4.0 (2019-07-31)
+
+
+#### Features
+
+* **chain:** schedule handlers to the next tick (#1798) ([806ed711](git://github.com/restify/node-restify.git/commit/806ed711))
+
+
 <a name="8.3.3"></a>
 ### 8.3.3 (2019-06-04)
 
