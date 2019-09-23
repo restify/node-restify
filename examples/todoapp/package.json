@@ -8,7 +8,7 @@
                 "bunyan": "1.5.1",
                 "posix-getopt": "1.2.0",
                 "restify-errors": "^3.1.0",
-                "restify": "^4.0.3"
+                "restify": "^8.1.0"
         },
         "devDependencies": {
                 "nodeunit": "0.9.1"
