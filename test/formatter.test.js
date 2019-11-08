@@ -4,6 +4,7 @@
 /* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
+var errors = require('restify-errors');
 
 var restify = require('../lib');
 
@@ -35,6 +36,9 @@ before(function(callback) {
                 'text/syncerror': function(req, res, body) {
                     // this is a bad formatter, on purpose.
                     return x.toString(); // eslint-disable-line no-undef
+                },
+                'text/syncerror_expected': function(req, res, body) {
+                    throw new errors.InternalServerError('Errors happen');
                 },
                 'application/foo; q=0.9': function(req, res, body) {
                     return 'foo!';
@@ -125,6 +129,30 @@ test('GH-845: sync formatter should blow up', function(t) {
         },
         function(err, req, res, data) {
             t.equal(data, 'uncaughtException');
+            t.end();
+        }
+    );
+});
+
+test('sync formatter should handle expected errors gracefully', function(t) {
+    var hasUncaughtException = false;
+    SERVER.on('uncaughtException', function(req, res, route, err) {
+        hasUncaughtException = true;
+    });
+
+    CLIENT.get(
+        {
+            path: '/sync',
+            headers: {
+                accept: 'text/syncerror_expected'
+            }
+        },
+        function(err, req, res, data) {
+            t.ok(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(res.statusCode, 500);
+            t.equal(hasUncaughtException, false);
             t.end();
         }
     );
