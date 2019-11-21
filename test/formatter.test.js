@@ -152,6 +152,7 @@ test('sync formatter should handle expected errors gracefully', function(t) {
             t.ok(req);
             t.ok(res);
             t.equal(res.statusCode, 500);
+            SERVER.removeAllListeners('uncaughtException');
             t.end();
         }
     );
@@ -294,6 +295,7 @@ test('default json formatter should wrap & throw InternalServer error on unseria
 
     CLIENT.get('/badJSON', function(err, req, res, data) {
         SERVER.rm('badJSON');
+        SERVER.removeAllListeners('uncaughtException');
         t.end();
     });
 });
