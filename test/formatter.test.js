@@ -7,6 +7,7 @@ var restifyClients = require('restify-clients');
 var errors = require('restify-errors');
 
 var restify = require('../lib');
+var jsonFormatter = require('../lib/formatters/json');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -112,7 +113,7 @@ test('GH-845: sync formatter', function(t) {
 });
 
 test('GH-845: sync formatter should blow up', function(t) {
-    SERVER.on('uncaughtException', function(req, res, route, err) {
+    SERVER.once('uncaughtException', function(req, res, route, err) {
         t.ok(err);
         t.equal(err.name, 'ReferenceError');
         t.equal(err.message, 'x is not defined');
@@ -135,9 +136,8 @@ test('GH-845: sync formatter should blow up', function(t) {
 });
 
 test('sync formatter should handle expected errors gracefully', function(t) {
-    var hasUncaughtException = false;
-    SERVER.on('uncaughtException', function(req, res, route, err) {
-        hasUncaughtException = true;
+    SERVER.once('uncaughtException', function(req, res, route, err) {
+        throw new Error('Should not reach');
     });
 
     CLIENT.get(
@@ -152,7 +152,6 @@ test('sync formatter should handle expected errors gracefully', function(t) {
             t.ok(req);
             t.ok(res);
             t.equal(res.statusCode, 500);
-            t.equal(hasUncaughtException, false);
             t.end();
         }
     );
@@ -253,6 +252,48 @@ test('default jsonp formatter should escape line and paragraph separators', func
         t.ok(req);
         t.ok(res);
         t.equal(data, '"\\u2028\\u2029"');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('default json formatter should wrap & throw InternalServer error on unserializable bodies', function(t) {
+    t.expect(2);
+
+    SERVER.once('uncaughtException', function(req, res, route, err) {
+        console.log(err.stack); // For convenience
+        throw new Error('Should not reach');
+    });
+
+    var opts = {
+        path: '/badJSON',
+        name: 'badJSON'
+    };
+
+    SERVER.get(opts, function(req, res, next) {
+        var body = {};
+        // Add unserializable circular reference
+        body.body = body;
+
+        try {
+            jsonFormatter(req, res, body);
+            throw new Error('Should not reach');
+        } catch (e) {
+            t.ok(e instanceof errors.InternalServerError);
+
+            // Ensure expected root cause
+            var causeError = e.cause();
+            t.equal(
+                causeError.message,
+                'Converting circular structure to JSON'
+            );
+        }
+
+        res.send();
+    });
+
+    CLIENT.get('/badJSON', function(err, req, res, data) {
+        SERVER.rm('badJSON');
         t.end();
     });
 });
