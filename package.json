@@ -141,6 +141,7 @@
     "proxyquire": "^1.8.0",
     "restify-clients": "^2.6.6",
     "rimraf": "^2.6.3",
+    "sinon": "^7.5.0",
     "validator": "^7.2.0",
     "watershed": "^0.4.0"
   },

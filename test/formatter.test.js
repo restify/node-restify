@@ -5,6 +5,7 @@
 
 var restifyClients = require('restify-clients');
 var errors = require('restify-errors');
+var sinon = require('sinon');
 
 var restify = require('../lib');
 var jsonFormatter = require('../lib/formatters/json');
@@ -261,6 +262,8 @@ test('default jsonp formatter should escape line and paragraph separators', func
 test('default json formatter should wrap & throw InternalServer error on unserializable bodies', function(t) {
     t.expect(2);
 
+    sinon.spy(JSON, 'stringify');
+
     SERVER.once('uncaughtException', function(req, res, route, err) {
         console.log(err.stack); // For convenience
         throw new Error('Should not reach');
@@ -281,13 +284,7 @@ test('default json formatter should wrap & throw InternalServer error on unseria
             throw new Error('Should not reach');
         } catch (e) {
             t.ok(e instanceof errors.InternalServerError);
-
-            // Ensure expected root cause
-            var causeError = e.cause();
-            t.equal(
-                causeError.message,
-                'Converting circular structure to JSON'
-            );
+            t.ok(JSON.stringify.threw(e.cause()));
         }
 
         res.send();
@@ -296,6 +293,7 @@ test('default json formatter should wrap & throw InternalServer error on unseria
     CLIENT.get('/badJSON', function(err, req, res, data) {
         SERVER.rm('badJSON');
         SERVER.removeAllListeners('uncaughtException');
+        JSON.stringify.restore();
         t.end();
     });
 });
