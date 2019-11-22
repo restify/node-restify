@@ -1820,7 +1820,7 @@ test('calling next(false) should early exit from use handlers', function(t) {
 
     SERVER.on('after', function() {
         steps++;
-        t.equal(steps, 2);
+        t.equal(steps, 1);
         t.end();
     });
 
@@ -2111,7 +2111,7 @@ test('should increment/decrement inflight request count', function(t) {
     CLIENT.get('/foo', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
     });
 });
 
@@ -2135,14 +2135,14 @@ test('should increment/decrement inflight request count for concurrent reqs', fu
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2174,7 +2174,7 @@ test('should cleanup inflight requests count for 404s', function(t) {
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
 
         CLIENT.get('/doesnotexist', function(err2, _2, res2) {
             t.ok(err2);
@@ -2219,7 +2219,7 @@ test('should cleanup inflight requests count for timeouts', function(t) {
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2862,7 +2862,7 @@ test('inflightRequest accounting stable with firstChain', function(t) {
         for (var i = 0; i < results.length; i++) {
             // The shed request should always be returned first, since it isn't
             // handled by SERVER.get
-            if (i === 0) {
+            if (i === 1) {
                 t.equal(
                     results[i].statusCode,
                     413,
