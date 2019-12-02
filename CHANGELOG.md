@@ -1,3 +1,12 @@
+<a name="8.5.0"></a>
+## 8.5.0 (2019-12-02)
+
+
+#### Features
+
+* **chain:** use nextTick instead of setImmediate (#1808) ([703470ad](git://github.com/restify/node-restify.git/commit/703470ad))
+
+
 <a name="8.4.1"></a>
 ### 8.4.1 (2019-11-27)
 
