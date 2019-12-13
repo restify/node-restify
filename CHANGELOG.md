@@ -1,3 +1,13 @@
+<a name="8.5.1"></a>
+### 8.5.1 (2019-12-13)
+
+
+#### Bug Fixes
+
+* **benchmark:** force latest restify version (#1810) ([b8ec60e3](git://github.com/restify/node-restify.git/commit/b8ec60e3))
+* **server:** address domain performance regression with Node v12.x (#1809) ([e648d491](git://github.com/restify/node-restify.git/commit/e648d491))
+
+
 <a name="8.5.0"></a>
 ## 8.5.0 (2019-12-02)
 
