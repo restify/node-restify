@@ -195,7 +195,7 @@ The difference between the two is that invoking `next()` with an Error object
 allows you to leverage the server's [event
 emitter](/components/server.md#errors). This enables you to handle all
 occurrences of an error type using a common handler. See the [error
-handling](#error handling) section for more details.
+handling](#error-handling) section for more details.
 
 
 Lastly, you can call `next.ifError(err)` with an Error object to cause restify
