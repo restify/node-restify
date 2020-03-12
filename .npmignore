@@ -13,3 +13,17 @@ tools
 .vscode
 .idea
 benchmark
+.dir-locals.el
+.eslintignore
+.eslintrc.js
+.gitignore
+.prettierignore
+.prettierrc
+.tern-project
+.travis.yml
+CONTRIBUTING.md
+FEATURE_REQUESTS.md
+*.log
+*.tar.gz
+*.tgz
+node_modules
