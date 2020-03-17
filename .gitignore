@@ -14,3 +14,4 @@ deps/javascriptlint
 deps/jsstyle
 package-lock.json
 benchmark/results
+.idea

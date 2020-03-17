@@ -680,3 +680,38 @@ test('GH-1607: should send numbers with explicit status code', function(t) {
         });
     });
 });
+
+test('should handle errors with a status property', function(t) {
+    var notFound = new Error('not found');
+    notFound.status = 404;
+    notFound.title = 'Not Found';
+
+    SERVER.get('/17', function handle(req, res, next) {
+        return next(notFound);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/17'), function(err, _, res, body) {
+        t.equal(res.statusCode, 404);
+        t.equal(res.headers['content-type'], 'application/problem+json');
+        t.equal(body.title, notFound.title);
+        t.end();
+    });
+});
+
+test('should prefer error statusCode property over status', function(t) {
+    var notFound = new Error('not found');
+    notFound.statusCode = 404;
+    notFound.status = 500;
+    notFound.title = 'Not Found';
+
+    SERVER.get('/18', function handle(req, res, next) {
+        return next(notFound);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/18'), function(err, _, res, body) {
+        t.equal(res.statusCode, 404);
+        t.equal(res.headers['content-type'], 'application/json');
+        t.equal(body.title, notFound.title);
+        t.end();
+    });
+});
