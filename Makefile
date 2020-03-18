@@ -21,7 +21,7 @@ ESLINT		:= ./node_modules/.bin/eslint
 DOCUMENTATION		:= ./node_modules/.bin/documentation
 NODEUNIT	:= ./node_modules/.bin/nodeunit
 MOCHA		:= ./node_modules/.bin/mocha
-NODECOVER	:= ./node_modules/.bin/cover
+NODECOVER	:= ./node_modules/.bin/nyc
 DOCS_BUILD	:= ./tools/docsBuild.js
 NPM		:= npm
 NODE		:= node
@@ -52,8 +52,7 @@ $(NODECOVER): | $(NPM_EXEC)
 .PHONY: cover
 cover: $(NODECOVER)
 	@rm -fr ./.coverage_data
-	$(NODECOVER) run $(NODEUNIT) ./test/*.js
-	$(NODECOVER) report html
+	$(NODECOVER) --reporter=html --reporter=text-summary --reporter=lcov $(NODEUNIT) ./test/*.js
 
 CLEAN_FILES += $(TAP) ./node_modules/nodeunit
 
