@@ -1,5 +1,3 @@
-.coverage_data
-cover_html
 node_modules
 docs/*.html
 docs/pkg
@@ -14,3 +12,6 @@ deps/javascriptlint
 deps/jsstyle
 package-lock.json
 benchmark/results
+.nyc_output/
+coverage/
+cover_html/
