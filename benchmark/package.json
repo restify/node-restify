@@ -9,11 +9,15 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "restify": "latest"
+    "restify": "latest",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {},
   "license": "MIT",
   "scripts": {
-    "start": "node indec"
-  }
+    "start": "node indec",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
