@@ -9,7 +9,10 @@ var config = {
     env: {
         browser: false,
         node: true,
-        es6: false
+        es6: true
+    },
+    parserOptions: {
+        ecmaVersion: 2018
     },
     rules: {}
 };

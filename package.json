@@ -90,7 +90,7 @@
     "report-latency": "./bin/report-latency"
   },
   "engines": {
-    "node": ">=8.3.0"
+    "node": ">=10.21.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
