@@ -127,7 +127,7 @@ if (!process.env.NO_LINT) {
 // stylistic.
 if (!process.env.NO_STYLE) {
     // Global
-    config.rules['max-len'] = [ERROR, { code: 80 }];
+    config.rules['max-len'] = [ERROR, { code: 80, ignoreComments: true }];
 
     // Prettier
     config.extends.push('prettier');

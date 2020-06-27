@@ -2926,3 +2926,145 @@ test('inflightRequest accounting stable with firstChain', function(t) {
     CLIENT.get('/foobar', getDone);
     CLIENT.get('/foobar', getDone);
 });
+
+test('async prerouting chain with error', function(t) {
+    SERVER.pre(async function(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async prerouting chain with empty rejection', function(t) {
+    SERVER.pre(async function(req, res) {
+        await helper.sleep(10);
+        return Promise.reject();
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    SERVER.on('Async', function(req, res, err, callback) {
+        t.equal(err.jse_info.cause, undefined);
+        t.equal(err.jse_info.method, 'GET');
+        t.equal(err.jse_info.path, '/hello/mark');
+        callback();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('async use chain with error', function(t) {
+    SERVER.use(async function(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async handler with error', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async handler with error after send succeeds', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        res.send(req.params.name);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('async handler with error after send succeeds', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        res.send(req.params.name);
+        await helper.sleep(20);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.on('after', function(req, res, route, error) {
+        t.ok(error);
+        t.end();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+test('async handler without next', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        res.send(req.params.name);
+    });
+
+    SERVER.on('after', function(req, res, route, error) {
+        t.ok(!error);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+test('async handler resolved with string should re-route', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        return 'getredirected';
+    });
+
+    SERVER.get('/redirected', async function tester(req, res) {
+        res.send(req.params.name);
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+        t.equal(res.body, '"mark"');
+        t.end();
+    });
+});

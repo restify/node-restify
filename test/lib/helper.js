@@ -85,5 +85,13 @@ module.exports = {
 
     get dtrace() {
         return true;
+    },
+
+    sleep: function sleep(timeInMs) {
+        return new Promise(function sleepPromise(resolve) {
+            setTimeout(function timeout() {
+                resolve();
+            }, timeInMs);
+        });
     }
 };
