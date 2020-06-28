@@ -730,7 +730,7 @@ describe('audit logger', function() {
             setTimeout(function() {
                 res.send();
                 next();
-            }, 100);
+            }, 150);
         });
 
         CLIENT.get(
