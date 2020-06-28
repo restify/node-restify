@@ -1,0 +1,40 @@
+on:
+  - push
+  - pull_request
+name: ci
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install node v10
+        uses: actions/setup-node@v1
+        with:
+          node-version: v10.x
+      - name: install dependencies
+        run: npm install
+      - name: check lint
+        run: make check-lint
+  test:
+    name: test
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        node-version:
+          - 10.x
+          - 12.x
+          - 14.x
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: use node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: install dependencies
+        run: npm install
+      - name: test
+        run: make test
