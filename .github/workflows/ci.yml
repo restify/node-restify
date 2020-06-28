@@ -17,7 +17,7 @@ jobs:
       - name: check lint
         run: make check-lint
   test:
-    name: test node ${{ matrix.node_version }} on ${{ matrix.os }}
+    name: test node ${{ matrix.node-version }} on ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -39,3 +39,5 @@ jobs:
         run: npm install
       - name: test
         run: make test
+        env:
+          TEST_SKIP_IP_V6: true
