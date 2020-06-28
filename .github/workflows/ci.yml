@@ -2,7 +2,9 @@ on:
   push:
     branches:
       - master
-  - pull_request
+  pull_request:
+    branches:
+      - master
 name: ci
 jobs:
   lint:
