@@ -94,7 +94,6 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "bunyan": "^1.8.12",
     "csv": "^5.1.1",
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
@@ -107,6 +106,7 @@
     "negotiator": "^0.6.2",
     "once": "^1.4.0",
     "pidusage": "^2.0.17",
+    "pino": "^6.3.2",
     "qs": "^6.7.0",
     "restify-errors": "^8.0.2",
     "semver": "^6.1.1",
