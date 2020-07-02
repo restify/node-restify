@@ -2497,6 +2497,48 @@ test('should emit error with multiple next calls with strictNext', function(t) {
     });
 });
 
+test(
+    'should send 500 if we reached the end of handler chain w/o sending ' +
+        'headers',
+    function(t) {
+        var server = restify.createServer({
+            dtrace: helper.dtrace,
+            strictNext: true,
+            log: helper.getLog('server')
+        });
+        var client;
+        var port;
+
+        server.listen(PORT + 1, '127.0.0.1', function() {
+            port = server.address().port;
+            client = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + port,
+                dtrace: helper.dtrace,
+                retry: false
+            });
+
+            server.get('/noResponse', function(req, res, next) {
+                next();
+            });
+
+            client.get('/noResponse', function(err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.equal(err.name, 'InternalServerError');
+                t.equal(
+                    err.message,
+                    'reached the end of the handler chain without ' +
+                        'writing a response!'
+                );
+                client.close();
+                server.close(function() {
+                    t.end();
+                });
+            });
+        });
+    }
+);
+
 test('uncaughtException should not trigger named routeHandler', function(t) {
     SERVER.get(
         {
