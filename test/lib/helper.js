@@ -9,10 +9,8 @@
 
 var domain = require('domain');
 
-var bunyan = require('bunyan');
+var pino = require('pino');
 var once = require('once');
-
-var restify = require('../../lib');
 
 ///--- Exports
 
@@ -74,13 +72,14 @@ module.exports = {
     },
 
     getLog: function(name, streams, level) {
-        return bunyan.createLogger({
-            level: process.env.LOG_LEVEL || level || 'fatal',
-            name: name || process.argv[1],
-            streams: streams || [{ stream: process.stdout }],
-            src: true,
-            serializers: restify.bunyan.serializers
-        });
+        return pino(
+            {
+                level: process.env.LOG_LEVEL || level || 'fatal',
+                name: name || process.argv[1],
+                serializers: pino.stdSerializers
+            },
+            streams || process.stdout
+        );
     },
 
     get dtrace() {

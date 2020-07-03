@@ -5,16 +5,17 @@
         "main": "main.js",
         "dependencies": {
                 "assert-plus": "0.2.0",
-                "bunyan": "1.8.13",
+                "pino": "^6.3.2",
                 "posix-getopt": "1.2.0",
                 "restify-errors": "^3.1.0",
                 "restify": "^4.0.3"
         },
         "devDependencies": {
-                "nodeunit": "0.9.1"
+                "nodeunit": "0.9.1",
+                "pino-pretty": "^4.0.0"
         },
         "scripts": {
-                "start": "node main.js 2>&1 | bunyan",
+                "start": "node main.js 2>&1 | pino-pretty",
                 "test": "nodeunit test"
         },
         "author": "Mark Cavage",

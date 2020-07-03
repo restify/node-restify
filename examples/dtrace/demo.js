@@ -80,8 +80,7 @@ var NAME = 'exampleapp';
 var log = new Logger({
     name: NAME,
     level: 'trace',
-    base: { service: NAME },
-    serializers: restify.bunyan.serializers
+    base: { service: NAME }
 });
 
 var server = restify.createServer({
