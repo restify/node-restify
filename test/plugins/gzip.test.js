@@ -106,7 +106,9 @@ describe('gzip parser', function() {
             bodyStream.resume();
             res.write('{"foo":"');
             bodyStream.pipe(res);
-            next();
+            bodyStream.on('end', function() {
+                next();
+            });
         });
 
         var opts = {
