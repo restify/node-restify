@@ -1,4 +1,18 @@
 <a name="8.5.1"></a>
+## [8.6.0](https://www.github.com/restify/node-restify/compare/v8.5.1...v8.6.0) (2020-07-06)
+
+
+### Features
+
+* send 500s for unhandled requests ([#1777](https://www.github.com/restify/node-restify/issues/1777)) ([885cecd](https://www.github.com/restify/node-restify/commit/885cecd7f9753b62faaa930f3cd39329057587f3))
+* **deps:** replace cover/istanbul with nyc ([#1823](https://www.github.com/restify/node-restify/issues/1823)) ([361f83e](https://www.github.com/restify/node-restify/commit/361f83e5acd814881c82add3e1bd06ce9ded777c))
+
+
+### Bug Fixes
+
+* examples/todoapp/package.json to reduce vulnerabilities ([#1832](https://www.github.com/restify/node-restify/issues/1832)) ([d9b27c6](https://www.github.com/restify/node-restify/commit/d9b27c602e260fc6c4f0e18e8b6835e89fa2adca))
+* **npm:** exclude extraneous files ([#1818](https://www.github.com/restify/node-restify/issues/1818)) ([e8516c3](https://www.github.com/restify/node-restify/commit/e8516c3735487ad5ebd332bc781404654c8c3cec))
+
 ### 8.5.1 (2019-12-13)
 
 
@@ -405,4 +419,3 @@ For more info see the `/guides/6to7guide.md`.
 * documentation update for restifyError event example (#1398) ([94fe7151](git://github.com/restify/node-restify.git/commit/94fe7151))
 * doc site (#1393) ([76ee5480](git://github.com/restify/node-restify.git/commit/76ee5480))
 * test static plugin's handling of sprintf escape sequences (#1391) ([5d7039a5](git://github.com/restify/node-restify.git/commit/5d7039a5))
-
