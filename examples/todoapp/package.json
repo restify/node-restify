@@ -7,7 +7,7 @@
                 "assert-plus": "0.2.0",
                 "pino": "^6.3.2",
                 "posix-getopt": "1.2.0",
-                "restify-errors": "^3.1.0",
+                "restify-errors": "^4.0.0",
                 "restify": "^4.0.3"
         },
         "devDependencies": {
