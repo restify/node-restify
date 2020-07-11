@@ -884,93 +884,6 @@ test('GH #704: Route with an invalid RegExp params', function(t) {
     });
 });
 
-test('gh-193 basic', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-test('gh-193 route name normalization', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('b-a-r');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'b-a-r',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-test('gh-193 route ENOEXIST', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('baz');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
-
 test('run param only with existing req.params', function(t) {
     var count = 0;
 
@@ -1023,91 +936,7 @@ test('run param only with existing req.params', function(t) {
     });
 });
 
-test('gh-193 route only run use once', function(t) {
-    var count = 0;
-
-    SERVER.use(function(req, res, next) {
-        count++;
-        next();
-    });
-
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(count, 1);
-        t.end();
-    });
-});
-
-test('gh-193 route chained', function(t) {
-    var count = 0;
-
-    SERVER.use(function addCounter(req, res, next) {
-        count++;
-        next();
-    });
-
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function getFoo(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function getBar(req, res, next) {
-            next('baz');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'baz',
-            path: '/baz'
-        },
-        function getBaz(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(count, 1);
-        t.end();
-    });
-});
-
-test('gh-193 route params basic', function(t) {
+test('next("string") returns InternalServer', function(t) {
     var count = 0;
 
     SERVER.use(function(req, res, next) {
@@ -1126,27 +955,15 @@ test('gh-193 route params basic', function(t) {
         }
     );
 
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar/:baz'
-        },
-        function(req, res, next) {
-            t.notOk(req.params.baz);
-            res.send(200);
-            next();
-        }
-    );
-
     CLIENT.get('/foo/blah', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
+        t.ok(err);
+        t.equal(res.statusCode, 500);
         t.equal(count, 1);
         t.end();
     });
 });
 
-test('gh-193 next("route") from a use plugin', function(t) {
+test('next("string") from a use plugin returns InternalServer', function(t) {
     var count = 0;
 
     SERVER.use(function plugin(req, res, next) {
@@ -1160,25 +977,14 @@ test('gh-193 next("route") from a use plugin', function(t) {
             path: '/foo'
         },
         function getFoo(req, res, next) {
-            res.send(500);
-            next();
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function getBar(req, res, next) {
             res.send(200);
             next();
         }
     );
 
     CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
+        t.ok(err);
+        t.equal(res.statusCode, 500);
         t.equal(count, 1);
         t.end();
     });
@@ -3000,14 +2806,11 @@ test('async handler without next', function(t) {
     });
 });
 
-test('async handler resolved with string should re-route', function(t) {
+test('async handler should discard value', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         await helper.sleep(10);
-        return 'getredirected';
-    });
-
-    SERVER.get('/redirected', async function tester(req, res) {
         res.send(req.params.name);
+        return 'foo';
     });
 
     CLIENT.get('/hello/mark', function(err, _, res) {
