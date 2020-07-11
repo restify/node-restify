@@ -5,7 +5,7 @@ permalink: /docs/8to9/
 
 ## Introduction
 
-restify `9.x` comes with `async/await` support!
+Restify `9.x` comes with `async/await` support, `pino` and more!
 
 ## Breaking Changes
 
@@ -94,3 +94,18 @@ server.use(async (req, res, next) => {
   });
 });
 ````
+
+### Remove `RequestCaptureStream`
+
+Removes `RequestCaptureStream` from Restify core.
+
+### Use `Pino` as default logger (removes dependency on `Bunyan`)
+
+[Pino](https://github.com/pinojs/pino) is well maintained, performance-focused, 
+compatible API. It does have a few key differences from `Bunyan`:
+
+- As a performance optimization, it stores bindings a single serialized `string`, 
+while `Bunyan` stores them as object keys;
+- It uses a `setter` to set the log level, `Bunyan` uses a method;
+- It only accepts one stream. If you need the multi-stream functionality, you
+must use [pino-multistream](https://github.com/pinojs/pino-multi-stream).  
