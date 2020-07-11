@@ -69,7 +69,7 @@
 //              512 |                                         0
 
 var restify = require('../../lib');
-var Logger = require('bunyan');
+var Logger = require('pino');
 
 ///--- Globals
 
@@ -80,8 +80,7 @@ var NAME = 'exampleapp';
 var log = new Logger({
     name: NAME,
     level: 'trace',
-    service: NAME,
-    serializers: restify.bunyan.serializers
+    base: { service: NAME }
 });
 
 var server = restify.createServer({

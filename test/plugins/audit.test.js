@@ -6,13 +6,14 @@ var PassThrough = require('stream').PassThrough;
 
 // external requires
 var assert = require('chai').assert;
-var bunyan = require('bunyan');
+var pino = require('pino');
 var lodash = require('lodash');
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
 
 // local files
 var helper = require('../lib/helper');
+var StreamRecorder = require('../lib/streamRecorder');
 var vasync = require('vasync');
 
 // local globals
@@ -51,22 +52,12 @@ describe('audit logger', function() {
     });
 
     it('audit logger should print log by default', function(done) {
-        var logBuffer = new bunyan.RingBuffer({
-            limit: 1000
-        });
+        var logBuffer = new StreamRecorder();
         var collectLog;
         SERVER.on(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: process.stdout
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, logBuffer),
                 server: SERVER,
                 event: 'after'
             })
@@ -126,15 +117,7 @@ describe('audit logger', function() {
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: process.stdout
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }),
                 server: SERVER,
                 event: 'after'
             })
@@ -166,22 +149,13 @@ describe('audit logger', function() {
     });
 
     it('test custom serializers', function(done) {
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record
+        var buffer = new StreamRecorder();
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after',
                 serializers: {
                     req: function(req) {
@@ -200,7 +174,7 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = ringbuffer.records && ringbuffer.records[0];
+            var record = buffer.records && buffer.records[0];
             assert.equal(record.req.fooReq, 'barReq');
             assert.equal(record.res.fooRes, 'barRes');
             done();
@@ -212,23 +186,14 @@ describe('audit logger', function() {
     });
 
     it('should log handler timers', function(done) {
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record
+        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -246,12 +211,12 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = ringbuffer.records && ringbuffer.records[0];
+            var record = buffer.records && buffer.records[0];
 
             // check timers
             assert.ok(record, 'no log records');
             assert.equal(
-                ringbuffer.records.length,
+                buffer.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -290,23 +255,14 @@ describe('audit logger', function() {
     it('should log anonymous handler timers', function(done) {
         this.timeout(5000);
 
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record
+        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1000;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -345,10 +301,10 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            var record = ringbuffer.records && ringbuffer.records[0];
+            var record = buffer.records && buffer.records[0];
             assert.ok(record, 'no log records');
             assert.equal(
-                ringbuffer.records.length,
+                buffer.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -415,23 +371,14 @@ describe('audit logger', function() {
     });
 
     it('restify-GH-1435 should accumulate log handler timers', function(done) {
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record
+        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -452,12 +399,12 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = ringbuffer.records && ringbuffer.records[0];
+            var record = buffer.records && buffer.records[0];
 
             // check timers
             assert.ok(record, 'no log records');
             assert.equal(
-                ringbuffer.records.length,
+                buffer.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -482,22 +429,13 @@ describe('audit logger', function() {
     });
 
     it('restify-GH-812 audit logger has query params string', function(done) {
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record
+        var buffer = new StreamRecorder();
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -509,13 +447,13 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            assert.ok(ringbuffer.records[0], 'no log records');
+            assert.ok(buffer.records[0], 'no log records');
             assert.equal(
-                ringbuffer.records.length,
+                buffer.records.length,
                 1,
                 'should only have 1 log record'
             );
-            assert.ok(ringbuffer.records[0].req.query, 'a=1&b=2');
+            assert.ok(buffer.records[0].req.query, 'a=1&b=2');
             done();
         });
 
@@ -525,22 +463,13 @@ describe('audit logger', function() {
     });
 
     it('restify-GH-812 audit logger has query params obj', function(done) {
-        // Dirty hack to capture the log record using a ring buffer.
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        // capture the log record using a buffer.
+        var buffer = new StreamRecorder();
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -555,13 +484,13 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            assert.ok(ringbuffer.records[0], 'no log records');
+            assert.ok(buffer.records[0], 'no log records');
             assert.equal(
-                ringbuffer.records.length,
+                buffer.records.length,
                 1,
                 'should only have 1 log record'
             );
-            assert.deepEqual(ringbuffer.records[0].req.query, {
+            assert.deepEqual(buffer.records[0].req.query, {
                 a: '1',
                 b: '2'
             });
@@ -579,15 +508,7 @@ describe('audit logger', function() {
         SERVER.once(
             'pre',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: ptStream
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, ptStream),
                 event: 'pre'
             })
         );
@@ -620,15 +541,7 @@ describe('audit logger', function() {
         SERVER.once(
             'routed',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: ptStream
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, ptStream),
                 event: 'routed'
             })
         );
@@ -659,15 +572,7 @@ describe('audit logger', function() {
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: process.stdout
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }),
                 context: function(req, res, route, err) {
                     return {
                         qs: req.getQuery()
@@ -704,15 +609,7 @@ describe('audit logger', function() {
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            stream: process.stdout
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }),
                 server: SERVER,
                 event: 'after'
             })

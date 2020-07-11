@@ -55,7 +55,7 @@ var docsConfig = [
             path.join(__dirname, LIB_PATH, 'plugins/query.js'),
             path.join(__dirname, LIB_PATH, 'plugins/jsonp.js'),
             path.join(__dirname, LIB_PATH, 'plugins/bodyParser.js'),
-            path.join(__dirname, LIB_PATH, 'plugins/bunyan.js'),
+            path.join(__dirname, LIB_PATH, 'plugins/requestLogger.js'),
             path.join(__dirname, LIB_PATH, 'plugins/gzip.js'),
             path.join(__dirname, LIB_PATH, 'plugins/static.js'),
             path.join(__dirname, LIB_PATH, 'plugins/staticFiles.js'),

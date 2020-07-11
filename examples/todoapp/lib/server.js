@@ -5,7 +5,7 @@ var path = require('path');
 var util = require('util');
 
 var assert = require('assert-plus');
-var bunyan = require('bunyan');
+var pino = require('pino');
 var restify = require('restify');
 var errors = require('restify-errors');
 
@@ -326,7 +326,7 @@ function createServer(options) {
     // Handles annoying user agents (curl)
     server.pre(restify.pre.userAgentConnection());
 
-    // Set a per request bunyan logger (with requestid filled in)
+    // Set a per request pino logger (with requestid filled in)
     server.use(restify.requestLogger());
 
     // Allow 5 requests/second by IP, and burst to 10
@@ -422,11 +422,7 @@ function createServer(options) {
             'after',
             restify.auditLogger({
                 body: true,
-                log: bunyan.createLogger({
-                    level: 'info',
-                    name: 'todoapp-audit',
-                    stream: process.stdout
-                })
+                log: pino({ level: 'info', name: 'todoapp-audit' })
             })
         );
     }

@@ -37,20 +37,20 @@ First, this has a `package.json`, so you'll need to run `npm install` in the
 directory. Once you've done that, to get started _and_ see audit logs on your
 terminal, run it like this:
 
-    $ node main.js 2>&1 | bunyan
+    $ node main.js 2>&1 | npx pino-pretty
 
 If you want to see all the built in restify tracing:
 
-    $ node main.js -vv 2>&1 | bunyan
+    $ node main.js -vv 2>&1 | npx pino-pretty
 
 By default, this program writes to a directory in `/tmp`, but you can override
 with a `-d` option.  Additionally, by default it does not require
 authentication, but you can require that with:
 
-    $ node main.js -u admin -z secret 2>&1 | bunyan
+    $ node main.js -u admin -z secret 2>&1 | npx pino-pretty
 
-Lastly, re: the `2>&1 | bunyan` bit.  In production, you assuredly would *not*
-want to pipe to the [bunyan](https://github.com/trentm/node-bunyan) CLI, but
+Lastly, re: the `2>&1 | npx pino-pretty` bit.  In production, you assuredly would *not*
+want to pipe to the [pino-pretty](https://github.com/pinojs/pino-pretty) CLI, but
 rather capture the audit records in their raw form, so they would be easy to
 post process and perform analytics on.  Like all UNIX programs should, this
 example writes "informational" messages to `stderr`, and `audit` records to
@@ -61,7 +61,7 @@ stdout.  It's up to you to redirect them as appropriate.
 
 Let's get the full magilla (i.e., with auth) running:
 
-    $ node main.js -u admin -z secret 2>&1 | bunyan
+    $ node main.js -u admin -z secret 2>&1 | npx pino-pretty
 
 Also, before we go any further, install the
 [json](https://github.com/trentm/json) tool as all the examples below use that.
