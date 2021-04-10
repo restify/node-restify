@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var bunyan = require('bunyan');
+var pino = require('pino');
 var restify = require('restify');
 
 var todo = require('../lib');
@@ -17,11 +17,9 @@ var SOCK = '/tmp/.todo_sock';
 ///--- Tests
 
 exports.setup = function(t) {
-    var log = bunyan.createLogger({
+    var log = pino({
         name: 'todo_unit_test',
-        level: process.env.LOG_LEVEL || 'info',
-        serializers: restify.bunyan.serializers,
-        stream: process.stdout
+        level: process.env.LOG_LEVEL || 'info'
     });
 
     fs.mkdir(DIR, function(err) {

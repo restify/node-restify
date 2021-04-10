@@ -90,7 +90,7 @@ describe('inlfightRequestThrottle', function() {
         var opts = { server: server, limit: 1, err: err };
         server.pre(inflightRequestThrottle(opts));
         var RES;
-        server.get('/foo', function(req, res) {
+        server.get('/foo', function(req, res, next) {
             if (RES) {
                 res.send(999);
             } else {

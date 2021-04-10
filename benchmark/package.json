@@ -9,7 +9,7 @@
     "node": ">=0.10"
   },
   "dependencies": {
-    "restify": "*"
+    "restify": "latest"
   },
   "devDependencies": {},
   "license": "MIT",

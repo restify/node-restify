@@ -195,7 +195,7 @@ The difference between the two is that invoking `next()` with an Error object
 allows you to leverage the server's [event
 emitter](/components/server.md#errors). This enables you to handle all
 occurrences of an error type using a common handler. See the [error
-handling](#error handling) section for more details.
+handling](#error-handling) section for more details.
 
 
 Lastly, you can call `next.ifError(err)` with an Error object to cause restify
@@ -581,9 +581,11 @@ which will catch errors of all types.
 An example of sending a 404:
 
 ```js
+var errs = require('restify-errors');
+
 server.get('/hello/:foo', function(req, res, next) {
   // resource not found error
-  var err = new restify.errors.NotFoundError('oh noes!');
+  var err = new errs.NotFoundError('oh noes!');
   return next(err);
 });
 
@@ -600,9 +602,11 @@ server.on('NotFound', function (req, res, err, cb) {
 For customizing the error being sent back to the client:
 
 ```js
+var errs = require('restify-errors');
+
 server.get('/hello/:name', function(req, res, next) {
   // some internal unrecoverable error
-  var err = new restify.errors.InternalServerError('oh noes!');
+  var err = new errs.InternalServerError('oh noes!');
   return next(err);
 });
 

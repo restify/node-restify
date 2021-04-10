@@ -1,6 +1,7 @@
 'use strict';
 /* eslint-disable func-names */
 
+var domain = require('domain');
 var Chain = require('../lib/chain');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
@@ -184,7 +185,7 @@ test('onceNext prevents double next calls', function(t) {
 });
 
 test('throws error for double next calls in strictNext mode', function(t) {
-    var doneCalled = 0;
+    t.expect(1);
     var chain = new Chain({
         strictNext: true
     });
@@ -194,7 +195,15 @@ test('throws error for double next calls in strictNext mode', function(t) {
         next();
     });
 
-    try {
+    var testDomain = domain.create();
+
+    testDomain.on('error', function onError(err) {
+        t.equal(err.message, "next shouldn't be called more than once");
+        testDomain.exit();
+        t.done();
+    });
+
+    testDomain.run(function run() {
         chain.run(
             {
                 startHandlerTimer: function() {},
@@ -206,14 +215,9 @@ test('throws error for double next calls in strictNext mode', function(t) {
             {},
             function(err) {
                 t.ifError(err);
-                doneCalled++;
-                t.equal(doneCalled, 1);
-                t.done();
             }
         );
-    } catch (err) {
-        t.equal(err.message, "next shouldn't be called more than once");
-    }
+    });
 });
 
 test('calls req.startHandlerTimer', function(t) {
@@ -276,5 +280,152 @@ test('getHandlers returns with the array of handlers', function(t) {
     chain.add(handlers[0]);
     chain.add(handlers[1]);
     t.deepEqual(chain.getHandlers(), handlers);
+    t.end();
+});
+
+test('waits async handlers', function(t) {
+    const chain = new Chain();
+    let counter = 0;
+
+    chain.add(async function(req, res) {
+        await helper.sleep(50);
+        counter++;
+    });
+    chain.add(function(req, res, next) {
+        counter++;
+        next();
+    });
+    chain.run(
+        {
+            startHandlerTimer: function() {},
+            endHandlerTimer: function() {},
+            closed: function() {
+                return false;
+            }
+        },
+        {},
+        function() {
+            t.equal(counter, 2);
+            t.done();
+        }
+    );
+});
+
+test('abort with rejected promise', function(t) {
+    const myError = new Error('Foo');
+    const chain = new Chain();
+    let counter = 0;
+
+    chain.add(async function(req, res) {
+        counter++;
+        await helper.sleep(10);
+        return Promise.reject(myError);
+    });
+    chain.add(function(req, res, next) {
+        counter++;
+        next();
+    });
+    chain.run(
+        {
+            startHandlerTimer: function() {},
+            endHandlerTimer: function() {},
+            closed: function() {
+                return false;
+            }
+        },
+        {},
+        function(err) {
+            t.deepEqual(err, myError);
+            t.equal(counter, 1);
+            t.done();
+        }
+    );
+});
+
+test('abort with rejected promise without error', function(t) {
+    const chain = new Chain();
+    let counter = 0;
+
+    chain.add(async function(req, res) {
+        counter++;
+        await helper.sleep(10);
+        return Promise.reject();
+    });
+    chain.add(function(req, res, next) {
+        counter++;
+        next();
+    });
+    chain.run(
+        {
+            startHandlerTimer: function() {},
+            endHandlerTimer: function() {},
+            closed: function() {
+                return false;
+            },
+            path: function() {
+                return '/';
+            }
+        },
+        {},
+        function(err) {
+            t.ok(typeof err === 'object');
+            t.equal(err.name, 'AsyncError');
+            t.equal(err.jse_info.cause, undefined);
+            t.equal(counter, 1);
+            t.done();
+        }
+    );
+});
+
+test('abort with throw inside async function', function(t) {
+    const myError = new Error('Foo');
+    const chain = new Chain();
+    let counter = 0;
+
+    chain.add(async function(req, res) {
+        counter++;
+        await helper.sleep(10);
+        throw myError;
+    });
+    chain.add(function(req, res, next) {
+        counter++;
+        next();
+    });
+    chain.run(
+        {
+            startHandlerTimer: function() {},
+            endHandlerTimer: function() {},
+            closed: function() {
+                return false;
+            }
+        },
+        {},
+        function(err) {
+            t.deepEqual(err, myError);
+            t.equal(counter, 1);
+            t.done();
+        }
+    );
+});
+
+test('fails to add non async function with arity 2', function(t) {
+    var chain = new Chain();
+
+    t.throws(function() {
+        chain.add(function(req, res) {
+            res.send('ok');
+        });
+    }, Error);
+    t.end();
+});
+
+test('fails to add async function with arity 3', function(t) {
+    var chain = new Chain();
+
+    t.throws(function() {
+        chain.add(async function(req, res, next) {
+            res.send('ok');
+        });
+    }, Error);
     t.end();
 });

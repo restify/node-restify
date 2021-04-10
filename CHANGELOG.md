@@ -1,3 +1,35 @@
+<a name="8.5.1"></a>
+### 8.5.1 (2019-12-13)
+
+
+#### Bug Fixes
+
+* **benchmark:** force latest restify version (#1810) ([b8ec60e3](git://github.com/restify/node-restify.git/commit/b8ec60e3))
+* **server:** address domain performance regression with Node v12.x (#1809) ([e648d491](git://github.com/restify/node-restify.git/commit/e648d491))
+
+
+<a name="8.5.0"></a>
+## 8.5.0 (2019-12-02)
+
+
+#### Features
+
+* **chain:** use nextTick instead of setImmediate (#1808) ([703470ad](git://github.com/restify/node-restify.git/commit/703470ad))
+
+
+<a name="8.4.1"></a>
+### 8.4.1 (2019-11-27)
+
+
+<a name="8.4.0"></a>
+## 8.4.0 (2019-07-31)
+
+
+#### Features
+
+* **chain:** schedule handlers to the next tick (#1798) ([806ed711](git://github.com/restify/node-restify.git/commit/806ed711))
+
+
 <a name="8.3.3"></a>
 ### 8.3.3 (2019-06-04)
 

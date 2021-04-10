@@ -3,7 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var bunyan = require('bunyan');
+var pino = require('pino');
 var getopt = require('posix-getopt');
 var restify = require('restify');
 
@@ -13,32 +13,7 @@ var todo = require('./lib');
 
 var NAME = 'todoapp';
 
-// In true UNIX fashion, debug messages go to stderr, and audit records go
-// to stdout, so you can split them as you like in the shell
-var LOG = bunyan.createLogger({
-    name: NAME,
-    streams: [
-        {
-            level: process.env.LOG_LEVEL || 'info',
-            stream: process.stderr
-        },
-        {
-            // This ensures that if we get a WARN or above all debug records
-            // related to that request are spewed to stderr - makes it nice
-            // filter out debug messages in prod, but still dump on user
-            // errors so you can debug problems
-            level: 'debug',
-            type: 'raw',
-            stream: new restify.bunyan.RequestCaptureStream({
-                level: bunyan.WARN,
-                maxRecords: 100,
-                maxRequestIds: 1000,
-                stream: process.stderr
-            })
-        }
-    ],
-    serializers: restify.bunyan.serializers
-});
+var LOG = pino({ name: NAME });
 
 ///--- Helpers
 
@@ -49,7 +24,7 @@ var LOG = bunyan.createLogger({
  * the 'verbose' or '-v' option afflicts the log level, repeatedly. So you
  * can run something like:
  *
- * node main.js -p 80 -vv 2>&1 | bunyan
+ * node main.js -p 80 -vv 2>&1 | npx pino-pretty
  *
  * And the log level will be set to TRACE.
  */
@@ -79,9 +54,9 @@ function parseOptions() {
             case 'v':
                 // Allows us to set -vvv -> this little hackery
                 // just ensures that we're never < TRACE
-                LOG.level(Math.max(bunyan.TRACE, LOG.level() - 10));
+                LOG.level(Math.max(pino.levels.values.trace, LOG.level - 10));
 
-                if (LOG.level() <= bunyan.DEBUG) {
+                if (LOG.level <= pino.levels.values.debug) {
                     LOG = LOG.child({ src: true });
                 }
                 break;

@@ -4,6 +4,7 @@
 /* eslint-disable func-names */
 
 // external requires
+var pino = require('pino');
 var assert = require('chai').assert;
 var restify = require('../../lib/index.js');
 var restifyClients = require('restify-clients');
@@ -76,8 +77,9 @@ describe('all other plugins', function() {
 
             SERVER.use(restify.plugins.requestLogger({ headers: headers }));
             SERVER.get(getPath, function(req, res, next) {
-                assert.equal(req.log.fields[key], 'foo-for-eva');
-                assert.equal(req.log.fields.hasOwnProperty(badKey), false);
+                var childings = req.log[pino.symbols.chindingsSym];
+                assert.match(childings, /"x-request-uuid":"foo-for-eva"/);
+                assert.notMatch(childings, /x-foo-bar/);
                 res.send();
                 next();
             });

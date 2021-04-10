@@ -4,10 +4,9 @@
 /* eslint-disable func-names */
 
 var assert = require('assert-plus');
-var bunyan = require('bunyan');
+var pino = require('pino');
 var childprocess = require('child_process');
 var http = require('http');
-var stream = require('stream');
 
 var errors = require('restify-errors');
 var restifyClients = require('restify-clients');
@@ -20,6 +19,7 @@ if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
 }
 var helper = require('./lib/helper.js');
+var StreamRecorder = require('./lib/streamRecorder');
 
 ///--- Globals
 
@@ -884,93 +884,6 @@ test('GH #704: Route with an invalid RegExp params', function(t) {
     });
 });
 
-test('gh-193 basic', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-test('gh-193 route name normalization', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('b-a-r');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'b-a-r',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
-
-test('gh-193 route ENOEXIST', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('baz');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
-
 test('run param only with existing req.params', function(t) {
     var count = 0;
 
@@ -1023,91 +936,7 @@ test('run param only with existing req.params', function(t) {
     });
 });
 
-test('gh-193 route only run use once', function(t) {
-    var count = 0;
-
-    SERVER.use(function(req, res, next) {
-        count++;
-        next();
-    });
-
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(count, 1);
-        t.end();
-    });
-});
-
-test('gh-193 route chained', function(t) {
-    var count = 0;
-
-    SERVER.use(function addCounter(req, res, next) {
-        count++;
-        next();
-    });
-
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function getFoo(req, res, next) {
-            next('bar');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function getBar(req, res, next) {
-            next('baz');
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'baz',
-            path: '/baz'
-        },
-        function getBaz(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
-
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(count, 1);
-        t.end();
-    });
-});
-
-test('gh-193 route params basic', function(t) {
+test('next("string") returns InternalServer', function(t) {
     var count = 0;
 
     SERVER.use(function(req, res, next) {
@@ -1126,27 +955,15 @@ test('gh-193 route params basic', function(t) {
         }
     );
 
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar/:baz'
-        },
-        function(req, res, next) {
-            t.notOk(req.params.baz);
-            res.send(200);
-            next();
-        }
-    );
-
     CLIENT.get('/foo/blah', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
+        t.ok(err);
+        t.equal(res.statusCode, 500);
         t.equal(count, 1);
         t.end();
     });
 });
 
-test('gh-193 next("route") from a use plugin', function(t) {
+test('next("string") from a use plugin returns InternalServer', function(t) {
     var count = 0;
 
     SERVER.use(function plugin(req, res, next) {
@@ -1160,25 +977,14 @@ test('gh-193 next("route") from a use plugin', function(t) {
             path: '/foo'
         },
         function getFoo(req, res, next) {
-            res.send(500);
-            next();
-        }
-    );
-
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function getBar(req, res, next) {
             res.send(200);
             next();
         }
     );
 
     CLIENT.get('/foo', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
+        t.ok(err);
+        t.equal(res.statusCode, 500);
         t.equal(count, 1);
         t.end();
     });
@@ -1519,20 +1325,11 @@ test(
         ]);
 
         // set up audit logs
-        var ringbuffer = new bunyan.RingBuffer({ limit: 1 });
+        var buffer = new StreamRecorder();
         SERVER.on(
             'after',
             restify.plugins.auditLogger({
-                log: bunyan.createLogger({
-                    name: 'audit',
-                    streams: [
-                        {
-                            level: 'info',
-                            type: 'raw',
-                            stream: ringbuffer
-                        }
-                    ]
-                }),
+                log: pino({ name: 'audit' }, buffer),
                 event: 'after'
             })
         );
@@ -1544,18 +1341,15 @@ test(
                 t.equal(err.name, 'RequestCloseError');
 
                 // check records
-                t.ok(ringbuffer.records[0], 'no log records');
+                t.ok(buffer.records[0], 'no log records');
                 t.equal(
-                    ringbuffer.records.length,
+                    buffer.records.length,
                     1,
                     'should only have 1 log record'
                 );
-                // TODO: fix this after plugin is fixed to use
-                // req.connectionState()
-                // t.equal(ringbuffer.records[0].req.clientClosed, true);
 
                 // check timers
-                var handlers = Object.keys(ringbuffer.records[0].req.timers);
+                var handlers = Object.keys(buffer.records[0].req.timers);
                 t.equal(handlers.length, 2, 'should only have 2 req timers');
                 t.equal(
                     handlers[0],
@@ -1583,6 +1377,8 @@ test(
 
             // reset numCount
             numCount = 0;
+            //reset stream-recorder
+            buffer.flushRecords();
 
             FAST_CLIENT.get('/audit?v=2', function(err2, req2, res2, data2) {
                 t.ok(err2);
@@ -1666,47 +1462,6 @@ test('GH-667 returning error in error handler should not do anything', function(
         // should still get the original error
         t.equal(err.name, 'ImATeapotError');
         t.end();
-    });
-});
-
-test('GH-958 RCS does not write triggering record', function(t) {
-    var passThrough = new stream.PassThrough();
-    var count = 1;
-    // we would expect to get 3 logging statements
-    passThrough.on('data', function(chunk) {
-        var obj = JSON.parse(chunk.toString());
-        t.equal(obj.msg, count.toString());
-
-        if (count === 3) {
-            t.end();
-        }
-        count++;
-    });
-
-    SERVER.log = helper.getLog('server', [
-        {
-            level: bunyan.DEBUG,
-            type: 'raw',
-            stream: new restify.bunyan.RequestCaptureStream({
-                level: bunyan.WARN,
-                stream: passThrough
-            })
-        }
-    ]);
-
-    SERVER.use(restify.plugins.requestLogger());
-
-    SERVER.get('/rcs', function(req, res, next) {
-        req.log.debug('1');
-        req.log.info('2');
-        req.log.error('3');
-        res.send();
-        next();
-    });
-
-    CLIENT.get('/rcs', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
     });
 });
 
@@ -1820,7 +1575,7 @@ test('calling next(false) should early exit from use handlers', function(t) {
 
     SERVER.on('after', function() {
         steps++;
-        t.equal(steps, 2);
+        t.equal(steps, 1);
         t.end();
     });
 
@@ -2111,7 +1866,7 @@ test('should increment/decrement inflight request count', function(t) {
     CLIENT.get('/foo', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
     });
 });
 
@@ -2135,14 +1890,14 @@ test('should increment/decrement inflight request count for concurrent reqs', fu
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
         t.end();
     });
 
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2174,7 +1929,7 @@ test('should cleanup inflight requests count for 404s', function(t) {
     CLIENT.get('/foo1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
+        t.equal(SERVER.inflightRequests(), 0);
 
         CLIENT.get('/doesnotexist', function(err2, _2, res2) {
             t.ok(err2);
@@ -2219,7 +1974,7 @@ test('should cleanup inflight requests count for timeouts', function(t) {
     CLIENT.get('/foo2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 2);
+        t.equal(SERVER.inflightRequests(), 1);
     });
 });
 
@@ -2496,6 +2251,48 @@ test('should emit error with multiple next calls with strictNext', function(t) {
         });
     });
 });
+
+test(
+    'should send 500 if we reached the end of handler chain w/o sending ' +
+        'headers',
+    function(t) {
+        var server = restify.createServer({
+            dtrace: helper.dtrace,
+            strictNext: true,
+            log: helper.getLog('server')
+        });
+        var client;
+        var port;
+
+        server.listen(PORT + 1, '127.0.0.1', function() {
+            port = server.address().port;
+            client = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + port,
+                dtrace: helper.dtrace,
+                retry: false
+            });
+
+            server.get('/noResponse', function(req, res, next) {
+                next();
+            });
+
+            client.get('/noResponse', function(err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+                t.equal(err.name, 'InternalServerError');
+                t.equal(
+                    err.message,
+                    'reached the end of the handler chain without ' +
+                        'writing a response!'
+                );
+                client.close();
+                server.close(function() {
+                    t.end();
+                });
+            });
+        });
+    }
+);
 
 test('uncaughtException should not trigger named routeHandler', function(t) {
     SERVER.get(
@@ -2862,7 +2659,7 @@ test('inflightRequest accounting stable with firstChain', function(t) {
         for (var i = 0; i < results.length; i++) {
             // The shed request should always be returned first, since it isn't
             // handled by SERVER.get
-            if (i === 0) {
+            if (i === 1) {
                 t.equal(
                     results[i].statusCode,
                     413,
@@ -2883,4 +2680,143 @@ test('inflightRequest accounting stable with firstChain', function(t) {
     CLIENT.get('/foobar', getDone);
     CLIENT.get('/foobar', getDone);
     CLIENT.get('/foobar', getDone);
+});
+
+test('async prerouting chain with error', function(t) {
+    SERVER.pre(async function(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async prerouting chain with empty rejection', function(t) {
+    SERVER.pre(async function(req, res) {
+        await helper.sleep(10);
+        return Promise.reject();
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    SERVER.on('Async', function(req, res, err, callback) {
+        t.equal(err.jse_info.cause, undefined);
+        t.equal(err.jse_info.method, 'GET');
+        t.equal(err.jse_info.path, '/hello/mark');
+        callback();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 500);
+        t.end();
+    });
+});
+
+test('async use chain with error', function(t) {
+    SERVER.use(async function(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.get('/hello/:name', function tester(req, res, next) {
+        res.send(req.params.name);
+        next();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async handler with error', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 400);
+        t.end();
+    });
+});
+
+test('async handler with error after send succeeds', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        res.send(req.params.name);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('async handler with error after send succeeds', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        res.send(req.params.name);
+        await helper.sleep(20);
+        throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
+    });
+
+    SERVER.on('after', function(req, res, route, error) {
+        t.ok(error);
+        t.end();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+test('async handler without next', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        res.send(req.params.name);
+    });
+
+    SERVER.on('after', function(req, res, route, error) {
+        t.ok(!error);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+    });
+});
+
+test('async handler should discard value', function(t) {
+    SERVER.get('/hello/:name', async function tester(req, res) {
+        await helper.sleep(10);
+        res.send(req.params.name);
+        return 'foo';
+    });
+
+    CLIENT.get('/hello/mark', function(err, _, res) {
+        t.ok(!err);
+        t.equal(res.statusCode, 200);
+        t.equal(res.body, '"mark"');
+        t.end();
+    });
 });

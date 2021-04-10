@@ -4,8 +4,11 @@
 /* eslint-disable func-names */
 
 var restifyClients = require('restify-clients');
+var errors = require('restify-errors');
+var sinon = require('sinon');
 
 var restify = require('../lib');
+var jsonFormatter = require('../lib/formatters/json');
 
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -35,6 +38,9 @@ before(function(callback) {
                 'text/syncerror': function(req, res, body) {
                     // this is a bad formatter, on purpose.
                     return x.toString(); // eslint-disable-line no-undef
+                },
+                'text/syncerror_expected': function(req, res, body) {
+                    throw new errors.InternalServerError('Errors happen');
                 },
                 'application/foo; q=0.9': function(req, res, body) {
                     return 'foo!';
@@ -108,7 +114,7 @@ test('GH-845: sync formatter', function(t) {
 });
 
 test('GH-845: sync formatter should blow up', function(t) {
-    SERVER.on('uncaughtException', function(req, res, route, err) {
+    SERVER.once('uncaughtException', function(req, res, route, err) {
         t.ok(err);
         t.equal(err.name, 'ReferenceError');
         t.equal(err.message, 'x is not defined');
@@ -125,6 +131,29 @@ test('GH-845: sync formatter should blow up', function(t) {
         },
         function(err, req, res, data) {
             t.equal(data, 'uncaughtException');
+            t.end();
+        }
+    );
+});
+
+test('sync formatter should handle expected errors gracefully', function(t) {
+    SERVER.once('uncaughtException', function(req, res, route, err) {
+        throw new Error('Should not reach');
+    });
+
+    CLIENT.get(
+        {
+            path: '/sync',
+            headers: {
+                accept: 'text/syncerror_expected'
+            }
+        },
+        function(err, req, res, data) {
+            t.ok(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(res.statusCode, 500);
+            SERVER.removeAllListeners('uncaughtException');
             t.end();
         }
     );
@@ -225,6 +254,46 @@ test('default jsonp formatter should escape line and paragraph separators', func
         t.ok(req);
         t.ok(res);
         t.equal(data, '"\\u2028\\u2029"');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line
+test('default json formatter should wrap & throw InternalServer error on unserializable bodies', function(t) {
+    t.expect(2);
+
+    sinon.spy(JSON, 'stringify');
+
+    SERVER.once('uncaughtException', function(req, res, route, err) {
+        console.log(err.stack); // For convenience
+        throw new Error('Should not reach');
+    });
+
+    var opts = {
+        path: '/badJSON',
+        name: 'badJSON'
+    };
+
+    SERVER.get(opts, function(req, res, next) {
+        var body = {};
+        // Add unserializable circular reference
+        body.body = body;
+
+        try {
+            jsonFormatter(req, res, body);
+            throw new Error('Should not reach');
+        } catch (e) {
+            t.ok(e instanceof errors.InternalServerError);
+            t.ok(JSON.stringify.threw(e.cause()));
+        }
+
+        res.send();
+    });
+
+    CLIENT.get('/badJSON', function(err, req, res, data) {
+        SERVER.rm('badJSON');
+        SERVER.removeAllListeners('uncaughtException');
+        JSON.stringify.restore();
         t.end();
     });
 });
