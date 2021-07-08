@@ -1,4 +1,36 @@
 <a name="8.5.1"></a>
+## [9.0.0](https://www.github.com/restify/node-restify/compare/v8.5.1...v9.0.0) (2021-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* deprecates and removes re-routing when passing a string parameter to `next()`
+* removes `RequestCaptureStream` and replaces `Bunyan` with `Pino`
+* adds async/await support to pre, use and handler chains
+* drops suppoprt to node 8 and updates linting rules
+
+### Features
+
+* async/await support ([12be9e2](https://www.github.com/restify/node-restify/commit/12be9e243a407eaf7a30cbb16e399ee2a46dec93))
+* remove re-routing from handler ([#1847](https://www.github.com/restify/node-restify/issues/1847)) ([9153587](https://www.github.com/restify/node-restify/commit/9153587c023a876237c1d8bc7491fee4984d9074))
+* send 500s for unhandled requests ([#1777](https://www.github.com/restify/node-restify/issues/1777)) ([885cecd](https://www.github.com/restify/node-restify/commit/885cecd7f9753b62faaa930f3cd39329057587f3))
+* **deps:** replace cover/istanbul with nyc ([#1823](https://www.github.com/restify/node-restify/issues/1823)) ([361f83e](https://www.github.com/restify/node-restify/commit/361f83e5acd814881c82add3e1bd06ce9ded777c))
+
+
+### Bug Fixes
+
+* examples/todoapp/package.json to reduce vulnerabilities ([#1832](https://www.github.com/restify/node-restify/issues/1832)) ([d9b27c6](https://www.github.com/restify/node-restify/commit/d9b27c602e260fc6c4f0e18e8b6835e89fa2adca))
+* format falsy constants properly in json formatter ([#1792](https://www.github.com/restify/node-restify/issues/1792)) ([3002182](https://www.github.com/restify/node-restify/commit/3002182cacc7a9334237a9284a339ba93d3f213c))
+* **npm:** exclude extraneous files ([#1818](https://www.github.com/restify/node-restify/issues/1818)) ([e8516c3](https://www.github.com/restify/node-restify/commit/e8516c3735487ad5ebd332bc781404654c8c3cec))
+
+
+### Miscellaneous Chores
+
+* drop support for node 8 ([bd34988](https://www.github.com/restify/node-restify/commit/bd349884321d3e8af549f4d9da4456774e82ac8b))
+
+
+* Prefer Pino logger over Bunyan (#1841) ([2f5bf87](https://www.github.com/restify/node-restify/commit/2f5bf8722c9e0ba0d45f32af5c2c16ddbaa538b4)), closes [#1841](https://www.github.com/restify/node-restify/issues/1841)
+
 ### 8.5.1 (2019-12-13)
 
 
@@ -405,4 +437,3 @@ For more info see the `/guides/6to7guide.md`.
 * documentation update for restifyError event example (#1398) ([94fe7151](git://github.com/restify/node-restify.git/commit/94fe7151))
 * doc site (#1393) ([76ee5480](git://github.com/restify/node-restify.git/commit/76ee5480))
 * test static plugin's handling of sprintf escape sequences (#1391) ([5d7039a5](git://github.com/restify/node-restify.git/commit/5d7039a5))
-
