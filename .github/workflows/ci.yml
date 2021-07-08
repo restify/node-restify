@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: install node v10
+      - name: install node v16
         uses: actions/setup-node@v1
         with:
-          node-version: v10.x
+          node-version: v16.x
       - name: install dependencies
         run: npm install
       - name: check lint
@@ -31,6 +31,7 @@ jobs:
           - 10.x
           - 12.x
           - 14.x
+          - 16.x
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v2
