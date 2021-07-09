@@ -297,3 +297,28 @@ test('default json formatter should wrap & throw InternalServer error on unseria
         t.end();
     });
 });
+
+// eslint-disable-next-line
+test('preserve original error when there is no fallback formatter', function(t) {
+    // _strictFormatters=false, content-type is set w/o supported formatter
+    // But an error is passed (unable to fallback to octet-stream)
+
+    var e = new Error('Render error');
+    var warnSpy;
+    SERVER.get('/error', function(req, res, next) {
+        res._strictFormatters = false;
+        warnSpy = sinon.spy(res.log, 'warn');
+        res.setHeader('content-type', 'text/html');
+        return res.send(e);
+    });
+
+    CLIENT.get('/error', function(err, req, res, data) {
+        t.ok(err);
+        t.ok(req);
+        t.ok(res);
+        t.equal(res.statusCode, 500);
+        t.equal(warnSpy.args[0][0].err.jse_cause, e);
+        warnSpy.restore();
+        t.end();
+    });
+});
