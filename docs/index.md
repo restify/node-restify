@@ -437,6 +437,17 @@ server.get('/websocket/attach', function upgradeRoute(req, res, next) {
 
 ## Responses' Content Negotiation And Formatting
 
+In restify, content type negotiation is tightly coupled with response
+formatting. Automatically negotiable content types are defined by available
+formatters, and a content type is required on response objects to determine
+which formatter to use to format the response.
+
+By default, formatting of responses is enabled, but it can be disabled by
+passing `disableResponseFormatting: true` to the `Server` constructor. The rest
+of this section describes the behavior of restify when responses formatting is
+enabled. When formatting is disabled, `res.send`'s behavior is equivalent to
+`res.sendRaw`.
+
 If you're using `res.send()` restify will determine the content-type to respond
 with by, from highest priority to lowest priority:
 

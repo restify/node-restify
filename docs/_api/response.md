@@ -143,7 +143,8 @@ Returns **[String][16]** the header value set to res
 
 ### send
 
-Sends the response object. pass through to internal `__send` that uses a
+Sends the response object. It is a pass through to internal `__send`. Unless the
+server instance was created with `disableResponseFormatting: true`, it uses a
 formatter based on the `content-type` header.
 
 **Parameters**
