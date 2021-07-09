@@ -3,6 +3,7 @@
 
 // core requires
 var http = require('http');
+var zlib = require('zlib');
 
 // external requires
 var assert = require('chai').assert;
@@ -63,6 +64,78 @@ describe('body reader', function() {
                     done();
                 }
             );
+        });
+
+        it('should return 400 if body is not a valid gzip', function(done) {
+            SERVER.use(restify.plugins.bodyParser());
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false,
+                headers: {
+                    'content-encoding': 'gzip'
+                }
+            });
+
+            SERVER.post('/compressed', function(req, res, next) {
+                res.send();
+                next();
+            });
+
+            CLIENT.post(
+                '/compressed',
+                {
+                    apple: 'red'
+                },
+                function(err, _, res) {
+                    assert.isOk(err, 'should fail');
+                    assert.equal(res.statusCode, 400);
+                    done();
+                }
+            );
+        });
+
+        describe('when maxBodySize given should', function() {
+            var body = { apple: 'red' };
+            var bodyTooLarge = { apple: 'red', lemon: 'yellow' };
+
+            var compressedBodySize = zlib.gzipSync(JSON.stringify(body))
+                .byteLength;
+
+            beforeEach(function() {
+                SERVER.use(
+                    restify.plugins.bodyParser({
+                        maxBodySize: compressedBodySize
+                    })
+                );
+
+                CLIENT = restifyClients.createJsonClient({
+                    url: 'http://127.0.0.1:' + PORT,
+                    retry: false,
+                    gzip: {}
+                });
+
+                SERVER.post('/compressed', function(req, res, next) {
+                    res.send();
+                    next();
+                });
+            });
+
+            it('return 200 when body size under the limit', function(done) {
+                CLIENT.post('/compressed', body, function(err, _, res) {
+                    assert.ifError(err);
+                    assert.equal(res.statusCode, 200);
+                    done();
+                });
+            });
+
+            it('return 413 when body size over the limit', function(done) {
+                CLIENT.post('/compressed', bodyTooLarge, function(err, _, res) {
+                    assert.isOk(err, 'should fail');
+                    assert.equal(res.statusCode, 413);
+                    done();
+                });
+            });
         });
 
         it('should not accept unsupported content encoding', function(done) {
