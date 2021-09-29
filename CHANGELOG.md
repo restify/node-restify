@@ -1,3 +1,20 @@
+<a name="8.6.0"></a>
+## 8.6.0 (2021-09-28)
+
+
+#### Bug Fixes
+
+* use more reliable close event ([e183e5d8](git://github.com/restify/node-restify.git/commit/e183e5d8))
+* examples/todoapp/package.json to reduce vulnerabilities (#1832) ([d9b27c60](git://github.com/restify/node-restify.git/commit/d9b27c60))
+* **npm:** exclude extraneous files (#1818) ([e8516c37](git://github.com/restify/node-restify.git/commit/e8516c37))
+
+
+#### Features
+
+* send 500s for unhandled requests (#1777) ([885cecd7](git://github.com/restify/node-restify.git/commit/885cecd7))
+* **deps:** replace cover/istanbul with nyc (#1823) ([361f83e5](git://github.com/restify/node-restify.git/commit/361f83e5))
+
+
 <a name="8.5.1"></a>
 ### 8.5.1 (2019-12-13)
 
