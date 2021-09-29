@@ -350,11 +350,14 @@ describe('static resource plugin', function() {
                     directory: TMP_PATH
                 });
 
+                var socket = new net.Socket();
                 SERVER.get('/index.html', function(req, res, next) {
                     // closed before serve
-                    serve(req, res, function(nextRoute) {
-                        assert.strictEqual(nextRoute, false);
-                        done();
+                    socket.on('end', () => {
+                        serve(req, res, function(nextRoute) {
+                            assert.strictEqual(nextRoute, false);
+                            done();
+                        });
                     });
                 });
                 SERVER.on('after', function(req, res, route, afterErr) {
@@ -362,7 +365,6 @@ describe('static resource plugin', function() {
                     done();
                 });
 
-                var socket = new net.Socket();
                 socket.connect({ host: '127.0.0.1', port: PORT }, function() {
                     socket.write(RAW_REQUEST, 'utf-8', function(err2, data) {
                         assert.ifError(err2);
