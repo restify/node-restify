@@ -53,9 +53,7 @@ routes and handlers for incoming requests.
         `res.send()`.
     -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
         will use a domain to catch and respond to any uncaught
-        exceptions that occur in it's handler stack.
-        [bunyan][27] instance.
-        response header, default is `restify`. Pass empty string to unset the header.
+        exceptions that occur in its handler stack.
         Comes with significant negative performance impact. (optional, default `false`)
     -   `options.spdy` **[Object][24]?** Any options accepted by
         [node-spdy][29].
@@ -118,10 +116,8 @@ Creates a new Server.
         `res.send()`.
     -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
         will use a domain to catch and respond to any uncaught
-        exceptions that occur in it's handler stack.
+        exceptions that occur in its handler stack.
         Comes with significant negative performance impact.
-        [bunyan][27] instance.
-        response header, default is `restify`. Pass empty string to unset the header. (optional, default `false`)
     -   `options.spdy` **[Object][24]?** Any options accepted by
         [node-spdy][29].
     -   `options.http2` **[Object][24]?** Any options accepted by
