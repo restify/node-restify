@@ -1366,7 +1366,7 @@ Returns **any** value stored in context
 
 [46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[47]: https://github.com/felixge/node-formidable
+[47]: https://github.com/node-formidable/formidable
 
 [48]: https://github.com/trentm/node-bunyan
 
