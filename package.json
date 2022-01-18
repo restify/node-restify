@@ -98,7 +98,7 @@
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
     "find-my-way": "^2.0.1",
-    "formidable": "^1.2.1",
+    "formidable": "^2.0.1",
     "http-signature": "^1.2.0",
     "lodash": "^4.17.11",
     "lru-cache": "^5.1.1",
