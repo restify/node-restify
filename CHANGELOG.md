@@ -1,3 +1,12 @@
+<a name="8.6.1"></a>
+### 8.6.1 (2022-02-10)
+
+
+#### Bug Fixes
+
+* use close event on response instead of socket (#1892) ([91a42d44](git://github.com/restify/node-restify.git/commit/91a42d44))
+
+
 <a name="8.6.0"></a>
 ## 8.6.0 (2021-09-28)
 
