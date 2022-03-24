@@ -33,6 +33,8 @@ var CLIENT;
 var FAST_CLIENT;
 var SERVER;
 
+var NODE_MAJOR_VERSION = process.versions.node.split('.')[0];
+
 if (SKIP_IP_V6) {
     console.warn('IPv6 tests are skipped: No IPv6 network is available');
 }
@@ -2846,7 +2848,7 @@ test('Server returns 400 on invalid method', function(t) {
     }).end();
 });
 
-test('Server returns 431 when header size is too large', function(t) {
+test('Server returns 4xx when header size is too large', function(t) {
     SERVER.get('/jellybeans', function echoId(req, res, next) {
         res.send();
         next();
@@ -2863,8 +2865,13 @@ test('Server returns 431 when header size is too large', function(t) {
         }
     };
     http.request(opts, function(res) {
-        t.equal(res.statusCode, 431);
-        t.equal(res.statusMessage, 'Request Header Fields Too Large');
+        if (NODE_MAJOR_VERSION > '10') {
+            t.equal(res.statusCode, 431);
+            t.equal(res.statusMessage, 'Request Header Fields Too Large');
+        } else {
+            t.equal(res.statusCode, 400);
+            t.equal(res.statusMessage, 'Bad Request');
+        }
         res.on('data', function() {
             t.fail('Data was sent on 431 error');
         });
