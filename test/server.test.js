@@ -33,6 +33,8 @@ var CLIENT;
 var FAST_CLIENT;
 var SERVER;
 
+var NODE_MAJOR_VERSION = process.versions.node.split('.')[0];
+
 if (SKIP_IP_V6) {
     console.warn('IPv6 tests are skipped: No IPv6 network is available');
 }
@@ -2819,4 +2821,134 @@ test('async handler should discard value', function(t) {
         t.equal(res.body, '"mark"');
         t.end();
     });
+});
+
+test('Server returns 400 on invalid method', function(t) {
+    SERVER.get('/snickers/bar', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/snickers/bar',
+        method: 'CANDYBARS',
+        agent: false
+    };
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 400);
+        t.equal(res.statusMessage, 'Bad Request');
+        res.on('data', function() {
+            t.fail('Data was sent on 400 error');
+        });
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
+});
+
+test('Server returns 4xx when header size is too large', function(t) {
+    SERVER.get('/jellybeans', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/jellybeans',
+        method: 'GET',
+        agent: false,
+        headers: {
+            'jellybean-colors': 'purple,green,red,black,pink,'.repeat(1000)
+        }
+    };
+    http.request(opts, function(res) {
+        if (NODE_MAJOR_VERSION > '10') {
+            t.equal(res.statusCode, 431);
+            t.equal(res.statusMessage, 'Request Header Fields Too Large');
+        } else {
+            t.equal(res.statusCode, 400);
+            t.equal(res.statusMessage, 'Bad Request');
+        }
+        res.on('data', function() {
+            t.fail('Data was sent on 431 error');
+        });
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
+});
+
+test('Server supports adding custom clientError listener', function(t) {
+    SERVER.get('/popcorn', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    SERVER.on('clientError', function(err, socket) {
+        if (err.code !== 'HPE_HEADER_OVERFLOW') {
+            t.fail('Expected HPE_HEADER_OVERFLOW but err.code was ' + err.code);
+        }
+        socket.write("HTTP/1.1 418 I'm a teapot\r\nConnection: close\r\n\r\n");
+        socket.destroy(err);
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/popcorn',
+        method: 'GET',
+        agent: false,
+        headers: {
+            'jellybean-colors': 'purple,green,red,black,pink,'.repeat(1000)
+        }
+    };
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 418);
+        t.equal(res.statusMessage, "I'm a teapot");
+        res.on('data', function() {});
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
+});
+
+test('Server correctly handles multiple clientError listeners', function(t) {
+    SERVER.get('/popcorn', function echoId(req, res, next) {
+        res.send();
+        next();
+    });
+
+    let numListenerCalls = 0;
+    SERVER.on('clientError', function(err, socket) {
+        socket.write("HTTP/1.1 418 I'm a teapot\r\nConnection: close\r\n\r\n");
+        numListenerCalls += 1;
+    });
+    SERVER.on('clientError', function(err, socket) {
+        if (numListenerCalls !== 1) {
+            t.fail('listener was called ' + numListenerCalls + ' times');
+        }
+        socket.destroy(err);
+    });
+
+    var opts = {
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/popcorn',
+        method: 'GET',
+        agent: false,
+        headers: {
+            'jellybean-colors': 'purple,green,red,black,pink,'.repeat(1000)
+        }
+    };
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 418);
+        t.equal(res.statusMessage, "I'm a teapot");
+        res.on('data', function() {});
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
 });
