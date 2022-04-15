@@ -409,23 +409,24 @@ test('abort with throw inside async function', function(t) {
 });
 
 test('fails to add non async function with arity 2', function(t) {
+    var handler = function getLunch(req, res) {
+        res.send('ok');
+    };
     var chain = new Chain();
-
     t.throws(function() {
-        chain.add(function(req, res) {
-            res.send('ok');
-        });
-    }, Error);
+        chain.add(handler);
+    }, /getLunch/);
     t.end();
 });
 
 test('fails to add async function with arity 3', function(t) {
-    var chain = new Chain();
+    var handler = async function getBreakfast(req, res, next) {
+        res.send('ok');
+    };
 
+    var chain = new Chain();
     t.throws(function() {
-        chain.add(async function(req, res, next) {
-            res.send('ok');
-        });
-    }, Error);
+        chain.add(handler);
+    }, /getBreakfast/);
     t.end();
 });
