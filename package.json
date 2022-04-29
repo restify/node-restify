@@ -30,6 +30,9 @@
     "type": "git",
     "url": "git://github.com/mcavage/node-restify.git"
   },
+  "publishConfig": {
+    "registry": "https://npm-registry.core.linximpulse.net/"
+  },
   "main": "lib/index.js",
   "bin": {
     "report-latency": "./bin/report-latency"
