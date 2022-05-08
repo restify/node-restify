@@ -3,7 +3,7 @@
 var util = require('util');
 
 var assert = require('assert-plus');
-var restify = require('restify');
+var clients = require('restify-clients');
 
 ///--- Globals
 
@@ -20,11 +20,10 @@ function TodoClient(options) {
 
     var ver = options.version || '~1.0';
 
-    this.client = restify.createClient({
+    this.client = clients.createJSONClient({
         log: options.log,
         name: 'TodoClient',
         socketPath: options.socketPath,
-        type: 'json',
         url: options.url,
         version: ver
     });

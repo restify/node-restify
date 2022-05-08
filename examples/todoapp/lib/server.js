@@ -11,19 +11,19 @@ var errors = require('restify-errors');
 
 ///--- Errors
 
-errors.makeConstructor('MissingTaskError', {
+var MissingTaskError = errors.makeConstructor('MissingTaskError', {
     statusCode: 409,
     restCode: 'MissingTask',
     message: '"task" is a required parameter'
 });
 
-errors.makeConstructor('TodoExistsError', {
+var TodoExistsError = errors.makeConstructor('TodoExistsError', {
     statusCode: 409,
     restCode: 'TodoExists',
     message: 'Todo already exists'
 });
 
-errors.makeConstructor('TodoNotFoundError', {
+var TodoNotFoundError = errors.makeConstructor('TodoNotFoundError', {
     statusCode: 404,
     restCode: 'TodoNotFound',
     message: 'Todo was not found'
@@ -102,20 +102,20 @@ function authenticate(req, res, next) {
  * Which would have `name` and `task` available in req.params
  */
 function createTodo(req, res, next) {
-    if (!req.params.task) {
-        req.log.warn({ params: p }, 'createTodo: missing task');
-        next(new errors.MissingTaskError());
+    if (!req.body.task) {
+        req.log.warn({ body: req.body }, 'createTodo: missing task');
+        next(new MissingTaskError());
         return;
     }
 
     var todo = {
-        name: req.params.name || req.params.task.replace(/\W+/g, '_'),
-        task: req.params.task
+        name: req.body.name || req.body.task.replace(/\W+/g, '_'),
+        task: req.body.task
     };
 
     if (req.todos.indexOf(todo.name) !== -1) {
         req.log.warn('%s already exists', todo.name);
-        next(new errors.TodoExistsError(todo.name));
+        next(new TodoExistsError(todo.name));
         return;
     }
 
@@ -184,7 +184,7 @@ function ensureTodo(req, res, next) {
 
     if (req.params.name && req.todos.indexOf(req.params.name) === -1) {
         req.log.warn('%s not found', req.params.name);
-        next(new errors.TodoNotFoundError(req.params.name));
+        next(new TodoNotFoundError(req.params.name));
     } else {
         next();
     }
@@ -277,9 +277,9 @@ function listTodos(req, res, next) {
  * Replaces a TODO completely
  */
 function putTodo(req, res, next) {
-    if (!req.params.task) {
-        req.log.warn({ params: req.params }, 'putTodo: missing task');
-        next(new errors.MissingTaskError());
+    if (!req.body.task) {
+        req.log.warn({ params: req.params, body: req.body }, 'putTodo: missing task');
+        next(new MissingTaskError());
         return;
     }
 
@@ -318,20 +318,20 @@ function createServer(options) {
     });
 
     // Ensure we don't drop data on uploads
-    server.pre(restify.pre.pause());
+    server.pre(restify.plugins.pre.pause());
 
     // Clean up sloppy paths like //todo//////1//
-    server.pre(restify.pre.sanitizePath());
+    server.pre(restify.plugins.pre.sanitizePath());
 
     // Handles annoying user agents (curl)
-    server.pre(restify.pre.userAgentConnection());
+    server.pre(restify.plugins.pre.userAgentConnection());
 
     // Set a per request pino logger (with requestid filled in)
-    server.use(restify.requestLogger());
+    server.use(restify.plugins.requestLogger());
 
     // Allow 5 requests/second by IP, and burst to 10
     server.use(
-        restify.throttle({
+        restify.plugins.throttle({
             burst: 10,
             rate: 5,
             ip: true
