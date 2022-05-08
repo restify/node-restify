@@ -760,3 +760,15 @@ test('GH-1791: should send NaN as null with application/json', function(t) {
         t.end();
     });
 });
+
+test('GH-1851: res.status should be chainable', function(t) {
+    SERVER.get('/418', function(req, res, next) {
+        res.status(418).json({ teapot: true });
+    });
+
+    CLIENT.get(join(LOCALHOST, '/418'), function(err, _, res, data) {
+        t.equal(res.statusCode, 418);
+        t.ok(data.teapot);
+        t.end();
+    });
+});
