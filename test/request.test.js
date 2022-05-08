@@ -275,27 +275,3 @@ test('should emit restifyDone event when request is fully served with error', fu
         clientDone = true;
     });
 });
-
-test('should emit warning if closed is called', function(t) {
-    let warningCalled = false;
-    SERVER.get('/ping/:name', function(req, res, next) {
-        function testWarning(warning) {
-            t.equal(warning.name, 'RestifyDeprecationWarning');
-            t.equal(warning.code, 'RestifyDEPReqClosed');
-            t.ok(warning.stack);
-            warningCalled = true;
-
-            res.send('ok');
-            return next();
-        }
-        process.once('warning', testWarning);
-        t.notOk(req.closed());
-    });
-
-    CLIENT.get('/ping/lagavulin', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.ok(warningCalled);
-        t.end();
-    });
-});
