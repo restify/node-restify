@@ -4,7 +4,7 @@
   "description": "Socket.io example",
   "main": "sockio.js",
   "dependencies": {
-    "socket.io": "2.0.3"
+    "socket.io": "^4.5.0"
   },
   "scripts": {
     "start": "node sockio.js"
