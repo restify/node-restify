@@ -476,6 +476,31 @@ describe('static resource plugin', function() {
         );
     });
 
+    // directory differs from path without appendPath
+    it('GH-1604 handling should not depend on directory name', function(done) {
+        var tmpDir = '.tmp';
+
+        function cb() {
+            CLIENT.get('/public/', function(err, req, res, obj) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            true,
+            tmpDir,
+            tmpDir + '/test',
+            '/test',
+            null,
+            null,
+            false,
+            null
+        );
+    });
+
     // To ensure this will always get properly restored (even in case of a test
     // failure) we do it here.
     var originalCreateReadStream = fs.createReadStream;
