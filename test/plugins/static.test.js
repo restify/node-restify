@@ -449,6 +449,33 @@ describe('static resource plugin', function() {
         );
     });
 
+    // url encoded null byte
+    it('GH-1864 respond with 400 on %00 path', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalPath = '/public/%00';
+
+        function cb() {
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 400);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            true,
+            404
+        );
+    });
+
     // To ensure this will always get properly restored (even in case of a test
     // failure) we do it here.
     var originalCreateReadStream = fs.createReadStream;
