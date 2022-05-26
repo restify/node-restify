@@ -3,8 +3,9 @@
 
 // core requires
 var fs = require('fs');
-var path = require('path');
 var net = require('net');
+var os = require('os');
+var path = require('path');
 
 // external requires
 var assert = require('chai').assert;
@@ -65,18 +66,44 @@ describe('static resource plugin', function() {
         SERVER.close(done);
     });
 
-    function serveStaticTest(done, testDefault, tmpDir, regex, staticFile) {
+    function getTmpDir(tmpDir) {
+        return path.normalize(
+            path.join(__dirname, '../', tmpDir ? tmpDir : '.tmp')
+        );
+    }
+
+    function serveStaticTest(
+        done,
+        testDefault,
+        tmpDir,
+        docRoot,
+        testDir,
+        match,
+        staticFile,
+        isAppendPath,
+        assertStatusCode
+    ) {
         var staticContent = '{"content": "abcdefg"}';
         var staticObj = JSON.parse(staticContent);
-        var testDir = 'public';
+        var tmpDirMv = getTmpDir(tmpDir);
+        if (!docRoot) {
+            docRoot = tmpDirMv;
+        } else {
+            docRoot = path.normalize(path.join(__dirname, '../', docRoot));
+        }
+        var testDirMod = testDir;
+        if (!testDirMod && testDirMod !== '') {
+            testDirMod = 'public/';
+        } else if (testDirMod && !testDirMod.endsWith('/')) {
+            testDirMod += '/';
+        }
         var testFileName = 'index.json';
         var routeName = 'GET wildcard';
-        var tmpPath = path.join(__dirname, '../', tmpDir);
 
-        mkdirp(tmpPath, function(err) {
+        mkdirp(tmpDirMv, function(err) {
             assert.ifError(err);
-            DIRS_TO_DELETE.push(tmpPath);
-            var folderPath = path.join(tmpPath, testDir);
+            DIRS_TO_DELETE.push(tmpDirMv);
+            var folderPath = path.join(tmpDirMv, testDirMod);
 
             mkdirp(folderPath, function(err2) {
                 assert.ifError(err2);
@@ -87,34 +114,50 @@ describe('static resource plugin', function() {
                 fs.writeFile(file, staticContent, function(err3) {
                     assert.ifError(err3);
                     FILES_TO_DELETE.push(file);
-                    var p = '/' + testDir + '/' + testFileName;
-                    var opts = { directory: tmpPath };
+                    var p = '/' + testDirMod + testFileName;
+                    var opts = { directory: docRoot };
+
+                    if (isAppendPath === false) {
+                        opts.appendRequestPath = false;
+                    }
+
+                    if (match) {
+                        opts.match = new RegExp('^' + match + '$');
+                    }
 
                     if (staticFile) {
-                        opts.file = p;
+                        opts.file =
+                            typeof staticFile === 'string' ? staticFile : p;
                     }
 
                     if (testDefault) {
-                        p = '/' + testDir + '/';
+                        p = '/public/';
                         opts.default = testFileName;
                         routeName += ' with default';
                     }
 
                     SERVER.get(
                         {
-                            path: '/' + testDir + '/*',
+                            path: '/public/*',
                             name: routeName
                         },
                         restify.plugins.serveStatic(opts)
                     );
 
                     CLIENT.get(p, function(err4, req, res, obj) {
-                        assert.ifError(err4);
-                        assert.equal(
-                            res.headers['cache-control'],
-                            'public, max-age=3600'
-                        );
-                        assert.deepEqual(obj, staticObj);
+                        if (assertStatusCode) {
+                            assert.strictEqual(
+                                res.statusCode,
+                                assertStatusCode
+                            );
+                        } else {
+                            assert.ifError(err4);
+                            assert.equal(
+                                res.headers['cache-control'],
+                                'public, max-age=3600'
+                            );
+                            assert.deepEqual(obj, staticObj);
+                        }
                         done();
                     });
                 });
@@ -122,62 +165,25 @@ describe('static resource plugin', function() {
         });
     }
 
-    function testNoAppendPath(done, testDefault, tmpDir, regex, staticFile) {
-        var staticContent = '{"content": "abcdefg"}';
-        var staticObj = JSON.parse(staticContent);
-        var testDir = 'public';
-        var testFileName = 'index.json';
-        var routeName = 'GET wildcard';
-        var tmpPath = path.join(__dirname, '../', tmpDir);
-
-        mkdirp(tmpPath, function(err) {
-            assert.ifError(err);
-            DIRS_TO_DELETE.push(tmpPath);
-            var folderPath = path.join(tmpPath, testDir);
-
-            mkdirp(folderPath, function(err2) {
-                assert.ifError(err2);
-
-                DIRS_TO_DELETE.push(folderPath);
-                var file = path.join(folderPath, testFileName);
-
-                fs.writeFile(file, staticContent, function(err3) {
-                    assert.ifError(err3);
-                    FILES_TO_DELETE.push(file);
-                    var p = '/' + testDir + '/' + testFileName;
-                    var opts = { directory: folderPath };
-                    opts.appendRequestPath = false;
-
-                    if (staticFile) {
-                        opts.file = testFileName;
-                    }
-
-                    if (testDefault) {
-                        p = '/' + testDir + '/';
-                        opts.default = testFileName;
-                        routeName += ' with default';
-                    }
-
-                    SERVER.get(
-                        {
-                            path: '/' + testDir + '/*',
-                            name: routeName
-                        },
-                        restify.plugins.serveStatic(opts)
-                    );
-
-                    CLIENT.get(p, function(err4, req, res, obj) {
-                        assert.ifError(err4);
-                        assert.equal(
-                            res.headers['cache-control'],
-                            'public, max-age=3600'
-                        );
-                        assert.deepEqual(obj, staticObj);
-                        done();
-                    });
-                });
-            });
-        });
+    function testNoAppendPath(
+        done,
+        testDefault,
+        tmpDir,
+        docRoot,
+        testDir,
+        match,
+        staticFile
+    ) {
+        serveStaticTest(
+            done,
+            testDefault,
+            tmpDir,
+            docRoot,
+            testDir,
+            match,
+            staticFile,
+            false
+        );
     }
 
     it('static serves static files', function(done) {
@@ -189,12 +195,12 @@ describe('static resource plugin', function() {
     });
 
     it('static serves static files in with a root regex', function(done) {
-        serveStaticTest(done, false, '.tmp', '/.*');
+        serveStaticTest(done, false, '.tmp', null, null, '/.*');
     });
 
     // eslint-disable-next-line
     it('static serves static files with a root, !greedy, regex', function(done) {
-        serveStaticTest(done, false, '.tmp', '/?.*');
+        serveStaticTest(done, false, '.tmp', null, null, '/?.*');
     });
 
     it('static serves default file', function(done) {
@@ -209,31 +215,33 @@ describe('static resource plugin', function() {
     it('restify-GH-719 serve a specific static file', function(done) {
         // serve the same default file .tmp/public/index.json
         // but get it from opts.file
-        serveStaticTest(done, false, '.tmp', null, true);
+        serveStaticTest(done, false, '.tmp', null, null, null, true);
     });
 
     // eslint-disable-next-line
     it('static serves static file with appendRequestPath = false', function(done) {
-        testNoAppendPath(done, false, '.tmp');
+        testNoAppendPath(done, false, '.tmp', '.tmp/public');
     });
 
     // eslint-disable-next-line
     it('static serves default file with appendRequestPath = false', function(done) {
-        testNoAppendPath(done, true, '.tmp');
+        testNoAppendPath(done, true, '.tmp', '.tmp/public');
     });
 
     // eslint-disable-next-line
     it('restify serve a specific static file with appendRequestPath = false', function(done) {
-        testNoAppendPath(done, false, '.tmp', null, true);
+        testNoAppendPath(done, false, '.tmp', null, null, null, true);
     });
 
     it('static responds 404 for missing file', function(done) {
-        var p = '/public/no-such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
+        var p = '/no-such-file.json';
+        var tmpDir = getTmpDir();
 
         SERVER.get(
-            '/public/.*',
-            restify.plugins.serveStatic({ directory: tmpPath })
+            '/(.*)',
+            restify.plugins.serveStatic({
+                directory: path.join(tmpDir, 'public')
+            })
         );
 
         CLIENT.get(p, function(err, req, res, obj) {
@@ -246,12 +254,14 @@ describe('static resource plugin', function() {
 
     // eslint-disable-next-line
     it('GH-1382 static responds 404 for missing file with percent-codes', function(done) {
-        var p = '/public/no-%22such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
+        var p = '/no-%22such-file.json';
+        var tmpDir = getTmpDir();
 
         SERVER.get(
-            '/public/.*',
-            restify.plugins.serveStatic({ directory: tmpPath })
+            '/.*',
+            restify.plugins.serveStatic({
+                directory: path.join(tmpDir, 'public')
+            })
         );
 
         CLIENT.get(p, function(err, req, res, obj) {
@@ -262,6 +272,235 @@ describe('static resource plugin', function() {
         });
     });
 
+    // with append path
+    it('GH-1910/1 respond 403 for path traversal', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalFile = path.join(getTmpDir(tmpDir), 'forbidden.json');
+        var traversalPath = '/public/../../forbidden.json';
+
+        function cb() {
+            fs.writeFileSync(traversalFile, '{}');
+            FILES_TO_DELETE.push(traversalFile);
+
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 403);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            true,
+            404
+        );
+    });
+
+    // no append path
+    it('GH-1910/2 respond 404 for ignored path traversal', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalFile = path.join(getTmpDir(tmpDir), 'forbidden.json');
+        var traversalPath = '/public/../../forbidden.json';
+
+        function cb() {
+            fs.writeFileSync(traversalFile, '{}');
+            FILES_TO_DELETE.push(traversalFile);
+
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 404);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            false,
+            200
+        );
+    });
+
+    // check static file config
+    it('GH-1910/3 respond 403 for misconfig path traversal', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalFile = path.join(getTmpDir(tmpDir), 'forbidden.json');
+        var traversalPath = '/public/../../forbidden.json';
+
+        function cb() {
+            fs.writeFileSync(traversalFile, '{}');
+            FILES_TO_DELETE.push(traversalFile);
+
+            CLIENT.get('/public/', function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 403);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            traversalPath,
+            true,
+            403
+        );
+    });
+
+    // url encoded slashes
+    it('GH-1910/4 respond 403 for path traversal %2F', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalFile = path.join(getTmpDir(tmpDir), 'forbidden.json');
+        var traversalPath = '/public/..%2F..%2Fforbidden.json';
+
+        function cb() {
+            fs.writeFileSync(traversalFile, '{}');
+            FILES_TO_DELETE.push(traversalFile);
+
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 403);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            true,
+            404
+        );
+    });
+
+    // traverse completely above domain root for reaching root and sys-tmp
+    it('GH-1910/5 respond 403 for extreme path traversal', function(done) {
+        var tmpDir = '.tmp';
+        var pathLevel = '';
+        var testDir = path.join(getTmpDir(tmpDir), 'public');
+
+        for (
+            var i = 0, slast = testDir.lastIndexOf(path.sep) + 1;
+            i >= 0 && i < slast;
+
+        ) {
+            i = testDir.indexOf(path.sep, i) + 1;
+            if (i > 0) {
+                pathLevel += '../';
+            }
+        }
+
+        var traversalTmp = fs.mkdtempSync(
+            path.join(os.tmpdir(), 'static-test-')
+        );
+        DIRS_TO_DELETE.push(traversalTmp);
+
+        var traversalFile = path.join(traversalTmp, 'index.json');
+        fs.writeFileSync(traversalFile, '{}');
+        FILES_TO_DELETE.push(traversalFile);
+
+        var traversalPath =
+            '/public/../' +
+            pathLevel.substring(0, pathLevel.length - 1) +
+            traversalFile;
+        traversalPath = traversalPath.replaceAll('\\', '/');
+
+        function cb() {
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 403);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            true,
+            404
+        );
+    });
+
+    // url encoded null byte
+    it('GH-1864 respond with 400 on %00 path', function(done) {
+        var tmpDir = '.tmp';
+
+        var traversalPath = '/public/%00';
+
+        function cb() {
+            CLIENT.get(traversalPath, function(err, req, res, obj) {
+                assert.ok(err, 'need to be an error');
+                assert.equal(err.statusCode, 400);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            false,
+            tmpDir,
+            tmpDir + '/public',
+            null,
+            null,
+            null,
+            true,
+            404
+        );
+    });
+
+    // directory differs from path without appendPath
+    it('GH-1604 handling should not depend on directory name', function(done) {
+        var tmpDir = '.tmp';
+
+        function cb() {
+            CLIENT.get('/public/', function(err, req, res, obj) {
+                assert.ifError(err);
+                assert.equal(res.statusCode, 200);
+                done();
+            });
+        }
+
+        serveStaticTest(
+            cb,
+            true,
+            tmpDir,
+            tmpDir + '/test',
+            '/test',
+            null,
+            null,
+            false,
+            null
+        );
+    });
+
     // To ensure this will always get properly restored (even in case of a test
     // failure) we do it here.
     var originalCreateReadStream = fs.createReadStream;
@@ -270,6 +509,7 @@ describe('static resource plugin', function() {
     });
 
     var TMP_PATH = path.join(__dirname, '../', '.tmp');
+    var PUBLIC_PATH = path.join(TMP_PATH, 'public');
     var RAW_REQUEST =
         'GET /index.html HTTP/1.1\r\n' +
         'Host: 127.0.0.1:' +
@@ -301,16 +541,16 @@ describe('static resource plugin', function() {
                 return stream;
             };
 
-            mkdirp(TMP_PATH, function(err) {
+            mkdirp(PUBLIC_PATH, function(err) {
                 assert.ifError(err);
                 DIRS_TO_DELETE.push(TMP_PATH);
                 fs.writeFileSync(
-                    path.join(TMP_PATH, 'index.html'),
+                    path.join(PUBLIC_PATH, 'index.html'),
                     'Hello world!'
                 );
 
                 var serve = restify.plugins.serveStatic({
-                    directory: TMP_PATH
+                    directory: PUBLIC_PATH
                 });
 
                 SERVER.get('/index.html', function(req, res, next) {
@@ -338,16 +578,16 @@ describe('static resource plugin', function() {
                 assert(false);
             };
 
-            mkdirp(TMP_PATH, function(err) {
+            mkdirp(PUBLIC_PATH, function(err) {
                 assert.ifError(err);
                 DIRS_TO_DELETE.push(TMP_PATH);
                 fs.writeFileSync(
-                    path.join(TMP_PATH, 'index.html'),
+                    path.join(PUBLIC_PATH, 'index.html'),
                     'Hello world!'
                 );
 
                 var serve = restify.plugins.serveStatic({
-                    directory: TMP_PATH
+                    directory: PUBLIC_PATH
                 });
 
                 var socket = new net.Socket();
@@ -374,39 +614,4 @@ describe('static resource plugin', function() {
             });
         }
     );
-
-    it('static responds 404 for missing file', function(done) {
-        var p = '/public/no-such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
-
-        SERVER.get(
-            '/public/.*',
-            restify.plugins.serveStatic({ directory: tmpPath })
-        );
-
-        CLIENT.get(p, function(err, req, res, obj) {
-            assert.ok(err);
-            assert.equal(err.statusCode, 404);
-            assert.equal(err.restCode, 'ResourceNotFound');
-            return done();
-        });
-    });
-
-    // eslint-disable-next-line
-    it('GH-1382 static responds 404 for missing file with percent-codes', function(done) {
-        var p = '/public/no-%22such-file.json';
-        var tmpPath = path.join(process.cwd(), '.tmp');
-
-        SERVER.get(
-            '/public/.*',
-            restify.plugins.serveStatic({ directory: tmpPath })
-        );
-
-        CLIENT.get(p, function(err, req, res, obj) {
-            assert.ok(err);
-            assert.equal(err.statusCode, 404);
-            assert.equal(err.restCode, 'ResourceNotFound');
-            return done();
-        });
-    });
 });

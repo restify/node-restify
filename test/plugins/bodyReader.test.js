@@ -188,10 +188,10 @@ describe('body reader', function() {
         });
     });
 
-    it('should not add a listener for each call on same socket', done => {
+    it('should not add listener for each call on same socket', function(done) {
         SERVER.use(restify.plugins.bodyParser());
 
-        let serverReq, serverRes, serverReqSocket;
+        var serverReq, serverRes, serverReqSocket;
         SERVER.post('/meals', function(req, res, next) {
             serverReq = req;
             serverRes = res;
@@ -206,18 +206,23 @@ describe('body reader', function() {
             agent: new http.Agent({ keepAlive: true })
         });
 
-        CLIENT.post('/meals', { breakfast: 'pancakes' }, (err, _, res) => {
+        CLIENT.post('/meals', { breakfast: 'pancakes' }, function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
 
-            const firstReqSocket = serverReqSocket;
-            const numReqListeners = listenerCount(serverReq);
-            const numResListeners = listenerCount(serverRes);
-            const numReqSocketListeners = listenerCount(serverReq.socket);
+            var firstReqSocket = serverReqSocket;
+            var numReqListeners = listenerCount(serverReq);
+            var numResListeners = listenerCount(serverRes);
+            var numReqSocketListeners = listenerCount(serverReq.socket);
 
-            // Without setImmediate, the second request will not reuse the socket.
-            setImmediate(() => {
-                CLIENT.post('/meals', { lunch: 'salad' }, (err2, __, res2) => {
+            // Without setImmediate, the second request will not reuse
+            // the socket.
+            setImmediate(function() {
+                CLIENT.post('/meals', { lunch: 'salad' }, function(
+                    err2,
+                    __,
+                    res2
+                ) {
                     assert.ifError(err2);
                     assert.equal(res2.statusCode, 200);
                     assert.equal(
@@ -240,15 +245,15 @@ describe('body reader', function() {
         });
     });
 
-    it('should call next for each successful request on same socket', done => {
-        let nextCallCount = 0;
+    it('should call next for successful requests on socket', function(done) {
+        var nextCallCount = 0;
         SERVER.use(restify.plugins.bodyParser());
-        SERVER.use((req, res, next) => {
+        SERVER.use(function(req, res, next) {
             nextCallCount += 1;
             next();
         });
 
-        let serverReqSocket;
+        var serverReqSocket;
         SERVER.post('/meals', function(req, res, next) {
             res.send();
             next();
@@ -260,15 +265,20 @@ describe('body reader', function() {
             agent: new http.Agent({ keepAlive: true })
         });
 
-        CLIENT.post('/meals', { breakfast: 'waffles' }, (err, _, res) => {
+        CLIENT.post('/meals', { breakfast: 'waffles' }, function(err, _, res) {
             assert.ifError(err);
             assert.equal(res.statusCode, 200);
-            const firstReqSocket = serverReqSocket;
+            var firstReqSocket = serverReqSocket;
             assert.equal(nextCallCount, 1);
 
-            // Without setImmediate, the second request will not reuse the socket.
-            setImmediate(() => {
-                CLIENT.post('/meals', { lunch: 'candy' }, (err2, __, res2) => {
+            // Without setImmediate, the second request will not reuse
+            // the socket.
+            setImmediate(function() {
+                CLIENT.post('/meals', { lunch: 'candy' }, function(
+                    err2,
+                    __,
+                    res2
+                ) {
                     assert.ifError(err2);
                     assert.equal(res2.statusCode, 200);
                     assert.equal(
@@ -290,9 +300,11 @@ describe('body reader', function() {
  * @returns {number} - The total number of listeners across all events
  */
 function listenerCount(emitter) {
-    let numListeners = 0;
-    for (const eventName of emitter.eventNames()) {
-        numListeners += emitter.listenerCount(eventName);
+    var numListeners = 0;
+    var eventNames = emitter.eventNames();
+    var emitterCount = eventNames.length;
+    for (var idx = 0; idx < emitterCount; idx += 1) {
+        numListeners += emitter.listenerCount(eventNames[idx]);
     }
     return numListeners;
 }
