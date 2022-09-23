@@ -85,7 +85,14 @@ $ npm install restify
 
 ## Supported Node Versions
 
-Restify currently works on Node.js v14.x and v16.x.
+Restify aims to support the Node.js LTS (Active and Maintenance) versions along with Node.js current stable version.
+
+| Node Release | Supported in Current Version | Notes |
+| :--: | :---:   | :---: |
+| 18.x | **No**  | Current stable. See [#1888](https://github.com/restify/node-restify/issues/1888) |
+| 16.x | **Yes** | Active LTS |
+| 14.x | **Yes** | Maintenance LTS |
+| 12.x | **No**  | Use restify v8.x, team will backport critical issues only |
 
 ## License
 
