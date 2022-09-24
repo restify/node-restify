@@ -95,7 +95,11 @@ test('toString()', function(t) {
 
     t.deepEqual(
         registry.toString(),
-        '└── / (GET|POST)\n' + '    └── a (GET)\n' + '        └── /b (GET)\n'
+        // prettier-ignore
+        '└── / (GET)\n' +
+        '    / (POST)\n' +
+        '    └── a (GET)\n' +
+        '        └── /b (GET)\n'
     );
     t.end();
 });
@@ -109,11 +113,11 @@ test('toString() with ignoreTrailingSlash', function(t) {
 
     t.deepEqual(
         registry.toString(),
-        '└── / (GET|POST)\n' +
-            '    └── a (GET)\n' +
-            '        └── / (GET)\n' +
-            '            └── b (GET)\n' +
-            '                └── / (GET)\n'
+        // prettier-ignore
+        '└── / (GET)\n' +
+        '    / (POST)\n' +
+        '    └── a (GET)\n' +
+        '        └── /b (GET)\n'
     );
     t.end();
 });
