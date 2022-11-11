@@ -29,8 +29,8 @@ test('calls all the handlers', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -58,8 +58,8 @@ test('abort with Error in next', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -85,7 +85,7 @@ test('abort with false in next', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
+            connectionState: function() {
                 return false;
             }
         },
@@ -112,8 +112,8 @@ test('abort with closed request', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return closed;
+            connectionState: function() {
+                return closed ? 'close' : '';
             }
         },
         {},
@@ -143,8 +143,8 @@ test('cals error middleware', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -170,8 +170,8 @@ test('onceNext prevents double next calls', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -208,8 +208,8 @@ test('throws error for double next calls in strictNext mode', function(t) {
             {
                 startHandlerTimer: function() {},
                 endHandlerTimer: function() {},
-                closed: function() {
-                    return false;
+                connectionState: function() {
+                    return '';
                 }
             },
             {},
@@ -234,8 +234,8 @@ test('calls req.startHandlerTimer', function(t) {
                 t.done();
             },
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -257,8 +257,8 @@ test('calls req.endHandlerTimer', function(t) {
                 t.equal(handleName, 'foo');
                 t.done();
             },
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -299,8 +299,8 @@ test('waits async handlers', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -329,8 +329,8 @@ test('abort with rejected promise', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -359,8 +359,8 @@ test('abort with rejected promise without error', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             },
             path: function() {
                 return '/';
@@ -395,8 +395,8 @@ test('abort with throw inside async function', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},

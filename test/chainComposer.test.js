@@ -29,8 +29,8 @@ test('chainComposer creates a valid chain for a handler array ', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
@@ -53,8 +53,8 @@ test('chainComposer creates a valid chain for a single handler', function(t) {
         {
             startHandlerTimer: function() {},
             endHandlerTimer: function() {},
-            closed: function() {
-                return false;
+            connectionState: function() {
+                return '';
             }
         },
         {},
