@@ -28,8 +28,6 @@ jobs:
         os:
           - ubuntu-latest
         node-version:
-          - 10.x
-          - 12.x
           - 14.x
           - 16.x
     runs-on: ${{matrix.os}}
