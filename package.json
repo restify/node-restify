@@ -105,7 +105,7 @@
     "mime": "^2.4.3",
     "negotiator": "^0.6.2",
     "once": "^1.4.0",
-    "pidusage": "^2.0.17",
+    "pidusage": "^3.0.2",
     "pino": "^8.7.0",
     "qs": "^6.7.0",
     "restify-errors": "^8.0.2",
