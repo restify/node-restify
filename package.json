@@ -94,7 +94,7 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "csv": "^5.1.1",
+    "csv": "^6.2.2",
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
     "find-my-way": "^7.2.0",
