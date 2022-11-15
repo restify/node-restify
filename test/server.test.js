@@ -108,7 +108,7 @@ test('listen and close (port only) w/ port number as string', function(t) {
 
 test('listen and close (socketPath)', function(t) {
     var server = restify.createServer();
-    server.listen('/tmp/.' + uuid(), function() {
+    server.listen('/tmp/.' + uuid.v4(), function() {
         server.close(function() {
             t.end();
         });
