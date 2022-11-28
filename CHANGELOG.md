@@ -1,4 +1,3 @@
-<a name="8.5.1"></a>
 ## [9.0.0](https://www.github.com/restify/node-restify/compare/v8.6.1...v9.0.0) (2022-11-15)
 
 
