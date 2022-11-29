@@ -121,6 +121,18 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [10.0.0](https://github.com/restify/node-restify/compare/v9.0.0...v10.0.0) (2022-11-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* support v18.x
+
+### Features
+
+* bump dtrace-provider version to avoid MacOS errors ([fa52f60](https://github.com/restify/node-restify/commit/fa52f60d85c3df8a1babde98be184bb918958ef3))
+* support v18.x ([5795223](https://github.com/restify/node-restify/commit/57952239fa1808a6cf6e70deb2754c4c85c1be39))
+
 ### 8.5.1 (2019-12-13)
 
 
