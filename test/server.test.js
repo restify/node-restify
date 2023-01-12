@@ -4,10 +4,10 @@
 /* eslint-disable func-names */
 
 var assert = require('assert-plus');
-var pino = require('pino');
 var childprocess = require('child_process');
 var http = require('http');
 
+var pino = require('pino');
 var errors = require('restify-errors');
 var restifyClients = require('restify-clients');
 var uuid = require('uuid');
@@ -32,6 +32,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var FAST_CLIENT;
 var SERVER;
+let LOG_BUFFER;
 
 var NODE_MAJOR_VERSION = process.versions.node.split('.')[0];
 
@@ -43,10 +44,11 @@ if (SKIP_IP_V6) {
 
 before(function(cb) {
     try {
+        LOG_BUFFER = new StreamRecorder();
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
             handleUncaughtExceptions: true,
-            log: helper.getLog('server'),
+            log: helper.getLog('server', LOG_BUFFER, 'info'),
             version: ['2.0.0', '0.5.4', '1.4.3'],
             ignoreTrailingSlash: true
         });
@@ -1327,11 +1329,10 @@ test(
         ]);
 
         // set up audit logs
-        var buffer = new StreamRecorder();
         SERVER.on(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -1343,15 +1344,15 @@ test(
                 t.equal(err.name, 'RequestCloseError');
 
                 // check records
-                t.ok(buffer.records[0], 'no log records');
+                t.ok(LOG_BUFFER.records[0], 'no log records');
                 t.equal(
-                    buffer.records.length,
+                    LOG_BUFFER.records.length,
                     1,
                     'should only have 1 log record'
                 );
 
                 // check timers
-                var handlers = Object.keys(buffer.records[0].req.timers);
+                var handlers = Object.keys(LOG_BUFFER.records[0].req.timers);
                 t.equal(handlers.length, 2, 'should only have 2 req timers');
                 t.equal(
                     handlers[0],
@@ -1380,7 +1381,7 @@ test(
             // reset numCount
             numCount = 0;
             //reset stream-recorder
-            buffer.flushRecords();
+            LOG_BUFFER.flushRecords();
 
             FAST_CLIENT.get('/audit?v=2', function(err2, req2, res2, data2) {
                 t.ok(err2);
