@@ -2953,3 +2953,44 @@ test('Server correctly handles multiple clientError listeners', function(t) {
         });
     }).end();
 });
+
+test('req and res should use server logger by default', function(t) {
+    SERVER.get('/ping', function echoId(req, res, next) {
+        t.ok(req.log);
+        t.strictEqual(req.log, SERVER.log);
+        req.log.info('foo');
+        t.equal(LOG_BUFFER.records[LOG_BUFFER.length - 1].msg, 'foo');
+        res.log.info('bar');
+        t.equal(LOG_BUFFER.records[LOG_BUFFER.length - 1].msg, 'bar');
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/ping', function() {
+        t.end();
+    });
+});
+
+test('req and res should use own logger by if set during .first', function(t) {
+    const buffer = new StreamRecorder();
+    SERVER.first(function first(req, res) {
+        req.log = helper.getLog('server', buffer, 'info');
+    });
+
+    SERVER.get('/ping', function echoId(req, res, next) {
+        LOG_BUFFER.flushRecords();
+        t.ok(req.log);
+        t.notStrictEqual(req.log, SERVER.log);
+        req.log.info('foo');
+        t.equal(buffer.records[buffer.length - 1].msg, 'foo');
+        res.log.info('bar');
+        t.equal(buffer.records[buffer.length - 1].msg, 'bar');
+        t.equal(LOG_BUFFER.records.length, 0);
+        res.send();
+        next();
+    });
+
+    CLIENT.get('/ping', function() {
+        t.end();
+    });
+});
