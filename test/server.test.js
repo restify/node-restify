@@ -2994,3 +2994,38 @@ test('req and res should use own logger by if set during .first', function(t) {
         t.end();
     });
 });
+
+test('should not call then when next called', function(t) {
+    let counter = 0;
+    SERVER.use(function first(req, res, next) {
+        next();
+        return Promise.resolve();
+    });
+
+    SERVER.get('/ping', function echoId(req, res, next) {
+        counter++;
+        t.equal(counter, 1);
+        next();
+    });
+
+    CLIENT.get('/ping', function() {
+        t.end();
+    });
+});
+
+test('should stop after next(false)', function(t) {
+    let counter = 0;
+    SERVER.use(function first(req, res, next) {
+        next(false);
+        return Promise.resolve();
+    });
+
+    SERVER.get('/ping', function echoId(req, res, next) {
+        counter++;
+        next();
+    });
+    CLIENT.get('/ping', function() {
+        t.equal(counter, 0);
+        t.end();
+    });
+});
