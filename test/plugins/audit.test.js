@@ -22,6 +22,7 @@ var TOLERATED_MICROSECONDS = MILLISECOND_IN_MICROSECONDS;
 var SERVER;
 var CLIENT;
 var PORT;
+let LOG_BUFFER;
 
 function assertIsAtLeastWithTolerate(num1, num2, tolerate, msg) {
     assert.isAtLeast(num1, num2 - tolerate, msg + 'should be >= ' + num2);
@@ -29,9 +30,10 @@ function assertIsAtLeastWithTolerate(num1, num2, tolerate, msg) {
 
 describe('audit logger', function() {
     beforeEach(function(done) {
+        LOG_BUFFER = new StreamRecorder();
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
-            log: helper.getLog('server')
+            log: helper.getLog('server', LOG_BUFFER, 'info')
         });
 
         SERVER.listen(0, '127.0.0.1', function() {
@@ -52,12 +54,11 @@ describe('audit logger', function() {
     });
 
     it('audit logger should print log by default', function(done) {
-        var logBuffer = new StreamRecorder();
         var collectLog;
         SERVER.on(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, logBuffer),
+                log: pino({ name: 'audit' }),
                 server: SERVER,
                 event: 'after'
             })
@@ -76,7 +77,7 @@ describe('audit logger', function() {
         SERVER.get('/auditrecords', function(req, res, next) {
             // strip log records of req/res as they will cause
             // serialization issues.
-            var data = logBuffer.records.map(function(record) {
+            var data = LOG_BUFFER.records.map(function(record) {
                 return lodash.omit(record, 'req', 'res');
             }, []);
             res.send(200, data);
@@ -149,13 +150,10 @@ describe('audit logger', function() {
     });
 
     it('test custom serializers', function(done) {
-        // capture the log record
-        var buffer = new StreamRecorder();
-
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after',
                 serializers: {
                     req: function(req) {
@@ -174,7 +172,7 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = buffer.records && buffer.records[0];
+            var record = LOG_BUFFER.records && LOG_BUFFER.records[0];
             assert.equal(record.req.fooReq, 'barReq');
             assert.equal(record.res.fooRes, 'barRes');
             done();
@@ -186,14 +184,12 @@ describe('audit logger', function() {
     });
 
     it('should log handler timers', function(done) {
-        // capture the log record
-        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -211,12 +207,12 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = buffer.records && buffer.records[0];
+            var record = LOG_BUFFER.records && LOG_BUFFER.records[0];
 
             // check timers
             assert.ok(record, 'no log records');
             assert.equal(
-                buffer.records.length,
+                LOG_BUFFER.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -255,14 +251,12 @@ describe('audit logger', function() {
     it('should log anonymous handler timers', function(done) {
         this.timeout(5000);
 
-        // capture the log record
-        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1000;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -301,10 +295,10 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            var record = buffer.records && buffer.records[0];
+            var record = LOG_BUFFER.records && LOG_BUFFER.records[0];
             assert.ok(record, 'no log records');
             assert.equal(
-                buffer.records.length,
+                LOG_BUFFER.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -372,13 +366,12 @@ describe('audit logger', function() {
 
     it('restify-GH-1435 should accumulate log handler timers', function(done) {
         // capture the log record
-        var buffer = new StreamRecorder();
         var WAIT_IN_MILLISECONDS = 1100;
 
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -399,12 +392,12 @@ describe('audit logger', function() {
         });
 
         SERVER.on('after', function() {
-            var record = buffer.records && buffer.records[0];
+            var record = LOG_BUFFER.records && LOG_BUFFER.records[0];
 
             // check timers
             assert.ok(record, 'no log records');
             assert.equal(
-                buffer.records.length,
+                LOG_BUFFER.records.length,
                 1,
                 'should only have 1 log record'
             );
@@ -429,13 +422,10 @@ describe('audit logger', function() {
     });
 
     it('restify-GH-812 audit logger has query params string', function(done) {
-        // capture the log record
-        var buffer = new StreamRecorder();
-
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -447,13 +437,13 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            assert.ok(buffer.records[0], 'no log records');
+            assert.ok(LOG_BUFFER.records[0], 'no log records');
             assert.equal(
-                buffer.records.length,
+                LOG_BUFFER.records.length,
                 1,
                 'should only have 1 log record'
             );
-            assert.ok(buffer.records[0].req.query, 'a=1&b=2');
+            assert.ok(LOG_BUFFER.records[0].req.query, 'a=1&b=2');
             done();
         });
 
@@ -463,13 +453,10 @@ describe('audit logger', function() {
     });
 
     it('restify-GH-812 audit logger has query params obj', function(done) {
-        // capture the log record using a buffer.
-        var buffer = new StreamRecorder();
-
         SERVER.once(
             'after',
             restify.plugins.auditLogger({
-                log: pino({ name: 'audit' }, buffer),
+                log: pino({ name: 'audit' }),
                 event: 'after'
             })
         );
@@ -484,13 +471,13 @@ describe('audit logger', function() {
 
         SERVER.on('after', function() {
             // check timers
-            assert.ok(buffer.records[0], 'no log records');
+            assert.ok(LOG_BUFFER.records[0], 'no log records');
             assert.equal(
-                buffer.records.length,
+                LOG_BUFFER.records.length,
                 1,
                 'should only have 1 log record'
             );
-            assert.deepEqual(buffer.records[0].req.query, {
+            assert.deepEqual(LOG_BUFFER.records[0].req.query, {
                 a: '1',
                 b: '2'
             });
