@@ -121,6 +121,13 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [11.1.0](https://github.com/restify/node-restify/compare/v11.0.0...v11.1.0) (2023-02-24)
+
+
+### Features
+
+* allow custom alternatives to domains ([54adfcb](https://github.com/restify/node-restify/commit/54adfcbdea1a6be3675dbc05573f8063fc16a05b))
+
 ## [11.0.0](https://github.com/restify/node-restify/compare/v10.0.0...v11.0.0) (2023-01-17)
 
 
