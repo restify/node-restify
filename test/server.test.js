@@ -3,6 +3,7 @@
 'use strict';
 /* eslint-disable func-names */
 
+const { AsyncLocalStorage } = require('async_hooks');
 var assert = require('assert-plus');
 var childprocess = require('child_process');
 var http = require('http');
@@ -2992,6 +2993,68 @@ test('req and res should use own logger by if set during .first', function(t) {
 
     CLIENT.get('/ping', function() {
         t.end();
+    });
+});
+
+test('should throw if handleUncaughtExceptions is invalid', function(t) {
+    t.throws(() => {
+        restify.createServer({
+            handleUncaughtExceptions: 'this is invalid'
+        });
+    });
+    t.end();
+});
+
+test('should use custom function for error handling', function(t) {
+    const asl = new AsyncLocalStorage();
+    let callOnError;
+    var server = restify.createServer({
+        dtrace: helper.dtrace,
+        strictNext: true,
+        handleUncaughtExceptions: (req, res, onError, next) => {
+            callOnError = err => {
+                const newErr = new Error('new error');
+                newErr.orig = err;
+                onError(newErr);
+            };
+            asl.run({}, next, req, res);
+        },
+        log: helper.getLog('server')
+    });
+    var client;
+    var port;
+
+    server.listen(PORT + 1, '127.0.0.1', function() {
+        port = server.address().port;
+        client = restifyClients.createJsonClient({
+            url: 'http://127.0.0.1:' + port,
+            dtrace: helper.dtrace,
+            retry: false
+        });
+
+        const expectedErr = new Error('foo');
+        server.get('/throw', function(req, res, next) {
+            // We don't really need to throw to test, and catching the throw is
+            // hard because nodeunit messes with uncaughtException event
+            callOnError(expectedErr);
+        });
+
+        server.on('uncaughtException', function(req, res, route, err) {
+            t.ok(err);
+            t.strictEqual(err.orig, expectedErr);
+            t.equal(err.message, 'new error');
+            res.send(err);
+        });
+
+        client.get('/throw', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+
+            client.close();
+            server.close(function() {
+                t.end();
+            });
+        });
     });
 });
 
