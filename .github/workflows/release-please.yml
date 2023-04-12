@@ -1,14 +1,15 @@
 on:
   push:
     branches:
-      - master
+      - 9.x
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v1.3.2
+      - uses: GoogleCloudPlatform/release-please-action@v3.7.9
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           package-name: restify
+          default-branch: 9.x
