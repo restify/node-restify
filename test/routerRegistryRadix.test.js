@@ -96,8 +96,7 @@ test('toString()', function(t) {
     t.deepEqual(
         registry.toString(),
         // prettier-ignore
-        '└── / (GET)\n' +
-        '    / (POST)\n' +
+        '└── / (GET, POST)\n' +
         '    └── a (GET)\n' +
         '        └── /b (GET)\n'
     );
@@ -114,8 +113,7 @@ test('toString() with ignoreTrailingSlash', function(t) {
     t.deepEqual(
         registry.toString(),
         // prettier-ignore
-        '└── / (GET)\n' +
-        '    / (POST)\n' +
+        '└── / (GET, POST)\n' +
         '    └── a (GET)\n' +
         '        └── /b (GET)\n'
     );
