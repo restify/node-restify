@@ -625,4 +625,38 @@ describe('audit logger', function() {
             function(err, req, res) {}
         );
     });
+
+    it('should set request id using supplied field name', function(done) {
+        SERVER.once(
+            'after',
+            restify.plugins.auditLogger({
+                log: pino({ name: 'audit' }),
+                server: SERVER,
+                event: 'after',
+                requestIdFieldName: 'traceId'
+            })
+        );
+
+        SERVER.once('audit', function(data) {
+            assert.ok(data);
+            assert.ok(data.traceId);
+            assert.notOk(data.req_id);
+            done();
+        });
+
+        SERVER.get('/audit', function(req, res, next) {
+            setTimeout(function() {
+                res.send();
+                next();
+            }, 150);
+        });
+
+        CLIENT.get(
+            {
+                path: '/audit',
+                requestTimeout: 50
+            },
+            function(err, req, res) {}
+        );
+    });
 });
