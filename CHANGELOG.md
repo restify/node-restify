@@ -1,4 +1,11 @@
 <a name="8.5.1"></a>
+## [9.1.0](https://github.com/restify/node-restify/compare/v9.0.0...v9.1.0) (2023-06-13)
+
+
+### Features
+
+* emit warning for req.closed only once ([86cab8c](https://github.com/restify/node-restify/commit/86cab8c61a75db323babf6bdcb4195ee1f9941b6))
+
 ## [9.0.0](https://www.github.com/restify/node-restify/compare/v8.6.1...v9.0.0) (2022-11-15)
 
 
