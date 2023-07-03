@@ -268,6 +268,28 @@ test('route handles 404', function(t) {
     );
 });
 
+test('route handles 404 when pathname invalid', function(t) {
+    var router = new Router({
+        log: {}
+    });
+    router.defaultRoute(
+        Object.assign(
+            {
+                getUrl: function() {
+                    return { pathname: null };
+                },
+                method: 'GET'
+            },
+            mockReq
+        ),
+        mockRes,
+        function next(err) {
+            t.equal(err.statusCode, 404);
+            t.end();
+        }
+    );
+});
+
 test('route handles method not allowed (405)', function(t) {
     var router = new Router({
         log: {}
