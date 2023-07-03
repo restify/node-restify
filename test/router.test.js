@@ -246,6 +246,26 @@ test('lookup calls next with err', function(t) {
     });
 });
 
+test('GH-1959: lookup returns undefined when no handler found', function(t) {
+    var router = new Router({
+        log: {}
+    });
+    var handlerFound = router.lookup(
+        Object.assign(
+            {
+                getUrl: function() {
+                    return { pathname: null };
+                },
+                method: 'GET'
+            },
+            mockReq
+        ),
+        mockRes
+    );
+    t.notOk(handlerFound);
+    t.end();
+});
+
 test('route handles 404', function(t) {
     var router = new Router({
         log: {}
@@ -268,7 +288,7 @@ test('route handles 404', function(t) {
     );
 });
 
-test('route handles 404 when pathname invalid', function(t) {
+test('GH-1959: route handles 404 when pathname invalid', function(t) {
     var router = new Router({
         log: {}
     });
