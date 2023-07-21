@@ -95,6 +95,39 @@ describe('all other plugins', function() {
                 done();
             });
         });
+
+        it('adds the request id to logs', function(done) {
+            SERVER.use(restify.plugins.requestLogger());
+            SERVER.get('/requestLogger/test', function(req, res, next) {
+                var childings = req.log[pino.symbols.chindingsSym];
+                assert.match(childings, /"req_id":"[0-9A-F-]+"/i);
+                res.send();
+                next();
+            });
+            CLIENT.get('/requestLogger/test', function(err, _, res) {
+                assert.equal(res.statusCode, 200);
+                assert.ifError(err);
+                done();
+            });
+        });
+
+        it('adds the request id with a custom field name', function(done) {
+            SERVER.use(
+                restify.plugins.requestLogger({ requestIdFieldName: 'traceId' })
+            );
+            SERVER.get('/requestLogger/test', function(req, res, next) {
+                var childings = req.log[pino.symbols.chindingsSym];
+                assert.match(childings, /"traceId":"[0-9A-F-]+"/i);
+                assert.notMatch(childings, /"req_id"/);
+                res.send();
+                next();
+            });
+            CLIENT.get('/requestLogger/test', function(err, _, res) {
+                assert.equal(res.statusCode, 200);
+                assert.ifError(err);
+                done();
+            });
+        });
     });
 
     describe('full response', function() {

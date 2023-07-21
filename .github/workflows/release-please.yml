@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - 9.x
 name: release-please
 jobs:
   release-please:

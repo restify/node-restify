@@ -3,6 +3,7 @@
 'use strict';
 /* eslint-disable func-names */
 
+const { AsyncLocalStorage } = require('async_hooks');
 var assert = require('assert-plus');
 var childprocess = require('child_process');
 var http = require('http');
