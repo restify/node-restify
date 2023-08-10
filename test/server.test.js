@@ -1094,7 +1094,9 @@ test('fire event on error', function(t) {
     });
 });
 
-test('error handler defers "after" event', function(t) {
+test('error handler defers "after" event', async function(t) {
+    let afterResolve;
+    let clientResolve;
     t.expect(9);
     SERVER.once('NotFound', function(req, res, err, cb) {
         t.ok(req);
@@ -1107,7 +1109,7 @@ test('error handler defers "after" event', function(t) {
         SERVER.once('after', function(req2, res2) {
             t.ok(req2);
             t.ok(res2);
-            t.end();
+            afterResolve();
         });
         return cb();
     });
@@ -1118,8 +1120,18 @@ test('error handler defers "after" event', function(t) {
     CLIENT.get('/' + uuid.v4(), function(err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
-        t.end();
+        clientResolve();
     });
+
+    await Promise.all([
+        new Promise(resolve => {
+            afterResolve = resolve;
+        }),
+        new Promise(resolve => {
+            clientResolve = resolve;
+        })
+    ]);
+    t.end();
 });
 
 // eslint-disable-next-line
@@ -1916,7 +1928,9 @@ test("should emit 'close' on server close", function(t) {
     });
 });
 
-test('should cleanup inflight requests count for 404s', function(t) {
+test('should cleanup inflight requests count for 404s', async function(t) {
+    let afterResolve;
+    let clientResolve;
     SERVER.get('/foo1', function(req, res, next) {
         t.equal(SERVER.inflightRequests(), 1);
         res.send();
@@ -1926,7 +1940,7 @@ test('should cleanup inflight requests count for 404s', function(t) {
     SERVER.on('after', function(req) {
         if (req.path() === '/doesnotexist') {
             t.equal(SERVER.inflightRequests(), 0);
-            t.end();
+            afterResolve();
         }
     });
 
@@ -1939,8 +1953,19 @@ test('should cleanup inflight requests count for 404s', function(t) {
             t.ok(err2);
             t.equal(res2.statusCode, 404);
             t.equal(SERVER.inflightRequests(), 0);
+            clientResolve();
         });
     });
+
+    await Promise.all([
+        new Promise(resolve => {
+            afterResolve = resolve;
+        }),
+        new Promise(resolve => {
+            clientResolve = resolve;
+        })
+    ]);
+    t.end();
 });
 
 test('should cleanup inflight requests count for timeouts', function(t) {
