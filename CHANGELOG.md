@@ -121,6 +121,19 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [11.2.0](https://github.com/restify/node-restify/compare/v11.1.0...v11.2.0) (2023-08-11)
+
+
+### Features
+
+* allow alternate name for request id in logs ([cbd16ef](https://github.com/restify/node-restify/commit/cbd16efa3be36e7888ecccc15ee28eaa8fa6c5ef))
+* support Node.js 20 ([9f1d249](https://github.com/restify/node-restify/commit/9f1d249c3fd023b05ac15c02352ec937ff7d1299))
+
+
+### Bug Fixes
+
+* tests broke due to find-my-way update ([f8beaae](https://github.com/restify/node-restify/commit/f8beaaef64c0541185bc4c2d864948d3c1299cc9))
+
 ## [11.1.0](https://github.com/restify/node-restify/compare/v11.0.0...v11.1.0) (2023-02-24)
 
 
