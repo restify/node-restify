@@ -290,28 +290,40 @@ describe('all other plugins', function() {
         // Ensure it santizies potential edge cases correctly
         var tests = {
             input: [
+                '/', // basic path
+                '///', // excess on basic path
                 '////foo////', //excess padding on both ends
                 'bar/foo/', // trailing slash
                 'bar/foo/////', // multiple trailing slashes
                 'foo////bar', // multiple slashes inbetween
                 '////foo', // multiple at beginning
-                '/foo/bar' // don't mutate
+                '/foo/bar', // don't mutate
+                '/?test=1', // basic with query
+                '///foo///?test=1' // excess with query
             ],
             output: [
+                '/',
+                '/',
                 '/foo',
                 'bar/foo',
                 'bar/foo',
                 'foo/bar',
                 '/foo',
-                '/foo/bar'
+                '/foo/bar',
+                '/?test=1',
+                '/foo?test=1'
             ],
             description: [
+                'should give the root as a slash',
+                'dont give empty string for excess on root',
                 'should clean excess padding on both ends',
                 'should clean trailing slash',
                 'should clean multiple trailing slashes',
                 'should clean multiple slashes inbetween',
                 'should clean multiple at beginning',
-                'dont mutate correct urls'
+                'dont mutate correct urls',
+                'preserve query string with basic path',
+                'preserve query string with excess slashes'
             ]
         };
 
