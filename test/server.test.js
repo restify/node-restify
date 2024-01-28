@@ -3082,3 +3082,22 @@ test('should use custom function for error handling', function(t) {
         });
     });
 });
+
+test('should stop the chain when response already destroyed', function(t) {
+    let counter = 0;
+    SERVER.get(
+        '/test',
+        async function test(req, res) {
+            counter++;
+            res.send();
+        },
+        async function test(req, res) {
+            counter++;
+            res.send();
+        }
+    );
+    CLIENT.get('/test', function() {
+        t.equal(counter, 1);
+        t.end();
+    });
+});
