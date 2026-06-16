@@ -29,7 +29,7 @@ function getTestRoute(opts) {
 
 ///--- Tests
 
-test('adds a route', function(t) {
+test(module, 'adds a route', function(t) {
     var registry = new RouterRegistryRadix();
     registry.add(getTestRoute({ method: 'GET', path: '/' }));
     registry.add(getTestRoute({ method: 'POST', path: '/' }));
@@ -40,7 +40,7 @@ test('adds a route', function(t) {
     t.done();
 });
 
-test('removes a route', function(t) {
+test(module, 'removes a route', function(t) {
     var registry = new RouterRegistryRadix();
 
     // Mount
@@ -59,7 +59,7 @@ test('removes a route', function(t) {
     t.end();
 });
 
-test('lookups a route', function(t) {
+test(module, 'lookups a route', function(t) {
     var registry = new RouterRegistryRadix();
     var route = getTestRoute({ method: 'GET', path: '/a/:b' });
     registry.add(route);
@@ -75,7 +75,7 @@ test('lookups a route', function(t) {
     t.done();
 });
 
-test('get registered routes', function(t) {
+test(module, 'get registered routes', function(t) {
     var registry = new RouterRegistryRadix();
     registry.add(getTestRoute({ method: 'GET', path: '/' }));
     registry.add(getTestRoute({ method: 'GET', path: '/a' }));
@@ -86,7 +86,7 @@ test('get registered routes', function(t) {
     t.end();
 });
 
-test('toString()', function(t) {
+test(module, 'toString()', function(t) {
     var registry = new RouterRegistryRadix();
     registry.add(getTestRoute({ method: 'GET', path: '/' }));
     registry.add(getTestRoute({ method: 'GET', path: '/a' }));
@@ -103,7 +103,7 @@ test('toString()', function(t) {
     t.end();
 });
 
-test('toString() with ignoreTrailingSlash', function(t) {
+test(module, 'toString() with ignoreTrailingSlash', function(t) {
     var registry = new RouterRegistryRadix({ ignoreTrailingSlash: true });
     registry.add(getTestRoute({ method: 'GET', path: '/' }));
     registry.add(getTestRoute({ method: 'GET', path: '/a' }));

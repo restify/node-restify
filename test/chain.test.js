@@ -13,7 +13,7 @@ var helper = require('./lib/helper.js');
 
 var test = helper.test;
 
-test('calls all the handlers', function(t) {
+test(module, 'calls all the handlers', function(t) {
     var chain = new Chain();
     var counter = 0;
 
@@ -41,7 +41,7 @@ test('calls all the handlers', function(t) {
     );
 });
 
-test('abort with Error in next', function(t) {
+test(module, 'abort with Error in next', function(t) {
     var chain = new Chain();
     var counter = 0;
     var myError = new Error('Foo');
@@ -71,7 +71,7 @@ test('abort with Error in next', function(t) {
     );
 });
 
-test('abort with false in next', function(t) {
+test(module, 'abort with false in next', function(t) {
     var chain = new Chain();
 
     chain.add(function(req, res, next) {
@@ -97,7 +97,7 @@ test('abort with false in next', function(t) {
     );
 });
 
-test('abort with closed request', function(t) {
+test(module, 'abort with closed request', function(t) {
     var chain = new Chain();
     var closed = false;
 
@@ -124,7 +124,7 @@ test('abort with closed request', function(t) {
     );
 });
 
-test('cals error middleware', function(t) {
+test(module, 'cals error middleware', function(t) {
     t.expect(2);
     var chain = new Chain();
     var myError = new Error('Foo');
@@ -155,7 +155,7 @@ test('cals error middleware', function(t) {
     );
 });
 
-test('onceNext prevents double next calls', function(t) {
+test(module, 'onceNext prevents double next calls', function(t) {
     var doneCalled = 0;
     var chain = new Chain({
         onceNext: true
@@ -184,7 +184,9 @@ test('onceNext prevents double next calls', function(t) {
     );
 });
 
-test('throws error for double next calls in strictNext mode', function(t) {
+test(module, 'throws error for double next calls in strictNext mode', function(
+    t
+) {
     t.expect(1);
     var chain = new Chain({
         strictNext: true
@@ -220,7 +222,7 @@ test('throws error for double next calls in strictNext mode', function(t) {
     });
 });
 
-test('calls req.startHandlerTimer', function(t) {
+test(module, 'calls req.startHandlerTimer', function(t) {
     var chain = new Chain();
 
     chain.add(function foo(req, res, next) {
@@ -243,7 +245,7 @@ test('calls req.startHandlerTimer', function(t) {
     );
 });
 
-test('calls req.endHandlerTimer', function(t) {
+test(module, 'calls req.endHandlerTimer', function(t) {
     var chain = new Chain();
 
     chain.add(function foo(req, res, next) {
@@ -266,7 +268,9 @@ test('calls req.endHandlerTimer', function(t) {
     );
 });
 
-test('count returns with the number of registered handlers', function(t) {
+test(module, 'count returns with the number of registered handlers', function(
+    t
+) {
     var chain = new Chain();
     chain.add(function(req, res, next) {});
     chain.add(function(req, res, next) {});
@@ -274,7 +278,7 @@ test('count returns with the number of registered handlers', function(t) {
     t.end();
 });
 
-test('getHandlers returns with the array of handlers', function(t) {
+test(module, 'getHandlers returns with the array of handlers', function(t) {
     var chain = new Chain();
     var handlers = [function(req, res, next) {}, function(req, res, next) {}];
     chain.add(handlers[0]);
@@ -283,7 +287,7 @@ test('getHandlers returns with the array of handlers', function(t) {
     t.end();
 });
 
-test('waits async handlers', function(t) {
+test(module, 'waits async handlers', function(t) {
     const chain = new Chain();
     let counter = 0;
 
@@ -311,7 +315,7 @@ test('waits async handlers', function(t) {
     );
 });
 
-test('abort with rejected promise', function(t) {
+test(module, 'abort with rejected promise', function(t) {
     const myError = new Error('Foo');
     const chain = new Chain();
     let counter = 0;
@@ -342,7 +346,7 @@ test('abort with rejected promise', function(t) {
     );
 });
 
-test('abort with rejected promise without error', function(t) {
+test(module, 'abort with rejected promise without error', function(t) {
     const chain = new Chain();
     let counter = 0;
 
@@ -377,7 +381,7 @@ test('abort with rejected promise without error', function(t) {
     );
 });
 
-test('abort with throw inside async function', function(t) {
+test(module, 'abort with throw inside async function', function(t) {
     const myError = new Error('Foo');
     const chain = new Chain();
     let counter = 0;
@@ -408,7 +412,7 @@ test('abort with throw inside async function', function(t) {
     );
 });
 
-test('fails to add non async function with arity 2', function(t) {
+test(module, 'fails to add non async function with arity 2', function(t) {
     var handler = function getLunch(req, res) {
         res.send('ok');
     };
@@ -419,7 +423,7 @@ test('fails to add non async function with arity 2', function(t) {
     t.end();
 });
 
-test('fails to add async function with arity 3', function(t) {
+test(module, 'fails to add async function with arity 3', function(t) {
     var handler = async function getBreakfast(req, res, next) {
         res.send('ok');
     };
