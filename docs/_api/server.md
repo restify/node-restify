@@ -55,8 +55,6 @@ routes and handlers for incoming requests.
         will use a domain to catch and respond to any uncaught
         exceptions that occur in its handler stack.
         Comes with significant negative performance impact. (optional, default `false`)
-    -   `options.spdy` **[Object][24]?** Any options accepted by
-        [node-spdy][29].
     -   `options.http2` **[Object][24]?** Any options accepted by
         [http2.createSecureServer][30].
     -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
@@ -69,7 +67,7 @@ routes and handlers for incoming requests.
     -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
         [node-https Server][31].
         If provided the following restify server options will be ignored:
-        spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
+        ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.noWriteContinue` **[Boolean][26]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
@@ -118,8 +116,6 @@ Creates a new Server.
         will use a domain to catch and respond to any uncaught
         exceptions that occur in its handler stack.
         Comes with significant negative performance impact.
-    -   `options.spdy` **[Object][24]?** Any options accepted by
-        [node-spdy][29].
     -   `options.http2` **[Object][24]?** Any options accepted by
         [http2.createSecureServer][30].
     -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
@@ -132,7 +128,7 @@ Creates a new Server.
     -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
         [node-https Server][31].
         If provided the following restify server options will be ignored:
-        spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
+        ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.noWriteContinue` **[Boolean][26]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
