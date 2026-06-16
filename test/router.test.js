@@ -29,7 +29,7 @@ var mockRes = {
 
 ///--- Tests
 
-test('mounts a route', function(t) {
+test(module, 'mounts a route', function(t) {
     function handler(req, res, next) {
         res.send('Hello world');
     }
@@ -54,7 +54,7 @@ test('mounts a route', function(t) {
     t.done();
 });
 
-test('unmounts a route', function(t) {
+test(module, 'unmounts a route', function(t) {
     function handler(req, res, next) {
         res.send('Hello world');
     }
@@ -94,7 +94,7 @@ test('unmounts a route', function(t) {
     t.end();
 });
 
-test('unmounts a route that does not exist', function(t) {
+test(module, 'unmounts a route that does not exist', function(t) {
     function handler(req, res, next) {
         res.send('Hello world');
     }
@@ -109,7 +109,7 @@ test('unmounts a route that does not exist', function(t) {
     t.end();
 });
 
-test('clean up xss for 404', function(t) {
+test(module, 'clean up xss for 404', function(t) {
     var server = restify.createServer();
 
     server.listen(3000, function(listenErr) {
@@ -143,7 +143,7 @@ test('clean up xss for 404', function(t) {
     });
 });
 
-test('lookupByName runs a route by name and calls next', function(t) {
+test(module, 'lookupByName runs a route by name and calls next', function(t) {
     var router = new Router({
         log: {}
     });
@@ -164,7 +164,7 @@ test('lookupByName runs a route by name and calls next', function(t) {
     });
 });
 
-test('lookupByName calls next with err', function(t) {
+test(module, 'lookupByName calls next with err', function(t) {
     var router = new Router({
         log: {}
     });
@@ -184,7 +184,7 @@ test('lookupByName calls next with err', function(t) {
     });
 });
 
-test('lookup runs a route chain by path and calls next', function(t) {
+test(module, 'lookup runs a route chain by path and calls next', function(t) {
     var router = new Router({
         log: {}
     });
@@ -215,7 +215,7 @@ test('lookup runs a route chain by path and calls next', function(t) {
     });
 });
 
-test('lookup calls next with err', function(t) {
+test(module, 'lookup calls next with err', function(t) {
     var router = new Router({
         log: {}
     });
@@ -246,7 +246,7 @@ test('lookup calls next with err', function(t) {
     });
 });
 
-test('route handles 404', function(t) {
+test(module, 'route handles 404', function(t) {
     var router = new Router({
         log: {}
     });
@@ -268,7 +268,7 @@ test('route handles 404', function(t) {
     );
 });
 
-test('route handles method not allowed (405)', function(t) {
+test(module, 'route handles method not allowed (405)', function(t) {
     var router = new Router({
         log: {}
     });
@@ -296,7 +296,7 @@ test('route handles method not allowed (405)', function(t) {
     );
 });
 
-test('prints debug info', function(t) {
+test(module, 'prints debug info', function(t) {
     function handler1(req, res, next) {
         res.send('Hello world');
     }
@@ -327,7 +327,7 @@ test('prints debug info', function(t) {
     t.end();
 });
 
-test('toString()', function(t) {
+test(module, 'toString()', function(t) {
     function handler(req, res, next) {
         res.send('Hello world');
     }
@@ -350,7 +350,7 @@ test('toString()', function(t) {
     t.end();
 });
 
-test('toString() with ignoreTrailingSlash', function(t) {
+test(module, 'toString() with ignoreTrailingSlash', function(t) {
     function handler(req, res, next) {
         res.send('Hello world');
     }
@@ -379,7 +379,7 @@ var mockResponse = function respond(req, res, next) {
     res.send(200);
 };
 
-test('render route', function(t) {
+test(module, 'render route', function(t) {
     var server = restify.createServer();
     server.get({ name: 'countries', path: '/countries' }, mockResponse);
     server.get({ name: 'country', path: '/countries/:name' }, mockResponse);
@@ -403,7 +403,7 @@ test('render route', function(t) {
     t.end();
 });
 
-test('render route (missing params)', function(t) {
+test(module, 'render route (missing params)', function(t) {
     var server = restify.createServer();
     server.get(
         { name: 'cities', path: '/countries/:name/states/:state/cities' },
@@ -421,7 +421,7 @@ test('render route (missing params)', function(t) {
     t.end();
 });
 
-test('GH #704: render route (special charaters)', function(t) {
+test(module, 'GH #704: render route (special charaters)', function(t) {
     var server = restify.createServer();
     server.get({ name: 'my-route', path: '/countries/:name' }, mockResponse);
 
@@ -432,7 +432,7 @@ test('GH #704: render route (special charaters)', function(t) {
     t.end();
 });
 
-test('GH #704: render route (with sub-regex param)', function(t) {
+test(module, 'GH #704: render route (with sub-regex param)', function(t) {
     var server = restify.createServer();
     server.get(
         {
@@ -451,7 +451,9 @@ test('GH #704: render route (with sub-regex param)', function(t) {
     t.end();
 });
 
-test('GH-796: render route (with multiple sub-regex param)', function(t) {
+test(module, 'GH-796: render route (with multiple sub-regex param)', function(
+    t
+) {
     var server = restify.createServer();
     server.get(
         {
@@ -466,7 +468,7 @@ test('GH-796: render route (with multiple sub-regex param)', function(t) {
     t.end();
 });
 
-test('render route (with encode)', function(t) {
+test(module, 'render route (with encode)', function(t) {
     var server = restify.createServer();
     server.get({ name: 'my-route', path: '/countries/:name' }, mockResponse);
 
@@ -476,7 +478,7 @@ test('render route (with encode)', function(t) {
     t.end();
 });
 
-test('render route (query string)', function(t) {
+test(module, 'render route (query string)', function(t) {
     var server = restify.createServer();
     server.get({ name: 'country', path: '/countries/:name' }, mockResponse);
 

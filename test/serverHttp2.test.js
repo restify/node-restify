@@ -39,7 +39,7 @@ var SERVER;
 
 ///--- Tests
 
-before(function(cb) {
+before(module, function(cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
@@ -65,7 +65,7 @@ before(function(cb) {
     }
 });
 
-after(function(cb) {
+after(module, function(cb) {
     try {
         CLIENT.destroy();
         SERVER.close(function() {
@@ -79,7 +79,7 @@ after(function(cb) {
     }
 });
 
-test('get (path only)', function(t) {
+test(module, 'get (path only)', function(t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');

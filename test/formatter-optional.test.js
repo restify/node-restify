@@ -23,7 +23,7 @@ var SERVER;
 
 ///--- Tests
 
-before(function(callback) {
+before(module, function(callback) {
     try {
         SERVER = restify.createServer({
             handleUncaughtExceptions: true,
@@ -46,7 +46,7 @@ before(function(callback) {
     }
 });
 
-after(function(callback) {
+after(module, function(callback) {
     try {
         SERVER.close(callback);
         CLIENT.close();
@@ -56,20 +56,24 @@ after(function(callback) {
     }
 });
 
-test('send 200 on formatter missing and strictFormatters false', function(t) {
-    // When server is passed "strictFormatters: false" at creation time,
-    // res.send still sends a successful response even when a formatter is
-    // not set up for a specific content-type.
-    SERVER.get('/11', function handle(req, res, next) {
-        res.header('content-type', 'application/hal+json');
-        res.send(200, JSON.stringify({ hello: 'world' }));
-        return next();
-    });
+test(
+    module,
+    'send 200 on formatter missing and strictFormatters false',
+    function(t) {
+        // When server is passed "strictFormatters: false" at creation time,
+        // res.send still sends a successful response even when a formatter is
+        // not set up for a specific content-type.
+        SERVER.get('/11', function handle(req, res, next) {
+            res.header('content-type', 'application/hal+json');
+            res.send(200, JSON.stringify({ hello: 'world' }));
+            return next();
+        });
 
-    CLIENT.get(LOCALHOST + '/11', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(res.headers['content-type'], 'application/hal+json');
-        t.end();
-    });
-});
+        CLIENT.get(LOCALHOST + '/11', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.equal(res.headers['content-type'], 'application/hal+json');
+            t.end();
+        });
+    }
+);

@@ -17,7 +17,7 @@ var test = helper.test;
 
 // parseRequestUrl
 
-test('parseRequestUrl: plain path', function(t) {
+test(module, 'parseRequestUrl: plain path', function(t) {
     var r = parseRequestUrl('/foo/bar');
 
     t.equal(r.pathname, '/foo/bar');
@@ -31,7 +31,7 @@ test('parseRequestUrl: plain path', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: path with query string', function(t) {
+test(module, 'parseRequestUrl: path with query string', function(t) {
     var r = parseRequestUrl('/foo?a=1&b=2');
 
     t.equal(r.pathname, '/foo');
@@ -42,7 +42,7 @@ test('parseRequestUrl: path with query string', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: path with hash', function(t) {
+test(module, 'parseRequestUrl: path with hash', function(t) {
     var r = parseRequestUrl('/foo/bar#section');
 
     t.equal(r.pathname, '/foo/bar');
@@ -52,7 +52,7 @@ test('parseRequestUrl: path with hash', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: absolute URL', function(t) {
+test(module, 'parseRequestUrl: absolute URL', function(t) {
     var r = parseRequestUrl('http://example.com/foo?x=1');
 
     t.equal(r.pathname, '/foo');
@@ -64,7 +64,7 @@ test('parseRequestUrl: absolute URL', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: absolute URL with port', function(t) {
+test(module, 'parseRequestUrl: absolute URL with port', function(t) {
     var r = parseRequestUrl('http://example.com:8080/foo');
 
     t.equal(r.pathname, '/foo');
@@ -74,7 +74,7 @@ test('parseRequestUrl: absolute URL with port', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: OPTIONS * request-target', function(t) {
+test(module, 'parseRequestUrl: OPTIONS * request-target', function(t) {
     var r = parseRequestUrl('*');
 
     t.equal(r.pathname, '*');
@@ -88,21 +88,23 @@ test('parseRequestUrl: OPTIONS * request-target', function(t) {
 
 // parseUrlQuery
 
-test('parseUrlQuery: simple params become object', function(t) {
+test(module, 'parseUrlQuery: simple params become object', function(t) {
     var sp = new URL('/foo?a=1&b=2', 'http://localhost').searchParams;
 
     t.deepEqual(parseUrlQuery(sp), { a: '1', b: '2' });
     t.done();
 });
 
-test('parseUrlQuery: duplicate keys accumulate into array', function(t) {
+test(module, 'parseUrlQuery: duplicate keys accumulate into array', function(
+    t
+) {
     var sp = new URL('/foo?a=1&a=2&b=3', 'http://localhost').searchParams;
 
     t.deepEqual(parseUrlQuery(sp), { a: ['1', '2'], b: '3' });
     t.done();
 });
 
-test('parseUrlQuery: no query returns empty object', function(t) {
+test(module, 'parseUrlQuery: no query returns empty object', function(t) {
     var sp = new URL('/foo', 'http://localhost').searchParams;
 
     t.deepEqual(parseUrlQuery(sp), {});
@@ -111,12 +113,12 @@ test('parseUrlQuery: no query returns empty object', function(t) {
 
 // formatUrl
 
-test('formatUrl: pathname only', function(t) {
+test(module, 'formatUrl: pathname only', function(t) {
     t.equal(formatUrl({ pathname: '/foo/bar' }), '/foo/bar');
     t.done();
 });
 
-test('formatUrl: hostname + pathname', function(t) {
+test(module, 'formatUrl: hostname + pathname', function(t) {
     t.equal(
         formatUrl({
             protocol: 'http',
@@ -128,7 +130,7 @@ test('formatUrl: hostname + pathname', function(t) {
     t.done();
 });
 
-test('formatUrl: hostname + port + pathname', function(t) {
+test(module, 'formatUrl: hostname + port + pathname', function(t) {
     t.equal(
         formatUrl({
             protocol: 'http',
@@ -141,7 +143,7 @@ test('formatUrl: hostname + port + pathname', function(t) {
     t.done();
 });
 
-test('formatUrl: pathname + query object', function(t) {
+test(module, 'formatUrl: pathname + query object', function(t) {
     t.equal(
         formatUrl({ pathname: '/foo', query: { a: '1', b: '2' } }),
         '/foo?a=1&b=2'
@@ -149,13 +151,15 @@ test('formatUrl: pathname + query object', function(t) {
     t.done();
 });
 
-test('formatUrl: string passthrough', function(t) {
+test(module, 'formatUrl: string passthrough', function(t) {
     t.equal(formatUrl('/already/a/string'), '/already/a/string');
     t.equal(formatUrl('http://example.com/foo'), 'http://example.com/foo');
     t.done();
 });
 
-test('formatUrl: array query values become repeated params', function(t) {
+test(module, 'formatUrl: array query values become repeated params', function(
+    t
+) {
     t.equal(
         formatUrl({ pathname: '/foo', query: { a: ['1', '2'] } }),
         '/foo?a=1&a=2'
@@ -165,7 +169,7 @@ test('formatUrl: array query values become repeated params', function(t) {
 
 // mergeQs
 
-test('merge qs', function(t) {
+test(module, 'merge qs', function(t) {
     var qs1 = mergeQs(undefined, { a: 1 });
     t.deepEqual(qs1, { a: 1 });
 

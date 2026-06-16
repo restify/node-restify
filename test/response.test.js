@@ -25,7 +25,7 @@ var SERVER;
 var LOCALHOST;
 var SLOCALHOST;
 
-before(function(cb) {
+before(module, function(cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
@@ -57,7 +57,7 @@ before(function(cb) {
     }
 });
 
-after(function(cb) {
+after(module, function(cb) {
     try {
         CLIENT.close();
         STRING_CLIENT.close();
@@ -78,7 +78,7 @@ function join() {
     return args.join('');
 }
 
-test('redirect to new string url as-is', function(t) {
+test(module, 'redirect to new string url as-is', function(t) {
     SERVER.get('/1', function(req, res, next) {
         res.redirect('www.foo.com', next);
     });
@@ -91,7 +91,7 @@ test('redirect to new string url as-is', function(t) {
     });
 });
 
-test('redirect to new relative string url as-is', function(t) {
+test(module, 'redirect to new relative string url as-is', function(t) {
     SERVER.get('/20', function(req, res, next) {
         res.redirect('/1', next);
     });
@@ -104,7 +104,7 @@ test('redirect to new relative string url as-is', function(t) {
     });
 });
 
-test('redirect to current url (reload)', function(t) {
+test(module, 'redirect to current url (reload)', function(t) {
     SERVER.get('/2', function(req, res, next) {
         res.redirect(
             {
@@ -122,7 +122,7 @@ test('redirect to current url (reload)', function(t) {
     });
 });
 
-test('redirect to current url from http -> https', function(t) {
+test(module, 'redirect to current url from http -> https', function(t) {
     SERVER.get('/3', function(req, res, next) {
         res.redirect(
             {
@@ -140,7 +140,7 @@ test('redirect to current url from http -> https', function(t) {
     });
 });
 
-test('redirect to current url from https -> http', function(t) {
+test(module, 'redirect to current url from https -> http', function(t) {
     SERVER.get('/3', function(req, res, next) {
         res.redirect(
             {
@@ -159,7 +159,7 @@ test('redirect to current url from https -> http', function(t) {
     });
 });
 
-test('redirect by changing path', function(t) {
+test(module, 'redirect by changing path', function(t) {
     SERVER.get('/4', function(req, res, next) {
         res.redirect(
             {
@@ -178,6 +178,7 @@ test('redirect by changing path', function(t) {
 });
 
 test(
+    module,
     'GH-1494: redirect should succeed even if req.url does not specify host' +
         ' or protocol',
     function(t) {
@@ -209,7 +210,7 @@ test(
     }
 );
 
-test('redirect should add query params', function(t) {
+test(module, 'redirect should add query params', function(t) {
     SERVER.get('/5', function(req, res, next) {
         res.redirect(
             {
@@ -229,7 +230,7 @@ test('redirect should add query params', function(t) {
     });
 });
 
-test('redirect should extend existing query params', function(t) {
+test(module, 'redirect should extend existing query params', function(t) {
     SERVER.get('/6', function(req, res, next) {
         res.redirect(
             {
@@ -254,7 +255,7 @@ test('redirect should extend existing query params', function(t) {
     });
 });
 
-test('redirect should stomp over existing query params', function(t) {
+test(module, 'redirect should stomp over existing query params', function(t) {
     SERVER.get('/7', function(req, res, next) {
         res.redirect(
             {
@@ -275,7 +276,7 @@ test('redirect should stomp over existing query params', function(t) {
     });
 });
 
-test('redirect with 301 status code', function(t) {
+test(module, 'redirect with 301 status code', function(t) {
     SERVER.get('/8', function(req, res, next) {
         res.redirect(
             {
@@ -293,7 +294,7 @@ test('redirect with 301 status code', function(t) {
     });
 });
 
-test('redirect with 301 status code ising string url', function(t) {
+test(module, 'redirect with 301 status code ising string url', function(t) {
     SERVER.get('/30', function(req, res, next) {
         res.redirect(301, '/foo', next);
     });
@@ -306,7 +307,7 @@ test('redirect with 301 status code ising string url', function(t) {
     });
 });
 
-test('redirect using options.url', function(t) {
+test(module, 'redirect using options.url', function(t) {
     SERVER.get('/8', function(req, res, next) {
         res.redirect(
             {
@@ -328,7 +329,7 @@ test('redirect using options.url', function(t) {
     });
 });
 
-test('redirect using opts.port', function(t) {
+test(module, 'redirect using opts.port', function(t) {
     SERVER.get('/9', function(req, res, next) {
         res.redirect(
             {
@@ -347,7 +348,7 @@ test('redirect using opts.port', function(t) {
     });
 });
 
-test('redirect using external url and custom port', function(t) {
+test(module, 'redirect using external url and custom port', function(t) {
     SERVER.get('/9', function(req, res, next) {
         res.redirect(
             {
@@ -370,7 +371,7 @@ test('redirect using external url and custom port', function(t) {
     });
 });
 
-test('redirect using default hostname with custom port', function(t) {
+test(module, 'redirect using default hostname with custom port', function(t) {
     SERVER.get('/9', function(req, res, next) {
         res.redirect(
             {
@@ -392,7 +393,7 @@ test('redirect using default hostname with custom port', function(t) {
     });
 });
 
-test('redirect opts.port exact location header', function(t) {
+test(module, 'redirect opts.port exact location header', function(t) {
     SERVER.get('/port-pin', function(req, res, next) {
         res.redirect({ port: 3000 }, next);
     });
@@ -405,23 +406,27 @@ test('redirect opts.port exact location header', function(t) {
     });
 });
 
-test('redirect external hostname and port exact location header', function(t) {
-    SERVER.get('/extport-pin', function(req, res, next) {
-        res.redirect(
-            { hostname: 'www.foo.com', pathname: '/bar', port: 3000 },
-            next
-        );
-    });
+test(
+    module,
+    'redirect external hostname and port exact location header',
+    function(t) {
+        SERVER.get('/extport-pin', function(req, res, next) {
+            res.redirect(
+                { hostname: 'www.foo.com', pathname: '/bar', port: 3000 },
+                next
+            );
+        });
 
-    CLIENT.get(join(LOCALHOST, '/extport-pin'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, 'http://www.foo.com:3000/bar');
-        t.end();
-    });
-});
+        CLIENT.get(join(LOCALHOST, '/extport-pin'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 302);
+            t.equal(res.headers.location, 'http://www.foo.com:3000/bar');
+            t.end();
+        });
+    }
+);
 
-test('redirect extend query params exact location header', function(t) {
+test(module, 'redirect extend query params exact location header', function(t) {
     SERVER.get('/extqs-pin', function(req, res, next) {
         res.redirect({ query: { b: '2' } }, next);
     });
@@ -438,100 +443,123 @@ test('redirect extend query params exact location header', function(t) {
     });
 });
 
-// eslint-disable-next-line max-len
-test('redirect should repeat query param when same key exists in both current and new query', function(t) {
-    SERVER.get('/dupqs-pin', function(req, res, next) {
-        res.redirect({ query: { a: '2' } }, next);
-    });
+test(
+    module,
+    // eslint-disable-next-line max-len
+    'redirect should repeat query param when same key exists in both current and new query',
+    function(t) {
+        SERVER.get('/dupqs-pin', function(req, res, next) {
+            res.redirect({ query: { a: '2' } }, next);
+        });
 
-    CLIENT.get(join(LOCALHOST, '/dupqs-pin?a=1'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 302);
-        var u = new URL(res.headers.location);
-        t.deepEqual(u.searchParams.getAll('a'), ['2', '1']);
-        t.end();
-    });
-});
-
-// eslint-disable-next-line max-len
-test('redirect with only pathname (no hostname) uses current host', function(t) {
-    SERVER.get('/rel-path-pin', function(req, res, next) {
-        res.redirect({ pathname: '/other' }, next);
-    });
-
-    CLIENT.get(join(LOCALHOST, '/rel-path-pin'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 302);
-        var u = new URL(res.headers.location);
-        t.equal(u.pathname, '/other');
-        t.equal(u.hostname, '127.0.0.1');
-        t.end();
-    });
-});
+        CLIENT.get(join(LOCALHOST, '/dupqs-pin?a=1'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 302);
+            var u = new URL(res.headers.location);
+            t.deepEqual(u.searchParams.getAll('a'), ['2', '1']);
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line max-len
-test('redirect with pathname and query (no hostname) preserves query string', function(t) {
-    SERVER.get('/rel-qs-pin', function(req, res, next) {
-        res.redirect({ pathname: '/other', query: { x: '1', y: '2' } }, next);
-    });
+test(
+    module,
+    'redirect with only pathname (no hostname) uses current host',
+    function(t) {
+        SERVER.get('/rel-path-pin', function(req, res, next) {
+            res.redirect({ pathname: '/other' }, next);
+        });
 
-    CLIENT.get(join(LOCALHOST, '/rel-qs-pin'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 302);
-        var u = new URL(res.headers.location);
-        t.equal(u.pathname, '/other');
-        t.equal(u.searchParams.get('x'), '1');
-        t.equal(u.searchParams.get('y'), '2');
-        t.end();
-    });
-});
+        CLIENT.get(join(LOCALHOST, '/rel-path-pin'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 302);
+            var u = new URL(res.headers.location);
+            t.equal(u.pathname, '/other');
+            t.equal(u.hostname, '127.0.0.1');
+            t.end();
+        });
+    }
+);
+
+// eslint-disable-next-line max-len
+test(
+    module,
+    'redirect with pathname and query (no hostname) preserves query string',
+    function(t) {
+        SERVER.get('/rel-qs-pin', function(req, res, next) {
+            res.redirect(
+                { pathname: '/other', query: { x: '1', y: '2' } },
+                next
+            );
+        });
+
+        CLIENT.get(join(LOCALHOST, '/rel-qs-pin'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 302);
+            var u = new URL(res.headers.location);
+            t.equal(u.pathname, '/other');
+            t.equal(u.searchParams.get('x'), '1');
+            t.equal(u.searchParams.get('y'), '2');
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line
-test('redirect should cause InternalError when invoked without next', function(t) {
-    SERVER.get('/9', function(req, res, next) {
-        res.redirect();
-    });
+test(
+    module,
+    'redirect should cause InternalError when invoked without next',
+    function(t) {
+        SERVER.get('/9', function(req, res, next) {
+            res.redirect();
+        });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
-        t.equal(res.statusCode, 500);
+        CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
+            t.equal(res.statusCode, 500);
 
-        // json parse the response
-        t.equal(body.code, 'Internal');
-        t.end();
-    });
-});
+            // json parse the response
+            t.equal(body.code, 'Internal');
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line
-test('redirect should call next with false to stop handler stack execution', function(t) {
-    var wasRun = false;
+test(
+    module,
+    'redirect should call next with false to stop handler stack execution',
+    function(t) {
+        var wasRun = false;
 
-    function A(req, res, next) {
-        req.a = 1;
-        next();
+        function A(req, res, next) {
+            req.a = 1;
+            next();
+        }
+        function B(req, res, next) {
+            req.b = 2;
+            wasRun = true;
+            next();
+        }
+        function redirect(req, res, next) {
+            res.redirect('/10', next);
+        }
+
+        SERVER.get('/10', [A, redirect, B]);
+
+        CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 302);
+            t.equal(res.headers.location, '/10');
+
+            // handler B should not be executed
+            t.equal(wasRun, false);
+            t.end();
+        });
     }
-    function B(req, res, next) {
-        req.b = 2;
-        wasRun = true;
-        next();
-    }
-    function redirect(req, res, next) {
-        res.redirect('/10', next);
-    }
+);
 
-    SERVER.get('/10', [A, redirect, B]);
-
-    CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, '/10');
-
-        // handler B should not be executed
-        t.equal(wasRun, false);
-        t.end();
-    });
-});
-
-test('redirect should emit a redirect event', function(t) {
+test(module, 'redirect should emit a redirect event', function(t) {
     var wasEmitted = false;
     var redirectLocation;
 
@@ -560,7 +588,7 @@ test('redirect should emit a redirect event', function(t) {
     });
 });
 
-test('writeHead should emit a header event', function(t) {
+test(module, 'writeHead should emit a header event', function(t) {
     var wasEmitted = false;
     var payloadPlaceholder;
 
@@ -587,7 +615,7 @@ test('writeHead should emit a header event', function(t) {
     });
 });
 
-test('should fail to set header due to missing formatter', function(t) {
+test(module, 'should fail to set header due to missing formatter', function(t) {
     // when a formatter is not set up for a specific content-type, restify will
     // default to octet-stream.
 
@@ -605,7 +633,7 @@ test('should fail to set header due to missing formatter', function(t) {
     });
 });
 
-test('should not fail to send null as body', function(t) {
+test(module, 'should not fail to send null as body', function(t) {
     SERVER.get('/12', function handle(req, res, next) {
         res.send(200, null);
         return next();
@@ -618,36 +646,44 @@ test('should not fail to send null as body', function(t) {
     });
 });
 
-test('should not fail to send null as body without status code', function(t) {
-    SERVER.get('/13', function handle(req, res, next) {
-        res.send(null);
-        return next();
-    });
+test(
+    module,
+    'should not fail to send null as body without status code',
+    function(t) {
+        SERVER.get('/13', function handle(req, res, next) {
+            res.send(null);
+            return next();
+        });
 
-    CLIENT.get(join(LOCALHOST, '/13'), function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get(join(LOCALHOST, '/13'), function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
-test('should prefer explicit status code over error status code', function(t) {
-    SERVER.get('/14', function handle(req, res, next) {
-        res.send(200, new errs.InternalServerError('boom'));
-        return next();
-    });
+test(
+    module,
+    'should prefer explicit status code over error status code',
+    function(t) {
+        SERVER.get('/14', function handle(req, res, next) {
+            res.send(200, new errs.InternalServerError('boom'));
+            return next();
+        });
 
-    CLIENT.get(join(LOCALHOST, '/14'), function(err, _, res, body) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        // ensure error body was still sent
-        t.equal(body.code, 'InternalServer');
-        t.equal(body.message, 'boom');
-        t.end();
-    });
-});
+        CLIENT.get(join(LOCALHOST, '/14'), function(err, _, res, body) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            // ensure error body was still sent
+            t.equal(body.code, 'InternalServer');
+            t.equal(body.message, 'boom');
+            t.end();
+        });
+    }
+);
 
-test('GH-951: should send without formatting', function(t) {
+test(module, 'GH-951: should send without formatting', function(t) {
     SERVER.get('/15', function handle(req, res, next) {
         res.header('content-type', 'application/json');
         res.sendRaw(
@@ -671,7 +707,7 @@ test('GH-951: should send without formatting', function(t) {
     });
 });
 
-test('GH-951: sendRaw accepts only strings or buffers', function(t) {
+test(module, 'GH-951: sendRaw accepts only strings or buffers', function(t) {
     SERVER.on('uncaughtException', function(req, res, route, err) {
         t.ok(err);
         // Node v8 uses static error codes
@@ -695,7 +731,9 @@ test('GH-951: sendRaw accepts only strings or buffers', function(t) {
     STRING_CLIENT.get(join(LOCALHOST, '/16'));
 });
 
-test('GH-1429: setting code with res.status not respected', function(t) {
+test(module, 'GH-1429: setting code with res.status not respected', function(
+    t
+) {
     SERVER.get('/404', function(req, res, next) {
         res.status(404);
         res.send(null);
@@ -707,7 +745,7 @@ test('GH-1429: setting code with res.status not respected', function(t) {
     });
 });
 
-test('should support multiple set-cookie headers', function(t) {
+test(module, 'should support multiple set-cookie headers', function(t) {
     SERVER.get('/set-cookie', function(req, res, next) {
         res.header('Set-Cookie', 'a=1');
         res.header('Set-Cookie', 'b=2');
@@ -720,7 +758,9 @@ test('should support multiple set-cookie headers', function(t) {
     });
 });
 
-test('GH-1607: should send bools with explicit status code', function(t) {
+test(module, 'GH-1607: should send bools with explicit status code', function(
+    t
+) {
     SERVER.get('/bool/:value', function(req, res, next) {
         res.send(200, req.params.value === 'true' ? true : false);
         return next();
@@ -746,7 +786,9 @@ test('GH-1607: should send bools with explicit status code', function(t) {
     });
 });
 
-test('GH-1607: should send numbers with explicit status code', function(t) {
+test(module, 'GH-1607: should send numbers with explicit status code', function(
+    t
+) {
     SERVER.get('/zero', function(req, res, next) {
         res.send(200, 0);
         return next();
@@ -771,7 +813,7 @@ test('GH-1607: should send numbers with explicit status code', function(t) {
     });
 });
 
-test('GH-1791: should send 0 as 0 with application/json', function(t) {
+test(module, 'GH-1791: should send 0 as 0 with application/json', function(t) {
     SERVER.get('/zero', function(req, res, next) {
         res.contentType = 'application/json';
         res.send(200, 0);
@@ -784,61 +826,99 @@ test('GH-1791: should send 0 as 0 with application/json', function(t) {
     });
 });
 
-test('GH-1791: should send false as false with application/json', function(t) {
-    SERVER.get('/false', function(req, res, next) {
-        res.contentType = 'application/json';
-        res.send(200, false);
-        return next();
-    });
+test(
+    module,
+    'GH-1791: should send false as false with application/json',
+    function(t) {
+        SERVER.get('/false', function(req, res, next) {
+            res.contentType = 'application/json';
+            res.send(200, false);
+            return next();
+        });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/false'), function(err, req, res, data) {
-        t.equal(data, 'false');
-        t.end();
-    });
-});
-
-// eslint-disable-next-line
-test('GH-1791: should send empty string as "" with application/json', function(t) {
-    SERVER.get('/empty', function(req, res, next) {
-        res.contentType = 'application/json';
-        res.send(200, '');
-        return next();
-    });
-
-    STRING_CLIENT.get(join(LOCALHOST, '/empty'), function(err, req, res, data) {
-        t.equal(data, '""');
-        t.end();
-    });
-});
-
-test('GH-1791: should send null as null with application/json', function(t) {
-    SERVER.get('/null', function(req, res, next) {
-        res.contentType = 'application/json';
-        res.send(200, null);
-        return next();
-    });
-
-    STRING_CLIENT.get(join(LOCALHOST, '/null'), function(err, req, res, data) {
-        t.equal(data, 'null');
-        t.end();
-    });
-});
+        STRING_CLIENT.get(join(LOCALHOST, '/false'), function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.equal(data, 'false');
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line
-test('GH-1791: should send undefined as empty with application/json', function(t) {
-    SERVER.get('/undef', function(req, res, next) {
-        res.contentType = 'application/json';
-        res.send(200, undefined);
-        return next();
-    });
+test(
+    module,
+    'GH-1791: should send empty string as "" with application/json',
+    function(t) {
+        SERVER.get('/empty', function(req, res, next) {
+            res.contentType = 'application/json';
+            res.send(200, '');
+            return next();
+        });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/undef'), function(err, req, res, data) {
-        t.equal(data, '');
-        t.end();
-    });
-});
+        STRING_CLIENT.get(join(LOCALHOST, '/empty'), function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.equal(data, '""');
+            t.end();
+        });
+    }
+);
 
-test('GH-1791: should send NaN as null with application/json', function(t) {
+test(
+    module,
+    'GH-1791: should send null as null with application/json',
+    function(t) {
+        SERVER.get('/null', function(req, res, next) {
+            res.contentType = 'application/json';
+            res.send(200, null);
+            return next();
+        });
+
+        STRING_CLIENT.get(join(LOCALHOST, '/null'), function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.equal(data, 'null');
+            t.end();
+        });
+    }
+);
+
+// eslint-disable-next-line
+test(
+    module,
+    'GH-1791: should send undefined as empty with application/json',
+    function(t) {
+        SERVER.get('/undef', function(req, res, next) {
+            res.contentType = 'application/json';
+            res.send(200, undefined);
+            return next();
+        });
+
+        STRING_CLIENT.get(join(LOCALHOST, '/undef'), function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.equal(data, '');
+            t.end();
+        });
+    }
+);
+
+test(module, 'GH-1791: should send NaN as null with application/json', function(
+    t
+) {
     SERVER.get('/nan', function(req, res, next) {
         res.contentType = 'application/json';
         res.send(200, NaN);

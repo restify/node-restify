@@ -43,7 +43,7 @@ if (SKIP_IP_V6) {
 
 ///--- Tests
 
-before(function(cb) {
+before(module, function(cb) {
     try {
         LOG_BUFFER = new StreamRecorder();
         SERVER = restify.createServer({
@@ -75,7 +75,7 @@ before(function(cb) {
     }
 });
 
-after(function(cb) {
+after(module, function(cb) {
     try {
         CLIENT.close();
         FAST_CLIENT.close();
@@ -91,7 +91,7 @@ after(function(cb) {
     }
 });
 
-test('listen and close (port only)', function(t) {
+test(module, 'listen and close (port only)', function(t) {
     var server = restify.createServer();
     server.listen(0, function() {
         server.close(function() {
@@ -100,7 +100,9 @@ test('listen and close (port only)', function(t) {
     });
 });
 
-test('listen and close (port only) w/ port number as string', function(t) {
+test(module, 'listen and close (port only) w/ port number as string', function(
+    t
+) {
     var server = restify.createServer();
     server.listen(String(0), function() {
         server.close(function() {
@@ -109,7 +111,7 @@ test('listen and close (port only) w/ port number as string', function(t) {
     });
 });
 
-test('listen and close (socketPath)', function(t) {
+test(module, 'listen and close (socketPath)', function(t) {
     var server = restify.createServer();
     server.listen('/tmp/.' + uuid.v4(), function() {
         server.close(function() {
@@ -134,7 +136,7 @@ if (!SKIP_IP_V6) {
     });
 }
 
-test('get (path only)', function(t) {
+test(module, 'get (path only)', function(t) {
     var r = SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -164,7 +166,7 @@ test('get (path only)', function(t) {
     });
 });
 
-test('get (path only - with trailing slash)', function(t) {
+test(module, 'get (path only - with trailing slash)', function(t) {
     SERVER.get('/foo/', function echoId(req, res, next) {
         res.send();
         next();
@@ -191,7 +193,9 @@ test('get (path only - with trailing slash)', function(t) {
     });
 });
 
-test('get (path only - with trailing slash and nested route)', function(t) {
+test(module, 'get (path only - with trailing slash and nested route)', function(
+    t
+) {
     SERVER.get('/foo/', function echoId(req, res, next) {
         res.statusCode = 200;
         res.send();
@@ -243,7 +247,7 @@ test('get (path only - with trailing slash and nested route)', function(t) {
     });
 });
 
-test('use + get (path only)', function(t) {
+test(module, 'use + get (path only)', function(t) {
     SERVER.use(function(req, res, next) {
         next();
     });
@@ -261,7 +265,7 @@ test('use + get (path only)', function(t) {
     });
 });
 
-test('rm', function(t) {
+test(module, 'rm', function(t) {
     var routeName = SERVER.get('/foo/:id', function foosy(req, res, next) {
         next();
     });
@@ -287,6 +291,7 @@ test('rm', function(t) {
 });
 
 test(
+    module,
     '_routeErrorResponse does not cause uncaughtException when called when' +
         'header has already been sent',
     function(t) {
@@ -314,7 +319,7 @@ test(
     }
 );
 
-test('use - throws TypeError on non function as argument', function(t) {
+test(module, 'use - throws TypeError on non function as argument', function(t) {
     var errMsg = 'handler (function) is required';
 
     t.throws(
@@ -352,7 +357,7 @@ test('use - throws TypeError on non function as argument', function(t) {
     t.end();
 });
 
-test('405', function(t) {
+test(module, '405', function(t) {
     SERVER.post('/foo/:id', function posty(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -368,7 +373,7 @@ test('405', function(t) {
     });
 });
 
-test('PUT ok', function(t) {
+test(module, 'PUT ok', function(t) {
     SERVER.put('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -384,7 +389,7 @@ test('PUT ok', function(t) {
     });
 });
 
-test('PATCH ok', function(t) {
+test(module, 'PATCH ok', function(t) {
     SERVER.patch('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -409,7 +414,7 @@ test('PATCH ok', function(t) {
     }).end();
 });
 
-test('HEAD ok', function(t) {
+test(module, 'HEAD ok', function(t) {
     SERVER.head('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -436,7 +441,7 @@ test('HEAD ok', function(t) {
     }).end();
 });
 
-test('DELETE ok', function(t) {
+test(module, 'DELETE ok', function(t) {
     SERVER.del('/foo/:id', function tester(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -461,7 +466,7 @@ test('DELETE ok', function(t) {
     }).end();
 });
 
-test('OPTIONS', function(t) {
+test(module, 'OPTIONS', function(t) {
     ['get', 'post', 'put', 'del'].forEach(function(method) {
         SERVER[method]('/foo/:id', function tester(req, res, next) {
             t.ok(req.params);
@@ -484,7 +489,7 @@ test('OPTIONS', function(t) {
     }).end();
 });
 
-test('RegExp ok', function(t) {
+test(module, 'RegExp ok', function(t) {
     SERVER.get('/example/:file(^\\d+).png', function tester(req, res, next) {
         t.deepEqual(req.params, {
             file: '12'
@@ -501,7 +506,7 @@ test('RegExp ok', function(t) {
     });
 });
 
-test('get (path and version ok)', function(t) {
+test(module, 'get (path and version ok)', function(t) {
     SERVER.get(
         {
             url: '/foo/:id',
@@ -528,7 +533,7 @@ test('get (path and version ok)', function(t) {
     });
 });
 
-test('GH-63 res.send 204 is sending a body', function(t) {
+test(module, 'GH-63 res.send 204 is sending a body', function(t) {
     SERVER.del('/hello/:name', function tester(req, res, next) {
         res.send(204);
         next();
@@ -559,7 +564,7 @@ test('GH-63 res.send 204 is sending a body', function(t) {
     }).end();
 });
 
-test('GH-64 prerouting chain', function(t) {
+test(module, 'GH-64 prerouting chain', function(t) {
     SERVER.pre(function(req, res, next) {
         req.log.debug('testing log is set');
         req.headers.accept = 'application/json';
@@ -595,7 +600,7 @@ test('GH-64 prerouting chain', function(t) {
     }).end();
 });
 
-test('GH-64 prerouting chain with error', function(t) {
+test(module, 'GH-64 prerouting chain with error', function(t) {
     SERVER.pre(function(req, res, next) {
         next(
             new RestError(
@@ -620,7 +625,7 @@ test('GH-64 prerouting chain with error', function(t) {
     });
 });
 
-test('GH-67 extend access-control headers', function(t) {
+test(module, 'GH-67 extend access-control headers', function(t) {
     SERVER.get('/hello/:name', function tester(req, res, next) {
         res.header(
             'Access-Control-Allow-Headers',
@@ -640,7 +645,7 @@ test('GH-67 extend access-control headers', function(t) {
     });
 });
 
-test('GH-77 uncaughtException (default behavior)', function(t) {
+test(module, 'GH-77 uncaughtException (default behavior)', function(t) {
     SERVER.get('/', function(req, res, next) {
         throw new Error('Catch me!');
     });
@@ -653,44 +658,52 @@ test('GH-77 uncaughtException (default behavior)', function(t) {
 });
 
 // eslint-disable-next-line
-test('handleUncaughtExceptions should not call handler for internal errors', function(t) {
-    SERVER.get('/', function(req, res, next) {
-        // This route is not used for the test but at least one route needs to
-        // be registered to Restify in order for routing logic to be run
-        assert.fail('should not run');
-    });
+test(
+    module,
+    'handleUncaughtExceptions should not call handler for internal errors',
+    function(t) {
+        SERVER.get('/', function(req, res, next) {
+            // This route is not used for the test but at least one route needs to
+            // be registered to Restify in order for routing logic to be run
+            assert.fail('should not run');
+        });
 
-    SERVER.on('uncaughtException', function throwError(err) {
-        t.ifError(err);
-        t.end();
-    });
+        SERVER.on('uncaughtException', function throwError(err) {
+            t.ifError(err);
+            t.end();
+        });
 
-    CLIENT.head('/', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 405);
-        t.end();
-    });
-});
+        CLIENT.head('/', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 405);
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line
-test('handleUncaughtExceptions should not call handler for next(new Error())', function(t) {
-    SERVER.get('/', function(req, res, next) {
-        next(new Error('I am not fatal'));
-    });
+test(
+    module,
+    'handleUncaughtExceptions should not call handler for next(new Error())',
+    function(t) {
+        SERVER.get('/', function(req, res, next) {
+            next(new Error('I am not fatal'));
+        });
 
-    SERVER.on('uncaughtException', function throwError(err) {
-        t.ifError(err);
-        t.end();
-    });
+        SERVER.on('uncaughtException', function throwError(err) {
+            t.ifError(err);
+            t.end();
+        });
 
-    CLIENT.get('/', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
+        CLIENT.get('/', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+            t.end();
+        });
+    }
+);
 
-test('GH-77 uncaughtException (with custom handler)', function(t) {
+test(module, 'GH-77 uncaughtException (with custom handler)', function(t) {
     SERVER.on('uncaughtException', function(req, res, route, err) {
         res.send(204);
     });
@@ -705,7 +718,7 @@ test('GH-77 uncaughtException (with custom handler)', function(t) {
     });
 });
 
-test('GH-180 can parse DELETE body', function(t) {
+test(module, 'GH-180 can parse DELETE body', function(t) {
     SERVER.use(restify.plugins.bodyParser({ mapParams: false }));
 
     SERVER.del('/', function(req, res, next) {
@@ -739,7 +752,7 @@ test('GH-180 can parse DELETE body', function(t) {
     }).end('{"param1": 1234}');
 });
 
-test('returning error from a handler (with domains)', function(t) {
+test(module, 'returning error from a handler (with domains)', function(t) {
     SERVER.get('/', function(req, res, next) {
         next(new errors.InternalError('bah!'));
     });
@@ -751,7 +764,7 @@ test('returning error from a handler (with domains)', function(t) {
     });
 });
 
-test('emitting error from a handler (with domains)', function(t) {
+test(module, 'emitting error from a handler (with domains)', function(t) {
     SERVER.get('/', function(req, res, next) {
         req.emit('error', new Error('bah!'));
     });
@@ -763,7 +776,7 @@ test('emitting error from a handler (with domains)', function(t) {
     });
 });
 
-test('re-emitting redirect from a response', function(t) {
+test(module, 're-emitting redirect from a response', function(t) {
     var redirectLocation;
 
     SERVER.on('redirect', function(payload) {
@@ -780,7 +793,7 @@ test('re-emitting redirect from a response', function(t) {
     });
 });
 
-test('throwing error from a handler (with domains)', function(t) {
+test(module, 'throwing error from a handler (with domains)', function(t) {
     SERVER.get('/', function(req, res, next) {
         process.nextTick(function() {
             throw new Error('bah!');
@@ -794,7 +807,7 @@ test('throwing error from a handler (with domains)', function(t) {
     });
 });
 
-test('gh-278 missing router error events (404)', function(t) {
+test(module, 'gh-278 missing router error events (404)', function(t) {
     SERVER.once('NotFound', function(req, res) {
         res.send(404, 'foo');
     });
@@ -807,7 +820,7 @@ test('gh-278 missing router error events (404)', function(t) {
     });
 });
 
-test('gh-278 missing router error events (405)', function(t) {
+test(module, 'gh-278 missing router error events (405)', function(t) {
     var p = '/' + uuid.v4();
     SERVER.post(p, function(req, res, next) {
         res.send(201);
@@ -825,7 +838,7 @@ test('gh-278 missing router error events (405)', function(t) {
     });
 });
 
-test('gh-329 wrong values in res.methods', function(t) {
+test(module, 'gh-329 wrong values in res.methods', function(t) {
     function route(req, res, next) {
         res.send(200);
         next();
@@ -849,7 +862,7 @@ test('gh-329 wrong values in res.methods', function(t) {
     });
 });
 
-test('GH #704: Route with a valid RegExp params', function(t) {
+test(module, 'GH #704: Route with a valid RegExp params', function(t) {
     SERVER.get(
         {
             name: 'regexp_param1',
@@ -869,7 +882,7 @@ test('GH #704: Route with a valid RegExp params', function(t) {
     });
 });
 
-test('GH #704: Route with an invalid RegExp params', function(t) {
+test(module, 'GH #704: Route with an invalid RegExp params', function(t) {
     SERVER.get(
         {
             name: 'regexp_param2',
@@ -889,7 +902,7 @@ test('GH #704: Route with an invalid RegExp params', function(t) {
     });
 });
 
-test('run param only with existing req.params', function(t) {
+test(module, 'run param only with existing req.params', function(t) {
     var count = 0;
 
     SERVER.param('name', function(req, res, next) {
@@ -914,7 +927,7 @@ test('run param only with existing req.params', function(t) {
     });
 });
 
-test('run param only with existing req.params', function(t) {
+test(module, 'run param only with existing req.params', function(t) {
     var count = 0;
 
     SERVER.param('name', function(req, res, next) {
@@ -941,7 +954,7 @@ test('run param only with existing req.params', function(t) {
     });
 });
 
-test('next("string") returns InternalServer', function(t) {
+test(module, 'next("string") returns InternalServer', function(t) {
     var count = 0;
 
     SERVER.use(function(req, res, next) {
@@ -968,34 +981,38 @@ test('next("string") returns InternalServer', function(t) {
     });
 });
 
-test('next("string") from a use plugin returns InternalServer', function(t) {
-    var count = 0;
+test(
+    module,
+    'next("string") from a use plugin returns InternalServer',
+    function(t) {
+        var count = 0;
 
-    SERVER.use(function plugin(req, res, next) {
-        count++;
-        next('bar');
-    });
+        SERVER.use(function plugin(req, res, next) {
+            count++;
+            next('bar');
+        });
 
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function getFoo(req, res, next) {
-            res.send(200);
-            next();
-        }
-    );
+        SERVER.get(
+            {
+                name: 'foo',
+                path: '/foo'
+            },
+            function getFoo(req, res, next) {
+                res.send(200);
+                next();
+            }
+        );
 
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.equal(count, 1);
-        t.end();
-    });
-});
+        CLIENT.get('/foo', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+            t.equal(count, 1);
+            t.end();
+        });
+    }
+);
 
-test('res.charSet', function(t) {
+test(module, 'res.charSet', function(t) {
     SERVER.get('/foo', function getFoo(req, res, next) {
         res.charSet('ISO-8859-1');
         res.set('Content-Type', 'text/plain');
@@ -1012,7 +1029,7 @@ test('res.charSet', function(t) {
     });
 });
 
-test('res.charSet override', function(t) {
+test(module, 'res.charSet override', function(t) {
     SERVER.get('/foo', function getFoo(req, res, next) {
         res.charSet('ISO-8859-1');
         res.set('Content-Type', 'text/plain;charset=utf-8');
@@ -1029,7 +1046,7 @@ test('res.charSet override', function(t) {
     });
 });
 
-test('GH-384 res.json(200, {}) broken', function(t) {
+test(module, 'GH-384 res.json(200, {}) broken', function(t) {
     SERVER.get('/foo', function(req, res, next) {
         res.json(200, { foo: 'bar' });
         next();
@@ -1044,7 +1061,7 @@ test('GH-384 res.json(200, {}) broken', function(t) {
     });
 });
 
-test('explicitly sending a 403 with custom error', function(t) {
+test(module, 'explicitly sending a 403 with custom error', function(t) {
     function MyCustomError() {}
 
     MyCustomError.prototype = Object.create(Error.prototype);
@@ -1060,7 +1077,7 @@ test('explicitly sending a 403 with custom error', function(t) {
     });
 });
 
-test('explicitly sending a 403 on error', function(t) {
+test(module, 'explicitly sending a 403 on error', function(t) {
     SERVER.get('/', function(req, res, next) {
         res.send(403, new Error('bah!'));
     });
@@ -1072,7 +1089,7 @@ test('explicitly sending a 403 on error', function(t) {
     });
 });
 
-test('fire event on error', function(t) {
+test(module, 'fire event on error', function(t) {
     SERVER.once('InternalServer', function(req, res, err, cb) {
         t.ok(req);
         t.ok(res);
@@ -1094,7 +1111,7 @@ test('fire event on error', function(t) {
     });
 });
 
-test('error handler defers "after" event', async function(t) {
+test(module, 'error handler defers "after" event', async function(t) {
     let afterResolve;
     let clientResolve;
     t.expect(9);
@@ -1135,50 +1152,58 @@ test('error handler defers "after" event', async function(t) {
 });
 
 // eslint-disable-next-line
-test('gh-757 req.absoluteUri() defaults path segment to req.path()', function(t) {
-    SERVER.get('/the-original-path', function(req, res, next) {
-        var prefix = 'http://127.0.0.1:' + PORT;
-        t.equal(
-            req.absoluteUri('?key=value'),
-            prefix + '/the-original-path/?key=value'
-        );
-        t.equal(
-            req.absoluteUri('#fragment'),
-            prefix + '/the-original-path/#fragment'
-        );
-        t.equal(
-            req.absoluteUri('?key=value#fragment'),
-            prefix + '/the-original-path/?key=value#fragment'
-        );
-        res.send();
-        next();
-    });
+test(
+    module,
+    'gh-757 req.absoluteUri() defaults path segment to req.path()',
+    function(t) {
+        SERVER.get('/the-original-path', function(req, res, next) {
+            var prefix = 'http://127.0.0.1:' + PORT;
+            t.equal(
+                req.absoluteUri('?key=value'),
+                prefix + '/the-original-path/?key=value'
+            );
+            t.equal(
+                req.absoluteUri('#fragment'),
+                prefix + '/the-original-path/#fragment'
+            );
+            t.equal(
+                req.absoluteUri('?key=value#fragment'),
+                prefix + '/the-original-path/?key=value#fragment'
+            );
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/the-original-path', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get('/the-original-path', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line max-len
-test('req.absoluteUri() resolves plain subpath relative to current path', function(t) {
-    SERVER.get('/base-path', function(req, res, next) {
-        var prefix = 'http://127.0.0.1:' + PORT;
-        t.equal(req.absoluteUri('child'), prefix + '/base-path/child');
-        t.equal(req.absoluteUri('/absolute'), prefix + '/absolute');
-        res.send();
-        next();
-    });
+test(
+    module,
+    'req.absoluteUri() resolves plain subpath relative to current path',
+    function(t) {
+        SERVER.get('/base-path', function(req, res, next) {
+            var prefix = 'http://127.0.0.1:' + PORT;
+            t.equal(req.absoluteUri('child'), prefix + '/base-path/child');
+            t.equal(req.absoluteUri('/absolute'), prefix + '/absolute');
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/base-path', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get('/base-path', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
-test('GH-693 sending multiple response header values', function(t) {
+test(module, 'GH-693 sending multiple response header values', function(t) {
     SERVER.get('/', function(req, res, next) {
         res.link('/', 'self');
         res.link('/foo', 'foo');
@@ -1193,7 +1218,7 @@ test('GH-693 sending multiple response header values', function(t) {
     });
 });
 
-test('gh-762 res.noCache()', function(t) {
+test(module, 'gh-762 res.noCache()', function(t) {
     SERVER.get('/some-path', function(req, res, next) {
         res.noCache();
         res.send('data');
@@ -1210,7 +1235,7 @@ test('gh-762 res.noCache()', function(t) {
     });
 });
 
-test('gh-779 set-cookie fields should never have commas', function(t) {
+test(module, 'gh-779 set-cookie fields should never have commas', function(t) {
     SERVER.get('/set-cookie', function(req, res, next) {
         res.header('set-cookie', 'foo');
         res.header('set-cookie', 'bar');
@@ -1233,6 +1258,7 @@ test('gh-779 set-cookie fields should never have commas', function(t) {
 });
 
 test(
+    module,
     'gh-986 content-type fields should never have commas' +
         ' (via `res.header(...)`)',
     function(t) {
@@ -1256,6 +1282,7 @@ test(
 );
 
 test(
+    module,
     'gh-986 content-type fields should never have commas' +
         ' (via `res.setHeader(...)`)',
     function(t) {
@@ -1278,7 +1305,7 @@ test(
     }
 );
 
-test('GH-877 content-type should be case insensitive', function(t) {
+test(module, 'GH-877 content-type should be case insensitive', function(t) {
     SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
 
     SERVER.get('/cl', function(req, res, next) {
@@ -1306,7 +1333,7 @@ test('GH-877 content-type should be case insensitive', function(t) {
     client.end();
 });
 
-test('GH-882: route name is same as specified', function(t) {
+test(module, 'GH-882: route name is same as specified', function(t) {
     SERVER.get(
         {
             name: 'my-r$-%-x',
@@ -1325,6 +1352,7 @@ test('GH-882: route name is same as specified', function(t) {
 });
 
 test(
+    module,
     'GH-733 if request closed early, stop processing. ensure only ' +
         'relevant audit logs output.',
     function(t) {
@@ -1421,7 +1449,7 @@ test(
     }
 );
 
-test('GH-667 emit error event for generic Errors', function(t) {
+test(module, 'GH-667 emit error event for generic Errors', function(t) {
     var restifyErrorFired = 0;
     var notFoundFired = 0;
     var myErr = new errors.NotFoundError('foobar');
@@ -1480,25 +1508,29 @@ test('GH-667 emit error event for generic Errors', function(t) {
 });
 
 // eslint-disable-next-line
-test('GH-667 returning error in error handler should not do anything', function(t) {
-    SERVER.on('ImATeapot', function(req, res, err, cb) {
-        // attempt to pass a new error back
-        return cb(new errors.LockedError('oh noes'));
-    });
+test(
+    module,
+    'GH-667 returning error in error handler should not do anything',
+    function(t) {
+        SERVER.on('ImATeapot', function(req, res, err, cb) {
+            // attempt to pass a new error back
+            return cb(new errors.LockedError('oh noes'));
+        });
 
-    SERVER.get('/1', function(req, res, next) {
-        return next(new errors.ImATeapotError('foobar'));
-    });
+        SERVER.get('/1', function(req, res, next) {
+            return next(new errors.ImATeapotError('foobar'));
+        });
 
-    CLIENT.get('/1', function(err, req, res, data) {
-        t.ok(err);
-        // should still get the original error
-        t.equal(err.name, 'ImATeapotError');
-        t.end();
-    });
-});
+        CLIENT.get('/1', function(err, req, res, data) {
+            t.ok(err);
+            // should still get the original error
+            t.equal(err.name, 'ImATeapotError');
+            t.end();
+        });
+    }
+);
 
-test('GH-1024 disable uncaughtException handler', function(t) {
+test(module, 'GH-1024 disable uncaughtException handler', function(t) {
     // With uncaughtException handling disabled, the node process will abort,
     // so testing of this feature must occur in a separate node process.
 
@@ -1544,7 +1576,7 @@ test('GH-1024 disable uncaughtException handler', function(t) {
     serverProc.send({ task: 'serverPortRequest' });
 });
 
-test('GH-999 Custom 404 handler does not send response', function(t) {
+test(module, 'GH-999 Custom 404 handler does not send response', function(t) {
     // make the 404 handler act like other error handlers - must modify
     // err.body to send a custom response.
 
@@ -1567,78 +1599,90 @@ test('GH-999 Custom 404 handler does not send response', function(t) {
     });
 });
 
-test('calling next(false) should early exit from pre handlers', function(t) {
-    var afterFired = false;
+test(
+    module,
+    'calling next(false) should early exit from pre handlers',
+    function(t) {
+        var afterFired = false;
 
-    SERVER.pre(function(req, res, next) {
-        res.send('early exit');
-        return next(false);
-    });
+        SERVER.pre(function(req, res, next) {
+            res.send('early exit');
+            return next(false);
+        });
 
-    SERVER.get('/1', function(req, res, next) {
-        res.send('hello world');
-        return next();
-    });
+        SERVER.get('/1', function(req, res, next) {
+            res.send('hello world');
+            return next();
+        });
 
-    SERVER.on('after', function() {
-        afterFired = true;
-    });
+        SERVER.on('after', function() {
+            afterFired = true;
+        });
 
-    CLIENT.get('/1', function(err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'early exit');
-        // ensure after event fired
-        t.ok(afterFired);
-        t.end();
-    });
-});
+        CLIENT.get('/1', function(err, req, res, data) {
+            t.ifError(err);
+            t.equal(data, 'early exit');
+            // ensure after event fired
+            t.ok(afterFired);
+            t.end();
+        });
+    }
+);
 
-test('calling next(false) should early exit from use handlers', function(t) {
-    var steps = 0;
+test(
+    module,
+    'calling next(false) should early exit from use handlers',
+    function(t) {
+        var steps = 0;
 
-    SERVER.use(function(req, res, next) {
-        res.send('early exit');
-        return next(false);
-    });
+        SERVER.use(function(req, res, next) {
+            res.send('early exit');
+            return next(false);
+        });
 
-    SERVER.get('/1', function(req, res, next) {
-        res.send('hello world');
-        return next();
-    });
+        SERVER.get('/1', function(req, res, next) {
+            res.send('hello world');
+            return next();
+        });
 
-    SERVER.on('after', function() {
-        steps++;
-        t.equal(steps, 1);
-        t.end();
-    });
+        SERVER.on('after', function() {
+            steps++;
+            t.equal(steps, 1);
+            t.end();
+        });
 
-    CLIENT.get('/1', function(err, req, res, data) {
-        t.ifError(err);
-        t.equal(data, 'early exit');
-        steps++;
-    });
-});
+        CLIENT.get('/1', function(err, req, res, data) {
+            t.ifError(err);
+            t.equal(data, 'early exit');
+            steps++;
+        });
+    }
+);
 
-test('calling next(err) from pre should still emit after event', function(t) {
-    setTimeout(function() {
-        t.fail('Timed out');
-        t.end();
-    }, 2000);
-    var error = new Error();
-    SERVER.pre(function(req, res, next) {
-        next(error);
-    });
-    SERVER.get('/', function(req, res, next) {
-        t.fail('should have aborted stack before routing');
-    });
-    SERVER.on('after', function(req, res, route, err) {
-        t.equal(err, error);
-        t.end();
-    });
-    CLIENT.get('/', function() {});
-});
+test(
+    module,
+    'calling next(err) from pre should still emit after event',
+    function(t) {
+        setTimeout(function() {
+            t.fail('Timed out');
+            t.end();
+        }, 2000);
+        var error = new Error();
+        SERVER.pre(function(req, res, next) {
+            next(error);
+        });
+        SERVER.get('/', function(req, res, next) {
+            t.fail('should have aborted stack before routing');
+        });
+        SERVER.on('after', function(req, res, route, err) {
+            t.equal(err, error);
+            t.end();
+        });
+        CLIENT.get('/', function() {});
+    }
+);
 
-test('GH-1078: server name should default to restify', function(t) {
+test(module, 'GH-1078: server name should default to restify', function(t) {
     var myServer = restify.createServer();
     var port = 3000;
 
@@ -1663,7 +1707,7 @@ test('GH-1078: server name should default to restify', function(t) {
     });
 });
 
-test('GH-1078: server name should be customizable', function(t) {
+test(module, 'GH-1078: server name should be customizable', function(t) {
     var myServer = restify.createServer({
         name: 'foo'
     });
@@ -1691,34 +1735,38 @@ test('GH-1078: server name should be customizable', function(t) {
 });
 
 // eslint-disable-next-line
-test('GH-1078: server name should be overridable and not sent down', function(t) {
-    var myServer = restify.createServer({
-        name: ''
-    });
-    var port = 3000;
-
-    myServer.get('/', function(req, res, next) {
-        res.send('hi');
-        return next();
-    });
-
-    var myClient = restifyClients.createStringClient({
-        url: 'http://127.0.0.1:' + port,
-        headers: {
-            connection: 'close'
-        }
-    });
-
-    myServer.listen(port, function() {
-        myClient.get('/', function(err, req, res, data) {
-            t.ifError(err);
-            t.equal(res.headers.hasOwnProperty('server'), false);
-            myServer.close(t.end);
+test(
+    module,
+    'GH-1078: server name should be overridable and not sent down',
+    function(t) {
+        var myServer = restify.createServer({
+            name: ''
         });
-    });
-});
+        var port = 3000;
 
-test("should emit 'after' on successful request", function(t) {
+        myServer.get('/', function(req, res, next) {
+            res.send('hi');
+            return next();
+        });
+
+        var myClient = restifyClients.createStringClient({
+            url: 'http://127.0.0.1:' + port,
+            headers: {
+                connection: 'close'
+            }
+        });
+
+        myServer.listen(port, function() {
+            myClient.get('/', function(err, req, res, data) {
+                t.ifError(err);
+                t.equal(res.headers.hasOwnProperty('server'), false);
+                myServer.close(t.end);
+            });
+        });
+    }
+);
+
+test(module, "should emit 'after' on successful request", function(t) {
     SERVER.on('after', function(req, res, route, err) {
         t.ifError(err);
         t.end();
@@ -1735,7 +1783,9 @@ test("should emit 'after' on successful request", function(t) {
     });
 });
 
-test("should emit 'after' on successful request with work", function(t) {
+test(module, "should emit 'after' on successful request with work", function(
+    t
+) {
     SERVER.on('after', function(req, res, route, err) {
         t.ifError(err);
         t.end();
@@ -1758,7 +1808,7 @@ test("should emit 'after' on successful request with work", function(t) {
     });
 });
 
-test("should emit 'after' on errored request", function(t) {
+test(module, "should emit 'after' on errored request", function(t) {
     SERVER.on('after', function(req, res, route, err) {
         t.ok(err);
         t.end();
@@ -1774,7 +1824,7 @@ test("should emit 'after' on errored request", function(t) {
     });
 });
 
-test("should emit 'after' on uncaughtException", function(t) {
+test(module, "should emit 'after' on uncaughtException", function(t) {
     SERVER.on('after', function(req, res, route, err) {
         t.ok(err);
         t.equal(err.message, 'oh noes');
@@ -1791,28 +1841,33 @@ test("should emit 'after' on uncaughtException", function(t) {
     });
 });
 
-test("should emit 'after' when sending res on uncaughtException", function(t) {
-    SERVER.on('after', function(req, res, route, err) {
-        t.ok(err);
-        t.equal(err.message, 'oh noes');
-    });
+test(
+    module,
+    "should emit 'after' when sending res on uncaughtException",
+    function(t) {
+        SERVER.on('after', function(req, res, route, err) {
+            t.ok(err);
+            t.equal(err.message, 'oh noes');
+        });
 
-    SERVER.on('uncaughtException', function(req, res, route, err) {
-        res.send(504, 'boom');
-    });
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            res.send(504, 'boom');
+        });
 
-    SERVER.get('/foobar', function(req, res, next) {
-        throw new Error('oh noes');
-    });
+        SERVER.get('/foobar', function(req, res, next) {
+            throw new Error('oh noes');
+        });
 
-    CLIENT.get('/foobar', function(err, _, res) {
-        t.ok(err);
-        t.equal(err.name, 'GatewayTimeoutError');
-        t.end();
-    });
-});
+        CLIENT.get('/foobar', function(err, _, res) {
+            t.ok(err);
+            t.equal(err.name, 'GatewayTimeoutError');
+            t.end();
+        });
+    }
+);
 
 test(
+    module,
     "should emit 'after' on client closed request " +
         "(req.connectionState(): 'close')",
     function(t) {
@@ -1843,48 +1898,58 @@ test(
 // specifically tests the edge case of an exception being thrown from a route
 // handler _after_ the response is considered to be "flushed" (for instance when
 // the request is aborted before a response is sent and an exception is thrown).
-// eslint-disable-next-line max-len
-test("should emit 'after' on uncaughtException after response closed with custom uncaughtException listener", function(t) {
-    var ERR_MSG = 'foo';
-    var gotAfter = false;
-    var gotReqCallback = false;
+test(
+    module,
+    // eslint-disable-next-line max-len
+    "should emit 'after' on uncaughtException after response closed with custom uncaughtException listener",
+    function(t) {
+        var ERR_MSG = 'foo';
+        var gotAfter = false;
+        var gotReqCallback = false;
 
-    SERVER.on('after', function(req, res, route, err) {
-        gotAfter = true;
-        t.ok(err);
-        t.equal(req.connectionState(), 'close');
-        t.equal(res.statusCode, 444);
-        t.equal(err.name, 'Error');
-        t.equal(err.message, ERR_MSG);
-        if (gotReqCallback) {
-            t.end();
-        }
-    });
-
-    SERVER.on('uncaughtException', function(req, res, route, err, callback) {
-        callback();
-    });
-
-    SERVER.get('/foobar', function(req, res, next) {
-        res.on('close', function onResClose() {
-            // We throw this error in the response's close event handler on
-            // purpose to exercise the code path where we mark the route
-            // handlers as finished _after_ the response is marked as flushed.
-            throw new Error(ERR_MSG);
+        SERVER.on('after', function(req, res, route, err) {
+            gotAfter = true;
+            t.ok(err);
+            t.equal(req.connectionState(), 'close');
+            t.equal(res.statusCode, 444);
+            t.equal(err.name, 'Error');
+            t.equal(err.message, ERR_MSG);
+            if (gotReqCallback) {
+                t.end();
+            }
         });
-    });
 
-    FAST_CLIENT.get('/foobar', function(err, _, res) {
-        gotReqCallback = true;
-        t.ok(err);
-        t.equal(err.name, 'RequestTimeoutError');
-        if (gotAfter) {
-            t.end();
-        }
-    });
-});
+        SERVER.on('uncaughtException', function(
+            req,
+            res,
+            route,
+            err,
+            callback
+        ) {
+            callback();
+        });
 
-test('should increment/decrement inflight request count', function(t) {
+        SERVER.get('/foobar', function(req, res, next) {
+            res.on('close', function onResClose() {
+                // We throw this error in the response's close event handler on
+                // purpose to exercise the code path where we mark the route
+                // handlers as finished _after_ the response is marked as flushed.
+                throw new Error(ERR_MSG);
+            });
+        });
+
+        FAST_CLIENT.get('/foobar', function(err, _, res) {
+            gotReqCallback = true;
+            t.ok(err);
+            t.equal(err.name, 'RequestTimeoutError');
+            if (gotAfter) {
+                t.end();
+            }
+        });
+    }
+);
+
+test(module, 'should increment/decrement inflight request count', function(t) {
     SERVER.get('/foo', function(req, res, next) {
         t.equal(SERVER.inflightRequests(), 1);
         res.send();
@@ -1904,37 +1969,41 @@ test('should increment/decrement inflight request count', function(t) {
 });
 
 // eslint-disable-next-line
-test('should increment/decrement inflight request count for concurrent reqs', function(t) {
-    SERVER.get('/foo1', function(req, res, next) {
-        // other request is already sent
-        t.equal(SERVER.inflightRequests() >= 1, true);
-        setTimeout(function() {
+test(
+    module,
+    'should increment/decrement inflight request count for concurrent reqs',
+    function(t) {
+        SERVER.get('/foo1', function(req, res, next) {
+            // other request is already sent
+            t.equal(SERVER.inflightRequests() >= 1, true);
+            setTimeout(function() {
+                res.send();
+                return next();
+            }, 250);
+        });
+
+        SERVER.get('/foo2', function(req, res, next) {
+            t.equal(SERVER.inflightRequests(), 2);
             res.send();
             return next();
-        }, 250);
-    });
+        });
 
-    SERVER.get('/foo2', function(req, res, next) {
-        t.equal(SERVER.inflightRequests(), 2);
-        res.send();
-        return next();
-    });
+        CLIENT.get('/foo1', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        });
 
-    CLIENT.get('/foo1', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 0);
-        t.end();
-    });
+        CLIENT.get('/foo2', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.equal(SERVER.inflightRequests(), 1);
+        });
+    }
+);
 
-    CLIENT.get('/foo2', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.equal(SERVER.inflightRequests(), 1);
-    });
-});
-
-test("should emit 'close' on server close", function(t) {
+test(module, "should emit 'close' on server close", function(t) {
     var server = restify.createServer();
 
     server.listen(PORT + 1, '127.0.0.1', function() {
@@ -1945,7 +2014,9 @@ test("should emit 'close' on server close", function(t) {
     });
 });
 
-test('should cleanup inflight requests count for 404s', async function(t) {
+test(module, 'should cleanup inflight requests count for 404s', async function(
+    t
+) {
     let afterResolve;
     let clientResolve;
     SERVER.get('/foo1', function(req, res, next) {
@@ -1985,7 +2056,9 @@ test('should cleanup inflight requests count for 404s', async function(t) {
     t.end();
 });
 
-test('should cleanup inflight requests count for timeouts', function(t) {
+test(module, 'should cleanup inflight requests count for timeouts', function(
+    t
+) {
     t.equal(SERVER.inflightRequests(), 0);
 
     SERVER.get('/foo1', function(req, res, next) {
@@ -2025,24 +2098,28 @@ test('should cleanup inflight requests count for timeouts', function(t) {
 });
 
 // eslint-disable-next-line
-test('should cleanup inflight requests count on uncaughtExceptions', function(t) {
-    SERVER.on('uncaughtException', function(req, res, route, err) {
-        res.send(500, 'asplode');
-    });
+test(
+    module,
+    'should cleanup inflight requests count on uncaughtExceptions',
+    function(t) {
+        SERVER.on('uncaughtException', function(req, res, route, err) {
+            res.send(500, 'asplode');
+        });
 
-    SERVER.get('/foo1', function(req, res, next) {
-        t.equal(SERVER.inflightRequests(), 1);
-        throw new Error('oh noes');
-    });
+        SERVER.get('/foo1', function(req, res, next) {
+            t.equal(SERVER.inflightRequests(), 1);
+            throw new Error('oh noes');
+        });
 
-    CLIENT.get('/foo1', function(err, _, res) {
-        t.ok(err);
-        t.equal(SERVER.inflightRequests(), 0);
-        t.end();
-    });
-});
+        CLIENT.get('/foo1', function(err, _, res) {
+            t.ok(err);
+            t.equal(SERVER.inflightRequests(), 0);
+            t.end();
+        });
+    }
+);
 
-test('should show debug information', function(t) {
+test(module, 'should show debug information', function(t) {
     SERVER.pre(function pre(req, res, next) {
         return next();
     });
@@ -2143,7 +2220,7 @@ test('should show debug information', function(t) {
     t.end();
 });
 
-test("should emit 'pre' event on a 200", function(t) {
+test(module, "should emit 'pre' event on a 200", function(t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2164,7 +2241,7 @@ test("should emit 'pre' event on a 200", function(t) {
     });
 });
 
-test("should emit 'pre' event on 404", function(t) {
+test(module, "should emit 'pre' event on 404", function(t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2185,7 +2262,7 @@ test("should emit 'pre' event on 404", function(t) {
     });
 });
 
-test("should emit 'routed' event on a 200", function(t) {
+test(module, "should emit 'routed' event on a 200", function(t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2207,7 +2284,7 @@ test("should emit 'routed' event on a 200", function(t) {
     });
 });
 
-test("should not emit 'routed' event on 404", function(t) {
+test(module, "should not emit 'routed' event on 404", function(t) {
     SERVER.get('/foo/:id', function echoId(req, res, next) {
         t.ok(req.params);
         t.equal(req.params.id, 'bar');
@@ -2227,7 +2304,7 @@ test("should not emit 'routed' event on 404", function(t) {
     });
 });
 
-test('should emit restifyError even for router errors', function(t) {
+test(module, 'should emit restifyError even for router errors', function(t) {
     var notFoundFired = false;
     var restifyErrFired = false;
 
@@ -2257,48 +2334,53 @@ test('should emit restifyError even for router errors', function(t) {
     });
 });
 
-test('should emit error with multiple next calls with strictNext', function(t) {
-    var server = restify.createServer({
-        dtrace: helper.dtrace,
-        strictNext: true,
-        handleUncaughtExceptions: true,
-        log: helper.getLog('server')
-    });
-    var client;
-    var port;
-
-    server.listen(PORT + 1, '127.0.0.1', function() {
-        port = server.address().port;
-        client = restifyClients.createJsonClient({
-            url: 'http://127.0.0.1:' + port,
+test(
+    module,
+    'should emit error with multiple next calls with strictNext',
+    function(t) {
+        var server = restify.createServer({
             dtrace: helper.dtrace,
-            retry: false
+            strictNext: true,
+            handleUncaughtExceptions: true,
+            log: helper.getLog('server')
         });
+        var client;
+        var port;
 
-        server.get('/strict-next', function(req, res, next) {
-            next();
-            next();
-        });
+        server.listen(PORT + 1, '127.0.0.1', function() {
+            port = server.address().port;
+            client = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + port,
+                dtrace: helper.dtrace,
+                retry: false
+            });
 
-        server.on('uncaughtException', function(req, res, route, err) {
-            t.ok(err);
-            t.equal(err.message, "next shouldn't be called more than once");
-            res.send(err);
-        });
+            server.get('/strict-next', function(req, res, next) {
+                next();
+                next();
+            });
 
-        client.get('/strict-next', function(err, _, res) {
-            t.ok(err);
-            t.equal(res.statusCode, 500);
+            server.on('uncaughtException', function(req, res, route, err) {
+                t.ok(err);
+                t.equal(err.message, "next shouldn't be called more than once");
+                res.send(err);
+            });
 
-            client.close();
-            server.close(function() {
-                t.end();
+            client.get('/strict-next', function(err, _, res) {
+                t.ok(err);
+                t.equal(res.statusCode, 500);
+
+                client.close();
+                server.close(function() {
+                    t.end();
+                });
             });
         });
-    });
-});
+    }
+);
 
 test(
+    module,
     'should send 500 if we reached the end of handler chain w/o sending ' +
         'headers',
     function(t) {
@@ -2340,37 +2422,41 @@ test(
     }
 );
 
-test('uncaughtException should not trigger named routeHandler', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            throw 'bar'; //eslint-disable-line no-throw-literal
-        }
-    );
+test(
+    module,
+    'uncaughtException should not trigger named routeHandler',
+    function(t) {
+        SERVER.get(
+            {
+                name: 'foo',
+                path: '/foo'
+            },
+            function(req, res, next) {
+                throw 'bar'; //eslint-disable-line no-throw-literal
+            }
+        );
 
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            // This code should not run, but we can test against the status code
-            res.send(200);
-            next();
-        }
-    );
+        SERVER.get(
+            {
+                name: 'bar',
+                path: '/bar'
+            },
+            function(req, res, next) {
+                // This code should not run, but we can test against the status code
+                res.send(200);
+                next();
+            }
+        );
 
-    CLIENT.get('/foo', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
+        CLIENT.get('/foo', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+            t.end();
+        });
+    }
+);
 
-test('uncaughtException should handle thrown null', function(t) {
+test(module, 'uncaughtException should handle thrown null', function(t) {
     SERVER.get(
         {
             name: 'foo',
@@ -2401,38 +2487,44 @@ test('uncaughtException should handle thrown null', function(t) {
     });
 });
 
-test('uncaughtException should handle thrown undefined literal', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            throw undefined; //eslint-disable-line no-throw-literal
-        }
-    );
+test(
+    module,
+    'uncaughtException should handle thrown undefined literal',
+    function(t) {
+        SERVER.get(
+            {
+                name: 'foo',
+                path: '/foo'
+            },
+            function(req, res, next) {
+                throw undefined; //eslint-disable-line no-throw-literal
+            }
+        );
 
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            // This code should not run, but we can test against the status code
-            res.send(200);
-            next();
-        }
-    );
+        SERVER.get(
+            {
+                name: 'bar',
+                path: '/bar'
+            },
+            function(req, res, next) {
+                // This code should not run, but we can test against the status code
+                res.send(200);
+                next();
+            }
+        );
 
-    CLIENT.get('/foo', function(err, _, res, data) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        t.equal(data.message, 'undefined');
-        t.end();
-    });
-});
+        CLIENT.get('/foo', function(err, _, res, data) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+            t.equal(data.message, 'undefined');
+            t.end();
+        });
+    }
+);
 
-test('uncaughtException should handle thrown falsy number', function(t) {
+test(module, 'uncaughtException should handle thrown falsy number', function(
+    t
+) {
     SERVER.get(
         {
             name: 'foo',
@@ -2463,38 +2555,42 @@ test('uncaughtException should handle thrown falsy number', function(t) {
     });
 });
 
-test('uncaughtException should handle thrown non falsy number', function(t) {
-    SERVER.get(
-        {
-            name: 'foo',
-            path: '/foo'
-        },
-        function(req, res, next) {
-            throw 1; //eslint-disable-line no-throw-literal
-        }
-    );
+test(
+    module,
+    'uncaughtException should handle thrown non falsy number',
+    function(t) {
+        SERVER.get(
+            {
+                name: 'foo',
+                path: '/foo'
+            },
+            function(req, res, next) {
+                throw 1; //eslint-disable-line no-throw-literal
+            }
+        );
 
-    SERVER.get(
-        {
-            name: 'bar',
-            path: '/bar'
-        },
-        function(req, res, next) {
-            // This code should not run, but we can test against the status code
-            res.send(200);
-            next();
-        }
-    );
+        SERVER.get(
+            {
+                name: 'bar',
+                path: '/bar'
+            },
+            function(req, res, next) {
+                // This code should not run, but we can test against the status code
+                res.send(200);
+                next();
+            }
+        );
 
-    CLIENT.get('/foo', function(err, _, res, data) {
-        t.ok(err);
-        t.equal(data.message, '1');
-        t.equal(res.statusCode, 500);
-        t.end();
-    });
-});
+        CLIENT.get('/foo', function(err, _, res, data) {
+            t.ok(err);
+            t.equal(data.message, '1');
+            t.equal(res.statusCode, 500);
+            t.end();
+        });
+    }
+);
 
-test('uncaughtException should handle thrown boolean', function(t) {
+test(module, 'uncaughtException should handle thrown boolean', function(t) {
     SERVER.get(
         {
             name: 'foo',
@@ -2525,7 +2621,9 @@ test('uncaughtException should handle thrown boolean', function(t) {
     });
 });
 
-test('uncaughtException should handle thrown falsy boolean', function(t) {
+test(module, 'uncaughtException should handle thrown falsy boolean', function(
+    t
+) {
     SERVER.get(
         {
             name: 'foo',
@@ -2556,7 +2654,7 @@ test('uncaughtException should handle thrown falsy boolean', function(t) {
     });
 });
 
-test('should have proxy event handlers as instance', function(t) {
+test(module, 'should have proxy event handlers as instance', function(t) {
     var server = restify.createServer({
         handleUpgrades: false
     });
@@ -2572,7 +2670,7 @@ test('should have proxy event handlers as instance', function(t) {
     });
 });
 
-test('first chain should get to reject requests', function(t) {
+test(module, 'first chain should get to reject requests', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         t.fail('should not call handler');
     });
@@ -2589,7 +2687,7 @@ test('first chain should get to reject requests', function(t) {
     });
 });
 
-test('first chain should get to allow requests', function(t) {
+test(module, 'first chain should get to allow requests', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         res.send(413, 'Im a teapot');
         return next();
@@ -2605,7 +2703,7 @@ test('first chain should get to allow requests', function(t) {
     });
 });
 
-test('first chain should allow multiple handlers', function(t) {
+test(module, 'first chain should allow multiple handlers', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         res.send(413, 'Im a teapot');
         return next();
@@ -2626,7 +2724,7 @@ test('first chain should allow multiple handlers', function(t) {
     });
 });
 
-test('first chain should allow any handler to reject', function(t) {
+test(module, 'first chain should allow any handler to reject', function(t) {
     SERVER.get('/foobar', function(req, res, next) {
         res.send(200, 'Handled');
         return next();
@@ -2657,7 +2755,7 @@ test('first chain should allow any handler to reject', function(t) {
     });
 });
 
-test('inflightRequest accounting stable with firstChain', function(t) {
+test(module, 'inflightRequest accounting stable with firstChain', function(t) {
     // Make 3 requests, shed the second, and ensure inflightRequest accounting
     // for all the requests
     var request = 0;
@@ -2728,7 +2826,7 @@ test('inflightRequest accounting stable with firstChain', function(t) {
     CLIENT.get('/foobar', getDone);
 });
 
-test('async prerouting chain with error', function(t) {
+test(module, 'async prerouting chain with error', function(t) {
     SERVER.pre(async function(req, res) {
         await helper.sleep(10);
         throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
@@ -2746,7 +2844,7 @@ test('async prerouting chain with error', function(t) {
     });
 });
 
-test('async prerouting chain with empty rejection', function(t) {
+test(module, 'async prerouting chain with empty rejection', function(t) {
     SERVER.pre(async function(req, res) {
         await helper.sleep(10);
         return Promise.reject();
@@ -2771,7 +2869,7 @@ test('async prerouting chain with empty rejection', function(t) {
     });
 });
 
-test('async use chain with error', function(t) {
+test(module, 'async use chain with error', function(t) {
     SERVER.use(async function(req, res) {
         await helper.sleep(10);
         throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
@@ -2789,7 +2887,7 @@ test('async use chain with error', function(t) {
     });
 });
 
-test('async handler with error', function(t) {
+test(module, 'async handler with error', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         await helper.sleep(10);
         throw new RestError({ statusCode: 400, restCode: 'BadRequest' }, 'bum');
@@ -2802,7 +2900,7 @@ test('async handler with error', function(t) {
     });
 });
 
-test('async handler with error after send succeeds', function(t) {
+test(module, 'async handler with error after send succeeds', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         await helper.sleep(10);
         res.send(req.params.name);
@@ -2816,7 +2914,7 @@ test('async handler with error after send succeeds', function(t) {
     });
 });
 
-test('async handler with error after send succeeds', function(t) {
+test(module, 'async handler with error after send succeeds', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         res.send(req.params.name);
         await helper.sleep(20);
@@ -2834,7 +2932,7 @@ test('async handler with error after send succeeds', function(t) {
     });
 });
 
-test('async handler without next', function(t) {
+test(module, 'async handler without next', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         await helper.sleep(10);
         res.send(req.params.name);
@@ -2852,7 +2950,7 @@ test('async handler without next', function(t) {
     });
 });
 
-test('async handler should discard value', function(t) {
+test(module, 'async handler should discard value', function(t) {
     SERVER.get('/hello/:name', async function tester(req, res) {
         await helper.sleep(10);
         res.send(req.params.name);
@@ -2867,7 +2965,7 @@ test('async handler should discard value', function(t) {
     });
 });
 
-test('Server returns 400 on invalid method', function(t) {
+test(module, 'Server returns 400 on invalid method', function(t) {
     SERVER.get('/snickers/bar', function echoId(req, res, next) {
         res.send();
         next();
@@ -2892,7 +2990,7 @@ test('Server returns 400 on invalid method', function(t) {
     }).end();
 });
 
-test('Server returns 4xx when header size is too large', function(t) {
+test(module, 'Server returns 4xx when header size is too large', function(t) {
     SERVER.get('/jellybeans', function echoId(req, res, next) {
         res.send();
         next();
@@ -2925,7 +3023,7 @@ test('Server returns 4xx when header size is too large', function(t) {
     }).end();
 });
 
-test('Server supports adding custom clientError listener', function(t) {
+test(module, 'Server supports adding custom clientError listener', function(t) {
     SERVER.get('/popcorn', function echoId(req, res, next) {
         res.send();
         next();
@@ -2959,45 +3057,51 @@ test('Server supports adding custom clientError listener', function(t) {
     }).end();
 });
 
-test('Server correctly handles multiple clientError listeners', function(t) {
-    SERVER.get('/popcorn', function echoId(req, res, next) {
-        res.send();
-        next();
-    });
-
-    let numListenerCalls = 0;
-    SERVER.on('clientError', function(err, socket) {
-        socket.write("HTTP/1.1 418 I'm a teapot\r\nConnection: close\r\n\r\n");
-        numListenerCalls += 1;
-    });
-    SERVER.on('clientError', function(err, socket) {
-        if (numListenerCalls !== 1) {
-            t.fail('listener was called ' + numListenerCalls + ' times');
-        }
-        socket.destroy(err);
-    });
-
-    var opts = {
-        hostname: '127.0.0.1',
-        port: PORT,
-        path: '/popcorn',
-        method: 'GET',
-        agent: false,
-        headers: {
-            'jellybean-colors': 'purple,green,red,black,pink,'.repeat(1000)
-        }
-    };
-    http.request(opts, function(res) {
-        t.equal(res.statusCode, 418);
-        t.equal(res.statusMessage, "I'm a teapot");
-        res.on('data', function() {});
-        res.on('end', function() {
-            t.end();
+test(
+    module,
+    'Server correctly handles multiple clientError listeners',
+    function(t) {
+        SERVER.get('/popcorn', function echoId(req, res, next) {
+            res.send();
+            next();
         });
-    }).end();
-});
 
-test('req and res should use server logger by default', function(t) {
+        let numListenerCalls = 0;
+        SERVER.on('clientError', function(err, socket) {
+            socket.write(
+                "HTTP/1.1 418 I'm a teapot\r\nConnection: close\r\n\r\n"
+            );
+            numListenerCalls += 1;
+        });
+        SERVER.on('clientError', function(err, socket) {
+            if (numListenerCalls !== 1) {
+                t.fail('listener was called ' + numListenerCalls + ' times');
+            }
+            socket.destroy(err);
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/popcorn',
+            method: 'GET',
+            agent: false,
+            headers: {
+                'jellybean-colors': 'purple,green,red,black,pink,'.repeat(1000)
+            }
+        };
+        http.request(opts, function(res) {
+            t.equal(res.statusCode, 418);
+            t.equal(res.statusMessage, "I'm a teapot");
+            res.on('data', function() {});
+            res.on('end', function() {
+                t.end();
+            });
+        }).end();
+    }
+);
+
+test(module, 'req and res should use server logger by default', function(t) {
     SERVER.get('/ping', function echoId(req, res, next) {
         t.ok(req.log);
         t.strictEqual(req.log, SERVER.log);
@@ -3014,31 +3118,37 @@ test('req and res should use server logger by default', function(t) {
     });
 });
 
-test('req and res should use own logger by if set during .first', function(t) {
-    const buffer = new StreamRecorder();
-    SERVER.first(function first(req, res) {
-        req.log = helper.getLog('server', buffer, 'info');
-    });
+test(
+    module,
+    'req and res should use own logger by if set during .first',
+    function(t) {
+        const buffer = new StreamRecorder();
+        SERVER.first(function first(req, res) {
+            req.log = helper.getLog('server', buffer, 'info');
+        });
 
-    SERVER.get('/ping', function echoId(req, res, next) {
-        LOG_BUFFER.flushRecords();
-        t.ok(req.log);
-        t.notStrictEqual(req.log, SERVER.log);
-        req.log.info('foo');
-        t.equal(buffer.records[buffer.length - 1].msg, 'foo');
-        res.log.info('bar');
-        t.equal(buffer.records[buffer.length - 1].msg, 'bar');
-        t.equal(LOG_BUFFER.records.length, 0);
-        res.send();
-        next();
-    });
+        SERVER.get('/ping', function echoId(req, res, next) {
+            LOG_BUFFER.flushRecords();
+            t.ok(req.log);
+            t.notStrictEqual(req.log, SERVER.log);
+            req.log.info('foo');
+            t.equal(buffer.records[buffer.length - 1].msg, 'foo');
+            res.log.info('bar');
+            t.equal(buffer.records[buffer.length - 1].msg, 'bar');
+            t.equal(LOG_BUFFER.records.length, 0);
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/ping', function() {
-        t.end();
-    });
-});
+        CLIENT.get('/ping', function() {
+            t.end();
+        });
+    }
+);
 
-test('should throw if handleUncaughtExceptions is invalid', function(t) {
+test(module, 'should throw if handleUncaughtExceptions is invalid', function(
+    t
+) {
     t.throws(() => {
         restify.createServer({
             handleUncaughtExceptions: 'this is invalid'
@@ -3047,7 +3157,7 @@ test('should throw if handleUncaughtExceptions is invalid', function(t) {
     t.end();
 });
 
-test('should use custom function for error handling', function(t) {
+test(module, 'should use custom function for error handling', function(t) {
     const asl = new AsyncLocalStorage();
     let callOnError;
     var server = restify.createServer({
