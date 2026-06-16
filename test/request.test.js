@@ -275,3 +275,82 @@ test('should emit restifyDone event when request is fully served with error', fu
         clientDone = true;
     });
 });
+
+test('getUrl should return correct shape for path with no query', function(t) {
+    SERVER.get('/geturl-plain', function(req, res, next) {
+        var u = req.getUrl();
+        t.equal(u.href, '/geturl-plain');
+        t.equal(u.pathname, '/geturl-plain');
+        t.equal(u.search, null);
+        t.equal(u.query, null);
+        t.equal(u.hash, null);
+        t.equal(u.host, null);
+        t.equal(u.hostname, null);
+        t.equal(u.port, null);
+        t.equal(u.protocol, null);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-plain', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('getUrl should return correct query string', function(t) {
+    SERVER.get('/geturl-qs', function(req, res, next) {
+        var u = req.getUrl();
+        t.equal(u.href, '/geturl-qs?a=1&b=2');
+        t.equal(u.pathname, '/geturl-qs');
+        t.equal(u.search, '?a=1&b=2');
+        t.equal(u.query, 'a=1&b=2');
+        t.equal(u.hash, null);
+        t.equal(u.host, null);
+        t.equal(u.hostname, null);
+        t.equal(u.port, null);
+        t.equal(u.protocol, null);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-qs?a=1&b=2', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('getUrl should handle OPTIONS * request-target', function(t) {
+    SERVER.opts('*', function(req, res, next) {
+        var u = req.getUrl();
+        t.equal(u.pathname, '*');
+        t.equal(u.search, null);
+        t.equal(u.query, null);
+        res.send(200);
+        return next();
+    });
+
+    CLIENT.opts('*', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test('getUrl result is cached across calls', function(t) {
+    SERVER.get('/geturl-cache', function(req, res, next) {
+        var u1 = req.getUrl();
+        var u2 = req.getUrl();
+        t.strictEqual(u1, u2);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-cache', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
