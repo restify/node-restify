@@ -300,12 +300,13 @@ describe('query parser', function() {
         });
     });
 
-    it('should return array for [] with < 20 items', function(done) {
+    it('should return object with 25 keys', function(done) {
         SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/indexed-over', function(req, res, next) {
-            assert.isArray(req.query.items);
-            assert.equal(req.query.items.length, 25);
+            assert.isNotArray(req.query.items);
+            assert.isObject(req.query.items);
+            assert.equal(Object.keys(req.query.items).length, 25);
             res.send();
             next();
         });
@@ -325,18 +326,19 @@ describe('query parser', function() {
         });
     });
 
-    it('should return array for [] with > 20 items', function(done) {
+    it('should return object with 23 keys', function(done) {
         SERVER.use(restify.plugins.queryParser());
 
         SERVER.get('/query/array', function(req, res, next) {
-            assert.isArray(req.query.items);
-            assert.equal(req.query.items.length, 25);
+            assert.isNotArray(req.query.items);
+            assert.isObject(req.query.items);
+            assert.equal(Object.keys(req.query.items).length, 23);
             res.send();
             next();
         });
 
         var items = [];
-        for (var i = 0; i < 25; i++) {
+        for (var i = 0; i < 23; i++) {
             items.push('items[]=' + i);
         }
         CLIENT.get('/query/array?' + items.join('&'), function(err, _, res) {

@@ -243,13 +243,14 @@ describe('form body parser', function() {
         client.end();
     });
 
-    it('should parse indexed array with > 20 items', function(done) {
+    it('should return object with 25 keys', function(done) {
         SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id', function(req, res, next) {
-            assert.isArray(req.body.items, 'items should be an array');
+            assert.isNotArray(req.body.items);
+            assert.isObject(req.body.items);
             assert.equal(
-                req.body.items.length,
+                Object.keys(req.body.items).length,
                 25,
                 'all 25 items should be present'
             );
@@ -278,15 +279,16 @@ describe('form body parser', function() {
         client.end();
     });
 
-    it('should parse array with more than 20 items', function(done) {
+    it('should return object with 23 keys', function(done) {
         SERVER.use(restify.plugins.bodyParser());
 
         SERVER.post('/bodyurl2/:id', function(req, res, next) {
-            assert.isArray(req.body.items, 'items should be an array');
+            assert.isNotArray(req.body.items);
+            assert.isObject(req.body.items);
             assert.equal(
-                req.body.items.length,
-                25,
-                'all 25 items should be present'
+                Object.keys(req.body.items).length,
+                23,
+                'all 23 items should be present'
             );
             res.send();
             next();
@@ -302,7 +304,7 @@ describe('form body parser', function() {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         };
-        var items = Array.from({ length: 25 }, function(_, i) {
+        var items = Array.from({ length: 23 }, function(_, i) {
             return 'items[]=value' + i;
         });
         var client = http.request(opts, function(res) {

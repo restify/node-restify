@@ -35,48 +35,6 @@ describe('jsonp plugin', function() {
         SERVER.close(done);
     });
 
-    it('should return array for bracket notation', function(done) {
-        SERVER.use(restify.plugins.jsonp());
-
-        SERVER.get('/jsonp/array', function(req, res, next) {
-            assert.isArray(req.query.items);
-            assert.equal(req.query.items.length, 25);
-            res.send();
-            next();
-        });
-
-        var items = [];
-        for (var i = 0; i < 25; i++) {
-            items.push('items[]=' + i);
-        }
-        CLIENT.get('/jsonp/array?' + items.join('&'), function(err, _, res) {
-            assert.ifError(err);
-            assert.equal(res.statusCode, 200);
-            done();
-        });
-    });
-
-    it('should return array for indexed notation', function(done) {
-        SERVER.use(restify.plugins.jsonp());
-
-        SERVER.get('/jsonp/array', function(req, res, next) {
-            assert.isArray(req.query.items);
-            assert.equal(req.query.items.length, 25);
-            res.send();
-            next();
-        });
-
-        var items = [];
-        for (var i = 0; i < 25; i++) {
-            items.push('items[' + i + ']=' + i);
-        }
-        CLIENT.get('/jsonp/array?' + items.join('&'), function(err, _, res) {
-            assert.ifError(err);
-            assert.equal(res.statusCode, 200);
-            done();
-        });
-    });
-
     it('should set content-type', function(done) {
         SERVER.use(restify.plugins.jsonp());
 

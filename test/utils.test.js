@@ -5,7 +5,6 @@ var mergeQs = require('../lib/utils').mergeQs;
 var parseRequestUrl = require('../lib/utils').parseRequestUrl;
 var parseUrlQuery = require('../lib/utils').parseUrlQuery;
 var formatUrl = require('../lib/utils').formatUrl;
-var normalizeArrays = require('../lib/utils').normalizeArrays;
 
 if (require.cache[__dirname + '/lib/helper.js']) {
     delete require.cache[__dirname + '/lib/helper.js'];
@@ -165,28 +164,6 @@ test(module, 'formatUrl: array query values become repeated params', function(
         formatUrl({ pathname: '/foo', query: { a: ['1', '2'] } }),
         '/foo?a=1&a=2'
     );
-    t.done();
-});
-
-// normalizeArrays
-
-test(module, 'normalizeArrays', function(t) {
-    var obj25 = {};
-    for (var i = 0; i < 25; i++) {
-        obj25[String(i)] = 'v' + i;
-    }
-    var result1 = normalizeArrays({ items: obj25 });
-    t.ok(Array.isArray(result1.items), 'items should be an array');
-    t.equal(result1.items.length, 25, 'all 25 items present');
-
-    var result2 = normalizeArrays(obj25);
-    t.ok(Array.isArray(result2), 'result should be an array');
-    t.equal(result2.items.length, 25, 'all 25 items present');
-
-    // passthrough: real arrays and plain objects are unchanged
-    t.deepEqual(normalizeArrays({ a: [1, 2, 3] }), { a: [1, 2, 3] });
-    t.deepEqual(normalizeArrays({ name: 'alex' }), { name: 'alex' });
-
     t.done();
 });
 

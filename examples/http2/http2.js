@@ -22,10 +22,7 @@ srv.on(
     restify.plugins.auditLogger({
         event: 'after',
         body: true,
-        log: pino(
-            { name: 'audit' },
-            process.stdout
-        )
+        log: pino({ name: 'audit' }, process.stdout)
     })
 );
 
