@@ -249,4 +249,150 @@ describe('query parser', function() {
             done();
         });
     });
+
+    it('should return array for [i] with < 20 items', function(done) {
+        SERVER.use(restify.plugins.queryParser());
+
+        SERVER.get('/query/indexed-under', function(req, res, next) {
+            assert.isArray(req.query.items);
+            assert.equal(req.query.items.length, 5);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var i = 0; i < 5; i++) {
+            items.push('items[' + i + ']=' + i);
+        }
+        CLIENT.get('/query/indexed-under?' + items.join('&'), function(
+            err,
+            _,
+            res
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
+    it('should return array for [] with < 20 items', function(done) {
+        SERVER.use(restify.plugins.queryParser());
+
+        SERVER.get('/query/indexed-under', function(req, res, next) {
+            assert.isArray(req.query.items);
+            assert.equal(req.query.items.length, 5);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var i = 0; i < 5; i++) {
+            items.push('items[]=' + i);
+        }
+        CLIENT.get('/query/indexed-under?' + items.join('&'), function(
+            err,
+            _,
+            res
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
+    it('should return array for [] with < 20 items', function(done) {
+        SERVER.use(restify.plugins.queryParser());
+
+        SERVER.get('/query/indexed-over', function(req, res, next) {
+            assert.isArray(req.query.items);
+            assert.equal(req.query.items.length, 25);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var i = 0; i < 25; i++) {
+            items.push('items[' + i + ']=' + i);
+        }
+        CLIENT.get('/query/indexed-over?' + items.join('&'), function(
+            err,
+            _,
+            res
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
+    it('should return array for [] with > 20 items', function(done) {
+        SERVER.use(restify.plugins.queryParser());
+
+        SERVER.get('/query/array', function(req, res, next) {
+            assert.isArray(req.query.items);
+            assert.equal(req.query.items.length, 25);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var i = 0; i < 25; i++) {
+            items.push('items[]=' + i);
+        }
+        CLIENT.get('/query/array?' + items.join('&'), function(err, _, res) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
+    it('should respect parseArrays', function(done) {
+        SERVER.use(restify.plugins.queryParser({ parseArrays: false }));
+
+        SERVER.get('/query/noparsearrays', function(req, res, next) {
+            assert.isNotArray(req.query.items);
+            assert.isObject(req.query.items);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var j = 0; j < 25; j++) {
+            items.push('items[]=' + j);
+        }
+        CLIENT.get('/query/noparsearrays?' + items.join('&'), function(
+            err,
+            _,
+            res
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
+
+    it('should respect explicit arrayLimit', function(done) {
+        SERVER.use(restify.plugins.queryParser({ arrayLimit: 5 }));
+
+        SERVER.get('/query/arraylimit', function(req, res, next) {
+            assert.isNotArray(req.query.items);
+            assert.isObject(req.query.items);
+            res.send();
+            next();
+        });
+
+        var items = [];
+        for (var k = 0; k < 10; k++) {
+            items.push('items[]=' + k);
+        }
+        CLIENT.get('/query/arraylimit?' + items.join('&'), function(
+            err,
+            _,
+            res
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+    });
 });

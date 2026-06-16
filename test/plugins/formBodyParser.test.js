@@ -243,6 +243,76 @@ describe('form body parser', function() {
         client.end();
     });
 
+    it('should parse indexed array with > 20 items', function(done) {
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/bodyurl2/:id', function(req, res, next) {
+            assert.isArray(req.body.items, 'items should be an array');
+            assert.equal(
+                req.body.items.length,
+                25,
+                'all 25 items should be present'
+            );
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/bodyurl2/foo',
+            agent: false,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        };
+        var items = Array.from({ length: 25 }, function(_, i) {
+            return 'items[' + i + ']=value' + i;
+        });
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+        client.write(items.join('&'));
+        client.end();
+    });
+
+    it('should parse array with more than 20 items', function(done) {
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/bodyurl2/:id', function(req, res, next) {
+            assert.isArray(req.body.items, 'items should be an array');
+            assert.equal(
+                req.body.items.length,
+                25,
+                'all 25 items should be present'
+            );
+            res.send();
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/bodyurl2/foo',
+            agent: false,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        };
+        var items = Array.from({ length: 25 }, function(_, i) {
+            return 'items[]=value' + i;
+        });
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 200);
+            done();
+        });
+        client.write(items.join('&'));
+        client.end();
+    });
+
     it('plugins-GH-6: should expose rawBody', function(done) {
         var input = 'name[first]=alex&name[last]=liu';
 
