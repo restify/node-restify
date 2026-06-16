@@ -1,7 +1,6 @@
 'use strict';
 /* eslint-disable func-names */
 
-var url = require('url');
 var restifyClients = require('restify-clients');
 var errs = require('restify-errors');
 
@@ -245,12 +244,9 @@ test('redirect should extend existing query params', function(t) {
     CLIENT.get(join(LOCALHOST, '/6?a=1'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = url.parse(res.headers.location, true);
-        t.deepEqual(parsedUrl.query, {
-            a: 1,
-            b: 2
-        });
-        t.equal(parsedUrl.query.b, 2);
+        var parsedUrl = new URL(res.headers.location);
+        t.equal(parsedUrl.searchParams.get('a'), '1');
+        t.equal(parsedUrl.searchParams.get('b'), '2');
         t.equal(parsedUrl.pathname, '/6');
 
         // t.equal(res.headers.location, join(LOCALHOST, '/6?a=1&b=2'));
@@ -345,8 +341,8 @@ test('redirect using opts.port', function(t) {
     CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = url.parse(res.headers.location, true);
-        t.equal(parsedUrl.port, 3000);
+        var parsedUrl = new URL(res.headers.location);
+        t.equal(Number(parsedUrl.port), 3000);
         t.end();
     });
 });
@@ -366,8 +362,8 @@ test('redirect using external url and custom port', function(t) {
     CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = url.parse(res.headers.location, true);
-        t.equal(parsedUrl.port, 3000);
+        var parsedUrl = new URL(res.headers.location);
+        t.equal(Number(parsedUrl.port), 3000);
         t.equal(parsedUrl.hostname, 'www.foo.com');
         t.equal(parsedUrl.pathname, '/99');
         t.end();
@@ -388,10 +384,104 @@ test('redirect using default hostname with custom port', function(t) {
     CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = url.parse(res.headers.location, true);
-        t.equal(parsedUrl.port, 3000);
+        var parsedUrl = new URL(res.headers.location);
+        t.equal(Number(parsedUrl.port), 3000);
         t.equal(parsedUrl.pathname, '/99');
         t.equal(res.headers.location, 'http://127.0.0.1:3000/99');
+        t.end();
+    });
+});
+
+test('redirect opts.port exact location header', function(t) {
+    SERVER.get('/port-pin', function(req, res, next) {
+        res.redirect({ port: 3000 }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/port-pin'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, 'http://127.0.0.1:3000/port-pin');
+        t.end();
+    });
+});
+
+test('redirect external hostname and port exact location header', function(t) {
+    SERVER.get('/extport-pin', function(req, res, next) {
+        res.redirect(
+            { hostname: 'www.foo.com', pathname: '/bar', port: 3000 },
+            next
+        );
+    });
+
+    CLIENT.get(join(LOCALHOST, '/extport-pin'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        t.equal(res.headers.location, 'http://www.foo.com:3000/bar');
+        t.end();
+    });
+});
+
+test('redirect extend query params exact location header', function(t) {
+    SERVER.get('/extqs-pin', function(req, res, next) {
+        res.redirect({ query: { b: '2' } }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/extqs-pin?a=1'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var loc = res.headers.location;
+        var u = new URL(loc);
+        t.equal(u.searchParams.get('a'), '1');
+        t.equal(u.searchParams.get('b'), '2');
+        t.equal(u.pathname, '/extqs-pin');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line max-len
+test('redirect should repeat query param when same key exists in both current and new query', function(t) {
+    SERVER.get('/dupqs-pin', function(req, res, next) {
+        res.redirect({ query: { a: '2' } }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/dupqs-pin?a=1'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var u = new URL(res.headers.location);
+        t.deepEqual(u.searchParams.getAll('a'), ['2', '1']);
+        t.end();
+    });
+});
+
+// eslint-disable-next-line max-len
+test('redirect with only pathname (no hostname) uses current host', function(t) {
+    SERVER.get('/rel-path-pin', function(req, res, next) {
+        res.redirect({ pathname: '/other' }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/rel-path-pin'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var u = new URL(res.headers.location);
+        t.equal(u.pathname, '/other');
+        t.equal(u.hostname, '127.0.0.1');
+        t.end();
+    });
+});
+
+// eslint-disable-next-line max-len
+test('redirect with pathname and query (no hostname) preserves query string', function(t) {
+    SERVER.get('/rel-qs-pin', function(req, res, next) {
+        res.redirect({ pathname: '/other', query: { x: '1', y: '2' } }, next);
+    });
+
+    CLIENT.get(join(LOCALHOST, '/rel-qs-pin'), function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 302);
+        var u = new URL(res.headers.location);
+        t.equal(u.pathname, '/other');
+        t.equal(u.searchParams.get('x'), '1');
+        t.equal(u.searchParams.get('y'), '2');
         t.end();
     });
 });
