@@ -28,7 +28,6 @@ jobs:
         os:
           - ubuntu-latest
         node-version:
-          - 20.x
           - 24.x
           - 26.x
     runs-on: ${{matrix.os}}
