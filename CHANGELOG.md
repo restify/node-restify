@@ -121,6 +121,17 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [12.0.0](https://github.com/restify/node-restify/compare/v11.2.0...v12.0.0) (2026-06-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade qs ([#1991](https://github.com/restify/node-restify/issues/1991))
+
+### Features
+
+* upgrade qs ([#1991](https://github.com/restify/node-restify/issues/1991)) ([aedcb65](https://github.com/restify/node-restify/commit/aedcb658da9ddbebc3615affa01b93e68deaea46))
+
 ## [11.2.0](https://github.com/restify/node-restify/compare/v11.1.0...v11.2.0) (2023-08-11)
 
 
