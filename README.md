@@ -85,7 +85,7 @@ $ npm install restify
 
 ## Supported Node Versions
 
-Restify currently works on Node.js v24.x and v26.x.
+Restify currently works on Node.js v22.x, v24.x and v26.x.
 
 ## License
 
