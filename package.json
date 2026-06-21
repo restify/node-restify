@@ -97,7 +97,7 @@
     "csv": "^6.2.2",
     "escape-regexp-component": "^1.0.2",
     "ewma": "^2.0.1",
-    "find-my-way": "^7.6.0",
+    "find-my-way": "^9.6.0",
     "formidable": "^1.2.1",
     "http-signature": "^1.3.6",
     "lodash": "^4.17.11",
@@ -110,9 +110,8 @@
     "qs": "^6.7.0",
     "restify-errors": "^8.0.2",
     "semver": "^7.3.8",
-    "send": "^0.18.0",
-    "spdy": "^4.0.0",
-    "uuid": "^9.0.0",
+    "send": "^1.2.1",
+    "uuid": "^14.0.0",
     "vasync": "^2.2.0"
   },
   "optionalDependencies": {

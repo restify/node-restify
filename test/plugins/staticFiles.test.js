@@ -65,8 +65,8 @@ describe('staticFiles plugin - no options', function() {
             // Verify headers
             assert.equal(res.headers['cache-control'], 'public, max-age=0');
             assert.equal(
-                res.headers['content-type'],
-                contentType //'text/html; charset=UTF-8'
+                res.headers['content-type'].toLowerCase(),
+                contentType.toLowerCase() //'text/html; charset=UTF-8'
             );
             assert.exists(res.headers.etag);
             assert.equal(
@@ -164,8 +164,8 @@ describe('staticFiles plugin - with options', function() {
             // Verify headers
             assert.equal(res.headers['cache-control'], 'public, max-age=3600');
             assert.equal(
-                res.headers['content-type'],
-                contentType //'text/html; charset=UTF-8'
+                res.headers['content-type'].toLowerCase(),
+                contentType.toLowerCase() //'text/html; charset=UTF-8'
             );
             assert.notExists(res.headers.etag);
             assert.equal(
