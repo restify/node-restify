@@ -10,37 +10,79 @@ permalink: /docs/plugins-api/
 -   [Usage][1]
 -   [server.pre() plugins][2]
     -   [context][3]
-    -   [dedupeSlashes][4]
-    -   [pause][5]
-    -   [sanitizePath][6]
-    -   [reqIdHeaders][7]
-    -   [strictQueryParams][8]
-    -   [userAgentConnection][9]
--   [server.use() plugins][10]
-    -   [acceptParser][11]
-    -   [authorizationParser][12]
-    -   [dateParser][13]
-    -   [queryParser][14]
-    -   [jsonp][15]
-    -   [bodyParser][16]
-    -   [requestLogger][17]
-    -   [gzipResponse][18]
-    -   [serveStatic][19]
-    -   [serveStaticFiles][20]
-    -   [throttle][21]
-    -   [requestExpiry][22]
-        -   [Using an external storage mechanism for key/bucket mappings.][23]
-    -   [inflightRequestThrottle][24]
-    -   [cpuUsageThrottle][25]
-    -   [conditionalHandler][26]
-    -   [conditionalRequest][27]
-    -   [auditLogger][28]
-    -   [metrics][29]
--   [Types][30]
-    -   [metrics~callback][31]
--   [req.set][32]
--   [req.get][33]
--   [req.getAll][34]
+        -   [Examples][4]
+    -   [dedupeSlashes][5]
+        -   [Examples][6]
+    -   [pause][7]
+    -   [sanitizePath][8]
+    -   [reqIdHeaders][9]
+        -   [Parameters][10]
+    -   [strictQueryParams][11]
+        -   [Parameters][12]
+    -   [userAgentConnection][13]
+        -   [Parameters][14]
+-   [server.use() plugins][15]
+    -   [acceptParser][16]
+        -   [Parameters][17]
+        -   [Examples][18]
+    -   [authorizationParser][19]
+        -   [Parameters][20]
+        -   [Examples][21]
+    -   [dateParser][22]
+        -   [Parameters][23]
+        -   [Examples][24]
+    -   [queryParser][25]
+        -   [Parameters][26]
+        -   [Examples][27]
+    -   [jsonp][28]
+        -   [Examples][29]
+    -   [bodyParser][30]
+        -   [Parameters][31]
+        -   [Examples][32]
+    -   [requestLogger][33]
+        -   [Parameters][34]
+        -   [Examples][35]
+    -   [gzipResponse][36]
+        -   [Parameters][37]
+        -   [Examples][38]
+    -   [serveStatic][39]
+        -   [Parameters][40]
+        -   [Examples][41]
+    -   [serveStaticFiles][42]
+        -   [Parameters][43]
+        -   [Examples][44]
+    -   [throttle][45]
+        -   [Parameters][46]
+        -   [Examples][47]
+    -   [requestExpiry][48]
+        -   [Using an external storage mechanism for key/bucket mappings.][49]
+        -   [Parameters][50]
+        -   [Examples][51]
+    -   [inflightRequestThrottle][52]
+        -   [Parameters][53]
+        -   [Examples][54]
+    -   [cpuUsageThrottle][55]
+        -   [Parameters][56]
+        -   [Examples][57]
+    -   [conditionalHandler][58]
+        -   [Parameters][59]
+        -   [Examples][60]
+    -   [conditionalRequest][61]
+        -   [Examples][62]
+    -   [auditLogger][63]
+        -   [Parameters][64]
+        -   [Examples][65]
+    -   [metrics][66]
+        -   [Parameters][67]
+        -   [Examples][68]
+-   [Types][69]
+    -   [metrics~callback][70]
+        -   [Parameters][71]
+-   [req.set][72]
+    -   [Parameters][73]
+-   [req.get][74]
+    -   [Parameters][75]
+-   [req.getAll][76]
 
 ## Usage
 
@@ -84,7 +126,7 @@ method.
 This plugin creates `req.set(key, val)` and `req.get(key)` methods for
 setting and retrieving request specific data.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.pre(restify.plugins.pre.context());
@@ -100,14 +142,14 @@ server.get('/', [
 ]);
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### dedupeSlashes
 
 This plugin deduplicates extra slashes found in the URL. This can help with
 malformed URLs that might otherwise get misrouted.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.pre(restify.plugins.pre.dedupeSlashes());
@@ -119,24 +161,24 @@ server.get('/hello/:one', function(req, res, next) {
 // the server will now convert requests to /hello//jake => /hello/jake
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### pause
 
 This pre handler fixes issues with node hanging when an `asyncHandler` is
 used prior to `bodyParser`.
-[https://github.com/restify/node-restify/issues/287][36]
-[https://github.com/restify/node-restify/issues/409][37]
-[https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips][38]
+[https://github.com/restify/node-restify/issues/287][78]
+[https://github.com/restify/node-restify/issues/409][79]
+[https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips][80]
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### sanitizePath
 
 Cleans up sloppy URLs on the request object,
 like `/foo////bar///` to `/foo/bar`.
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### reqIdHeaders
 
@@ -144,14 +186,14 @@ This plugin pulls the value from an incoming request header and uses it
 as the value of the request id. Subsequent calls to `req.id()`
 will return the header values.
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** an options object
-    -   `opts.headers` **[Array][40]&lt;[String][41]>** array of headers from where to pull existing
+-   `opts` **[Object][81]** an options object
+    -   `opts.headers` **[Array][82]&lt;[String][83]>** array of headers from where to pull existing
                                        request id headers. Lookup precedence
                                        is left to right (lowest index first)
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### strictQueryParams
 
@@ -167,14 +209,14 @@ with an appropriate status code.
 part of Hypertext Transfer Protocol -- HTTP/1.1 | 5.1.2 Request-URI
 RFC 2616 Fielding, et al.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an options object
-    -   `options.message` **[String][41]?** a custom error message
+-   `options` **[Object][81]?** an options object
+    -   `options.message` **[String][83]?** a custom error message
                                      default value:
                                      "Url query params does not meet strict format"
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### userAgentConnection
 
@@ -191,13 +233,13 @@ curl does not).
 To be slightly more generic, the options block takes a user
 agent regexp, however.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an options object
-    -   `options.userAgentRegExp` **[RegExp][42]** matching any
+-   `options` **[Object][81]?** an options object
+    -   `options.userAgentRegExp` **[RegExp][84]** matching any
                                                                user-agents applicable (optional, default `/^curl.+/`)
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ## server.use() plugins
 
@@ -215,11 +257,11 @@ for a non-handled type, this plugin will return a `NotAcceptableError` (406).
 Note you can get the set of types allowed from a restify server by doing
 `server.acceptable`.
 
-**Parameters**
+#### Parameters
 
--   `accepts` **[Array][40]&lt;[String][41]>** array of accept types.
+-   `accepts` **[Array][82]&lt;[String][83]>** array of accept types.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.acceptParser(server.acceptable));
@@ -227,21 +269,21 @@ server.use(restify.plugins.acceptParser(server.acceptable));
 
 -   Throws **NotAcceptableError** 
 
-Returns **[Function][35]** restify handler.
+Returns **[Function][77]** restify handler.
 
 ### authorizationParser
 
 Parses out the `Authorization` header as best restify can.
 Currently only HTTP Basic Auth and
-[HTTP Signature][43]
+[HTTP Signature][85]
 schemes are supported.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an optional options object that is
+-   `options` **[Object][81]?** an optional options object that is
                                    passed to http-signature
 
-**Examples**
+#### Examples
 
 Subsequent handlers will see `req.authorization`, which looks like above.
 
@@ -263,7 +305,7 @@ is unrecognized, the only thing available in `req.authorization` will be
 
 -   Throws **InvalidArgumentError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### dateParser
 
@@ -276,11 +318,11 @@ before (`$now - $clockSkew`).
 The default clockSkew allowance is 5m (thanks
 Kerberos!)
 
-**Parameters**
+#### Parameters
 
--   `clockSkew` **[Number][44]** allowed clock skew in seconds. (optional, default `300`)
+-   `clockSkew` **[Number][86]** allowed clock skew in seconds. (optional, default `300`)
 
-**Examples**
+#### Examples
 
 ```javascript
 // Allows clock skew of 1m
@@ -290,7 +332,7 @@ server.use(restify.plugins.dateParser(60));
 -   Throws **RequestExpiredError** 
 -   Throws **InvalidHeaderError** 
 
-Returns **[Function][35]** restify handler.
+Returns **[Function][77]** restify handler.
 
 ### queryParser
 
@@ -300,41 +342,41 @@ additionally params are merged into `req.params`.
 You can disable by passing in `mapParams: false` in the options object.
 
 Many options correspond directly to option defined for the underlying
-[`qs.parse`][45].
+[`qs.parse`][87].
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an options object
-    -   `options.mapParams` **[Object][39]** disable passing (optional, default `true`)
-    -   `options.mapParams` **[Boolean][46]** Copies parsed query parameters
+-   `options` **[Object][81]?** an options object
+    -   `options.mapParams` **[Object][81]** disable passing (optional, default `true`)
+    -   `options.mapParams` **[Boolean][88]** Copies parsed query parameters
         into`req.params`. (optional, default `false`)
-    -   `options.overrideParams` **[Boolean][46]** Only applies when if
+    -   `options.overrideParams` **[Boolean][88]** Only applies when if
         mapParams true.
         When true, will stomp on req.params field when existing value is found. (optional, default `false`)
-    -   `options.allowDots` **[Boolean][46]** Transform `?foo.bar=baz` to a
+    -   `options.allowDots` **[Boolean][88]** Transform `?foo.bar=baz` to a
         nested object: `{foo: {bar: 'baz'}}`. (optional, default `false`)
-    -   `options.arrayLimit` **[Number][44]** Only transform `?a[$index]=b`
+    -   `options.arrayLimit` **[Number][86]** Only transform `?a[$index]=b`
         to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
-    -   `options.depth` **[Number][44]** The depth limit for parsing
+    -   `options.depth` **[Number][86]** The depth limit for parsing
         nested objects, e.g. `?a[b][c][d][e][f][g][h][i]=j`. (optional, default `5`)
-    -   `options.parameterLimit` **[Number][44]** Maximum number of query
+    -   `options.parameterLimit` **[Number][86]** Maximum number of query
         params parsed. Additional params are silently dropped. (optional, default `1000`)
-    -   `options.parseArrays` **[Boolean][46]** Whether to parse
+    -   `options.parseArrays` **[Boolean][88]** Whether to parse
         `?a[]=b&a[1]=c` to an array, e.g. `{a: ['b', 'c']}`. (optional, default `true`)
-    -   `options.plainObjects` **[Boolean][46]** Whether `req.query` is a
+    -   `options.plainObjects` **[Boolean][88]** Whether `req.query` is a
         "plain" object -- does not inherit from `Object`.
         This can be used to allow query params whose names collide with Object
         methods, e.g. `?hasOwnProperty=blah`. (optional, default `false`)
-    -   `options.strictNullHandling` **[Boolean][46]** If true, `?a&b=`
+    -   `options.strictNullHandling` **[Boolean][88]** If true, `?a&b=`
         results in `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`. (optional, default `false`)
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.queryParser({ mapParams: false }));
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### jsonp
 
@@ -346,14 +388,14 @@ There is also a default `application/javascript` formatter to handle this.
 You _should_ set the `queryParser` plugin to run before this, but if you
 don't this plugin will still parse the query string properly.
 
-**Examples**
+#### Examples
 
 ```javascript
 var server = restify.createServer();
 server.use(restify.plugins.jsonp());
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### bodyParser
 
@@ -377,65 +419,67 @@ All bodyParsers support the following options:
     mapParams true. when true, will stomp on req.params value when
     existing value is found.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an option object
-    -   `options.maxBodySize` **[Number][44]?** The maximum size in bytes allowed in
+-   `options` **[Object][81]?** an option object
+    -   `options.maxBodySize` **[Number][86]?** The maximum size in bytes allowed in
         the HTTP body. Useful for limiting clients from hogging server memory.
-    -   `options.mapParams` **[Boolean][46]?** if `req.params` should be filled with
+    -   `options.mapParams` **[Boolean][88]?** if `req.params` should be filled with
         parsed parameters from HTTP body.
-    -   `options.mapFiles` **[Boolean][46]?** if `req.params` should be filled with
+    -   `options.mapFiles` **[Boolean][88]?** if `req.params` should be filled with
         the contents of files sent through a multipart request.
-        [formidable][47] is used internally
+        [formidable][89] is used internally
         for parsing, and a file is denoted as a multipart part with the `filename`
         option set in its `Content-Disposition`. This will only be performed if
         `mapParams` is true.
-    -   `options.overrideParams` **[Boolean][46]?** if an entry in `req.params`
+    -   `options.overrideParams` **[Boolean][88]?** if an entry in `req.params`
         should be overwritten by the value in the body if the names are the same.
         For instance, if you have the route `/:someval`,
         and someone posts an `x-www-form-urlencoded`
         Content-Type with the body `someval=happy` to `/sad`, the value will be
         `happy` if `overrideParams` is `true`, `sad` otherwise.
-    -   `options.multipartHandler` **[Function][35]?** a callback to handle any
+    -   `options.multipartHandler` **[Function][77]?** a callback to handle any
         multipart part which is not a file.
         If this is omitted, the default handler is invoked which may
         or may not map the parts into `req.params`, depending on
         the `mapParams`-option.
-    -   `options.multipartFileHandler` **[Function][35]?** a callback to handle any
+    -   `options.multipartFileHandler` **[Function][77]?** a callback to handle any
         multipart file.
         It will be a file if the part has a `Content-Disposition` with the
         `filename` parameter set. This typically happens when a browser sends a
         form and there is a parameter similar to `<input type="file" />`.
         If this is not provided, the default behaviour is to map the contents
         into `req.params`.
-    -   `options.keepExtensions` **[Boolean][46]?** if you want the uploaded
+    -   `options.keepExtensions` **[Boolean][88]?** if you want the uploaded
         files to include the extensions of the original files
         (multipart uploads only).
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.uploadDir` **[String][41]?** Where uploaded files are
+    -   `options.uploadDir` **[String][83]?** Where uploaded files are
         intermediately stored during transfer before the contents is mapped
         into `req.params`.
         Does nothing if `multipartFileHandler` is defined.
-    -   `options.multiples` **[Boolean][46]?** if you want to support html5 multiple
+    -   `options.multiples` **[Boolean][88]?** if you want to support html5 multiple
         attribute in upload fields.
-    -   `options.hash` **[String][41]?** If you want checksums calculated for
+    -   `options.hash` **[String][83]?** If you want checksums calculated for
         incoming files, set this to either `sha1` or `md5`.
-    -   `options.rejectUnknown` **[Boolean][46]?** Set to `true` if you want to end
+    -   `options.rejectUnknown` **[Boolean][88]?** Set to `true` if you want to end
         the request with a `UnsupportedMediaTypeError` when none of
         the supported content types was given.
-    -   `options.requestBodyOnGet` **[Boolean][46]**  Parse body of a GET
+    -   `options.requestBodyOnGet` **[Boolean][88]**  Parse body of a GET
         request. (optional, default `false`)
-    -   `options.reviver` **[Function][35]?** `jsonParser` only. If a function,
+    -   `options.reviver` **[Function][77]?** `jsonParser` only. If a function,
         this prescribes how the value originally produced by parsing is transformed,
         before being returned. For more information check out
         `JSON.parse(text[, reviver])`.
-    -   `options.maxFieldsSize` **[Number][44]** `multipartParser`
+    -   `options.maxFieldsSize` **[Number][86]** `multipartParser`
         only.
         Limits the amount of memory all fields together (except files)
         can allocate in bytes.
         The default size is `2 * 1024 * 1024` bytes _(2MB)_. (optional, default `2*1024*1024`)
+    -   `options.arrayLimit` **[Number][86]** `urlEncodedBodyParser` only. Only
+        transform `a[$index]=b` to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.bodyParser({
@@ -466,28 +510,33 @@ server.use(restify.plugins.bodyParser({
 
 -   Throws **UnsupportedMediaTypeError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### requestLogger
 
-Sets up a child [bunyan][48] logger with
+Sets up a child [logger][90] logger with
 the current request id filled in, along with any other parameters you define.
 
 You can pass in no options to this, in which case only the request id will be
 appended, and no serializers appended (this is also the most performant); the
 logger created at server creation time will be used as the parent logger.
-This logger can be used normally, with [req.log][49].
+This logger can be used normally, with [req.log][91].
 
 This plugin does _not_ log each individual request. Use the Audit Logging
 plugin or a custom middleware for that use.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]?** an options object
-    -   `options.headers` **[Array][40]?** A list of headers to transfer from
+-   `options` **[Object][81]?** an options object
+    -   `options.headers` **[Array][82]?** A list of headers to transfer from
                                          the request to top level props on the log.
+    -   `options.properties` **[Object][81]?** A set of key-values to pass to the child logger
+    -   `options.serializers` **[Object][81]?** Override serializers to use in the child logger
+    -   `options.log` **[Object][81]?** A logger to use as a fallback if req.log is missing
+    -   `options.requestIdFieldName` **[String][83]?** The name of the request id property attached
+                                          to log lines. Defaults to "req_id".
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.requestLogger({
@@ -498,7 +547,7 @@ server.use(restify.plugins.requestLogger({
 }));
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### gzipResponse
 
@@ -514,29 +563,29 @@ that the `content-length` header cannot be known, and so
 This plugin has no impact if the client does not send
 `accept-encoding: gzip`.
 
-[https://github.com/restify/node-restify/issues/284][50]
+[https://github.com/restify/node-restify/issues/284][92]
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]?** an options object, see: zlib.createGzip
+-   `opts` **[Object][81]?** an options object, see: zlib.createGzip
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.gzipResponse());
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### serveStatic
 
 Serves static files.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]** an options object
+-   `options` **[Object][81]** an options object
 
-**Examples**
+#### Examples
 
 The serveStatic module is different than most of the other plugins, in that
 it is expected that you are going to map it to a route, as below:
@@ -591,26 +640,26 @@ server.get('/home/([a-z]+[.]html)', restify.plugins.serveStatic({
 -   Throws **NotAuthorizedError** 
 -   Throws **ResourceNotFoundError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### serveStaticFiles
 
 Serves static files, with API similar to expressjs
 
-**Parameters**
+#### Parameters
 
--   `directory` **[String][41]** the directory to serve files from
--   `opts` **[Object][39]** an options object, which is optional
-    -   `opts.maxAge` **[Number][44]** specify max age in millisecs (optional, default `0`)
-    -   `opts.etag` **[Boolean][46]** enable/disable etag, default = true (optional, default `true`)
-    -   `opts.setHeaders` **[Function][35]?** set custom headers for the Files
+-   `directory` **[String][83]** the directory to serve files from
+-   `opts` **[Object][81]** an options object, which is optional
+    -   `opts.maxAge` **[Number][86]** specify max age in millisecs (optional, default `0`)
+    -   `opts.etag` **[Boolean][88]** enable/disable etag, default = true (optional, default `true`)
+    -   `opts.setHeaders` **[Function][77]?** set custom headers for the Files
         (synchronously), The function is called as `fn(res, path, stat)`,
         where the arguments are:
              `res` the response object
              `path` the file path that is being sent
              `stat` the stat object of the file that is being sent
 
-**Examples**
+#### Examples
 
 The serveStaticFiles plugin allows you to map a GET route to a
 directory on the disk
@@ -626,7 +675,7 @@ The GET `route` and `directory` combination will serve a file
 located in `./documentation/v1/index.html` when you attempt to hit
 `http://localhost:8080/public/index.html`
 
-The plugin uses [send][51] under the hood
+The plugin uses [send][93] under the hood
 which is also used by `expressjs` to serve static files. Most of the options
 that work with `send` will work with this plugin.
 
@@ -649,7 +698,7 @@ server.get('/public/*',
 -   Throws **NotAuthorizedError** 
 -   Throws **ResourceNotFoundError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### throttle
 
@@ -657,7 +706,7 @@ Creates an API rate limiter that can be plugged into the standard
 restify request handling pipeline.
 
 `restify` ships with a fairly comprehensive implementation of
-[Token bucket][52], with the ability
+[Token bucket][94], with the ability
 to throttle on IP (or x-forwarded-for) and username (from `req.username`).
 You define "global" request rate and burst rate, and you can define
 overrides for specific keys.
@@ -668,7 +717,7 @@ than `/my/fast/memcache`).
 
 If a client has consumed all of their available rate/burst, an HTTP response
 code of `429`
-[Too Many Requests][53]
+[Too Many Requests][95]
 is returned.
 
 This throttle gives you three options on which to throttle:
@@ -688,28 +737,28 @@ TokenBucket to track each.
 
 On the `options` object ip and username are treated as an XOR.
 
-**Parameters**
+#### Parameters
 
--   `options` **[Object][39]** required options with:
-    -   `options.burst` **[Number][44]** burst
-    -   `options.rate` **[Number][44]** rate
-    -   `options.ip` **[Boolean][46]?** ip
-    -   `options.username` **[Boolean][46]?** username
-    -   `options.xff` **[Boolean][46]?** xff
-    -   `options.setHeaders` **[Boolean][46]** Set response headers for rate,
+-   `options` **[Object][81]** required options with:
+    -   `options.burst` **[Number][86]** burst
+    -   `options.rate` **[Number][86]** rate
+    -   `options.ip` **[Boolean][88]?** ip
+    -   `options.username` **[Boolean][88]?** username
+    -   `options.xff` **[Boolean][88]?** xff
+    -   `options.setHeaders` **[Boolean][88]** Set response headers for rate,
                                       limit (burst) and remaining. (optional, default `false`)
-    -   `options.overrides` **[Object][39]?** overrides
-    -   `options.tokensTable` **[Object][39]** a storage engine this plugin will
+    -   `options.overrides` **[Object][81]?** overrides
+    -   `options.tokensTable` **[Object][81]** a storage engine this plugin will
                                      use to store throttling keys -> bucket mappings.
                                      If you don't specify this, the default is to
                                      use an in-memory O(1) LRU, with 10k distinct
                                      keys.  Any implementation just needs to support
                                      put/get.
-    -   `options.maxKeys` **[Number][44]** If using the default
+    -   `options.maxKeys` **[Number][86]** If using the default
                                      implementation, you can specify how large you
                                      want the table to be. (optional, default `10000`)
 
-**Examples**
+#### Examples
 
 An example options object with overrides:
 
@@ -729,7 +778,7 @@ An example options object with overrides:
 
 -   Throws **TooManyRequestsError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### requestExpiry
 
@@ -767,18 +816,18 @@ and/or uniform request distribution.  To enable this, you can pass in
 `options.tokensTable`, which is simply any Object that supports `put` and
 `get` with a `String` key, and an `Object` value.
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** an options object
-    -   `opts.absoluteHeader` **[String][41]?** The header key to be used for
+-   `opts` **[Object][81]** an options object
+    -   `opts.absoluteHeader` **[String][83]?** The header key to be used for
                                           the expiry time of each request.
-    -   `opts.startHeader` **[String][41]** The header key for the start time
+    -   `opts.startHeader` **[String][83]** The header key for the start time
                                           of the request.
-    -   `opts.timeoutHeader` **[String][41]** The header key for the time in
+    -   `opts.timeoutHeader` **[String][83]** The header key for the time in
                                           milliseconds that should ellapse before
                                           the request is considered expired.
 
-**Examples**
+#### Examples
 
 The only option provided is `header` which is the request header used
 to specify the client timeout.
@@ -790,7 +839,7 @@ server.use(restify.plugins.requestExpiry({
 });
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### inflightRequestThrottle
 
@@ -806,17 +855,17 @@ requests. It defaults to `503 ServiceUnavailableError`.
 This plugin should be registered as early as possibly in the middleware stack
 using `pre` to avoid performing unnecessary work.
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** configure this plugin
-    -   `opts.limit` **[Number][44]** maximum number of inflight requests the server
+-   `opts` **[Object][81]** configure this plugin
+    -   `opts.limit` **[Number][86]** maximum number of inflight requests the server
            will handle before returning an error
-    -   `opts.err` **[Error][54]** A restify error used as a response when the
+    -   `opts.err` **[Error][96]** A restify error used as a response when the
            inflight request limit is exceeded
-    -   `opts.server` **[Function][35]** the instance of the restify server this
+    -   `opts.server` **[Function][77]** the instance of the restify server this
            plugin will throttle.
 
-**Examples**
+#### Examples
 
 ```javascript
 var errors = require('restify-errors');
@@ -828,7 +877,7 @@ options.res = new errors.InternalServerError();
 server.pre(restify.plugins.inflightRequestThrottle(options));
 ```
 
-Returns **[Function][35]** middleware to be registered on server.pre
+Returns **[Function][77]** middleware to be registered on server.pre
 
 ### cpuUsageThrottle
 
@@ -872,20 +921,20 @@ case.
 For a better understanding of the EWMA algorithn, refer to the documentation
 for the ewma module.
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** Configure this plugin.
-    -   `opts.limit` **[Number][44]?** The point at which restify will begin
+-   `opts` **[Object][81]** Configure this plugin.
+    -   `opts.limit` **[Number][86]?** The point at which restify will begin
            rejecting a % of all requests at the front door.
            This value is a percentage.
            For example 0.8 === 80% average CPU utilization. Defaults to 0.75.
-    -   `opts.max` **[Number][44]?** The point at which restify will reject 100% of
+    -   `opts.max` **[Number][86]?** The point at which restify will reject 100% of
            all requests at the front door. This is used in conjunction with limit to
            determine what % of traffic restify needs to reject when attempting to
            bring the average load back to the user requested values. Since Node.js is
            single threaded, the default for this is 1. In some rare cases, a Node.js
            process can exceed 100% CPU usage and you will want to update this value.
-    -   `opts.interval` **[Number][44]?** How frequently we calculate the average CPU
+    -   `opts.interval` **[Number][86]?** How frequently we calculate the average CPU
            utilization. When we calculate an average CPU utilization, we calculate it
            over this interval, and this drives whether or not we should be shedding
            load. This can be thought of as a "resolution" where the lower this value,
@@ -893,7 +942,7 @@ for the ewma module.
            we will recalculate the % of traffic we should be shedding. This check
            is rather lightweight, while the default is 250ms, you should be able to
            decrease this value without seeing a significant impact to performance.
-    -   `opts.halfLife` **[Number][44]?** When we sample the CPU usage on an
+    -   `opts.halfLife` **[Number][86]?** When we sample the CPU usage on an
            interval, we create a series of data points.
            We take these points and calculate a
            moving average. The halfLife indicates how quickly a point "decays" to
@@ -904,7 +953,7 @@ for the ewma module.
            determininng whether it should shed load, set this to a higher value. The
            unit is in ms. Defaults to 250.
 
-**Examples**
+#### Examples
 
 ```javascript
 var restify = require('restify');
@@ -931,20 +980,20 @@ server.pre(plugin);
 plugin.update({ limit: .4, halfLife: 5000 });
 ```
 
-Returns **[Function][35]** middleware to be registered on server.pre
+Returns **[Function][77]** middleware to be registered on server.pre
 
 ### conditionalHandler
 
 Runs first handler that matches to the condition
 
-**Parameters**
+#### Parameters
 
--   `candidates` **([Object][39] \| [Array][40]&lt;[Object][39]>)** candidates
-    -   `candidates.handler` **([Function][35] \| [Array][40]&lt;[Function][35]>)** handler(s)
-    -   `candidates.version` **([String][41] \| [Array][40]&lt;[String][41]>)?** '1.1.0', ['1.1.0', '1.2.0']
-    -   `candidates.contentType` **[String][41]?** accepted content type, '\*\\/json'
+-   `candidates` **([Object][81] \| [Array][82]&lt;[Object][81]>)** candidates
+    -   `candidates.handler` **([Function][77] \| [Array][82]&lt;[Function][77]>)** handler(s)
+    -   `candidates.version` **([String][83] \| [Array][82]&lt;[String][83]>)?** '1.1.0', ['1.1.0', '1.2.0']
+    -   `candidates.contentType` **[String][83]?** accepted content type, '\*\\/json'
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.conditionalHandler({
@@ -991,7 +1040,7 @@ server.get('/hello/:name', restify.plugins.conditionalHandler([
 -   Throws **InvalidVersionError** 
 -   Throws **UnsupportedMediaTypeError** 
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### conditionalRequest
 
@@ -1016,7 +1065,7 @@ The specific headers this plugin looks at are:
 -   `If-Modified-Since`
 -   `If-Unmodified-Since`
 
-**Examples**
+#### Examples
 
 ```javascript
 server.use(restify.plugins.conditionalRequest());
@@ -1038,29 +1087,31 @@ server.get('/hello/:name', function(req, res, next) {
 -   Throws **BadRequestError** 
 -   Throws **PreconditionFailedError** 
 
-Returns **[Array][40]&lt;[Function][35]>** Handlers
+Returns **[Array][82]&lt;[Function][77]>** Handlers
 
 ### auditLogger
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** The options object.
-    -   `opts.log` **[Object][39]** The logger.
-    -   `opts.event` **[String][41]** The event from the server which initiates the
+-   `opts` **[Object][81]** The options object.
+    -   `opts.log` **[Object][81]** The logger.
+    -   `opts.event` **[String][83]** The event from the server which initiates the
         log, one of 'pre', 'routed', or 'after'
-    -   `opts.context` **[Function][35]?** The optional context function of signature
+    -   `opts.context` **[Function][77]?** The optional context function of signature
         f(req, res, route, err).  Invoked each time an audit log is generated. This
         function can return an object that customizes the format of anything off the
         req, res, route, and err objects. The output of this function will be
         available on the `context` key in the audit object.
-    -   `opts.server` **[Object][39]?** The restify server, used to emit
+    -   `opts.server` **[Object][81]?** The restify server, used to emit
         the audit log object programmatically
-    -   `opts.printLog` **[boolean][46]** Whether to print the log
+    -   `opts.printLog` **[boolean][88]** Whether to print the log
         via the logger. (optional, default `true`)
-    -   `opts.serializers` **[Object][39]?** Override the default logger serializers
+    -   `opts.serializers` **[Object][81]?** Override the default logger serializers
         for err, req and res
+    -   `opts.requestIdFieldName` **[String][83]?** The name of the request id property attached
+        to log lines. Defaults to "req_id".
 
-**Examples**
+#### Examples
 
 Audit logging is a special plugin, as you don't use it with `.use()`
 but with the `after` event:
@@ -1068,10 +1119,10 @@ but with the `after` event:
 
 ```javascript
 server.on('after', restify.plugins.auditLogger({
-  log: bunyan.createLogger({
-    name: 'audit',
-    stream: process.stdout
-  }),
+  log: pino(
+    {name: 'audit'},
+    process.stdout
+  ),
   event: 'after',
   server: SERVER,
   logMetrics : logBuffer,
@@ -1079,7 +1130,7 @@ server.on('after', restify.plugins.auditLogger({
 }));
 ```
 
-You pass in the auditor a bunyan logger, optionally server object,
+You pass in the auditor a pino logger, optionally server object,
 Ringbuffer and a flag printLog indicate if log needs to be print out at info
 level or not.  By default, without specify printLog flag, it will write out
 record lookling like this:
@@ -1110,7 +1161,7 @@ record lookling like this:
     "trailers": {},
     "version": "*",
     "timers": {
-      "bunyan": 52,
+      "requestLogger": 52,
       "saveAction": 8,
       "reqResTracker": 213,
       "addContext": 8,
@@ -1166,8 +1217,8 @@ The `timers` field shows the time each handler took to run in microseconds.
 Restify by default will record this information for every handler for each
 route. However, if you decide to include nested handlers, you can track the
 timing yourself by utilizing the Request
-[startHandlerTimer][55] and
-[endHandlerTimer][56] API.
+[startHandlerTimer][97] and
+[endHandlerTimer][98] API.
 You can also listen to auditlog event and get same above log object when
 log event emits. For example
 
@@ -1178,7 +1229,7 @@ SERVER.on('auditlog', function (data) {
 });
 ```
 
-Returns **[Function][35]** Handler
+Returns **[Function][77]** Handler
 
 ### metrics
 
@@ -1188,13 +1239,13 @@ event, e.g., `server.on('after', restify.plugins.metrics());`:
 A plugin that listens to the server's after event and emits information
 about that request.
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Object][39]** an options obj
+-   `opts` **[Object][81]** an options obj
     -   `opts.server` **Server** restify server
 -   `callback` **createMetrics~callback** a callback fn
 
-**Examples**
+#### Examples
 
 ```javascript
 server.on('after', restify.plugins.metrics({ server: server },
@@ -1203,7 +1254,7 @@ server.on('after', restify.plugins.metrics({ server: server },
 }));
 ```
 
-Returns **[Function][35]** returns a function suitable to be used
+Returns **[Function][77]** returns a function suitable to be used
   with restify server's `after` event
 
 ## Types
@@ -1215,33 +1266,33 @@ Returns **[Function][35]** returns a function suitable to be used
 
 Callback used by metrics plugin
 
-Type: [Function][35]
+Type: [Function][77]
 
-**Parameters**
+#### Parameters
 
--   `err` **[Error][54]** 
--   `metrics` **[Object][39]** metrics about the request
-    -   `metrics.statusCode` **[Number][44]** status code of the response. can be
+-   `err` **[Error][96]** 
+-   `metrics` **[Object][81]** metrics about the request
+    -   `metrics.statusCode` **[Number][86]** status code of the response. can be
           undefined in the case of an uncaughtException
-    -   `metrics.method` **[String][41]** http request verb
-    -   `metrics.totalLatency` **[Number][44]** latency includes both request is flushed
+    -   `metrics.method` **[String][83]** http request verb
+    -   `metrics.totalLatency` **[Number][86]** latency includes both request is flushed
                                              and all handlers finished
-    -   `metrics.latency` **[Number][44]** latency when request is flushed
-    -   `metrics.preLatency` **([Number][44] | null)** pre handlers latency
-    -   `metrics.useLatency` **([Number][44] | null)** use handlers latency
-    -   `metrics.routeLatency` **([Number][44] | null)** route handlers latency
-    -   `metrics.path` **[String][41]** `req.path()` value
-    -   `metrics.inflightRequests` **[Number][44]** Number of inflight requests pending
+    -   `metrics.latency` **[Number][86]** latency when request is flushed
+    -   `metrics.preLatency` **([Number][86] | null)** pre handlers latency
+    -   `metrics.useLatency` **([Number][86] | null)** use handlers latency
+    -   `metrics.routeLatency` **([Number][86] | null)** route handlers latency
+    -   `metrics.path` **[String][83]** `req.path()` value
+    -   `metrics.inflightRequests` **[Number][86]** Number of inflight requests pending
           in restify.
-    -   `metrics.unifinishedRequests` **[Number][44]** Same as `inflightRequests`
-    -   `metrics.connectionState` **[String][41]** can be either `'close'` or
+    -   `metrics.unifinishedRequests` **[Number][86]** Same as `inflightRequests`
+    -   `metrics.connectionState` **[String][83]** can be either `'close'` or
          `undefined`. If this value is set, err will be a
           corresponding `RequestCloseError`.
           If connectionState is either
           `'close'`, then the `statusCode` is not applicable since the
           connection was severed before a response was written.
--   `req` **[Request][57]** the request obj
--   `res` **[Response][58]** the response obj
+-   `req` **[Request][99]** the request obj
+-   `res` **[Response][100]** the response obj
 -   `route` **Route** the route obj that serviced the request
 
 ## req.set
@@ -1249,21 +1300,21 @@ Type: [Function][35]
 Set context value by key
 Requires the context plugin.
 
-**Parameters**
+### Parameters
 
--   `key` **[String][41]** key
+-   `key` **[String][83]** key
 -   `value` **any** value
 
-Returns **[undefined][59]** no return value
+Returns **[undefined][101]** no return value
 
 ## req.get
 
 Get context value by key.
 Requires the context plugin.
 
-**Parameters**
+### Parameters
 
--   `key` **[String][41]** key
+-   `key` **[String][83]** key
 
 Returns **any** value stored in context
 
@@ -1280,114 +1331,198 @@ Returns **any** value stored in context
 
 [3]: #context
 
-[4]: #dedupeslashes
+[4]: #examples
 
-[5]: #pause
+[5]: #dedupeslashes
 
-[6]: #sanitizepath
+[6]: #examples-1
 
-[7]: #reqidheaders
+[7]: #pause
 
-[8]: #strictqueryparams
+[8]: #sanitizepath
 
-[9]: #useragentconnection
+[9]: #reqidheaders
 
-[10]: #serveruse-plugins
+[10]: #parameters
 
-[11]: #acceptparser
+[11]: #strictqueryparams
 
-[12]: #authorizationparser
+[12]: #parameters-1
 
-[13]: #dateparser
+[13]: #useragentconnection
 
-[14]: #queryparser
+[14]: #parameters-2
 
-[15]: #jsonp
+[15]: #serveruse-plugins
 
-[16]: #bodyparser
+[16]: #acceptparser
 
-[17]: #requestlogger
+[17]: #parameters-3
 
-[18]: #gzipresponse
+[18]: #examples-2
 
-[19]: #servestatic
+[19]: #authorizationparser
 
-[20]: #servestaticfiles
+[20]: #parameters-4
 
-[21]: #throttle
+[21]: #examples-3
 
-[22]: #requestexpiry
+[22]: #dateparser
 
-[23]: #using-an-external-storage-mechanism-for-keybucket-mappings
+[23]: #parameters-5
 
-[24]: #inflightrequestthrottle
+[24]: #examples-4
 
-[25]: #cpuusagethrottle
+[25]: #queryparser
 
-[26]: #conditionalhandler
+[26]: #parameters-6
 
-[27]: #conditionalrequest
+[27]: #examples-5
 
-[28]: #auditlogger
+[28]: #jsonp
 
-[29]: #metrics
+[29]: #examples-6
 
-[30]: #types
+[30]: #bodyparser
 
-[31]: #metricscallback
+[31]: #parameters-7
 
-[32]: #reqset
+[32]: #examples-7
 
-[33]: #reqget
+[33]: #requestlogger
 
-[34]: #reqgetall
+[34]: #parameters-8
 
-[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[35]: #examples-8
 
-[36]: https://github.com/restify/node-restify/issues/287
+[36]: #gzipresponse
 
-[37]: https://github.com/restify/node-restify/issues/409
+[37]: #parameters-9
 
-[38]: https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips
+[38]: #examples-9
 
-[39]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[39]: #servestatic
 
-[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[40]: #parameters-10
 
-[41]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[41]: #examples-10
 
-[42]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+[42]: #servestaticfiles
 
-[43]: https://github.com/joyent/node-http-signature
+[43]: #parameters-11
 
-[44]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[44]: #examples-11
 
-[45]: https://github.com/ljharb/qs
+[45]: #throttle
 
-[46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[46]: #parameters-12
 
-[47]: https://github.com/felixge/node-formidable
+[47]: #examples-12
 
-[48]: https://github.com/trentm/node-bunyan
+[48]: #requestexpiry
 
-[49]: #request-api
+[49]: #using-an-external-storage-mechanism-for-keybucket-mappings
 
-[50]: https://github.com/restify/node-restify/issues/284
+[50]: #parameters-13
 
-[51]: https://github.com/pillarjs/send
+[51]: #examples-13
 
-[52]: http://en.wikipedia.org/wiki/Token_bucket
+[52]: #inflightrequestthrottle
 
-[53]: http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4
+[53]: #parameters-14
 
-[54]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+[54]: #examples-14
 
-[55]: #starthandlertimerhandlername
+[55]: #cpuusagethrottle
 
-[56]: #endhandlertimerhandlername
+[56]: #parameters-15
 
-[57]: https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request
+[57]: #examples-15
 
-[58]: https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5
+[58]: #conditionalhandler
 
-[59]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+[59]: #parameters-16
+
+[60]: #examples-16
+
+[61]: #conditionalrequest
+
+[62]: #examples-17
+
+[63]: #auditlogger
+
+[64]: #parameters-17
+
+[65]: #examples-18
+
+[66]: #metrics
+
+[67]: #parameters-18
+
+[68]: #examples-19
+
+[69]: #types
+
+[70]: #metricscallback
+
+[71]: #parameters-19
+
+[72]: #reqset
+
+[73]: #parameters-20
+
+[74]: #reqget
+
+[75]: #parameters-21
+
+[76]: #reqgetall
+
+[77]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[78]: https://github.com/restify/node-restify/issues/287
+
+[79]: https://github.com/restify/node-restify/issues/409
+
+[80]: https://github.com/restify/node-restify/wiki/1.4-to-2.0-Migration-Tips
+
+[81]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[82]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[83]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[84]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+
+[85]: https://github.com/joyent/node-http-signature
+
+[86]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[87]: https://github.com/ljharb/qs
+
+[88]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[89]: https://github.com/felixge/node-formidable
+
+[90]: https://github.com/pinojs/pino
+
+[91]: #request-api
+
+[92]: https://github.com/restify/node-restify/issues/284
+
+[93]: https://github.com/pillarjs/send
+
+[94]: http://en.wikipedia.org/wiki/Token_bucket
+
+[95]: http://tools.ietf.org/html/draft-nottingham-http-new-status-03#section-4
+
+[96]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error
+
+[97]: #starthandlertimerhandlername
+
+[98]: #endhandlertimerhandlername
+
+[99]: https://developer.mozilla.org/Add-ons/SDK/High-Level_APIs/request
+
+[100]: https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5
+
+[101]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
