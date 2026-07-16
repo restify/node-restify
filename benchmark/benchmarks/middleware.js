@@ -24,10 +24,11 @@ for (var j = 0; j < 10; j++) {
     server.use(handler);
 }
 
-server.get(path, function get(req, res) {
+server.get(path, function get(req, res, next) {
     res.send('hello world');
+    next();
 });
 
-if (!module.parent) {
+if (require.main === module) {
     server.listen(port);
 }
