@@ -215,7 +215,7 @@ describe('multipart parser', function() {
             '/multipart/:id',
             restify.plugins.bodyParser({
                 multipartHandler: function(part) {
-                    var buffer = new Buffer(0);
+                    var buffer = Buffer.alloc(0);
                     part.on('data', function(data) {
                         buffer = Buffer.concat([data]);
                     });
@@ -226,7 +226,7 @@ describe('multipart parser', function() {
                     });
                 },
                 multipartFileHandler: function(part) {
-                    var buffer = new Buffer(0);
+                    var buffer = Buffer.alloc(0);
                     part.on('data', function(data) {
                         buffer = Buffer.concat([data]);
                     });
