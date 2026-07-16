@@ -12,10 +12,11 @@ module.exports = {
     url: 'http://localhost:' + port + path
 };
 
-server.get(path, function onRequest(req, res) {
+server.get(path, function onRequest(req, res, next) {
     res.send('hello world');
+    next();
 });
 
-if (!module.parent) {
+if (require.main === module) {
     server.listen(port);
 }

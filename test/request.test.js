@@ -21,7 +21,7 @@ var PORT = process.env.UNIT_TEST_PORT || 0;
 var CLIENT;
 var SERVER;
 
-before(function(cb) {
+before(module, function(cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
@@ -43,7 +43,7 @@ before(function(cb) {
     }
 });
 
-after(function(cb) {
+after(module, function(cb) {
     try {
         CLIENT.close();
         SERVER.close(function() {
@@ -57,7 +57,7 @@ after(function(cb) {
     }
 });
 
-test('query should return empty string', function(t) {
+test(module, 'query should return empty string', function(t) {
     SERVER.get('/emptyQs', function(req, res, next) {
         t.equal(req.query(), '');
         t.equal(req.getQuery(), '');
@@ -72,7 +72,7 @@ test('query should return empty string', function(t) {
     });
 });
 
-test('query should return raw query string string', function(t) {
+test(module, 'query should return raw query string string', function(t) {
     SERVER.get('/qs', function(req, res, next) {
         t.equal(req.query(), 'a=1&b=2');
         t.equal(req.getQuery(), 'a=1&b=2');
@@ -87,7 +87,7 @@ test('query should return raw query string string', function(t) {
     });
 });
 
-test('should generate request id on first req.id() call', function(t) {
+test(module, 'should generate request id on first req.id() call', function(t) {
     SERVER.get('/ping', function(req, res, next) {
         t.equal(typeof req.id(), 'string');
         t.equal(validator.isUUID(req.id(), 4), true);
@@ -102,7 +102,7 @@ test('should generate request id on first req.id() call', function(t) {
     });
 });
 
-test('should set request id', function(t) {
+test(module, 'should set request id', function(t) {
     SERVER.pre(function setId(req, res, next) {
         var newId = req.id('lagavulin');
         t.equal(newId, 'lagavulin');
@@ -123,29 +123,33 @@ test('should set request id', function(t) {
     });
 });
 
-test('should throw when setting request id after autogeneration', function(t) {
-    SERVER.get('/ping', function(req, res, next) {
-        t.equal(typeof req.id(), 'string');
-        t.equal(validator.isUUID(req.id(), 4), true);
-        t.throws(
-            function() {
-                req.id('blowup');
-            },
-            Error,
-            'request id is immutable, cannot be set again!'
-        );
-        res.send();
-        return next();
-    });
+test(
+    module,
+    'should throw when setting request id after autogeneration',
+    function(t) {
+        SERVER.get('/ping', function(req, res, next) {
+            t.equal(typeof req.id(), 'string');
+            t.equal(validator.isUUID(req.id(), 4), true);
+            t.throws(
+                function() {
+                    req.id('blowup');
+                },
+                Error,
+                'request id is immutable, cannot be set again!'
+            );
+            res.send();
+            return next();
+        });
 
-    CLIENT.get('/ping', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get('/ping', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
-test('should throw when setting request id twice', function(t) {
+test(module, 'should throw when setting request id twice', function(t) {
     SERVER.get('/ping', function(req, res, next) {
         req.id('lagavulin');
         t.throws(
@@ -166,7 +170,7 @@ test('should throw when setting request id twice', function(t) {
     });
 });
 
-test('should provide route object', function(t) {
+test(module, 'should provide route object', function(t) {
     SERVER.get('/ping/:name', function(req, res, next) {
         /*
          req.getRoute() should return something like this :
@@ -192,7 +196,7 @@ test('should provide route object', function(t) {
     });
 });
 
-test('should provide time when request started', function(t) {
+test(module, 'should provide time when request started', function(t) {
     SERVER.get('/ping/:name', function(req, res, next) {
         t.equal(typeof req.time(), 'number');
         t.ok(req.time() > Date.now() - 1000);
@@ -208,7 +212,7 @@ test('should provide time when request started', function(t) {
     });
 });
 
-test('should provide date when request started', function(t) {
+test(module, 'should provide date when request started', function(t) {
     SERVER.get('/ping/:name', function(req, res, next) {
         t.ok(req.date() instanceof Date);
         t.ok(req.date().getTime() > Date.now() - 1000);
@@ -226,48 +230,55 @@ test('should provide date when request started', function(t) {
 
 // restifyDone is emitted at the same time when server's after event is emitted,
 // you can find more comprehensive testing for `after` lives in server tests.
-test('should emit restifyDone event when request is fully served', function(t) {
-    var restifyDoneCalled = false;
+test(
+    module,
+    'should emit restifyDone event when request is fully served',
+    function(t) {
+        var restifyDoneCalled = false;
 
-    SERVER.get('/', function(req, res, next) {
-        req.on('restifyDone', function(route, err) {
-            t.ifError(err);
-            t.ok(route);
-            setImmediate(function() {
-                restifyDoneCalled = true;
+        SERVER.get('/', function(req, res, next) {
+            req.on('restifyDone', function(route, err) {
+                t.ifError(err);
+                t.ok(route);
+                setImmediate(function() {
+                    restifyDoneCalled = true;
+                });
             });
+
+            res.send('hello');
+            return next();
         });
 
-        res.send('hello');
-        return next();
-    });
-
-    CLIENT.get('/', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.ok(restifyDoneCalled);
-        t.end();
-    });
-});
+        CLIENT.get('/', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.ok(restifyDoneCalled);
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line max-len
-test('should emit restifyDone event when request is fully served with error', function(t) {
-    var clientDone = false;
+test(
+    module,
+    'should emit restifyDone event when request is fully served with error',
+    function(t) {
+        var clientDone = false;
 
-    SERVER.get('/', function(req, res, next) {
-        var myErr = new Error('My Error');
+        SERVER.get('/', function(req, res, next) {
+            var myErr = new Error('My Error');
 
-        req.on('restifyDone', function(route, err) {
-            t.ok(route);
-            t.deepEqual(err, myErr);
-            setImmediate(function() {
-                t.ok(clientDone);
-                t.end();
+            req.on('restifyDone', function(route, err) {
+                t.ok(route);
+                t.deepEqual(err, myErr);
+                setImmediate(function() {
+                    t.ok(clientDone);
+                    t.end();
+                });
             });
-        });
 
-        return next(myErr);
-    });
+            return next(myErr);
+        });
 
     CLIENT.get('/', function(err, _, res) {
         t.ok(err);

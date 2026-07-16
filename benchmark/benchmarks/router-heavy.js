@@ -99,8 +99,9 @@ var routes = {
     }
 };
 
-function handler(req, res) {
+function handler(req, res, next) {
     res.send('hello');
+    next();
 }
 
 function attachRoute(parent, routeConfig) {
@@ -127,6 +128,6 @@ function attachRoute(parent, routeConfig) {
 
 attachRoute('', routes);
 
-if (!module.parent) {
+if (require.main === module) {
     server.listen(port);
 }

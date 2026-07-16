@@ -27,7 +27,7 @@ var SERVER;
 
 ///--- Tests
 
-before(function(callback) {
+before(module, function(callback) {
     try {
         SERVER = restify.createServer({
             handleUncaughtExceptions: true,
@@ -86,7 +86,7 @@ before(function(callback) {
     }
 });
 
-after(function(callback) {
+after(module, function(callback) {
     try {
         SERVER.close(callback);
     } catch (e) {
@@ -95,7 +95,7 @@ after(function(callback) {
     }
 });
 
-test('GH-845: sync formatter', function(t) {
+test(module, 'GH-845: sync formatter', function(t) {
     CLIENT.get(
         {
             path: '/sync',
@@ -113,7 +113,7 @@ test('GH-845: sync formatter', function(t) {
     );
 });
 
-test('GH-845: sync formatter should blow up', function(t) {
+test(module, 'GH-845: sync formatter should blow up', function(t) {
     SERVER.once('uncaughtException', function(req, res, route, err) {
         t.ok(err);
         t.equal(err.name, 'ReferenceError');
@@ -136,30 +136,34 @@ test('GH-845: sync formatter should blow up', function(t) {
     );
 });
 
-test('sync formatter should handle expected errors gracefully', function(t) {
-    SERVER.once('uncaughtException', function(req, res, route, err) {
-        throw new Error('Should not reach');
-    });
+test(
+    module,
+    'sync formatter should handle expected errors gracefully',
+    function(t) {
+        SERVER.once('uncaughtException', function(req, res, route, err) {
+            throw new Error('Should not reach');
+        });
 
-    CLIENT.get(
-        {
-            path: '/sync',
-            headers: {
-                accept: 'text/syncerror_expected'
+        CLIENT.get(
+            {
+                path: '/sync',
+                headers: {
+                    accept: 'text/syncerror_expected'
+                }
+            },
+            function(err, req, res, data) {
+                t.ok(err);
+                t.ok(req);
+                t.ok(res);
+                t.equal(res.statusCode, 500);
+                SERVER.removeAllListeners('uncaughtException');
+                t.end();
             }
-        },
-        function(err, req, res, data) {
-            t.ok(err);
-            t.ok(req);
-            t.ok(res);
-            t.equal(res.statusCode, 500);
-            SERVER.removeAllListeners('uncaughtException');
-            t.end();
-        }
-    );
-});
+        );
+    }
+);
 
-test('q-val priority', function(t) {
+test(module, 'q-val priority', function(t) {
     var opts = {
         path: '/sync',
         headers: {
@@ -175,7 +179,7 @@ test('q-val priority', function(t) {
     });
 });
 
-test('GH-771 q-val priority on */*', function(t) {
+test(module, 'GH-771 q-val priority on */*', function(t) {
     var opts = {
         path: '/sync',
         headers: {
@@ -196,6 +200,7 @@ test('GH-771 q-val priority on */*', function(t) {
 });
 
 test(
+    module,
     'GH-937 should return 406 when no content-type header set on response ' +
         'matching an acceptable type found by matching client',
     function(t) {
@@ -218,6 +223,7 @@ test(
 );
 
 test(
+    module,
     'GH-937 should return 500 when no default formatter found ' +
         'and octet-stream is not available',
     function(t) {
@@ -240,60 +246,69 @@ test(
 );
 
 // eslint-disable-next-line
-test('default jsonp formatter should escape line and paragraph separators', function(t) {
-    // ensure client accepts only a type not specified by server
-    var opts = {
-        path: '/jsonpSeparators',
-        headers: {
-            accept: 'application/javascript'
-        }
-    };
+test(
+    module,
+    'default jsonp formatter should escape line and paragraph separators',
+    function(t) {
+        // ensure client accepts only a type not specified by server
+        var opts = {
+            path: '/jsonpSeparators',
+            headers: {
+                accept: 'application/javascript'
+            }
+        };
 
-    CLIENT.get(opts, function(err, req, res, data) {
-        t.ifError(err);
-        t.ok(req);
-        t.ok(res);
-        t.equal(data, '"\\u2028\\u2029"');
-        t.end();
-    });
-});
+        CLIENT.get(opts, function(err, req, res, data) {
+            t.ifError(err);
+            t.ok(req);
+            t.ok(res);
+            t.equal(data, '"\\u2028\\u2029"');
+            t.end();
+        });
+    }
+);
 
 // eslint-disable-next-line
-test('default json formatter should wrap & throw InternalServer error on unserializable bodies', function(t) {
-    t.expect(2);
+test(
+    module,
+    // eslint-disable-next-line max-len
+    'default json formatter should wrap & throw InternalServer error on unserializable bodies',
+    function(t) {
+        t.expect(2);
 
-    sinon.spy(JSON, 'stringify');
+        sinon.spy(JSON, 'stringify');
 
-    SERVER.once('uncaughtException', function(req, res, route, err) {
-        console.log(err.stack); // For convenience
-        throw new Error('Should not reach');
-    });
-
-    var opts = {
-        path: '/badJSON',
-        name: 'badJSON'
-    };
-
-    SERVER.get(opts, function(req, res, next) {
-        var body = {};
-        // Add unserializable circular reference
-        body.body = body;
-
-        try {
-            jsonFormatter(req, res, body);
+        SERVER.once('uncaughtException', function(req, res, route, err) {
+            console.log(err.stack); // For convenience
             throw new Error('Should not reach');
-        } catch (e) {
-            t.ok(e instanceof errors.InternalServerError);
-            t.ok(JSON.stringify.threw(e.cause()));
-        }
+        });
 
-        res.send();
-    });
+        var opts = {
+            path: '/badJSON',
+            name: 'badJSON'
+        };
 
-    CLIENT.get('/badJSON', function(err, req, res, data) {
-        SERVER.rm('badJSON');
-        SERVER.removeAllListeners('uncaughtException');
-        JSON.stringify.restore();
-        t.end();
-    });
-});
+        SERVER.get(opts, function(req, res, next) {
+            var body = {};
+            // Add unserializable circular reference
+            body.body = body;
+
+            try {
+                jsonFormatter(req, res, body);
+                throw new Error('Should not reach');
+            } catch (e) {
+                t.ok(e instanceof errors.InternalServerError);
+                t.ok(JSON.stringify.threw(e.cause()));
+            }
+
+            res.send();
+        });
+
+        CLIENT.get('/badJSON', function(err, req, res, data) {
+            SERVER.rm('badJSON');
+            SERVER.removeAllListeners('uncaughtException');
+            JSON.stringify.restore();
+            t.end();
+        });
+    }
+);
