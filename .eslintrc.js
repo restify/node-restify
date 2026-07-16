@@ -59,10 +59,10 @@ if (!process.env.NO_LINT) {
     config.rules['func-names'] = ERROR;
     config.rules['block-scoped-var'] = ERROR;
     config.rules['consistent-return'] = ERROR;
-    config.rules['curly'] = OFF;
+    config.rules.curly = OFF;
     config.rules['default-case'] = ERROR;
     config.rules['dot-notation'] = [ERROR, { allowKeywords: true }];
-    config.rules['eqeqeq'] = ERROR;
+    config.rules.eqeqeq = ERROR;
     config.rules['guard-for-in'] = ERROR;
     config.rules['no-alert'] = ERROR;
     config.rules['no-caller'] = ERROR;
@@ -99,11 +99,11 @@ if (!process.env.NO_LINT) {
 
     config.rules['no-warning-comments'] = [1];
     config.rules['no-with'] = ERROR;
-    config.rules['radix'] = ERROR;
+    config.rules.radix = ERROR;
     config.rules['wrap-iife'] = ERROR;
 
     // strict mode
-    config.rules['strict'] = [ERROR, 'global'];
+    config.rules.strict = [ERROR, 'global'];
 
     // variables
     config.rules['no-catch-shadow'] = ERROR;
