@@ -11,11 +11,11 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: install node v16
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: install node v26
+        uses: actions/setup-node@v4
         with:
-          node-version: v16.x
+          node-version: v26.x
       - name: install dependencies
         run: npm install
       - name: check lint
@@ -28,15 +28,14 @@ jobs:
         os:
           - ubuntu-latest
         node-version:
-          - 14.x
-          - 16.x
-          - 18.x
-          - 20.x
+          - 22.x
+          - 24.x
+          - 26.x
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: use node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
       - name: install dependencies
