@@ -12,7 +12,9 @@ var helper = require('./lib/helper.js');
 
 var test = helper.test;
 
-test('merge qs', function(t) {
+// mergeQs
+
+test(module, 'merge qs', function(t) {
     var qs1 = mergeQs(undefined, { a: 1 });
     t.deepEqual(qs1, { a: 1 });
 
