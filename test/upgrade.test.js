@@ -75,7 +75,7 @@ function finish_latch(_test, _names) {
 
 ///--- Tests
 
-before(function(cb) {
+before(module, function(cb) {
     try {
         SERVER = restify.createServer({
             dtrace: helper.dtrace,
@@ -99,7 +99,7 @@ before(function(cb) {
     }
 });
 
-after(function(cb) {
+after(module, function(cb) {
     try {
         CLIENT.close();
         SERVER.close(function() {
@@ -117,7 +117,7 @@ after(function(cb) {
     }
 });
 
-test('GET without upgrade headers', function(t) {
+test(module, 'GET without upgrade headers', function(t) {
     var done = finish_latch(t, {
         'client response': 1,
         'server response': 1
@@ -158,7 +158,7 @@ test('GET without upgrade headers', function(t) {
     });
 });
 
-test('Dueling upgrade and response handling 1', function(t) {
+test(module, 'Dueling upgrade and response handling 1', function(t) {
     var done = finish_latch(t, {
         'expected requestUpgrade error': 1,
         'client response': 1
@@ -214,7 +214,7 @@ test('Dueling upgrade and response handling 1', function(t) {
     });
 });
 
-test('Dueling upgrade and response handling 2', function(t) {
+test(module, 'Dueling upgrade and response handling 2', function(t) {
     var done = finish_latch(t, {
         'expected res.send error': 1,
         'expected server to reset': 1
@@ -258,7 +258,7 @@ test('Dueling upgrade and response handling 2', function(t) {
     });
 });
 
-test('GET with upgrade headers', function(t) {
+test(module, 'GET with upgrade headers', function(t) {
     var done = finish_latch(t, {
         'client shed end': 1,
         'server shed end': 1
@@ -320,7 +320,7 @@ test('GET with upgrade headers', function(t) {
     });
 });
 
-test('GET with some websocket traffic', function(t) {
+test(module, 'GET with some websocket traffic', function(t) {
     var done = finish_latch(t, {
         'client shed end': 1,
         'server shed end': 1,
