@@ -87,11 +87,9 @@ routes and handlers for incoming requests.
         will use a domain to catch and respond to any uncaught
         exceptions that occur in its handler stack.
         Comes with significant negative performance impact. (optional, default `false`)
-    -   `options.spdy` **[Object][56]?** Any options accepted by
-        [node-spdy][61].
-    -   `options.http2` **[Object][56]?** Any options accepted by
-        [http2.createSecureServer][62].
-    -   `options.handleUpgrades` **[Boolean][58]** Hook the `upgrade` event
+    -   `options.http2` **[Object][24]?** Any options accepted by
+        [http2.createSecureServer][30].
+    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
     -   `options.onceNext` **[Boolean][58]** Prevents calling next multiple
@@ -101,7 +99,7 @@ routes and handlers for incoming requests.
     -   `options.httpsServerOptions` **[Object][56]?** Any options accepted by
         [node-https Server][63].
         If provided the following restify server options will be ignored:
-        spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
+        ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.noWriteContinue` **[Boolean][58]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
@@ -146,22 +144,13 @@ Creates a new Server.
         pass in a PEM-encoded certificate and key.
     -   `options.formatters` **[Object][56]?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **([Boolean][58] \| [Function][65])** When
-        true restify will use a domain to catch and respond to any uncaught
-        exceptions that occur in its handler stack. Comes with significant negative
-        performance impact.
-        Can also receive a function with signature (req, res, onError, next),
-        allowing for domains alternatives. onError should be called by the custom
-        error handler, and next must be called at the end of this function. THIS
-        FUNCTION IS NOT INTENDED TO BE USED TO HANDLE ERRORS DIRECTLY, IT IS ONLY
-        INTENDED AS AN ALTERNATIVE TO `domains`.
-          onError signature: (err, req, res)
-          next signature: (res, res) (optional, default `false`)
-    -   `options.spdy` **[Object][56]?** Any options accepted by
-        [node-spdy][61].
-    -   `options.http2` **[Object][56]?** Any options accepted by
-        [http2.createSecureServer][62].
-    -   `options.handleUpgrades` **[Boolean][58]** Hook the `upgrade` event
+    -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
+        will use a domain to catch and respond to any uncaught
+        exceptions that occur in its handler stack.
+        Comes with significant negative performance impact.
+    -   `options.http2` **[Object][24]?** Any options accepted by
+        [http2.createSecureServer][30].
+    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
     -   `options.onceNext` **[Boolean][58]** Prevents calling next multiple
@@ -171,7 +160,7 @@ Creates a new Server.
     -   `options.httpsServerOptions` **[Object][56]?** Any options accepted by
         [node-https Server][63].
         If provided the following restify server options will be ignored:
-        spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
+        ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
     -   `options.noWriteContinue` **[Boolean][58]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)

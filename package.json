@@ -90,7 +90,7 @@
     "report-latency": "./bin/report-latency"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
@@ -111,7 +111,6 @@
     "restify-errors": "^8.0.2",
     "semver": "^7.3.8",
     "send": "^0.18.0",
-    "spdy": "^4.0.0",
     "uuid": "^9.0.0",
     "vasync": "^2.2.0"
   },
@@ -129,7 +128,7 @@
     "eslint-plugin-jsdoc": "^3.15.1",
     "eslint-plugin-prettier": "^3.1.0",
     "glob": "^7.1.4",
-    "inquirer": "^3.3.0",
+    "inquirer": "^8.2.7",
     "mkdirp": "^0.5.1",
     "mocha": "^7.1.1",
     "nodeunit": "^0.11.3",

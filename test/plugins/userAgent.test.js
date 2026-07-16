@@ -115,7 +115,7 @@ describe('userAgent pre-route handler', function() {
                 // destroy the socket explicitly now since the request was
                 // explicitly requesting to not destroy the socket by setting
                 // its connection header to 'keep-alive'.
-                req.abort();
+                req.destroy();
 
                 done();
             }

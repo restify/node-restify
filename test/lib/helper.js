@@ -15,8 +15,8 @@ var once = require('once');
 ///--- Exports
 
 module.exports = {
-    after: function after(teardown) {
-        module.parent.exports.tearDown = function _teardown(callback) {
+    after: function after(callerModule, teardown) {
+        callerModule.exports.tearDown = function _teardown(callback) {
             var d = domain.create();
             var self = this;
 
@@ -31,8 +31,8 @@ module.exports = {
         };
     },
 
-    before: function before(setup) {
-        module.parent.exports.setUp = function _setup(callback) {
+    before: function before(callerModule, setup) {
+        callerModule.exports.setUp = function _setup(callback) {
             var d = domain.create();
             var self = this;
 
@@ -47,8 +47,8 @@ module.exports = {
         };
     },
 
-    test: function test(name, tester) {
-        module.parent.exports[name] = function _(t) {
+    test: function test(callerModule, name, tester) {
+        callerModule.exports[name] = function _(t) {
             var d = domain.create();
             var self = this;
 

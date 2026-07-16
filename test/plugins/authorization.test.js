@@ -46,7 +46,7 @@ describe('authorization parser', function() {
     });
 
     it('should accept basic authorization', function(done) {
-        var authz = 'Basic ' + new Buffer('user:secret').toString('base64');
+        var authz = 'Basic ' + Buffer.from('user:secret').toString('base64');
         var opts = {
             path: '/',
             headers: {

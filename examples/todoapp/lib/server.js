@@ -278,7 +278,10 @@ function listTodos(req, res, next) {
  */
 function putTodo(req, res, next) {
     if (!req.body.task) {
-        req.log.warn({ params: req.params, body: req.body }, 'putTodo: missing task');
+        req.log.warn(
+            { params: req.params, body: req.body },
+            'putTodo: missing task'
+        );
         next(new MissingTaskError());
         return;
     }
