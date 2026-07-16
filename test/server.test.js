@@ -7,11 +7,11 @@ const { AsyncLocalStorage } = require('async_hooks');
 var assert = require('assert-plus');
 var childprocess = require('child_process');
 var http = require('http');
+var crypto = require('crypto');
 
 var pino = require('pino');
 var errors = require('restify-errors');
 var restifyClients = require('restify-clients');
-var uuid = require('uuid');
 
 var RestError = errors.RestError;
 var restify = require('../lib');
@@ -113,7 +113,7 @@ test(module, 'listen and close (port only) w/ port number as string', function(
 
 test(module, 'listen and close (socketPath)', function(t) {
     var server = restify.createServer();
-    server.listen('/tmp/.' + uuid.v4(), function() {
+    server.listen('/tmp/.' + crypto.randomUUID(), function() {
         server.close(function() {
             t.end();
         });
@@ -812,7 +812,7 @@ test(module, 'gh-278 missing router error events (404)', function(t) {
         res.send(404, 'foo');
     });
 
-    CLIENT.get('/' + uuid.v4(), function(err, _, res) {
+    CLIENT.get('/' + crypto.randomUUID(), function(err, _, res) {
         t.ok(err);
         t.equal(err.message, '"foo"');
         t.equal(res.statusCode, 404);
@@ -821,7 +821,7 @@ test(module, 'gh-278 missing router error events (404)', function(t) {
 });
 
 test(module, 'gh-278 missing router error events (405)', function(t) {
-    var p = '/' + uuid.v4();
+    var p = '/' + crypto.randomUUID();
     SERVER.post(p, function(req, res, next) {
         res.send(201);
         next();
@@ -1134,7 +1134,7 @@ test(module, 'error handler defers "after" event', async function(t) {
         // do not fire prematurely
         t.notOk(true);
     });
-    CLIENT.get('/' + uuid.v4(), function(err, _, res) {
+    CLIENT.get('/' + crypto.randomUUID(), function(err, _, res) {
         t.ok(err);
         t.equal(res.statusCode, 404);
         clientResolve();

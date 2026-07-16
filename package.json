@@ -111,7 +111,6 @@
     "restify-errors": "^8.0.2",
     "semver": "^7.3.8",
     "send": "^1.2.1",
-    "uuid": "^14.0.0",
     "vasync": "^2.2.0"
   },
   "optionalDependencies": {
