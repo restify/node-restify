@@ -15,7 +15,7 @@ var test = helper.test;
 
 // parseRequestUrl
 
-test('parseRequestUrl: plain path', function(t) {
+test(module, 'parseRequestUrl: plain path', function(t) {
     var r = parseRequestUrl('/foo/bar');
 
     t.equal(r.pathname, '/foo/bar');
@@ -29,7 +29,7 @@ test('parseRequestUrl: plain path', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: path with query string', function(t) {
+test(module, 'parseRequestUrl: path with query string', function(t) {
     var r = parseRequestUrl('/foo?a=1&b=2');
 
     t.equal(r.pathname, '/foo');
@@ -40,7 +40,7 @@ test('parseRequestUrl: path with query string', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: path with hash', function(t) {
+test(module, 'parseRequestUrl: path with hash', function(t) {
     var r = parseRequestUrl('/foo/bar#section');
 
     t.equal(r.pathname, '/foo/bar');
@@ -50,7 +50,7 @@ test('parseRequestUrl: path with hash', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: absolute URL', function(t) {
+test(module, 'parseRequestUrl: absolute URL', function(t) {
     var r = parseRequestUrl('http://example.com/foo?x=1');
 
     t.equal(r.pathname, '/foo');
@@ -62,7 +62,7 @@ test('parseRequestUrl: absolute URL', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: absolute URL with port', function(t) {
+test(module, 'parseRequestUrl: absolute URL with port', function(t) {
     var r = parseRequestUrl('http://example.com:8080/foo');
 
     t.equal(r.pathname, '/foo');
@@ -72,7 +72,7 @@ test('parseRequestUrl: absolute URL with port', function(t) {
     t.done();
 });
 
-test('parseRequestUrl: OPTIONS * request-target', function(t) {
+test(module, 'parseRequestUrl: OPTIONS * request-target', function(t) {
     var r = parseRequestUrl('*');
 
     t.equal(r.pathname, '*');
@@ -86,7 +86,7 @@ test('parseRequestUrl: OPTIONS * request-target', function(t) {
 
 // mergeQs
 
-test('merge qs', function(t) {
+test(module, 'merge qs', function(t) {
     var qs1 = mergeQs(undefined, { a: 1 });
     t.deepEqual(qs1, { a: 1 });
 

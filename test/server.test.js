@@ -1183,21 +1183,25 @@ test(
 );
 
 // eslint-disable-next-line max-len
-test(module, 'req.absoluteUri() resolves plain subpath relative to current path', function(t) {
-    SERVER.get('/base-path', function(req, res, next) {
-        var prefix = 'http://127.0.0.1:' + PORT;
-        t.equal(req.absoluteUri('child'), prefix + '/base-path/child');
-        t.equal(req.absoluteUri('/absolute'), prefix + '/absolute');
-        res.send();
-        next();
-    });
+test(
+    module,
+    'req.absoluteUri() resolves plain subpath relative to current path',
+    function(t) {
+        SERVER.get('/base-path', function(req, res, next) {
+            var prefix = 'http://127.0.0.1:' + PORT;
+            t.equal(req.absoluteUri('child'), prefix + '/base-path/child');
+            t.equal(req.absoluteUri('/absolute'), prefix + '/absolute');
+            res.send();
+            next();
+        });
 
-    CLIENT.get('/base-path', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get('/base-path', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
 test(module, 'GH-693 sending multiple response header values', function(t) {
     SERVER.get('/', function(req, res, next) {

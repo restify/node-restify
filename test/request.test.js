@@ -280,37 +280,42 @@ test(
             return next(myErr);
         });
 
-    CLIENT.get('/', function(err, _, res) {
-        t.ok(err);
-        t.equal(res.statusCode, 500);
-        clientDone = true;
-    });
-});
+        CLIENT.get('/', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 500);
+            clientDone = true;
+        });
+    }
+);
 
-test('getUrl should return correct shape for path with no query', function(t) {
-    SERVER.get('/geturl-plain', function(req, res, next) {
-        var u = req.getUrl();
-        t.equal(u.href, '/geturl-plain');
-        t.equal(u.pathname, '/geturl-plain');
-        t.equal(u.search, null);
-        t.equal(u.query, null);
-        t.equal(u.hash, null);
-        t.equal(u.host, null);
-        t.equal(u.hostname, null);
-        t.equal(u.port, null);
-        t.equal(u.protocol, null);
-        res.send();
-        return next();
-    });
+test(
+    module,
+    'getUrl should return correct shape for path with no query',
+    function(t) {
+        SERVER.get('/geturl-plain', function(req, res, next) {
+            var u = req.getUrl();
+            t.equal(u.href, '/geturl-plain');
+            t.equal(u.pathname, '/geturl-plain');
+            t.equal(u.search, null);
+            t.equal(u.query, null);
+            t.equal(u.hash, null);
+            t.equal(u.host, null);
+            t.equal(u.hostname, null);
+            t.equal(u.port, null);
+            t.equal(u.protocol, null);
+            res.send();
+            return next();
+        });
 
-    CLIENT.get('/geturl-plain', function(err, _, res) {
-        t.ifError(err);
-        t.equal(res.statusCode, 200);
-        t.end();
-    });
-});
+        CLIENT.get('/geturl-plain', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
 
-test('getUrl should return correct query string', function(t) {
+test(module, 'getUrl should return correct query string', function(t) {
     SERVER.get('/geturl-qs', function(req, res, next) {
         var u = req.getUrl();
         t.equal(u.href, '/geturl-qs?a=1&b=2');
@@ -333,7 +338,7 @@ test('getUrl should return correct query string', function(t) {
     });
 });
 
-test('getUrl should handle OPTIONS * request-target', function(t) {
+test(module, 'getUrl should handle OPTIONS * request-target', function(t) {
     SERVER.opts('*', function(req, res, next) {
         var u = req.getUrl();
         t.equal(u.pathname, '*');
@@ -350,7 +355,7 @@ test('getUrl should handle OPTIONS * request-target', function(t) {
     });
 });
 
-test('getUrl result is cached across calls', function(t) {
+test(module, 'getUrl result is cached across calls', function(t) {
     SERVER.get('/geturl-cache', function(req, res, next) {
         var u1 = req.getUrl();
         var u2 = req.getUrl();
