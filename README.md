@@ -10,17 +10,17 @@
 
 <!-- icons with padding -->
 
-[1.1]: http://i.imgur.com/tXSoThF.png (twitter icon with padding)
+[1.1]: https://i.imgur.com/tXSoThF.png (twitter icon with padding)
 
 <!-- icons without padding -->
 
-[1.2]: http://i.imgur.com/wWzX9uB.png (twitter icon without padding)
+[1.2]: https://i.imgur.com/wWzX9uB.png (twitter icon without padding)
 
 
 <!-- links to your social media accounts -->
 <!-- update these accordingly -->
 
-[1]: http://www.twitter.com/restifyjs
+[1]: https://www.twitter.com/restifyjs
 
 <!-- Please don't remove this: Grab your social icons from https://github.com/carlsednaoui/gitsocial -->
 
@@ -31,9 +31,9 @@
 [![devDependency Status](https://david-dm.org/restify/node-restify/dev-status.svg)](https://david-dm.org/restify/node-restify#info=devDependencies)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-[restify](http://restify.com) is a framework, utilizing
+[restify](https://restify.com) is a framework, utilizing
 [connect](https://github.com/senchalabs/connect) style middleware for building
-REST APIs.  For full details, see http://restify.com
+REST APIs.  For full details, see https://restify.com
 
 Follow restify on [![alt text][1.2]][1]
 
