@@ -294,15 +294,15 @@ test(
     function(t) {
         SERVER.get('/geturl-plain', function(req, res, next) {
             var u = req.getUrl();
-            t.equal(u.href, '/geturl-plain');
+            t.ok(u instanceof URL);
+            t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-plain');
             t.equal(u.pathname, '/geturl-plain');
-            t.equal(u.search, null);
-            t.equal(u.query, null);
-            t.equal(u.hash, null);
-            t.equal(u.host, null);
-            t.equal(u.hostname, null);
-            t.equal(u.port, null);
-            t.equal(u.protocol, null);
+            t.equal(u.search, '');
+            t.equal(u.hash, '');
+            t.equal(u.host, '127.0.0.1:' + PORT);
+            t.equal(u.hostname, '127.0.0.1');
+            t.equal(u.port, String(PORT));
+            t.equal(u.protocol, 'http:');
             res.send();
             return next();
         });
@@ -318,15 +318,17 @@ test(
 test(module, 'getUrl should return correct query string', function(t) {
     SERVER.get('/geturl-qs', function(req, res, next) {
         var u = req.getUrl();
-        t.equal(u.href, '/geturl-qs?a=1&b=2');
+        t.ok(u instanceof URL);
+        t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-qs?a=1&b=2');
         t.equal(u.pathname, '/geturl-qs');
         t.equal(u.search, '?a=1&b=2');
-        t.equal(u.query, 'a=1&b=2');
-        t.equal(u.hash, null);
-        t.equal(u.host, null);
-        t.equal(u.hostname, null);
-        t.equal(u.port, null);
-        t.equal(u.protocol, null);
+        t.equal(u.searchParams.get('a'), '1');
+        t.equal(u.searchParams.get('b'), '2');
+        t.equal(u.hash, '');
+        t.equal(u.host, '127.0.0.1:' + PORT);
+        t.equal(u.hostname, '127.0.0.1');
+        t.equal(u.port, String(PORT));
+        t.equal(u.protocol, 'http:');
         res.send();
         return next();
     });
@@ -341,9 +343,11 @@ test(module, 'getUrl should return correct query string', function(t) {
 test(module, 'getUrl should handle OPTIONS * request-target', function(t) {
     SERVER.opts('*', function(req, res, next) {
         var u = req.getUrl();
-        t.equal(u.pathname, '*');
-        t.equal(u.search, null);
-        t.equal(u.query, null);
+        t.ok(u instanceof URL);
+        // a URL instance can't represent the literal '*' request-target -
+        // it resolves against the base path, so it comes out as '/*'.
+        t.equal(u.pathname, '/*');
+        t.equal(u.search, '');
         res.send(200);
         return next();
     });

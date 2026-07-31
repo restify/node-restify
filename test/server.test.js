@@ -122,7 +122,7 @@ test(module, 'listen and close (socketPath)', function(t) {
 
 // Run IPv6 tests only if IPv6 network is available
 if (!SKIP_IP_V6) {
-    test('gh-751 IPv4/IPv6 server URL', function(t) {
+    test(module, 'gh-751 IPv4/IPv6 server URL', function(t) {
         t.equal(SERVER.url, 'http://127.0.0.1:' + PORT, 'ipv4 url');
 
         var server = restify.createServer();
@@ -1359,6 +1359,14 @@ test(
         // Dirty hack to capture the log record using a ring buffer.
         var numCount = 0;
 
+        // Guard against the 'after' event never firing for the aborted
+        // request (e.g. a timing race between the handler chain and the
+        // client timeout), which would otherwise hang this test forever.
+        var safetyTimer = setTimeout(function() {
+            t.ok(false, 'timed out waiting for audit "after" event on v=2');
+            t.end();
+        }, 5000);
+
         // FAST_CLIENT times out at 500ms, should capture two records then close
         // the request.
         SERVER.get('/audit', [
@@ -1396,7 +1404,9 @@ test(
         );
 
         SERVER.on('after', function(req, res, route, err) {
-            if (req.href() === '/audit?v=2') {
+            if (req.getPath() === '/audit' && req.getQuery() === 'v=2') {
+                clearTimeout(safetyTimer);
+
                 // should request timeout error
                 t.ok(err);
                 t.equal(err.name, 'RequestCloseError');
