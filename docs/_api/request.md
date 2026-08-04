@@ -119,7 +119,7 @@ Returns the full requested URL.
 // incoming request is http://localhost:3000/foo/bar?a=1
 server.get('/:x/bar', function(req, res, next) {
     console.warn(req.href());
-    // => /foo/bar/?a=1
+    // => http://localhost:3000/foo/bar?a=1
 });
 ```
 
@@ -149,6 +149,15 @@ Returns the cleaned up requested URL.
 server.get('/:x/bar', function(req, res, next) {
     console.warn(req.path());
     // => /foo/bar
+});
+```
+
+```javascript
+// dot segments are normalized away
+// incoming request is http://localhost:3000/foo/../bar
+server.get('/bar', function(req, res, next) {
+    console.warn(req.path());
+    // => /bar
 });
 ```
 
