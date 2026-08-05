@@ -9,39 +9,55 @@ permalink: /docs/request-api/
 
 -   [Request][1]
     -   [accepts][2]
-    -   [acceptsEncoding][3]
-    -   [contentLength][4]
-    -   [getContentType][5]
-    -   [date][6]
-    -   [href][7]
-    -   [id][8]
-    -   [getPath][9]
-    -   [getQuery][10]
-    -   [time][11]
-    -   [version][12]
-    -   [header][13]
-    -   [trailer][14]
-    -   [is][15]
-    -   [isChunked][16]
-    -   [isKeepAlive][17]
-    -   [isSecure][18]
-    -   [isUpgradeRequest][19]
-    -   [isUpload][20]
-    -   [toString][21]
-    -   [userAgent][22]
-    -   [startHandlerTimer][23]
-    -   [endHandlerTimer][24]
-    -   [connectionState][25]
-    -   [getRoute][26]
--   [Events][27]
--   [Log][28]
+        -   [Parameters][3]
+        -   [Examples][4]
+    -   [acceptsEncoding][5]
+        -   [Parameters][6]
+    -   [contentLength][7]
+    -   [getContentType][8]
+    -   [date][9]
+    -   [href][10]
+        -   [Examples][11]
+    -   [id][12]
+        -   [Parameters][13]
+    -   [getPath][14]
+        -   [Examples][15]
+    -   [getQuery][16]
+        -   [Examples][17]
+    -   [time][18]
+    -   [version][19]
+    -   [header][20]
+        -   [Parameters][21]
+        -   [Examples][22]
+    -   [trailer][23]
+        -   [Parameters][24]
+    -   [is][25]
+        -   [Parameters][26]
+        -   [Examples][27]
+    -   [isChunked][28]
+    -   [isKeepAlive][29]
+    -   [isSecure][30]
+    -   [isUpgradeRequest][31]
+    -   [isUpload][32]
+    -   [toString][33]
+    -   [userAgent][34]
+    -   [startHandlerTimer][35]
+        -   [Parameters][36]
+        -   [Examples][37]
+    -   [endHandlerTimer][38]
+        -   [Parameters][39]
+    -   [connectionState][40]
+    -   [getRoute][41]
+        -   [Examples][42]
+-   [Events][43]
+-   [Log][44]
 
 ## Request
 
 **Extends http.IncomingMessage**
 
 Wraps all of the node
-[http.IncomingMessage][29]
+[http.IncomingMessage][45]
 APIs, events and properties, plus the following.
 
 ### accepts
@@ -50,11 +66,11 @@ Check if the Accept header is present, and includes the given type.
 When the Accept header is not present true is returned.
 Otherwise the given type is matched by an exact match, and then subtypes.
 
-**Parameters**
+#### Parameters
 
--   `types` **([String][30] \| [Array][31]&lt;[String][30]>)** an array of accept type headers
+-   `types` **([String][46] \| [Array][47]&lt;[String][46]>)** an array of accept type headers
 
-**Examples**
+#### Examples
 
 You may pass the subtype such as html which is then converted internally
 to text/html using the mime lookup table:
@@ -77,43 +93,43 @@ req.accepts('png');
 // => false
 ```
 
-Returns **[Boolean][32]** is accepteed
+Returns **[Boolean][48]** is accepteed
 
 ### acceptsEncoding
 
 Checks if the request accepts the encoding type(s) specified.
 
-**Parameters**
+#### Parameters
 
--   `types` **([String][30] \| [Array][31]&lt;[String][30]>)** an array of accept type headers
+-   `types` **([String][46] \| [Array][47]&lt;[String][46]>)** an array of accept type headers
 
-Returns **[Boolean][32]** is accepted encoding
+Returns **[Boolean][48]** is accepted encoding
 
 ### contentLength
 
 Returns the value of the content-length header.
 
-Returns **[Number][33]** 
+Returns **[Number][49]** 
 
 ### getContentType
 
 Returns the value of the content-type header. If a content-type is not
 set, this will return a default value of `application/octet-stream`
 
-Returns **[String][30]** content type
+Returns **[String][46]** content type
 
 ### date
 
 Returns a Date object representing when the request was setup.
 Like `time()`, but returns a Date object.
 
-Returns **[Date][34]** date when request began being processed
+Returns **[Date][50]** date when request began being processed
 
 ### href
 
 Returns the full requested URL.
 
-**Examples**
+#### Examples
 
 ```javascript
 // incoming request is http://localhost:3000/foo/bar?a=1
@@ -123,7 +139,7 @@ server.get('/:x/bar', function(req, res, next) {
 });
 ```
 
-Returns **[String][30]** 
+Returns **[String][46]** 
 
 ### id
 
@@ -132,17 +148,17 @@ this will become the request’s new id. The request id is immutable,
 and can only be set once. Attempting to set the request id more than
 once will cause restify to throw.
 
-**Parameters**
+#### Parameters
 
--   `reqId` **[String][30]** request id
+-   `reqId` **[String][46]** request id
 
-Returns **[String][30]** id
+Returns **[String][46]** id
 
 ### getPath
 
 Returns the cleaned up requested URL.
 
-**Examples**
+#### Examples
 
 ```javascript
 // incoming request is http://localhost:3000/foo/bar?a=1
@@ -152,14 +168,14 @@ server.get('/:x/bar', function(req, res, next) {
 });
 ```
 
-Returns **[String][30]** 
+Returns **[String][46]** 
 
 ### getQuery
 
 Returns the raw query string. Returns empty string
 if no query string is found.
 
-**Examples**
+#### Examples
 
 ```javascript
 // incoming request is /foo?a=1
@@ -178,14 +194,14 @@ req.query;
 // => { a: 1 }
 ```
 
-Returns **[String][30]** query
+Returns **[String][46]** query
 
 ### time
 
 The number of ms since epoch of when this request began being processed.
 Like date(), but returns a number.
 
-Returns **[Number][33]** time when request began being processed in epoch:
+Returns **[Number][49]** time when request began being processed in epoch:
                    ellapsed milliseconds since
                    January 1, 1970, 00:00:00 UTC
 
@@ -193,7 +209,7 @@ Returns **[Number][33]** time when request began being processed in epoch:
 
 Returns the accept-version header.
 
-Returns **[String][30]** 
+Returns **[String][46]** 
 
 ### header
 
@@ -202,13 +218,13 @@ and optionally provide a default value (express-compliant).
 Returns any header off the request. also, 'correct' any
 correctly spelled 'referrer' header to the actual spelling used.
 
-**Parameters**
+#### Parameters
 
--   `key` **[String][30]** the key of the header
--   `defaultValue` **[String][30]?** default value if header isn't
+-   `key` **[String][46]** the key of the header
+-   `defaultValue` **[String][46]?** default value if header isn't
                                       found on the req
 
-**Examples**
+#### Examples
 
 ```javascript
 req.header('Host');
@@ -216,30 +232,30 @@ req.header('HOST');
 req.header('Accept', '*\/*');
 ```
 
-Returns **[String][30]** header value
+Returns **[String][46]** header value
 
 ### trailer
 
 Returns any trailer header off the request. Also, 'correct' any
 correctly spelled 'referrer' header to the actual spelling used.
 
-**Parameters**
+#### Parameters
 
--   `name` **[String][30]** the name of the header
--   `value` **[String][30]** default value if header isn't found on the req
+-   `name` **[String][46]** the name of the header
+-   `value` **[String][46]** default value if header isn't found on the req
 
-Returns **[String][30]** trailer value
+Returns **[String][46]** trailer value
 
 ### is
 
 Check if the incoming request contains the `Content-Type` header field,
 and if it contains the given mime type.
 
-**Parameters**
+#### Parameters
 
--   `type` **[String][30]** a content-type header value
+-   `type` **[String][46]** a content-type header value
 
-**Examples**
+#### Examples
 
 ```javascript
 // With Content-Type: text/html; charset=utf-8
@@ -256,49 +272,49 @@ req.is('html');
 // => false
 ```
 
-Returns **[Boolean][32]** is content-type header
+Returns **[Boolean][48]** is content-type header
 
 ### isChunked
 
 Check if the incoming request is chunked.
 
-Returns **[Boolean][32]** is chunked
+Returns **[Boolean][48]** is chunked
 
 ### isKeepAlive
 
 Check if the incoming request is kept alive.
 
-Returns **[Boolean][32]** is keep alive
+Returns **[Boolean][48]** is keep alive
 
 ### isSecure
 
 Check if the incoming request is encrypted.
 
-Returns **[Boolean][32]** is secure
+Returns **[Boolean][48]** is secure
 
 ### isUpgradeRequest
 
 Check if the incoming request has been upgraded.
 
-Returns **[Boolean][32]** is upgraded
+Returns **[Boolean][48]** is upgraded
 
 ### isUpload
 
 Check if the incoming request is an upload verb.
 
-Returns **[Boolean][32]** is upload
+Returns **[Boolean][48]** is upload
 
 ### toString
 
 toString serialization
 
-Returns **[String][30]** serialized request
+Returns **[String][46]** serialized request
 
 ### userAgent
 
 Returns the user-agent header.
 
-Returns **[String][30]** user agent
+Returns **[String][46]** user agent
 
 ### startHandlerTimer
 
@@ -308,11 +324,11 @@ registered in your handler chain.
 However, this can be called manually for nested functions inside the
 handler chain to record timing information.
 
-**Parameters**
+#### Parameters
 
--   `handlerName` **[String][30]** The name of the handler.
+-   `handlerName` **[String][46]** The name of the handler.
 
-**Examples**
+#### Examples
 
 You must explicitly invoke
 endHandlerTimer() after invoking this function. Otherwise timing
@@ -341,7 +357,7 @@ server.get('/', function fooHandler(req, res, next) {
 });
 ```
 
-Returns **[undefined][35]** no return value
+Returns **[undefined][51]** no return value
 
 ### endHandlerTimer
 
@@ -349,11 +365,11 @@ End the timer for a request handler.
 You must invoke this function if you called `startRequestHandler` on a
 handler. Otherwise the time recorded will be incorrect.
 
-**Parameters**
+#### Parameters
 
--   `handlerName` **[String][30]** The name of the handler.
+-   `handlerName` **[String][46]** The name of the handler.
 
-Returns **[undefined][35]** no return value
+Returns **[undefined][51]** no return value
 
 ### connectionState
 
@@ -361,13 +377,13 @@ Returns the connection state of the request. Current possible values are:
 
 -   `close` - when the request has been closed by the clien
 
-Returns **[String][30]** connection state (`"close"`)
+Returns **[String][46]** connection state (`"close"`)
 
 ### getRoute
 
 Returns the route object to which the current request was matched to.
 
-**Examples**
+#### Examples
 
 Route info object structure:
 
@@ -381,12 +397,12 @@ Route info object structure:
 }
 ```
 
-Returns **[Object][36]** route
+Returns **[Object][52]** route
 
 ## Events
 
 In additional to emitting all the events from node's
-[http.Server][37],
+[http.Server][53],
 restify servers also emit a number of additional events that make building REST
 and web applications much easier.
 
@@ -479,7 +495,7 @@ routable, i.e. one that would result in a `404`.
 ### uncaughtException
 
 If the restify server was created with `handleUncaughtExceptions: true`,
-restify will leverage [domains][38] to handle
+restify will leverage [domains][54] to handle
 thrown errors in the handler chain. Thrown errors are a result of an explicit
 `throw` statement, or as a result of programmer errors like a typo or a null
 ref. These thrown errors are caught by the domain, and will be emitted via this
@@ -491,15 +507,21 @@ server.get('/', function(req, res, next) {
     return next();
 });
 
-server.on('uncaughtException', function(req, res, route, err) {
+server.on('uncaughtException', function(req, res, route, err, callback) {
     // this event will be fired, with the error object from above:
     // ReferenceError: x is not defined
+    res.send(504, 'boom');
+    callback();
 });
 ```
 
-If you listen to this event, you **must** send a response to the client. This
-behavior is different from the standard error events. If you do not listen to
-this event, restify's default behavior is to call `res.send()` with the error
+If you listen to this event, you **must**:
+
+1.  send a response to the client _and_
+2.  call the callback function passed as the fourth argument of the event listener
+
+This behavior is different from the standard error events. If you do not listen
+to this event, restify's default behavior is to call `res.send()` with the error
 that was thrown.
 
 The signature is for the after event is as follows:
@@ -520,7 +542,7 @@ Emitted when the server closes.
 
 ## Log
 
-If you are using the [RequestLogger][39] plugin, the child logger
+If you are using the [RequestLogger][55] plugin, the child logger
 will be available on `req.log`:
 
 ```js
@@ -541,76 +563,108 @@ separate handlers.
 
 [2]: #accepts
 
-[3]: #acceptsencoding
+[3]: #parameters
 
-[4]: #contentlength
+[4]: #examples
 
-[5]: #getcontenttype
+[5]: #acceptsencoding
 
-[6]: #date
+[6]: #parameters-1
 
-[7]: #href
+[7]: #contentlength
 
-[8]: #id
+[8]: #getcontenttype
 
-[9]: #getpath
+[9]: #date
 
-[10]: #getquery
+[10]: #href
 
-[11]: #time
+[11]: #examples-1
 
-[12]: #version
+[12]: #id
 
-[13]: #header
+[13]: #parameters-2
 
-[14]: #trailer
+[14]: #getpath
 
-[15]: #is
+[15]: #examples-2
 
-[16]: #ischunked
+[16]: #getquery
 
-[17]: #iskeepalive
+[17]: #examples-3
 
-[18]: #issecure
+[18]: #time
 
-[19]: #isupgraderequest
+[19]: #version
 
-[20]: #isupload
+[20]: #header
 
-[21]: #tostring
+[21]: #parameters-3
 
-[22]: #useragent
+[22]: #examples-4
 
-[23]: #starthandlertimer
+[23]: #trailer
 
-[24]: #endhandlertimer
+[24]: #parameters-4
 
-[25]: #connectionstate
+[25]: #is
 
-[26]: #getroute
+[26]: #parameters-5
 
-[27]: #events
+[27]: #examples-5
 
-[28]: #log
+[28]: #ischunked
 
-[29]: https://nodejs.org/api/http.html
+[29]: #iskeepalive
 
-[30]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[30]: #issecure
 
-[31]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[31]: #isupgraderequest
 
-[32]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[32]: #isupload
 
-[33]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[33]: #tostring
 
-[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+[34]: #useragent
 
-[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+[35]: #starthandlertimer
 
-[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[36]: #parameters-6
 
-[37]: http://nodejs.org/docs/latest/api/http.html#http_class_http_server
+[37]: #examples-6
 
-[38]: https://nodejs.org/api/domain.html
+[38]: #endhandlertimer
 
-[39]: #bundled-plugins
+[39]: #parameters-7
+
+[40]: #connectionstate
+
+[41]: #getroute
+
+[42]: #examples-7
+
+[43]: #events
+
+[44]: #log
+
+[45]: https://nodejs.org/api/http.html
+
+[46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[47]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[48]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[49]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[50]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+
+[51]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+
+[52]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[53]: http://nodejs.org/docs/latest/api/http.html#http_class_http_server
+
+[54]: https://nodejs.org/api/domain.html
+
+[55]: #bundled-plugins
