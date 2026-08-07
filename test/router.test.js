@@ -374,6 +374,64 @@ test(module, 'toString() with ignoreTrailingSlash', function(t) {
     t.end();
 });
 
+test(
+    module,
+    'lookup() with useSemicolonDelimiter strips matrix params',
+    function(t) {
+        function handler(req, res, next) {
+            res.send('Hello world');
+        }
+
+        var router = new Router({
+            log: {},
+            useSemicolonDelimiter: true
+        });
+        router.mount({ method: 'GET', path: '/a/:id' }, [handler]);
+
+        var req = {
+            method: 'GET',
+            params: {},
+            getUrl: function getUrl() {
+                return { pathname: '/a/123;jsessionid=abc' };
+            }
+        };
+        var res = {};
+
+        router.lookup(req, res);
+        t.deepEqual(req.params, { id: '123' });
+        t.end();
+    }
+);
+
+test(
+    module,
+    'lookup() without useSemicolonDelimiter keeps matrix params',
+    function(t) {
+        function handler(req, res, next) {
+            res.send('Hello world');
+        }
+
+        var router = new Router({
+            log: {}
+        });
+        router.mount({ method: 'GET', path: '/a/:id' }, [handler]);
+
+        var req = {
+            method: 'GET',
+            params: {},
+            getUrl: function getUrl() {
+                return { pathname: '/a/123;jsessionid=abc' };
+            }
+        };
+        var res = {};
+
+        var found = router.lookup(req, res);
+        t.deepEqual(req.params, { id: '123;jsessionid=abc' });
+        t.ok(found);
+        t.end();
+    }
+);
+
 // Tests router.render()
 var mockResponse = function respond(req, res, next) {
     res.send(200);
