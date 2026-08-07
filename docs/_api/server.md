@@ -8,78 +8,113 @@ permalink: /docs/server-api/
 ### Table of Contents
 
 -   [createServer][1]
--   [Server][2]
-    -   [listen][3]
-    -   [close][4]
-    -   [get][5]
-    -   [head][6]
-    -   [post][7]
-    -   [put][8]
-    -   [patch][9]
-    -   [del][10]
-    -   [opts][11]
-    -   [pre][12]
-    -   [use][13]
-    -   [param][14]
-    -   [rm][15]
-    -   [address][16]
-    -   [inflightRequests][17]
-    -   [debugInfo][18]
-    -   [toString][19]
--   [Events][20]
--   [Errors][21]
--   [Types][22]
-    -   [Server~methodOpts][23]
+    -   [Parameters][2]
+    -   [Examples][3]
+-   [Server][4]
+    -   [Parameters][5]
+    -   [Examples][6]
+    -   [listen][7]
+        -   [Parameters][8]
+        -   [Examples][9]
+    -   [close][10]
+        -   [Parameters][11]
+    -   [get][12]
+        -   [Parameters][13]
+        -   [Examples][14]
+    -   [head][15]
+        -   [Parameters][16]
+    -   [post][17]
+        -   [Parameters][18]
+    -   [put][19]
+        -   [Parameters][20]
+    -   [patch][21]
+        -   [Parameters][22]
+    -   [del][23]
+        -   [Parameters][24]
+    -   [opts][25]
+        -   [Parameters][26]
+    -   [pre][27]
+        -   [Parameters][28]
+        -   [Examples][29]
+    -   [first][30]
+        -   [Parameters][31]
+        -   [Examples][32]
+    -   [use][33]
+        -   [Parameters][34]
+        -   [Examples][35]
+    -   [param][36]
+        -   [Parameters][37]
+        -   [Examples][38]
+    -   [rm][39]
+        -   [Parameters][40]
+    -   [address][41]
+        -   [Examples][42]
+    -   [inflightRequests][43]
+    -   [debugInfo][44]
+        -   [Examples][45]
+    -   [toString][46]
+        -   [Examples][47]
+-   [Events][48]
+-   [Errors][49]
+-   [Types][50]
+    -   [Server~methodOpts][51]
+        -   [Properties][52]
+        -   [Examples][53]
+-   [proxyEventWhenListenerAdded][54]
+    -   [Parameters][55]
 
 ## createServer
 
 A restify server object is the main interface through which you will register
 routes and handlers for incoming requests.
 
-**Parameters**
+### Parameters
 
--   `options` **[Object][24]?** an options object
-    -   `options.name` **[String][25]** Name of the server. (optional, default `"restify"`)
-    -   `options.dtrace` **[Boolean][26]** enable DTrace support (optional, default `false`)
+-   `options` **[Object][56]?** an options object
+    -   `options.name` **[String][57]** Name of the server. (optional, default `"restify"`)
+    -   `options.dtrace` **[Boolean][58]** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
-    -   `options.log` **[Object][24]** [bunyan][27] instance. (optional, default `bunyan.createLogger(options.name||"restify")`)
-    -   `options.url` **[String][25]?** Once listen() is called, this will be filled
+    -   `options.useSemicolonDelimiter` **[Boolean][58]** strip
+        semicolon-delimited matrix parameters from a path segment before route
+        matching (passed through to `find-my-way`) (optional, default `false`)
+    -   `options.log` **[Object][56]** [pino][59] instance. (optional, default `pino({name:options.name||"restify"})`)
+    -   `options.url` **[String][57]?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS
+    -   `options.certificate` **([String][57] \| [Buffer][60])?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS server,
+    -   `options.key` **([String][57] \| [Buffer][60])?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object][24]?** Custom response formatters for
+    -   `options.formatters` **[Object][56]?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
+    -   `options.handleUncaughtExceptions` **[Boolean][58]** When true restify
         will use a domain to catch and respond to any uncaught
         exceptions that occur in its handler stack.
         Comes with significant negative performance impact. (optional, default `false`)
-    -   `options.http2` **[Object][24]?** Any options accepted by
-        [http2.createSecureServer][30].
-    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
+    -   `options.http2` **[Object][56]?** Any options accepted by
+        [http2.createSecureServer][61].
+    -   `options.handleUpgrades` **[Boolean][58]** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.onceNext` **[Boolean][26]** Prevents calling next multiple
+    -   `options.onceNext` **[Boolean][58]** Prevents calling next multiple
          times (optional, default `false`)
-    -   `options.strictNext` **[Boolean][26]** Throws error when next() is
+    -   `options.strictNext` **[Boolean][58]** Throws error when next() is
          called more than once, enabled onceNext option (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
-        [node-https Server][31].
+    -   `options.httpsServerOptions` **[Object][56]?** Any options accepted by
+        [node-https Server][62].
         If provided the following restify server options will be ignored:
         ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.noWriteContinue` **[Boolean][26]** prevents
+    -   `options.noWriteContinue` **[Boolean][58]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
-    -   `options.ignoreTrailingSlash` **[Boolean][26]** ignore trailing slash
+    -   `options.ignoreTrailingSlash` **[Boolean][58]** ignore trailing slash
         on paths (optional, default `false`)
-    -   `options.strictFormatters` **[Boolean][26]** enables strict formatters
+    -   `options.strictFormatters` **[Boolean][58]** enables strict formatters
         behavior: a formatter matching the response's content-type is required. If
         not found, the response's content-type is automatically set to
         'application/octet-stream'. If a formatter for that content-type is not
         found, sending the response errors. (optional, default `true`)
 
-**Examples**
+### Examples
 
 ```javascript
 var restify = require('restify');
@@ -90,57 +125,68 @@ server.listen(8080, function () {
 });
 ```
 
-Returns **[Server][32]** server
+Returns **[Server][63]** server
 
 ## Server
 
 Creates a new Server.
 
-**Parameters**
+### Parameters
 
--   `options` **[Object][24]** an options object
-    -   `options.name` **[String][25]** Name of the server.
-    -   `options.dtrace` **[Boolean][26]** enable DTrace support (optional, default `false`)
+-   `options` **[Object][56]** an options object
+    -   `options.name` **[String][57]** Name of the server.
+    -   `options.dtrace` **[Boolean][58]** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router
-    -   `options.log` **[Object][24]** [bunyan][27]
+    -   `options.log` **[Object][56]** [pino][59]
         instance.
-    -   `options.url` **[String][25]?** Once listen() is called, this will be filled
+    -   `options.url` **[String][57]?** Once listen() is called, this will be filled
         in with where the server is running.
-    -   `options.certificate` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS
+    -   `options.certificate` **([String][57] \| [Buffer][60])?** If you want to create an HTTPS
         server, pass in a PEM-encoded certificate and key.
-    -   `options.key` **([String][25] \| [Buffer][28])?** If you want to create an HTTPS server,
+    -   `options.key` **([String][57] \| [Buffer][60])?** If you want to create an HTTPS server,
         pass in a PEM-encoded certificate and key.
-    -   `options.formatters` **[Object][24]?** Custom response formatters for
+    -   `options.formatters` **[Object][56]?** Custom response formatters for
         `res.send()`.
-    -   `options.handleUncaughtExceptions` **[Boolean][26]** When true restify
-        will use a domain to catch and respond to any uncaught
-        exceptions that occur in its handler stack.
-        Comes with significant negative performance impact.
-    -   `options.http2` **[Object][24]?** Any options accepted by
-        [http2.createSecureServer][30].
-    -   `options.handleUpgrades` **[Boolean][26]** Hook the `upgrade` event
+    -   `options.handleUncaughtExceptions` **([Boolean][58] \| [Function][64])** When
+        true restify will use a domain to catch and respond to any uncaught
+        exceptions that occur in its handler stack. Comes with significant negative
+        performance impact.
+        Can also receive a function with signature (req, res, onError, next),
+        allowing for domains alternatives. onError should be called by the custom
+        error handler, and next must be called at the end of this function. THIS
+        FUNCTION IS NOT INTENDED TO BE USED TO HANDLE ERRORS DIRECTLY, IT IS ONLY
+        INTENDED AS AN ALTERNATIVE TO `domains`.
+          onError signature: (err, req, res)
+          next signature: (res, res) (optional, default `false`)
+    -   `options.http2` **[Object][56]?** Any options accepted by
+        [http2.createSecureServer][61].
+    -   `options.handleUpgrades` **[Boolean][58]** Hook the `upgrade` event
         from the node HTTP server, pushing `Connection: Upgrade` requests through the
          regular request handling chain. (optional, default `false`)
-    -   `options.onceNext` **[Boolean][26]** Prevents calling next multiple
+    -   `options.onceNext` **[Boolean][58]** Prevents calling next multiple
          times (optional, default `false`)
-    -   `options.strictNext` **[Boolean][26]** Throws error when next() is
+    -   `options.strictNext` **[Boolean][58]** Throws error when next() is
          called more than once, enabled onceNext option (optional, default `false`)
-    -   `options.httpsServerOptions` **[Object][24]?** Any options accepted by
-        [node-https Server][31].
+    -   `options.httpsServerOptions` **[Object][56]?** Any options accepted by
+        [node-https Server][62].
         If provided the following restify server options will be ignored:
         ca, certificate, key, passphrase, rejectUnauthorized, requestCert and
         ciphers; however these can all be specified on httpsServerOptions.
-    -   `options.noWriteContinue` **[Boolean][26]** prevents
+    -   `options.noWriteContinue` **[Boolean][58]** prevents
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
-    -   `options.ignoreTrailingSlash` **[Boolean][26]** ignore trailing slash
+    -   `options.ignoreTrailingSlash` **[Boolean][58]** ignore trailing slash
         on paths (optional, default `false`)
-    -   `options.strictFormatters` **[Boolean][26]** enables strict formatters
+    -   `options.useSemicolonDelimiter` **[Boolean][58]** strip
+        semicolon-delimited matrix parameters (e.g. `;jsessionid=X`) from a path
+        segment before route matching. Passed through to the default router
+        (`find-my-way`). (optional, default `false`)
+    -   `options.strictFormatters` **[Boolean][58]** enables strict formatters
         behavior: a formatter matching the response's content-type is required. If
         not found, the response's content-type is automatically set to
         'application/octet-stream'. If a formatter for that content-type is not
         found, sending the response errors. (optional, default `true`)
 
-**Examples**
+### Examples
 
 ```javascript
 var restify = require('restify');
@@ -155,15 +201,15 @@ server.listen(8080, function () {
 
 Gets the server up and listening.
 Wraps node's
-[listen()][33].
+[listen()][65].
 
-**Parameters**
+#### Parameters
 
--   `port` **[Number][34]** Port
--   `host` **[Number][34]?** Host
--   `callback` **[Function][35]?** optionally get notified when listening.
+-   `port` **[Number][66]** Port
+-   `host` **[Number][66]?** Host
+-   `callback` **[Function][64]?** optionally get notified when listening.
 
-**Examples**
+#### Examples
 
 You can call like:
 
@@ -174,32 +220,32 @@ server.listen(80, '127.0.0.1')
 server.listen('/tmp/server.sock')
 ```
 
--   Throws **[TypeError][36]** 
+-   Throws **[TypeError][67]** 
 
-Returns **[undefined][37]** no return value
+Returns **[undefined][68]** no return value
 
 ### close
 
 Shuts down this server, and invokes callback (optionally) when done.
 Wraps node's
-[close()][38].
+[close()][69].
 
-**Parameters**
+#### Parameters
 
--   `callback` **[Function][35]?** callback to invoke when done
+-   `callback` **[Function][64]?** callback to invoke when done
 
-Returns **[undefined][37]** no return value
+Returns **[undefined][68]** no return value
 
 ### get
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.get('/', function (req, res, next) {
@@ -208,15 +254,26 @@ server.get('/', function (req, res, next) {
 });
 ```
 
+using with async/await
+
+
+```javascript
+server.get('/', function (req, res) {
+   await somethingAsync();
+   res.send({ hello: 'world' });
+   next();
+}
+```
+
 Returns **Route** the newly created route.
 
 ### head
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -225,9 +282,9 @@ Returns **Route** the newly created route.
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `post` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `post` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -236,9 +293,9 @@ Returns **Route** the newly created route.
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `put` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `put` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -247,9 +304,9 @@ Returns **Route** the newly created route.
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `patch` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `patch` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -258,9 +315,9 @@ Returns **Route** the newly created route.
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
@@ -269,22 +326,24 @@ Returns **Route** the newly created route.
 
 Mounts a chain on the given path against this HTTP verb
 
-**Parameters**
+#### Parameters
 
--   `opts` **[Server~methodOpts][39]** if string, the URL to handle.
+-   `opts` **[Server~methodOpts][70]** if string, the URL to handle.
                                     if options, the URL to handle, at minimum.
 
 Returns **Route** the newly created route.
 
 ### pre
 
+-   **See: [Restify pre() plugins][71]**
+
 Gives you hooks to run _before_ any routes are located.  This gives you
 a chance to intercept the request and change headers, etc., that routing
 depends on.  Note that req.params will _not_ be set yet.
 
-**Parameters**
+#### Parameters
 
--   `handler` **...([Function][35] \| [Array][40])** Allows you to add handlers that
+-   `handler` **...([Function][64] \| [Array][72])** Allows you to add handlers that
     run for all routes. _before_ routing occurs.
     This gives you a hook to change request headers and the like if you need to.
     Note that `req.params` will be undefined, as that's filled in _after_
@@ -292,13 +351,23 @@ depends on.  Note that req.params will _not_ be set yet.
     Takes a function, or an array of functions.
     variable number of nested arrays of handler functions
 
-**Examples**
+#### Examples
 
 ```javascript
 server.pre(function(req, res, next) {
   req.headers.accept = 'application/json';
   return next();
 });
+```
+
+using with async/await
+
+
+```javascript
+server.pre(async function(req, res) {
+  await somethingAsync();
+  somethingSync();
+}
 ```
 
 For example, `pre()` can be used to deduplicate slashes in
@@ -309,9 +378,71 @@ URLs
 server.pre(restify.pre.dedupeSlashes());
 ```
 
-Returns **[Object][24]** returns self
+Returns **[Object][56]** returns self
+
+### first
+
+Gives you hooks that run before restify touches a request. These hooks
+allow you to do processing early in the request/response life cycle without
+the overhead of the restify framework. You can not yield the event loop in
+this handler.
+
+The function handler accepts two parameters: req, res. If you want restify
+to ignore this request, return false from your handler. Return true or
+undefined to let restify continue handling the request.
+
+When false is returned, restify immediately stops handling the request. This
+means that no further middleware will be executed for any chain and routing
+will not occure. All request/response handling for an incoming request must
+be done inside the first handler if you intend to return false. This
+includes things like closing the response and returning a status code.
+
+The only work restify does for a first handler is to increment the number of
+inflightRequests prior to calling the chain, and decrement that value if the
+handler returns false. Returning anything other than true, false, undefined,
+or null will cause an exception to be thrown.
+
+Since server.first is designed to bypass the restify framework, there are
+naturally trade-offs you make when using this API:
+
+-   Standard restify lifecycle events such as 'after' are not triggered for
+    any request that you return false from a handler for
+-   Invoking any of the restify req/res APIs from within a first handler is
+    unspecified behavior, as the restify framework hasn't built up state for
+    the request yet.
+-   There are no request timers available at the time that the first chain
+    runs.
+-   And more! Beware doing anything with restify in these handlers. They are
+    designed to give you similar access to the req/res as you would have if
+    you were directly using node.js' http module, they are outside of the
+    restify framework!
+
+#### Parameters
+
+-   `handler` **...[Function][64]** Allows you to add handlers that
+    run for all requests, _before_ restify touches the request.
+    This gives you a hook to change request headers and the like if you need to.
+    Note that `req.params` will be undefined, as that's filled in _after_
+    routing.Takes one or more functions.
+
+#### Examples
+
+```javascript
+server.first(function(req, res) {
+  if(server.inflightRequests() > 100) {
+    res.statusCode = 503;
+    res.end();
+    return false
+  }
+  return true;
+})
+```
+
+Returns **[Object][56]** returns self
 
 ### use
+
+-   **See: [Restify use() plugins][73]**
 
 Allows you to add in handlers that run for all routes. Note that handlers
 added
@@ -321,16 +452,42 @@ of functions.
 
 You can pass in any combination of functions or array of functions.
 
-**Parameters**
+#### Parameters
 
--   `handler` **...([Function][35] \| [Array][40])** A variable number of handler functions-   and/or a
+-   `handler` **...([Function][64] \| [Array][72])** A variable number of handler functions-   and/or a
         variable number of nested arrays of handler functions
 
-Returns **[Object][24]** returns self
+#### Examples
+
+```javascript
+server.use(function(req, res, next) {
+  // do something...
+  return next();
+});
+```
+
+using with async/await
+
+
+```javascript
+server.use(async function(req, res) {
+  await somethingAsync();
+  somethingSync();
+}
+```
+
+For example, `use()` can be used to attach a request logger
+
+
+```javascript
+server.pre(restify.plugins.requestLogger());
+```
+
+Returns **[Object][56]** returns self
 
 ### param
 
--   **See: [http://expressjs.com/guide.html#route-param%20pre-conditions][41]**
+-   **See: [ Express route param pre-conditions][74]**
 
 Minimal port of the functionality offered by Express.js Route Param
 Pre-conditions
@@ -339,39 +496,56 @@ This basically piggy-backs on the `server.use` method. It attaches a
 new middleware function that only fires if the specified parameter exists
 in req.params
 
-Exposes an API:
-  server.param("user", function (req, res, next) {
-    // load the user's information here, always making sure to call next()
+#### Parameters
+
+-   `name` **[String][57]** The name of the URL param to respond to
+-   `fn` **[Function][64]**   The middleware function to execute
+
+#### Examples
+
+```javascript
+server.param("user", function (req, res, next) {
+  // load the user's information here, always making sure to call next()
+  fetchUserInformation(req, function callback(user) {
+    req.user = user;
+    next();
   });
+});
+```
 
-**Parameters**
+using with async/await
 
--   `name` **[String][25]** The name of the URL param to respond to
--   `fn` **[Function][35]**   The middleware function to execute
 
-Returns **[Object][24]** returns self
+```javascript
+server.param("user", async function(req, res) {
+  req.user = await fetchUserInformation(req);
+  somethingSync();
+}
+```
+
+Returns **[Object][56]** returns self
 
 ### rm
 
 Removes a route from the server.
 You pass in the route 'blob' you got from a mount call.
 
-**Parameters**
+#### Parameters
 
--   `routeName` **[String][25]** the route name.
+-   `routeName` **[String][57]** the route name.
 
 
--   Throws **[TypeError][36]** on bad input.
+-   Throws **[TypeError][67]** on bad input.
 
-Returns **[Boolean][26]** true if route was removed, false if not.
+Returns **[Boolean][58]** true if route was removed, false if not.
 
 ### address
 
 Returns the server address.
 Wraps node's
-[address()][42].
+[address()][75].
 
-**Examples**
+#### Examples
 
 ```javascript
 server.address()
@@ -384,19 +558,19 @@ Output:
 { address: '::', family: 'IPv6', port: 8080 }
 ```
 
-Returns **[Object][24]** Address of server
+Returns **[Object][56]** Address of server
 
 ### inflightRequests
 
 Returns the number of inflight requests currently being handled by the server
 
-Returns **[number][34]** number of inflight requests
+Returns **[number][66]** number of inflight requests
 
 ### debugInfo
 
 Return debug information about the server.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.getDebugInfo()
@@ -434,13 +608,13 @@ Output:
 }
 ```
 
-Returns **[Object][24]** debug info
+Returns **[Object][56]** debug info
 
 ### toString
 
 toString() the server for easy reading/output.
 
-**Examples**
+#### Examples
 
 ```javascript
 server.toString()
@@ -470,12 +644,12 @@ Url: http://[::]:8080
 Version:
 ```
 
-Returns **[String][25]** stringified server
+Returns **[String][57]** stringified server
 
 ## Events
 
 In additional to emitting all the events from node's
-[http.Server][43],
+[http.Server][76],
 restify servers also emit a number of additional events that make building REST
 and web applications much easier.
 
@@ -568,7 +742,7 @@ routable, i.e. one that would result in a `404`.
 ### uncaughtException
 
 If the restify server was created with `handleUncaughtExceptions: true`,
-restify will leverage [domains][44] to handle
+restify will leverage [domains][77] to handle
 thrown errors in the handler chain. Thrown errors are a result of an explicit
 `throw` statement, or as a result of programmer errors like a typo or a null
 ref. These thrown errors are caught by the domain, and will be emitted via this
@@ -580,15 +754,21 @@ server.get('/', function(req, res, next) {
     return next();
 });
 
-server.on('uncaughtException', function(req, res, route, err) {
+server.on('uncaughtException', function(req, res, route, err, callback) {
     // this event will be fired, with the error object from above:
     // ReferenceError: x is not defined
+    res.send(504, 'boom');
+    callback();
 });
 ```
 
-If you listen to this event, you **must** send a response to the client. This
-behavior is different from the standard error events. If you do not listen to
-this event, restify's default behavior is to call `res.send()` with the error
+If you listen to this event, you **must**:
+
+1.  send a response to the client _and_
+2.  call the callback function passed as the fourth argument of the event listener
+
+This behavior is different from the standard error events. If you do not listen
+to this event, restify's default behavior is to call `res.send()` with the error
 that was thrown.
 
 The signature is for the after event is as follows:
@@ -675,7 +855,7 @@ function(req, res, err, callback) { }
 -   `callback` - a callback function to invoke
 
 When using this feature in conjunction with
-[restify-errors][45], restify will emit events
+[restify-errors][78], restify will emit events
 for all of the basic http errors:
 
 -   `400` - `BadRequestError`
@@ -755,15 +935,15 @@ on this event, and if there are none, responds with a default 415 handler.
 
 Server method opts
 
-Type: ([String][25] \| [Regexp][46] \| [Object][24])
+Type: [Object][56]
 
-**Properties**
+#### Properties
 
--   `name` **[String][25]** a name for the route
--   `path` **[String][25]** can be any String accepted by
-    [find-my-way][47]
+-   `name` **[String][57]** a name for the route
+-   `path` **[String][57]** can be any String accepted by
+    [find-my-way][79]
 
-**Examples**
+#### Examples
 
 ```javascript
 // a static route
@@ -778,96 +958,174 @@ server.get({
 }, function(req, res, next) {});
 ```
 
+## proxyEventWhenListenerAdded
+
+Only add a listener on the wrappedEmitter when a listener for the event is
+added to the wrapperEmitter. This is useful when just adding a listener to
+the wrappedEmittter overrides/disables a default behavior.
+
+### Parameters
+
+-   `eventName` **[string][57]** The name of the event to proxy
+-   `wrapperEmitter` **EventEmitter** The emitter that proxies events from the wrappedEmitter
+-   `wrappedEmitter` **EventEmitter** The proxied emitter
+
+Returns **[undefined][68]** NA
+
 [1]: #createserver
 
-[2]: #server
+[2]: #parameters
 
-[3]: #listen
+[3]: #examples
 
-[4]: #close
+[4]: #server
 
-[5]: #get
+[5]: #parameters-1
 
-[6]: #head
+[6]: #examples-1
 
-[7]: #post
+[7]: #listen
 
-[8]: #put
+[8]: #parameters-2
 
-[9]: #patch
+[9]: #examples-2
 
-[10]: #del
+[10]: #close
 
-[11]: #opts
+[11]: #parameters-3
 
-[12]: #pre
+[12]: #get
 
-[13]: #use
+[13]: #parameters-4
 
-[14]: #param
+[14]: #examples-3
 
-[15]: #rm
+[15]: #head
 
-[16]: #address
+[16]: #parameters-5
 
-[17]: #inflightrequests
+[17]: #post
 
-[18]: #debuginfo
+[18]: #parameters-6
 
-[19]: #tostring
+[19]: #put
 
-[20]: #events
+[20]: #parameters-7
 
-[21]: #errors
+[21]: #patch
 
-[22]: #types
+[22]: #parameters-8
 
-[23]: #servermethodopts
+[23]: #del
 
-[24]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[24]: #parameters-9
 
-[25]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[25]: #opts
 
-[26]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[26]: #parameters-10
 
-[27]: https://github.com/trentm/node-bunyan
+[27]: #pre
 
-[28]: https://nodejs.org/api/buffer.html
+[28]: #parameters-11
 
-[29]: https://github.com/indutny/node-spdy
+[29]: #examples-4
 
-[30]: https://nodejs.org/api/http2.html
+[30]: #first
 
-[31]: http://nodejs.org/api/https.html#https_https
+[31]: #parameters-12
 
-[32]: #server
+[32]: #examples-5
 
-[33]: http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback
+[33]: #use
 
-[34]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[34]: #parameters-13
 
-[35]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[35]: #examples-6
 
-[36]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError
+[36]: #param
 
-[37]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+[37]: #parameters-14
 
-[38]: http://nodejs.org/docs/latest/api/net.html#net_event_close
+[38]: #examples-7
 
-[39]: #servermethodopts
+[39]: #rm
 
-[40]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[40]: #parameters-15
 
-[41]: http://expressjs.com/guide.html#route-param%20pre-conditions
+[41]: #address
 
-[42]: http://nodejs.org/docs/latest/api/net.html#net_server_address
+[42]: #examples-8
 
-[43]: http://nodejs.org/docs/latest/api/http.html#http_class_http_server
+[43]: #inflightrequests
 
-[44]: https://nodejs.org/api/domain.html
+[44]: #debuginfo
 
-[45]: https://github.com/restify/errors
+[45]: #examples-9
 
-[46]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+[46]: #tostring
 
-[47]: https://github.com/delvedor/find-my-way
+[47]: #examples-10
+
+[48]: #events
+
+[49]: #errors
+
+[50]: #types
+
+[51]: #servermethodopts
+
+[52]: #properties
+
+[53]: #examples-11
+
+[54]: #proxyeventwhenlisteneradded
+
+[55]: #parameters-16
+
+[56]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[57]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[58]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[59]: https://github.com/pinojs/pino
+
+[60]: https://nodejs.org/api/buffer.html
+
+[61]: https://nodejs.org/api/http2.html
+
+[62]: http://nodejs.org/api/https.html#https_https
+
+[63]: #server
+
+[64]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[65]: http://nodejs.org/docs/latest/api/net.html#net_server_listen_path_callback
+
+[66]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+
+[67]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/TypeError
+
+[68]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
+
+[69]: http://nodejs.org/docs/latest/api/net.html#net_event_close
+
+[70]: #servermethodopts
+
+[71]: http://restify.com/docs/plugins-api/#serverpre-plugins
+
+[72]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
+[73]: http://restify.com/docs/plugins-api/#serveruse-plugins
+
+[74]: http://expressjs.com/guide.html#route-param%20pre-conditions
+
+[75]: http://nodejs.org/docs/latest/api/net.html#net_server_address
+
+[76]: http://nodejs.org/docs/latest/api/http.html#http_class_http_server
+
+[77]: https://nodejs.org/api/domain.html
+
+[78]: https://github.com/restify/errors
+
+[79]: https://github.com/delvedor/find-my-way
