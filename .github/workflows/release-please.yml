@@ -3,13 +3,17 @@ on:
     branches:
       - master
       - 9.x
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v3.6.1
+      - uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
-          package-name: restify
+          target-branch: ${{ github.ref_name }}

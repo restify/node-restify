@@ -77,7 +77,7 @@
   "version": "11.2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/restify/node-restify.git"
+    "url": "git+https://github.com/restify/node-restify.git"
   },
   "bugs": {
     "url": "https://github.com/restify/node-restify/issues"
