@@ -74,6 +74,9 @@ routes and handlers for incoming requests.
     -   `options.name` **[String][57]** Name of the server. (optional, default `"restify"`)
     -   `options.dtrace` **[Boolean][58]** enable DTrace support (optional, default `false`)
     -   `options.router` **Router** Router (optional, default `newRouter(opts)`)
+    -   `options.useSemicolonDelimiter` **[Boolean][58]** strip
+        semicolon-delimited matrix parameters from a path segment before route
+        matching (passed through to `find-my-way`) (optional, default `false`)
     -   `options.log` **[Object][56]** [pino][59] instance. (optional, default `pino({name:options.name||"restify"})`)
     -   `options.url` **[String][57]?** Once listen() is called, this will be filled
         in with where the server is running.
@@ -173,6 +176,10 @@ Creates a new Server.
          `res.writeContinue()` in `server.on('checkContinue')` when proxing (optional, default `false`)
     -   `options.ignoreTrailingSlash` **[Boolean][58]** ignore trailing slash
         on paths (optional, default `false`)
+    -   `options.useSemicolonDelimiter` **[Boolean][58]** strip
+        semicolon-delimited matrix parameters (e.g. `;jsessionid=X`) from a path
+        segment before route matching. Passed through to the default router
+        (`find-my-way`). (optional, default `false`)
     -   `options.strictFormatters` **[Boolean][58]** enables strict formatters
         behavior: a formatter matching the response's content-type is required. If
         not found, the response's content-type is automatically set to
