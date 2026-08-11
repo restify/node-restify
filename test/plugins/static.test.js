@@ -270,14 +270,19 @@ describe('static resource plugin', function() {
     });
 
     var TMP_PATH = path.join(__dirname, '../', '.tmp');
-    var RAW_REQUEST =
-        'GET /index.html HTTP/1.1\r\n' +
-        'Host: 127.0.0.1:' +
-        PORT +
-        '\r\n' +
-        'User-Agent: curl/7.48.0\r\n' +
-        'Accept: */*\r\n' +
-        '\r\n';
+    // built lazily (not at describe-registration time) since PORT is only
+    // assigned once beforeEach has run for the test that's about to use it.
+    function rawRequest() {
+        return (
+            'GET /index.html HTTP/1.1\r\n' +
+            'Host: 127.0.0.1:' +
+            PORT +
+            '\r\n' +
+            'User-Agent: curl/7.48.0\r\n' +
+            'Accept: */*\r\n' +
+            '\r\n'
+        );
+    }
 
     it(
         'static does not leak the file stream and next() is properly called ' +
@@ -322,7 +327,7 @@ describe('static resource plugin', function() {
                 });
 
                 socket.connect({ host: '127.0.0.1', port: PORT }, function() {
-                    socket.write(RAW_REQUEST, 'utf-8', function(err2, data) {
+                    socket.write(rawRequest(), 'utf-8', function(err2, data) {
                         assert.ifError(err2);
                     });
                 });
@@ -366,7 +371,7 @@ describe('static resource plugin', function() {
                 });
 
                 socket.connect({ host: '127.0.0.1', port: PORT }, function() {
-                    socket.write(RAW_REQUEST, 'utf-8', function(err2, data) {
+                    socket.write(rawRequest(), 'utf-8', function(err2, data) {
                         assert.ifError(err2);
                         socket.end();
                     });

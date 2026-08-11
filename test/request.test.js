@@ -287,3 +287,90 @@ test(
         });
     }
 );
+
+test(
+    module,
+    'getUrl should return correct shape for path with no query',
+    function(t) {
+        SERVER.get('/geturl-plain', function(req, res, next) {
+            var u = req.getUrl();
+            t.ok(u instanceof URL);
+            t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-plain');
+            t.equal(u.pathname, '/geturl-plain');
+            t.equal(u.search, '');
+            t.equal(u.hash, '');
+            t.equal(u.host, '127.0.0.1:' + PORT);
+            t.equal(u.hostname, '127.0.0.1');
+            t.equal(u.port, String(PORT));
+            t.equal(u.protocol, 'http:');
+            res.send();
+            return next();
+        });
+
+        CLIENT.get('/geturl-plain', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    }
+);
+
+test(module, 'getUrl should return correct query string', function(t) {
+    SERVER.get('/geturl-qs', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-qs?a=1&b=2');
+        t.equal(u.pathname, '/geturl-qs');
+        t.equal(u.search, '?a=1&b=2');
+        t.equal(u.searchParams.get('a'), '1');
+        t.equal(u.searchParams.get('b'), '2');
+        t.equal(u.hash, '');
+        t.equal(u.host, '127.0.0.1:' + PORT);
+        t.equal(u.hostname, '127.0.0.1');
+        t.equal(u.port, String(PORT));
+        t.equal(u.protocol, 'http:');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-qs?a=1&b=2', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'getUrl should handle OPTIONS * request-target', function(t) {
+    SERVER.opts('*', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        // a URL instance can't represent the literal '*' request-target -
+        // it resolves against the base path, so it comes out as '/*'.
+        t.equal(u.pathname, '/*');
+        t.equal(u.search, '');
+        res.send(200);
+        return next();
+    });
+
+    CLIENT.opts('*', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'getUrl result is cached across calls', function(t) {
+    SERVER.get('/geturl-cache', function(req, res, next) {
+        var u1 = req.getUrl();
+        var u2 = req.getUrl();
+        t.strictEqual(u1, u2);
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-cache', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
