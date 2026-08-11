@@ -369,6 +369,9 @@ Many options correspond directly to option defined for the underlying
         methods, e.g. `?hasOwnProperty=blah`. (optional, default `false`)
     -   `options.strictNullHandling` **[Boolean][88]** If true, `?a&b=`
         results in `{a: null, b: ''}`. Otherwise, `{a: '', b: ''}`. (optional, default `false`)
+    -   `options.throwOnLimitExceeded` **[Boolean][88]** If true, throws
+        (surfaced as a `InvalidContentError`) when `arrayLimit` or `parameterLimit`
+        is exceeded, instead of silently dropping the offending params. (optional, default `false`)
 
 #### Examples
 
@@ -476,6 +479,12 @@ All bodyParsers support the following options:
         Limits the amount of memory all fields together (except files)
         can allocate in bytes.
         The default size is `2 * 1024 * 1024` bytes _(2MB)_. (optional, default `2*1024*1024`)
+    -   `options.arrayLimit` **[Number][86]** `urlEncodedBodyParser` only. Only
+        transform `a[$index]=b` to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
+    -   `options.throwOnLimitExceeded` **[Boolean][88]** `urlEncodedBodyParser`
+        only. If true, throws when `arrayLimit` or `parameterLimit` is exceeded,
+        instead of silently dropping the offending params. The error is surfaced
+        as an `InvalidContentError`. (optional, default `false`)
 
 #### Examples
 
