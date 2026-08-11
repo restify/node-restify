@@ -157,7 +157,10 @@ describe('body reader', function() {
             });
 
             SERVER.on('after', function(req2) {
-                if (req2.href() === '/compressed?v=2') {
+                if (
+                    req2.href() ===
+                    'http://127.0.0.1:' + PORT + '/compressed?v=2'
+                ) {
                     assert.equal(SERVER.inflightRequests(), 0);
                     done();
                 }
