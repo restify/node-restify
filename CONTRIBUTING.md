@@ -50,16 +50,21 @@ make benchmark
 
 ## Cutting a release
 
-Cutting a release is currently a manual process. We use a [Conventional Changelog](http://conventionalcommits.org/) to simplify the process of managing semver on this project. Generally, the following series of commands will cut a release from the `master` branch:
+Releases are automated with [release-please](https://github.com/googleapis/release-please) and published to npm via GitHub Actions. We use [Conventional Commits](http://conventionalcommits.org/) to simplify the process of managing semver on this project — release-please parses commit types (`fix`, `feat`, etc.) to determine the version bump.
 
-```
-$ git fetch
-$ git pull origin master # ensure you have the latest changes
-$ npx unleash [-p for patch, -m for minor, -M for major] --no-publish -d # do a dry run to verify
-$ npx unleash [-p for patch, -m for minor, -M for major] --no-publish 
-# Unleash doesnt support 2FA, hence we use --no-publish flag here.
-# This ensures we have the package.json updated, changelog generated, tag created
-# and all the changes into origin
-# Next, publish to npm manually and do not forget to provide the 2FA code.
-$ npm publish
-```
+### Release flow
+
+1. Merge pull requests to `master` using [Conventional Commits](http://conventionalcommits.org/).
+2. `release-please` opens or updates a **Release PR** with the version bump and changelog.
+3. Review and merge the Release PR when ready to ship.
+4. `release-please` creates a GitHub Release and version tag (for example `v11.3.0`).
+5. The `npm-publish` workflow runs automatically, re-runs tests, validates the package contents (`npm pack --dry-run`), then pauses at the `Publish` environment for reviewer approval.
+6. After approval, the package is published to npm via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC). Do not run `npm publish` manually.
+
+### Dry run
+
+To validate the publish workflow without publishing, run **Actions → npm-publish → Run workflow**. This runs tests and `npm pack --dry-run`.
+
+### Retrying a failed run
+
+If `npm-publish` fails, use **Re-run jobs** on the failed run itself (Actions tab) — it replays the same release/tag, so there's no need to cut a new one. This is safe even if `publish` partially ran, since `validate` checks whether the version is already on npm before continuing. 

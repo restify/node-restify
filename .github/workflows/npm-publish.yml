@@ -1,0 +1,86 @@
+name: npm-publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # tag_name grouping - queues actual releases for the same tag
+  # run_id - fallback value required for group as tag_name might not always be present (manual triggers)
+  group: npm-publish-${{ github.event.release.tag_name || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: verify release version
+        if: github.event_name == 'release'
+        run: |
+          pkg_name=$(jq -r .name package.json)
+          pkg_version=$(jq -r .version package.json)
+          tag_version="${GITHUB_EVENT_RELEASE_TAG_NAME#v}"
+          if [ "$pkg_version" != "$tag_version" ]; then
+            echo "package.json version ($pkg_version) does not match release tag ($tag_version)"
+            exit 1
+          fi
+          if npm view "${pkg_name}@${pkg_version}" version >/dev/null 2>&1; then
+            echo "${pkg_name}@${pkg_version} is already published"
+            exit 1
+          fi
+        env:
+          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: run tests
+        run: make test
+        env:
+          TEST_SKIP_IP_V6: true
+
+      - name: validate publish package contents
+        run: |
+          npm pack --dry-run 2>&1 | tee pack.log
+          grep -q 'lib/index.js' pack.log
+          grep -q 'bin/report-latency' pack.log
+          ! grep -qE '[[:space:]]test/' pack.log
+          ! grep -qE '[[:space:]]tools/' pack.log
+
+  publish:
+    name: publish
+    needs: validate
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    environment: Publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+
+      - name: publish to npm
+        run: npm publish --provenance
