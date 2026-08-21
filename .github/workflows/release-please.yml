@@ -7,13 +7,28 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
+  # Releases created with GITHUB_TOKEN cannot trigger other workflows, so
+  # npm-publish is dispatched explicitly below. workflow_dispatch is one of the
+  # few events that always creates a run, even from GITHUB_TOKEN.
+  actions: write
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v5
+        id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: node
           target-branch: ${{ github.ref_name }}
+
+      # releases_created is only true on the run that tagged a release, which is
+      # the run triggered by merging the release PR.
+      - name: trigger npm-publish
+        if: steps.release.outputs.releases_created == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag_name }}
+        run: gh workflow run npm-publish.yml --ref "$GITHUB_REF_NAME" -f tag="$TAG"
