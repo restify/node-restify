@@ -1,17 +1,21 @@
 name: npm-publish
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: >-
+          Release tag to publish, for example v12.0.0. Leave empty to run
+          validation only (dry run).
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  # tag_name grouping - queues actual releases for the same tag
-  # run_id - fallback value required for group as tag_name might not always be present (manual triggers)
-  group: npm-publish-${{ github.event.release.tag_name || github.run_id }}
+  # tag grouping - queues repeat publishes of the same release
+  # run_id - fallback for validation-only runs, which have no tag
+  group: npm-publish-${{ inputs.tag || github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -21,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.tag_name || github.ref }}
+          ref: ${{ inputs.tag || github.ref }}
           persist-credentials: false
 
       - uses: actions/setup-node@v6
@@ -30,11 +34,11 @@ jobs:
           cache: npm
 
       - name: verify release version
-        if: github.event_name == 'release'
+        if: inputs.tag != ''
         run: |
           pkg_name=$(jq -r .name package.json)
           pkg_version=$(jq -r .version package.json)
-          tag_version="${GITHUB_EVENT_RELEASE_TAG_NAME#v}"
+          tag_version="${RELEASE_TAG#v}"
           if [ "$pkg_version" != "$tag_version" ]; then
             echo "package.json version ($pkg_version) does not match release tag ($tag_version)"
             exit 1
@@ -44,7 +48,7 @@ jobs:
             exit 1
           fi
         env:
-          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ inputs.tag }}
 
       - name: install dependencies
         run: npm ci
@@ -65,7 +69,7 @@ jobs:
   publish:
     name: publish
     needs: validate
-    if: github.event_name == 'release'
+    if: inputs.tag != ''
     runs-on: ubuntu-latest
     environment: Publish
     permissions:
@@ -74,7 +78,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ inputs.tag }}
           persist-credentials: false
 
       - uses: actions/setup-node@v6

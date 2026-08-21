@@ -58,13 +58,13 @@ Releases are automated with [release-please](https://github.com/googleapis/relea
 2. `release-please` opens or updates a **Release PR** with the version bump and changelog.
 3. Review and merge the Release PR when ready to ship.
 4. `release-please` creates a GitHub Release and version tag (for example `v11.3.0`).
-5. The `npm-publish` workflow runs automatically, re-runs tests, validates the package contents (`npm pack --dry-run`), then pauses at the `Publish` environment for reviewer approval.
-6. After approval, the package is published to npm via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC). Do not run `npm publish` manually.
+5. The same `release-please` run then dispatches `npm-publish` with that tag. It re-runs tests, validates the package contents (`npm pack --dry-run`), then pauses at the `Publish` environment for reviewer approval.
+6. After approval, the package is published to npm via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC).
 
 ### Dry run
 
-To validate the publish workflow without publishing, run **Actions → npm-publish → Run workflow**. This runs tests and `npm pack --dry-run`.
+To validate the publish workflow without publishing, run **Actions → npm-publish → Run workflow** and leave `tag` empty. This runs tests and `npm pack --dry-run`, and skips the publish job.
 
 ### Retrying a failed run
 
-If `npm-publish` fails, use **Re-run jobs** on the failed run itself (Actions tab) — it replays the same release/tag, so there's no need to cut a new one. This is safe even if `publish` partially ran, since `validate` checks whether the version is already on npm before continuing. 
+If `npm-publish` fails, use **Re-run jobs** on the failed run itself (Actions tab) — it replays the same tag, so there's no need to cut a new one. You can also re-run **Actions → npm-publish → Run workflow** with the same `tag`. Either is safe even if `publish` partially ran, since `validate` checks whether the version is already on npm before continuing. 
