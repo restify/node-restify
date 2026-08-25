@@ -121,6 +121,32 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [12.0.0](https://github.com/restify/node-restify/compare/v11.2.0...v12.0.0) (2026-08-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade qs ([#1995](https://github.com/restify/node-restify/issues/1995))
+* Node.js 26 support ([#1999](https://github.com/restify/node-restify/issues/1999))
+* remove deprecated spdy protocol ([#1998](https://github.com/restify/node-restify/issues/1998))
+
+### Features
+
+* add useSemicolonDelimiter option ([#2004](https://github.com/restify/node-restify/issues/2004)) ([e4102d8](https://github.com/restify/node-restify/commit/e4102d822d298e4a912758a76788a5d4473ab7f7))
+* Node.js 26 support ([#1999](https://github.com/restify/node-restify/issues/1999)) ([fe3ce84](https://github.com/restify/node-restify/commit/fe3ce84f77fffe403205657c0a30b76bb321f0e7))
+* remove deprecated spdy protocol ([#1998](https://github.com/restify/node-restify/issues/1998)) ([7077bbc](https://github.com/restify/node-restify/commit/7077bbc1b9e285cc03e65f8e5e49d1132ef635e1))
+* replace deprecated node apis ([#1997](https://github.com/restify/node-restify/issues/1997)) ([d610d83](https://github.com/restify/node-restify/commit/d610d83a62b8d43b9f93e077af1eff23bc493591))
+* replace deprecated url.resolve() and url.parse() with WHATWG URL ([#1996](https://github.com/restify/node-restify/issues/1996)) ([f602304](https://github.com/restify/node-restify/commit/f602304c89db17633bd056fb02404163fa86ab4e))
+* replace module.parent with explicit module param in test helper ([#2001](https://github.com/restify/node-restify/issues/2001)) ([ba712be](https://github.com/restify/node-restify/commit/ba712be5d94a629228515d2740e0fb9c670d2e13))
+* update dependencies ([#2002](https://github.com/restify/node-restify/issues/2002)) ([120b4bb](https://github.com/restify/node-restify/commit/120b4bb1fd90f675773a53ae6961eea203baec79))
+* upgrade qs ([#1995](https://github.com/restify/node-restify/issues/1995)) ([e2d188b](https://github.com/restify/node-restify/commit/e2d188bfb889e1bacfdd6c886eba49951b784d23))
+
+
+### Bug Fixes
+
+* fix benchmark tests ([#2000](https://github.com/restify/node-restify/issues/2000)) ([3009d32](https://github.com/restify/node-restify/commit/3009d32e665c51cfbf0f6f20cfde6b23a117a08b))
+* npm publish workflow ([#2005](https://github.com/restify/node-restify/issues/2005)) ([b1000e6](https://github.com/restify/node-restify/commit/b1000e6822f949428d7936abc4268cbab4fe6023))
+
 ## [11.2.0](https://github.com/restify/node-restify/compare/v11.1.0...v11.2.0) (2023-08-11)
 
 
