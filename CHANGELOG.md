@@ -129,7 +129,6 @@
 * upgrade qs ([#1995](https://github.com/restify/node-restify/issues/1995))
 * Node.js 26 support ([#1999](https://github.com/restify/node-restify/issues/1999))
 * remove deprecated spdy protocol ([#1998](https://github.com/restify/node-restify/issues/1998))
-* upgrade qs ([#1991](https://github.com/restify/node-restify/issues/1991))
 
 ### Features
 
@@ -140,7 +139,6 @@
 * replace deprecated url.resolve() and url.parse() with WHATWG URL ([#1996](https://github.com/restify/node-restify/issues/1996)) ([f602304](https://github.com/restify/node-restify/commit/f602304c89db17633bd056fb02404163fa86ab4e))
 * replace module.parent with explicit module param in test helper ([#2001](https://github.com/restify/node-restify/issues/2001)) ([ba712be](https://github.com/restify/node-restify/commit/ba712be5d94a629228515d2740e0fb9c670d2e13))
 * update dependencies ([#2002](https://github.com/restify/node-restify/issues/2002)) ([120b4bb](https://github.com/restify/node-restify/commit/120b4bb1fd90f675773a53ae6961eea203baec79))
-* upgrade qs ([#1991](https://github.com/restify/node-restify/issues/1991)) ([aedcb65](https://github.com/restify/node-restify/commit/aedcb658da9ddbebc3615affa01b93e68deaea46))
 * upgrade qs ([#1995](https://github.com/restify/node-restify/issues/1995)) ([e2d188b](https://github.com/restify/node-restify/commit/e2d188bfb889e1bacfdd6c886eba49951b784d23))
 
 
