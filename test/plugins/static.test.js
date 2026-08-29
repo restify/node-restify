@@ -122,11 +122,22 @@ describe('static resource plugin', function() {
         });
     }
 
-    function testNoAppendPath(done, testDefault, tmpDir, regex, staticFile) {
+    function testNoAppendPath(
+        done,
+        testDefault,
+        tmpDir,
+        regex,
+        staticFile,
+        requestDirectFile,
+        customRoute
+    ) {
         var staticContent = '{"content": "abcdefg"}';
+        var staticContent2 = '{"content2": "hijklmn"}';
         var staticObj = JSON.parse(staticContent);
+        var staticObj2 = JSON.parse(staticContent2);
         var testDir = 'public';
         var testFileName = 'index.json';
+        var testFileName2 = 'specific.json';
         var routeName = 'GET wildcard';
         var tmpPath = path.join(__dirname, '../', tmpDir);
 
@@ -140,40 +151,61 @@ describe('static resource plugin', function() {
 
                 DIRS_TO_DELETE.push(folderPath);
                 var file = path.join(folderPath, testFileName);
+                var file2 = path.join(folderPath, testFileName2);
 
                 fs.writeFile(file, staticContent, function(err3) {
                     assert.ifError(err3);
                     FILES_TO_DELETE.push(file);
-                    var p = '/' + testDir + '/' + testFileName;
-                    var opts = { directory: folderPath };
-                    opts.appendRequestPath = false;
 
-                    if (staticFile) {
-                        opts.file = testFileName;
-                    }
-
-                    if (testDefault) {
-                        p = '/' + testDir + '/';
-                        opts.default = testFileName;
-                        routeName += ' with default';
-                    }
-
-                    SERVER.get(
-                        {
-                            path: '/' + testDir + '/*',
-                            name: routeName
-                        },
-                        restify.plugins.serveStatic(opts)
-                    );
-
-                    CLIENT.get(p, function(err4, req, res, obj) {
+                    fs.writeFile(file2, staticContent2, function(err4) {
                         assert.ifError(err4);
-                        assert.equal(
-                            res.headers['cache-control'],
-                            'public, max-age=3600'
+                        FILES_TO_DELETE.push(file2);
+
+                        var p = '/' + testDir + '/' + testFileName;
+                        var opts = { directory: folderPath };
+                        opts.appendRequestPath = false;
+
+                        if (staticFile) {
+                            opts.file = testFileName;
+                        }
+
+                        if (testDefault) {
+                            p =
+                                '/' +
+                                testDir +
+                                '/other/route/it/should/serve/default/anyway';
+                            opts.default = testFileName;
+                            routeName += ' with default';
+                        }
+
+                        if (requestDirectFile) {
+                            p = '/' + testDir + '/specific.json';
+                        }
+
+                        if (customRoute) {
+                            p = '/' + testDir + '/' + customRoute;
+                        }
+
+                        SERVER.get(
+                            {
+                                path: '/' + testDir + '/*',
+                                name: routeName
+                            },
+                            restify.plugins.serveStatic(opts)
                         );
-                        assert.deepEqual(obj, staticObj);
-                        done();
+
+                        CLIENT.get(p, function(err5, req, res, obj) {
+                            assert.ifError(err5);
+                            assert.equal(
+                                res.headers['cache-control'],
+                                'public, max-age=3600'
+                            );
+                            var ojbToCompare = requestDirectFile
+                                ? staticObj2
+                                : staticObj;
+                            assert.deepEqual(obj, ojbToCompare);
+                            done();
+                        });
                     });
                 });
             });
@@ -225,6 +257,42 @@ describe('static resource plugin', function() {
     // eslint-disable-next-line
     it('restify serve a specific static file with appendRequestPath = false', function(done) {
         testNoAppendPath(done, false, '.tmp', null, true);
+    });
+
+    // eslint-disable-next-line
+    it('static serves and request an specific file with appendRequestPath = false', function(done) {
+        testNoAppendPath(done, true, '.tmp', null, null, true);
+    });
+
+    // eslint-disable-next-line
+    it('static serves and request an specific file with appendRequestPath = false, with no default file specified', function(done) {
+        testNoAppendPath(done, false, '.tmp', null, null, true);
+    });
+
+    // eslint-disable-next-line
+    it('static serves and request an inexistent specific file with appendRequestPath = false, with default file specified', function(done) {
+        testNoAppendPath(
+            done,
+            true,
+            '.tmp',
+            null,
+            null,
+            false,
+            'doesNotExists.json'
+        );
+    });
+
+    // eslint-disable-next-line
+    it('static serves and request an inexistent specific route with appendRequestPath = false, with default file specified', function(done) {
+        testNoAppendPath(
+            done,
+            true,
+            '.tmp',
+            null,
+            null,
+            false,
+            'doesNotExists'
+        );
     });
 
     it('static responds 404 for missing file', function(done) {
