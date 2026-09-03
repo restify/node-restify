@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: npm
 
       - name: verify release version
@@ -83,7 +83,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version: 26.x
           registry-url: https://registry.npmjs.org
 
       - name: publish to npm
