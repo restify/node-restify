@@ -1,6 +1,9 @@
 'use strict';
 /* eslint-disable func-names */
 
+var http = require('http');
+var net = require('net');
+
 var restifyClients = require('restify-clients');
 var validator = require('validator');
 
@@ -371,6 +374,60 @@ test(module, 'getUrl result is cached across calls', function(t) {
     CLIENT.get('/geturl-cache', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'should not crash when the Host header is not a valid URL host', function(t) {
+    SERVER.get('/hosthdr', function(req, res, next) {
+        res.send({ pathname: req.path() });
+        return next();
+    });
+
+    // The Host header is client-supplied and Node does not validate it as a
+    // URL authority. getUrl() must not throw on it: it is called from
+    // Router.lookup on every request, where nothing catches, so a throw
+    // here takes down the process.
+    var opts = {
+        agent: false,
+        headers: { Host: 'foo|bar' },
+        hostname: '127.0.0.1',
+        method: 'GET',
+        path: '/hosthdr',
+        port: PORT
+    };
+
+    http.request(opts, function(res) {
+        t.equal(res.statusCode, 200);
+        res.resume();
+        res.on('end', function() {
+            t.end();
+        });
+    }).end();
+});
+
+test(module, 'should not crash when the request target is not a valid URL', function(t) {
+    // An absolute-form request target is client-supplied and Node's HTTP
+    // parser does not validate it as a URL either, so getUrl() must not
+    // throw on it. Needs a raw socket: http.request only emits
+    // origin-form targets.
+    var response = '';
+    var socket = net.connect(PORT, '127.0.0.1', function() {
+        socket.write(
+            'GET http://a:99999/x HTTP/1.1\r\n' +
+                'Host: 127.0.0.1:' +
+                PORT +
+                '\r\n' +
+                'Connection: close\r\n\r\n'
+        );
+    });
+
+    socket.on('data', function(chunk) {
+        response += chunk;
+    });
+
+    socket.on('close', function() {
+        t.ok(/^HTTP\/1\.1 \d{3}/.test(response), 'server sent a response');
         t.end();
     });
 });
