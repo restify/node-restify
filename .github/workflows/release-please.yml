@@ -11,24 +11,44 @@ permissions:
   # npm-publish is dispatched explicitly below. workflow_dispatch is one of the
   # few events that always creates a run, even from GITHUB_TOKEN.
   actions: write
+
+concurrency:
+  group: release-please-${{ github.ref_name }}
+  cancel-in-progress: false
+
 name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v5
-        id: release
+        id: prerelease
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
+          config-file: .github/prerelease-config.json
+          manifest-file: .github/prerelease-manifest.json
           target-branch: ${{ github.ref_name }}
 
-      # releases_created is only true on the run that tagged a release, which is
-      # the run triggered by merging the release PR.
+      # Once an RC PR is merged and tagged, replace it with the stable Release
+      # PR. The stable config also synchronizes the prerelease manifest when
+      # that stable PR is eventually merged.
+      - name: create stable Release PR
+        if: >-
+          steps.prerelease.outputs.releases_created == 'true' &&
+          contains(steps.prerelease.outputs.tag_name, '-rc')
+        uses: googleapis/release-please-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/release-config.json
+          manifest-file: .github/release-manifest.json
+          target-branch: ${{ github.ref_name }}
+
+      # The prerelease action recognizes merges of both RC and stable Release
+      # PRs. It creates the corresponding tag and GitHub Release in either case.
       - name: trigger npm-publish
-        if: steps.release.outputs.releases_created == 'true'
+        if: steps.prerelease.outputs.releases_created == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
-          TAG: ${{ steps.release.outputs.tag_name }}
+          TAG: ${{ steps.prerelease.outputs.tag_name }}
         run: gh workflow run npm-publish.yml --ref "$GITHUB_REF_NAME" -f tag="$TAG"
