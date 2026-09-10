@@ -204,6 +204,14 @@ describe('multipart parser', function() {
         client.write(echoes + '\r\n');
         client.write('--huff--');
 
+        client.write(
+            'Content-Disposition: form-data; name="echoes"; ' +
+                'filename="echoes2.txt"\r\n'
+        );
+        client.write('Content-Type: text/plain\r\n\r\n');
+        client.write(echoes + '\r\n');
+        client.write('--huff--');
+
         client.end();
     });
 
