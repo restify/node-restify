@@ -9,7 +9,7 @@
                 "posix-getopt": "^1.2.1",
                 "restify-errors": "^8.0.2",
                 "restify-clients": "^3.1.0",
-                "restify": "^8.6.1"
+                "restify": "^10.0.0"
         },
         "devDependencies": {
                 "mocha": "^10.0.0",
