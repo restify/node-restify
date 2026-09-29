@@ -96,6 +96,97 @@ describe('body reader', function() {
             );
         });
 
+        it('should not crash on an empty gzip body', function(done) {
+            SERVER.use(restify.plugins.bodyParser());
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false
+            });
+
+            SERVER.get('/hello', function(req, res, next) {
+                res.send(200, { hello: 'world' });
+                next();
+            });
+
+            var req = http.request(
+                {
+                    hostname: '127.0.0.1',
+                    port: PORT,
+                    path: '/hello',
+                    method: 'GET',
+                    headers: {
+                        'Content-Encoding': 'gzip',
+                        'Content-Type': 'application/json'
+                    }
+                },
+                function(res) {
+                    var body = '';
+                    res.on('data', function(chunk) {
+                        body += chunk;
+                    });
+                    res.on('end', function() {
+                        assert.equal(res.statusCode, 400);
+                        var rsp = JSON.parse(body);
+                        assert.equal(rsp.code, 'InvalidContent');
+                        CLIENT.get('/hello', function(err, _, okRes) {
+                            assert.ifError(err);
+                            assert.equal(okRes.statusCode, 200);
+                            done();
+                        });
+                    });
+                }
+            );
+
+            req.on('error', done);
+            req.end();
+        });
+
+        it('should not crash on invalid gzip content', function(done) {
+            SERVER.use(restify.plugins.bodyParser());
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false
+            });
+
+            SERVER.post('/hello', function(req, res, next) {
+                res.send(200, { hello: 'world' });
+                next();
+            });
+
+            var payload = Buffer.from('not-gzip');
+            var req = http.request(
+                {
+                    hostname: '127.0.0.1',
+                    port: PORT,
+                    path: '/hello',
+                    method: 'POST',
+                    headers: {
+                        'Content-Encoding': 'gzip',
+                        'Content-Type': 'application/json',
+                        'Content-Length': payload.length
+                    }
+                },
+                function(res) {
+                    var body = '';
+                    res.on('data', function(chunk) {
+                        body += chunk;
+                    });
+                    res.on('end', function() {
+                        assert.equal(res.statusCode, 400);
+                        var rsp = JSON.parse(body);
+                        assert.equal(rsp.code, 'InvalidContent');
+                        done();
+                    });
+                }
+            );
+
+            req.on('error', done);
+            req.write(payload);
+            req.end();
+        });
+
         it('should parse unencoded content', function(done) {
             SERVER.use(restify.plugins.bodyParser());
 
