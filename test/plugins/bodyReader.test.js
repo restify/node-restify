@@ -2,7 +2,9 @@
 /* eslint-disable func-names */
 
 // core requires
+var crypto = require('crypto');
 var http = require('http');
+var zlib = require('zlib');
 
 // external requires
 var assert = require('chai').assert;
@@ -63,6 +65,120 @@ describe('body reader', function() {
                     done();
                 }
             );
+        });
+
+        it('should limit the decompressed body size', function(done) {
+            SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false,
+                gzip: {}
+            });
+
+            SERVER.post('/compressed', function(req, res, next) {
+                assert.fail('route should not be called');
+                res.send();
+                next();
+            });
+
+            CLIENT.post(
+                '/compressed',
+                {
+                    value: new Array(2049).join('x')
+                },
+                function(err, _, res) {
+                    assert.isOk(err, 'should fail');
+                    assert.equal(res.statusCode, 413);
+                    done();
+                }
+            );
+        });
+
+        it('should limit compressed gzip body size', function(done) {
+            SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false
+            });
+
+            SERVER.post('/compressed', function(req, res, next) {
+                assert.fail('route should not be called');
+                res.send();
+                next();
+            });
+
+            var compressedBody = zlib.gzipSync(crypto.randomBytes(2048));
+            assert.isAbove(compressedBody.length, 1024);
+
+            var request = http.request(
+                {
+                    hostname: '127.0.0.1',
+                    port: PORT,
+                    path: '/compressed',
+                    method: 'POST',
+                    headers: {
+                        'content-encoding': 'gzip',
+                        'content-length': compressedBody.length,
+                        'content-type': 'text/plain'
+                    }
+                },
+                function(response) {
+                    assert.equal(response.statusCode, 413);
+                    response.resume();
+                    response.once('end', done);
+                }
+            );
+            request.once('error', done);
+            request.end(compressedBody);
+        });
+
+        it('should reject malformed gzip and remain healthy', function(done) {
+            SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
+
+            CLIENT = restifyClients.createJsonClient({
+                url: 'http://127.0.0.1:' + PORT,
+                retry: false
+            });
+
+            SERVER.post('/compressed', function(req, res, next) {
+                assert.fail('route should not be called');
+                res.send();
+                next();
+            });
+            SERVER.get('/health', function(req, res, next) {
+                res.send({ healthy: true });
+                next();
+            });
+
+            var malformedBody = Buffer.from('not a gzip body');
+            var request = http.request(
+                {
+                    hostname: '127.0.0.1',
+                    port: PORT,
+                    path: '/compressed',
+                    method: 'POST',
+                    headers: {
+                        'content-encoding': 'gzip',
+                        'content-length': malformedBody.length,
+                        'content-type': 'text/plain'
+                    }
+                },
+                function(response) {
+                    assert.equal(response.statusCode, 400);
+                    response.resume();
+                    response.once('end', function() {
+                        CLIENT.get('/health', function(err, _, healthResponse) {
+                            assert.ifError(err);
+                            assert.equal(healthResponse.statusCode, 200);
+                            done();
+                        });
+                    });
+                }
+            );
+            request.once('error', done);
+            request.end(malformedBody);
         });
 
         it('should not accept unsupported content encoding', function(done) {
