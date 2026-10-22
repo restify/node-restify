@@ -413,6 +413,77 @@ describe('JSON body parser', function() {
         client.end();
     });
 
+    it('limits request body size to 2 MiB by default', function(done) {
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/', function(req, res, next) {
+            res.send(200, { length: req.body.length });
+            next();
+        });
+
+        var opts = {
+            hostname: '127.0.0.1',
+            port: PORT,
+            path: '/',
+            method: 'POST',
+            agent: false,
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/x-www-form-urlencoded',
+                'transfer-encoding': 'chunked'
+            }
+        };
+        var client = http.request(opts, function(res) {
+            assert.equal(res.statusCode, 413);
+            res.once('end', done);
+            res.resume();
+        });
+        client.write(Buffer.alloc(2 * 1024 * 1024 + 1, 'x'));
+        client.end();
+    });
+
+    it('accepts a 2 MiB request body by default', function(done) {
+        SERVER.use(restify.plugins.bodyParser());
+
+        SERVER.post('/', function(req, res, next) {
+            res.send(200, { length: req.body.length });
+            next();
+        });
+
+        var body = JSON.stringify('x'.repeat(2 * 1024 * 1024 - 2));
+        assert.equal(Buffer.byteLength(body), 2 * 1024 * 1024);
+
+        var client = http.request(
+            {
+                hostname: '127.0.0.1',
+                port: PORT,
+                path: '/',
+                method: 'POST',
+                agent: false,
+                headers: {
+                    'content-type': 'application/json',
+                    'content-length': Buffer.byteLength(body)
+                }
+            },
+            function(res) {
+                var responseBody = '';
+                res.on('data', function(chunk) {
+                    responseBody += chunk;
+                });
+                res.once('end', function() {
+                    assert.equal(res.statusCode, 200);
+                    assert.equal(
+                        JSON.parse(responseBody).length,
+                        body.length - 2
+                    );
+                    done();
+                });
+            }
+        );
+        client.on('error', done);
+        client.end(body);
+    });
+
     it('restify-GH-149 limit request body size (json)', function(done) {
         SERVER.use(restify.plugins.bodyParser({ maxBodySize: 1024 }));
 
