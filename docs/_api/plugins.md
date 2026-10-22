@@ -425,8 +425,9 @@ All bodyParsers support the following options:
 #### Parameters
 
 -   `options` **[Object][81]?** an option object
-    -   `options.maxBodySize` **[Number][86]?** The maximum size in bytes allowed in
-        the HTTP body. Useful for limiting clients from hogging server memory.
+    -   `options.maxBodySize` **[Number][86]** The maximum size in
+        bytes allowed in the HTTP body. The default is 2 MiB. Set to `0` to disable
+        the limit. (optional, default `2*1024*1024`)
     -   `options.mapParams` **[Boolean][88]?** if `req.params` should be filled with
         parsed parameters from HTTP body.
     -   `options.mapFiles` **[Boolean][88]?** if `req.params` should be filled with
@@ -478,7 +479,7 @@ All bodyParsers support the following options:
         only.
         Limits the amount of memory all fields together (except files)
         can allocate in bytes.
-        The default size is `2 * 1024 * 1024` bytes _(2MB)_. (optional, default `2*1024*1024`)
+        The default size is `2 * 1024 * 1024` bytes _(2 MiB)_. (optional, default `2*1024*1024`)
     -   `options.arrayLimit` **[Number][86]** `urlEncodedBodyParser` only. Only
         transform `a[$index]=b` to an array if `$index` is less than `arrayLimit`. (optional, default `20`)
     -   `options.throwOnLimitExceeded` **[Boolean][88]** `urlEncodedBodyParser`
@@ -490,7 +491,7 @@ All bodyParsers support the following options:
 
 ```javascript
 server.use(restify.plugins.bodyParser({
-    maxBodySize: 0,
+    maxBodySize: 2 * 1024 * 1024,
     mapParams: true,
     mapFiles: false,
     overrideParams: false,
