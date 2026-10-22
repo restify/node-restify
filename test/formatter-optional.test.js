@@ -17,7 +17,6 @@ var before = helper.before;
 var test = helper.test;
 
 var CLIENT;
-var LOCALHOST;
 var PORT = process.env.UNIT_TEST_PORT || 0;
 var SERVER;
 
@@ -37,7 +36,6 @@ before(module, function(callback) {
                 dtrace: helper.dtrace,
                 retry: false
             });
-            LOCALHOST = 'http://' + '127.0.0.1:' + PORT;
             callback();
         });
     } catch (e) {
@@ -69,7 +67,7 @@ test(
             return next();
         });
 
-        CLIENT.get(LOCALHOST + '/11', function(err, _, res) {
+        CLIENT.get('/11', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 200);
             t.equal(res.headers['content-type'], 'application/hal+json');

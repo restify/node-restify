@@ -22,9 +22,6 @@ var CLIENT;
 var STRING_CLIENT;
 var SERVER;
 
-var LOCALHOST;
-var SLOCALHOST;
-
 before(module, function(cb) {
     try {
         SERVER = restify.createServer({
@@ -46,8 +43,6 @@ before(module, function(cb) {
                 dtrace: helper.dtrace,
                 retry: false
             });
-            LOCALHOST = 'http://' + '127.0.0.1:' + PORT;
-            SLOCALHOST = 'https://' + '127.0.0.1:' + PORT;
 
             cb();
         });
@@ -72,18 +67,12 @@ after(module, function(cb) {
     }
 });
 
-// helper for joining array into strings
-function join() {
-    var args = [].slice.call(arguments, 0);
-    return args.join('');
-}
-
 test(module, 'redirect to new string url as-is', function(t) {
     SERVER.get('/1', function(req, res, next) {
         res.redirect('www.foo.com', next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/1'), function(err, _, res) {
+    CLIENT.get('/1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, 'www.foo.com');
@@ -96,7 +85,7 @@ test(module, 'redirect to new relative string url as-is', function(t) {
         res.redirect('/1', next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/20?a=1'), function(err, _, res) {
+    CLIENT.get('/20?a=1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, '/1');
@@ -114,10 +103,10 @@ test(module, 'redirect to current url (reload)', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/2'), function(err, _, res) {
+    CLIENT.get('/2', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(LOCALHOST, '/2'));
+        t.equal(res.headers.location, '/2');
         t.end();
     });
 });
@@ -132,10 +121,10 @@ test(module, 'redirect to current url from http -> https', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/3'), function(err, _, res) {
+    CLIENT.get('/3', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(SLOCALHOST, '/3'));
+        t.equal(res.headers.location, '/3');
         t.end();
     });
 });
@@ -151,10 +140,10 @@ test(module, 'redirect to current url from https -> http', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/3'), function(err, _, res) {
+    CLIENT.get('/3', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(LOCALHOST, '/3'));
+        t.equal(res.headers.location, '/3');
         t.end();
     });
 });
@@ -169,10 +158,10 @@ test(module, 'redirect by changing path', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/4'), function(err, _, res) {
+    CLIENT.get('/4', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(LOCALHOST, '/1'));
+        t.equal(res.headers.location, '/1');
         t.end();
     });
 });
@@ -222,10 +211,10 @@ test(module, 'redirect should add query params', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/5'), function(err, _, res) {
+    CLIENT.get('/5', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(LOCALHOST, '/5?a=1'));
+        t.equal(res.headers.location, '/5?a=1');
         t.end();
     });
 });
@@ -242,15 +231,11 @@ test(module, 'redirect should extend existing query params', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/6?a=1'), function(err, _, res) {
+    CLIENT.get('/6?a=1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = new URL(res.headers.location);
-        t.equal(parsedUrl.searchParams.get('a'), '1');
-        t.equal(parsedUrl.searchParams.get('b'), '2');
-        t.equal(parsedUrl.pathname, '/6');
 
-        // t.equal(res.headers.location, join(LOCALHOST, '/6?a=1&b=2'));
+        t.equal(res.headers.location, '/6?b=2&a=1');
         t.end();
     });
 });
@@ -268,10 +253,10 @@ test(module, 'redirect should stomp over existing query params', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/7?a=1'), function(err, _, res) {
+    CLIENT.get('/7?a=1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, join(LOCALHOST, '/7?b=2'));
+        t.equal(res.headers.location, '/7?b=2');
         t.end();
     });
 });
@@ -286,10 +271,10 @@ test(module, 'redirect with 301 status code', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/8'), function(err, _, res) {
+    CLIENT.get('/8', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 301);
-        t.equal(res.headers.location, join(LOCALHOST, '/8'));
+        t.equal(res.headers.location, '/8');
         t.end();
     });
 });
@@ -299,7 +284,7 @@ test(module, 'redirect with 301 status code ising string url', function(t) {
         res.redirect(301, '/foo', next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/30'), function(err, _, res) {
+    CLIENT.get('/30', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 301);
         t.equal(res.headers.location, '/foo');
@@ -321,7 +306,7 @@ test(module, 'redirect using options.url', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/8'), function(err, _, res) {
+    CLIENT.get('/8', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, 'http://www.foo.com/8?a=1');
@@ -339,7 +324,7 @@ test(module, 'redirect using opts.port', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
+    CLIENT.get('/9', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         var parsedUrl = new URL(res.headers.location);
@@ -360,7 +345,7 @@ test(module, 'redirect using external url and custom port', function(t) {
         );
     });
 
-    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
+    CLIENT.get('/9', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         var parsedUrl = new URL(res.headers.location);
@@ -381,14 +366,10 @@ test(module, 'redirect using default hostname with custom port', function(t) {
             next
         );
     });
-
-    CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res) {
+    CLIENT.get('/9', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var parsedUrl = new URL(res.headers.location);
-        t.equal(Number(parsedUrl.port), 3000);
-        t.equal(parsedUrl.pathname, '/99');
-        t.equal(res.headers.location, 'http://127.0.0.1:3000/99');
+        t.equal(res.headers.location, 'http://localhost:3000/99');
         t.end();
     });
 });
@@ -398,10 +379,10 @@ test(module, 'redirect opts.port exact location header', function(t) {
         res.redirect({ port: 3000 }, next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/port-pin'), function(err, _, res) {
+    CLIENT.get('/port-pin', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        t.equal(res.headers.location, 'http://127.0.0.1:3000/port-pin');
+        t.equal(res.headers.location, 'http://localhost:3000/port-pin');
         t.end();
     });
 });
@@ -417,7 +398,7 @@ test(
             );
         });
 
-        CLIENT.get(join(LOCALHOST, '/extport-pin'), function(err, _, res) {
+        CLIENT.get('/extport-pin', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 302);
             t.equal(res.headers.location, 'http://www.foo.com:3000/bar');
@@ -431,14 +412,11 @@ test(module, 'redirect extend query params exact location header', function(t) {
         res.redirect({ query: { b: '2' } }, next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/extqs-pin?a=1'), function(err, _, res) {
+    CLIENT.get('/extqs-pin?a=1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var loc = res.headers.location;
-        var u = new URL(loc);
-        t.equal(u.searchParams.get('a'), '1');
-        t.equal(u.searchParams.get('b'), '2');
-        t.equal(u.pathname, '/extqs-pin');
+
+        t.equal(res.headers.location, '/extqs-pin?b=2&a=1');
         t.end();
     });
 });
@@ -449,11 +427,10 @@ test(module, 'redirect should repeat query param when same key', function(t) {
         res.redirect({ query: { a: '2' } }, next);
     });
 
-    CLIENT.get(join(LOCALHOST, '/dupqs-pin?a=1'), function(err, _, res) {
+    CLIENT.get('/dupqs-pin?a=1', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
-        var u = new URL(res.headers.location);
-        t.deepEqual(u.searchParams.getAll('a'), ['2', '1']);
+        t.deepEqual(res.headers.location, '/dupqs-pin?a=2&a=1');
         t.end();
     });
 });
@@ -467,12 +444,10 @@ test(
             res.redirect({ pathname: '/other' }, next);
         });
 
-        CLIENT.get(join(LOCALHOST, '/rel-path-pin'), function(err, _, res) {
+        CLIENT.get('/rel-path-pin', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 302);
-            var u = new URL(res.headers.location);
-            t.equal(u.pathname, '/other');
-            t.equal(u.hostname, '127.0.0.1');
+            t.equal(res.headers.location, '/other');
             t.end();
         });
     }
@@ -490,13 +465,10 @@ test(
             );
         });
 
-        CLIENT.get(join(LOCALHOST, '/rel-qs-pin'), function(err, _, res) {
+        CLIENT.get('/rel-qs-pin', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 302);
-            var u = new URL(res.headers.location);
-            t.equal(u.pathname, '/other');
-            t.equal(u.searchParams.get('x'), '1');
-            t.equal(u.searchParams.get('y'), '2');
+            t.equal(res.headers.location, '/other?x=1&y=2');
             t.end();
         });
     }
@@ -511,7 +483,7 @@ test(
             res.redirect();
         });
 
-        CLIENT.get(join(LOCALHOST, '/9'), function(err, _, res, body) {
+        CLIENT.get('/9', function(err, _, res, body) {
             t.equal(res.statusCode, 500);
 
             // json parse the response
@@ -543,7 +515,7 @@ test(
 
         SERVER.get('/10', [A, redirect, B]);
 
-        CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+        CLIENT.get('/10', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 302);
             t.equal(res.headers.location, '/10');
@@ -572,7 +544,7 @@ test(module, 'redirect should emit a redirect event', function(t) {
 
     SERVER.get('/10', [preRedirectHandler, redirect]);
 
-    CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+    CLIENT.get('/10', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
         t.equal(res.headers.location, '/10');
@@ -600,7 +572,7 @@ test(module, 'writeHead should emit a header event', function(t) {
 
     SERVER.get('/10', [handler]);
 
-    CLIENT.get(join(LOCALHOST, '/10'), function(err, _, res) {
+    CLIENT.get('/10', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 302);
 
@@ -621,7 +593,7 @@ test(module, 'should fail to set header due to missing formatter', function(t) {
         return next();
     });
 
-    CLIENT.get(join(LOCALHOST, '/11'), function(err, _, res) {
+    CLIENT.get('/11', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.equal(res.headers['content-type'], 'application/octet-stream');
@@ -635,7 +607,7 @@ test(module, 'should not fail to send null as body', function(t) {
         return next();
     });
 
-    CLIENT.get(join(LOCALHOST, '/12'), function(err, _, res) {
+    CLIENT.get('/12', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
@@ -651,7 +623,7 @@ test(
             return next();
         });
 
-        CLIENT.get(join(LOCALHOST, '/13'), function(err, _, res) {
+        CLIENT.get('/13', function(err, _, res) {
             t.ifError(err);
             t.equal(res.statusCode, 200);
             t.end();
@@ -668,7 +640,7 @@ test(
             return next();
         });
 
-        CLIENT.get(join(LOCALHOST, '/14'), function(err, _, res, body) {
+        CLIENT.get('/14', function(err, _, res, body) {
             t.ifError(err);
             t.equal(res.statusCode, 200);
             // ensure error body was still sent
@@ -691,7 +663,7 @@ test(module, 'GH-951: should send without formatting', function(t) {
         return next();
     });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/15'), function(err, _, res, body) {
+    STRING_CLIENT.get('/15', function(err, _, res, body) {
         t.ifError(err);
         t.equal(
             body,
@@ -724,7 +696,7 @@ test(module, 'GH-951: sendRaw accepts only strings or buffers', function(t) {
     });
 
     // throw away response, we don't need it.
-    STRING_CLIENT.get(join(LOCALHOST, '/16'));
+    STRING_CLIENT.get('/16');
 });
 
 test(module, 'GH-1429: setting code with res.status not respected', function(
@@ -735,7 +707,7 @@ test(module, 'GH-1429: setting code with res.status not respected', function(
         res.send(null);
     });
 
-    CLIENT.get(join(LOCALHOST, '/404'), function(err, _, res) {
+    CLIENT.get('/404', function(err, _, res) {
         t.equal(res.statusCode, 404);
         t.end();
     });
@@ -748,7 +720,7 @@ test(module, 'should support multiple set-cookie headers', function(t) {
         res.send(null);
     });
 
-    CLIENT.get(join(LOCALHOST, '/set-cookie'), function(err, _, res) {
+    CLIENT.get('/set-cookie', function(err, _, res) {
         t.equal(res.headers['set-cookie'].length, 2);
         t.end();
     });
@@ -762,20 +734,10 @@ test(module, 'GH-1607: should send bools with explicit status code', function(
         return next();
     });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/bool/false'), function(
-        err,
-        req,
-        res,
-        data
-    ) {
+    STRING_CLIENT.get('/bool/false', function(err, req, res, data) {
         t.equal(data, 'false');
 
-        STRING_CLIENT.get(join(LOCALHOST, '/bool/true'), function(
-            err2,
-            req2,
-            res2,
-            data2
-        ) {
+        STRING_CLIENT.get('/bool/true', function(err2, req2, res2, data2) {
             t.equal(data2, 'true');
             t.end();
         });
@@ -795,14 +757,9 @@ test(module, 'GH-1607: should send numbers with explicit status code', function(
         return next();
     });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/zero'), function(err, req, res, data) {
+    STRING_CLIENT.get('/zero', function(err, req, res, data) {
         t.equal(data, '0');
-        STRING_CLIENT.get(join(LOCALHOST, '/one'), function(
-            err2,
-            req2,
-            res2,
-            data2
-        ) {
+        STRING_CLIENT.get('/one', function(err2, req2, res2, data2) {
             t.equal(data2, '1');
             t.end();
         });
@@ -816,7 +773,7 @@ test(module, 'GH-1791: should send 0 as 0 with application/json', function(t) {
         return next();
     });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/zero'), function(err, req, res, data) {
+    STRING_CLIENT.get('/zero', function(err, req, res, data) {
         t.equal(data, '0');
         t.end();
     });
@@ -832,12 +789,7 @@ test(
             return next();
         });
 
-        STRING_CLIENT.get(join(LOCALHOST, '/false'), function(
-            err,
-            req,
-            res,
-            data
-        ) {
+        STRING_CLIENT.get('/false', function(err, req, res, data) {
             t.equal(data, 'false');
             t.end();
         });
@@ -855,12 +807,7 @@ test(
             return next();
         });
 
-        STRING_CLIENT.get(join(LOCALHOST, '/empty'), function(
-            err,
-            req,
-            res,
-            data
-        ) {
+        STRING_CLIENT.get('/empty', function(err, req, res, data) {
             t.equal(data, '""');
             t.end();
         });
@@ -877,12 +824,7 @@ test(
             return next();
         });
 
-        STRING_CLIENT.get(join(LOCALHOST, '/null'), function(
-            err,
-            req,
-            res,
-            data
-        ) {
+        STRING_CLIENT.get('/null', function(err, req, res, data) {
             t.equal(data, 'null');
             t.end();
         });
@@ -900,12 +842,7 @@ test(
             return next();
         });
 
-        STRING_CLIENT.get(join(LOCALHOST, '/undef'), function(
-            err,
-            req,
-            res,
-            data
-        ) {
+        STRING_CLIENT.get('/undef', function(err, req, res, data) {
             t.equal(data, '');
             t.end();
         });
@@ -921,7 +858,7 @@ test(module, 'GH-1791: should send NaN as null with application/json', function(
         return next();
     });
 
-    STRING_CLIENT.get(join(LOCALHOST, '/nan'), function(err, req, res, data) {
+    STRING_CLIENT.get('/nan', function(err, req, res, data) {
         t.equal(data, 'null');
         t.end();
     });
