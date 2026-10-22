@@ -244,6 +244,64 @@ describe('static resource plugin', function() {
         });
     });
 
+    it('static rejects traversal into a sibling directory', function(done) {
+        var tmpPath = path.join(process.cwd(), '.tmp', 'public');
+        var siblingPath = tmpPath + '-secret';
+        var secretFile = path.join(siblingPath, 'secret.json');
+
+        mkdirp.sync(tmpPath);
+        mkdirp.sync(siblingPath);
+        fs.writeFileSync(secretFile, '{"secret": true}');
+        DIRS_TO_DELETE.push(path.dirname(tmpPath));
+
+        SERVER.get('/*', restify.plugins.serveStatic({ directory: tmpPath }));
+
+        CLIENT.get(
+            '/..%2f' + path.basename(siblingPath) + '/secret.json',
+            function(err) {
+                assert.ok(err);
+                assert.equal(err.statusCode, 403);
+                assert.equal(err.restCode, 'NotAuthorized');
+                done();
+            }
+        );
+    });
+
+    it('static rejects a sibling ending in a newline', function(done) {
+        var tmpPath = path.join(process.cwd(), '.tmp', 'public');
+
+        SERVER.get('/*', restify.plugins.serveStatic({ directory: tmpPath }));
+
+        CLIENT.get('/..%2fpublic%0a/secret.json', function(err) {
+            assert.ok(err);
+            assert.strictEqual(err.statusCode, 403);
+            assert.strictEqual(err.restCode, 'NotAuthorized');
+            done();
+        });
+    });
+
+    it('static rejects NUL bytes without crashing the server', function(done) {
+        var tmpPath = path.join(process.cwd(), '.tmp', 'nul-byte');
+
+        mkdirp.sync(tmpPath);
+        fs.writeFileSync(path.join(tmpPath, 'ok.json'), '{"ok": true}');
+        DIRS_TO_DELETE.push(tmpPath);
+
+        SERVER.get('/*', restify.plugins.serveStatic({ directory: tmpPath }));
+
+        CLIENT.get('/%00', function(err) {
+            assert.ok(err);
+            assert.strictEqual(err.statusCode, 400);
+            assert.strictEqual(err.restCode, 'BadRequest');
+
+            CLIENT.get('/ok.json', function(nextErr, req, res, obj) {
+                assert.ifError(nextErr);
+                assert.deepEqual(obj, { ok: true });
+                done();
+            });
+        });
+    });
+
     // eslint-disable-next-line
     it('GH-1382 static responds 404 for missing file with percent-codes', function(done) {
         var p = '/public/no-%22such-file.json';
