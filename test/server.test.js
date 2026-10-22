@@ -1157,18 +1157,17 @@ test(
     'gh-757 req.absoluteUri() defaults path segment to req.path()',
     function(t) {
         SERVER.get('/the-original-path', function(req, res, next) {
-            var prefix = 'http://127.0.0.1:' + PORT;
             t.equal(
                 req.absoluteUri('?key=value'),
-                prefix + '/the-original-path/?key=value'
+                'http://localhost/the-original-path/?key=value'
             );
             t.equal(
                 req.absoluteUri('#fragment'),
-                prefix + '/the-original-path/#fragment'
+                'http://localhost/the-original-path/#fragment'
             );
             t.equal(
                 req.absoluteUri('?key=value#fragment'),
-                prefix + '/the-original-path/?key=value#fragment'
+                'http://localhost/the-original-path/?key=value#fragment'
             );
             res.send();
             next();
@@ -1188,9 +1187,17 @@ test(
     'req.absoluteUri() resolves plain subpath relative to current path',
     function(t) {
         SERVER.get('/base-path', function(req, res, next) {
-            var prefix = 'http://127.0.0.1:' + PORT;
-            t.equal(req.absoluteUri('child'), prefix + '/base-path/child');
-            t.equal(req.absoluteUri('/absolute'), prefix + '/absolute');
+            t.equal(
+                req.absoluteUri('child'),
+                'http://localhost/base-path/child'
+            );
+            t.equal(req.absoluteUri(''), 'http://localhost/base-path/');
+            t.equal(
+                req.absoluteUri('./child'),
+                'http://localhost/base-path/child'
+            );
+            t.equal(req.absoluteUri('../sibling'), 'http://localhost/sibling');
+            t.equal(req.absoluteUri('/absolute'), 'http://localhost/absolute');
             res.send();
             next();
         });
@@ -1689,6 +1696,27 @@ test(
             t.end();
         });
         CLIENT.get('/', function() {});
+    }
+);
+
+test(
+    module,
+    'req.absoluteUri() avoids duplicate slash after trailing slash',
+    function(t) {
+        SERVER.get('/base-path/', function(req, res, next) {
+            t.equal(
+                req.absoluteUri('child'),
+                'http://localhost/base-path/child'
+            );
+            res.send();
+            next();
+        });
+
+        CLIENT.get('/base-path/', function(err, _, res) {
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
     }
 );
 

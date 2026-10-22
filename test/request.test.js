@@ -295,13 +295,11 @@ test(
         SERVER.get('/geturl-plain', function(req, res, next) {
             var u = req.getUrl();
             t.ok(u instanceof URL);
-            t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-plain');
+            t.equal(u.href, 'http://localhost/geturl-plain');
             t.equal(u.pathname, '/geturl-plain');
             t.equal(u.search, '');
             t.equal(u.hash, '');
-            t.equal(u.host, '127.0.0.1:' + PORT);
-            t.equal(u.hostname, '127.0.0.1');
-            t.equal(u.port, String(PORT));
+            t.equal(u.hostname, 'localhost');
             t.equal(u.protocol, 'http:');
             res.send();
             return next();
@@ -319,15 +317,13 @@ test(module, 'getUrl should return correct query string', function(t) {
     SERVER.get('/geturl-qs', function(req, res, next) {
         var u = req.getUrl();
         t.ok(u instanceof URL);
-        t.equal(u.href, 'http://127.0.0.1:' + PORT + '/geturl-qs?a=1&b=2');
+        t.equal(u.href, 'http://localhost/geturl-qs?a=1&b=2');
         t.equal(u.pathname, '/geturl-qs');
         t.equal(u.search, '?a=1&b=2');
         t.equal(u.searchParams.get('a'), '1');
         t.equal(u.searchParams.get('b'), '2');
         t.equal(u.hash, '');
-        t.equal(u.host, '127.0.0.1:' + PORT);
-        t.equal(u.hostname, '127.0.0.1');
-        t.equal(u.port, String(PORT));
+        t.equal(u.hostname, 'localhost');
         t.equal(u.protocol, 'http:');
         res.send();
         return next();
@@ -343,9 +339,11 @@ test(module, 'getUrl should return correct query string', function(t) {
 test(module, 'getUrl should handle OPTIONS * request-target', function(t) {
     SERVER.opts('*', function(req, res, next) {
         var u = req.getUrl();
+        t.equal(req.url, '*');
         t.ok(u instanceof URL);
         // a URL instance can't represent the literal '*' request-target -
         // it resolves against the base path, so it comes out as '/*'.
+        t.equal(u.href, 'http://localhost/*');
         t.equal(u.pathname, '/*');
         t.equal(u.search, '');
         res.send(200);
@@ -353,6 +351,24 @@ test(module, 'getUrl should handle OPTIONS * request-target', function(t) {
     });
 
     CLIENT.opts('*', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'getUrl should route a literal * path segment', function(t) {
+    SERVER.get('/api/test/:asterisk/some_test', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        t.equal(u.href, 'http://localhost/api/test/*/some_test');
+        t.equal(u.pathname, '/api/test/*/some_test');
+        t.equal(req.params.asterisk, '*');
+        res.send(200);
+        return next();
+    });
+
+    CLIENT.get('/api/test/*/some_test', function(err, _, res) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
@@ -372,5 +388,255 @@ test(module, 'getUrl result is cached across calls', function(t) {
         t.ifError(err);
         t.equal(res.statusCode, 200);
         t.end();
+    });
+});
+
+test(module, 'getUrl should handle a path starting with // correctly', function(
+    t
+) {
+    SERVER.get('//foo/bar', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        t.equal(u.href, 'http://localhost//foo/bar');
+        t.equal(u.hostname, 'localhost');
+        t.equal(u.pathname, '//foo/bar');
+        t.equal(u.search, '');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('//foo/bar', function(err, _, res) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'getUrl should not match // path to / route', function(t) {
+    SERVER.get('/foo/bar', function(req, res, next) {
+        t.ok(false, 'route handler should not be called');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('//foo/bar', function(err, _, res) {
+        t.ok(err);
+        t.equal(res.statusCode, 404);
+        t.end();
+    });
+});
+
+test(
+    module,
+    'getUrl should parse special characters after // as a path',
+    function(t) {
+        SERVER.get('//images', function(req, res, next) {
+            var u = req.getUrl();
+            t.ok(u instanceof URL);
+            t.equal(u.href, 'http://localhost//images;:@example.com');
+            t.equal(u.hostname, 'localhost');
+            t.equal(u.username, '');
+            t.equal(u.pathname, '//images;:@example.com');
+            res.send();
+            return next();
+        });
+
+        CLIENT.get('//images;:@example.com', function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 404);
+            t.end();
+        });
+    }
+);
+
+test(module, 'getUrl should preserve special query characters', function(t) {
+    SERVER.get('/geturl-special-query', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        t.equal(
+            u.href,
+            'http://localhost/geturl-special-query?a=1&b=test\\@gmail.com'
+        );
+        t.equal(u.pathname, '/geturl-special-query');
+        t.equal(u.hostname, 'localhost');
+        t.equal(u.search, '?a=1&b=test\\@gmail.com');
+        t.equal(u.searchParams.get('a'), '1');
+        t.equal(u.searchParams.get('b'), 'test\\@gmail.com');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-special-query?a=1&b=test\\@gmail.com', function(
+        err,
+        _,
+        res
+    ) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+test(module, 'getUrl should preserve encoded path characters', function(t) {
+    SERVER.get('/geturl-encoded/:value', function(req, res, next) {
+        var u = req.getUrl();
+        t.ok(u instanceof URL);
+        t.equal(
+            u.href,
+            'http://localhost/geturl-encoded/a%2Fb%20c?email=test%40gmail.com'
+        );
+        t.equal(u.pathname, '/geturl-encoded/a%2Fb%20c');
+        t.equal(u.search, '?email=test%40gmail.com');
+        t.equal(u.searchParams.get('email'), 'test@gmail.com');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-encoded/a%2Fb%20c?email=test%40gmail.com', function(
+        err,
+        _,
+        res
+    ) {
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+[
+    { host: 'example.com', hostname: 'example.com', port: '' },
+    { host: 'example.com:8080', hostname: 'example.com', port: '8080' },
+    { host: '127.0.0.1', hostname: '127.0.0.1', port: '' },
+    { host: '[::1]', hostname: '[::1]', port: '' },
+    {
+        host: '[2001:db8::1]:8080',
+        hostname: '[2001:db8::1]',
+        port: '8080'
+    }
+].forEach(function(testCase, index) {
+    test(module, 'getUrl should support HOST ' + testCase.host, function(t) {
+        var originalHost = process.env.HOST;
+        var path = '/geturl-valid-host-' + index;
+
+        SERVER.get(path, function(req, res, next) {
+            var u = req.getUrl();
+            t.ok(u instanceof URL);
+            t.equal(u.href, 'http://' + testCase.host + path + '?a=1');
+            t.equal(u.hostname, testCase.hostname);
+            t.equal(u.port, testCase.port);
+            t.equal(u.pathname, path);
+            t.equal(u.search, '?a=1');
+            res.send();
+            return next();
+        });
+
+        process.env.HOST = testCase.host;
+        CLIENT.get(path + '?a=1', function(err, _, res) {
+            if (originalHost === undefined) {
+                delete process.env.HOST;
+            } else {
+                process.env.HOST = originalHost;
+            }
+
+            t.ifError(err);
+            t.equal(res.statusCode, 200);
+            t.end();
+        });
+    });
+});
+
+[
+    '::1',
+    '[::1',
+    '[gggg::1]',
+    'localhost:not-a-port',
+    'localhost:65536',
+    'bad host',
+    '999.999.999.999',
+    'http://example.com',
+    '%'
+].forEach(function(host, index) {
+    test(module, 'getUrl should reject HOST ' + host, function(t) {
+        var originalHost = process.env.HOST;
+        var path = '/geturl-invalid-host-' + index;
+
+        SERVER.get(path, function(req, res, next) {
+            t.ok(false, 'route handler should not be called');
+            res.send();
+            return next();
+        });
+
+        process.env.HOST = host;
+        CLIENT.get(path, function(err, _, res) {
+            if (originalHost === undefined) {
+                delete process.env.HOST;
+            } else {
+                process.env.HOST = originalHost;
+            }
+
+            t.ok(err);
+            t.equal(res.statusCode, 400);
+            t.end();
+        });
+    });
+});
+
+test(module, 'getUrl should use localhost when HOST is missing', function(t) {
+    var originalHost = process.env.HOST;
+    delete process.env.HOST;
+
+    SERVER.get('/geturl-missing-host', function(req, res, next) {
+        var u = req.getUrl();
+        t.equal(u.href, 'http://localhost/geturl-missing-host');
+        t.equal(u.hostname, 'localhost');
+        res.send();
+        return next();
+    });
+
+    CLIENT.get('/geturl-missing-host', function(err, _, res) {
+        if (originalHost !== undefined) {
+            process.env.HOST = originalHost;
+        }
+
+        t.ifError(err);
+        t.equal(res.statusCode, 200);
+        t.end();
+    });
+});
+
+[
+    'http://example.com/foo?a=1',
+    'https://example.com/foo',
+    'http://[::1]:8080/foo',
+    'http://',
+    'http://[::1',
+    'https://bad host/foo',
+    'http://example.com:bad/foo'
+].forEach(function(requestUrl, index) {
+    test(module, 'getUrl should reject absoluteURL ' + requestUrl, function(t) {
+        var path = '/geturl-absolute-' + index;
+
+        SERVER.get(path, function(req, res, next) {
+            var originalUrl = req.url;
+            req.url = requestUrl;
+
+            try {
+                req.getUrl();
+            } catch (err) {
+                req.url = originalUrl;
+                return next(err);
+            }
+
+            req.url = originalUrl;
+            t.ok(false, 'getUrl should throw');
+            res.send(200);
+            return next();
+        });
+
+        CLIENT.get(path, function(err, _, res) {
+            t.ok(err);
+            t.equal(res.statusCode, 400);
+            t.end();
+        });
     });
 });
