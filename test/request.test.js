@@ -531,6 +531,9 @@ test(module, 'getUrl should preserve encoded path characters', function(t) {
         });
 
         process.env.HOST = testCase.host;
+        t.doesNotThrow(function() {
+            restify.createServer();
+        });
         CLIENT.get(path + '?a=1', function(err, _, res) {
             if (originalHost === undefined) {
                 delete process.env.HOST;
@@ -554,30 +557,28 @@ test(module, 'getUrl should preserve encoded path characters', function(t) {
     'bad host',
     '999.999.999.999',
     'http://example.com',
+    'example.com/path',
+    'example.com?query',
+    'example.com#fragment',
+    'user@example.com',
     '%'
-].forEach(function(host, index) {
-    test(module, 'getUrl should reject HOST ' + host, function(t) {
+].forEach(function(host) {
+    test(module, 'createServer should reject HOST ' + host, function(t) {
         var originalHost = process.env.HOST;
-        var path = '/geturl-invalid-host-' + index;
-
-        SERVER.get(path, function(req, res, next) {
-            t.ok(false, 'route handler should not be called');
-            res.send();
-            return next();
-        });
 
         process.env.HOST = host;
-        CLIENT.get(path, function(err, _, res) {
+        try {
+            t.throws(function() {
+                restify.createServer();
+            }, /Invalid HOST environment variable/);
+        } finally {
             if (originalHost === undefined) {
                 delete process.env.HOST;
             } else {
                 process.env.HOST = originalHost;
             }
-
-            t.ok(err);
-            t.equal(res.statusCode, 400);
-            t.end();
-        });
+        }
+        t.end();
     });
 });
 
