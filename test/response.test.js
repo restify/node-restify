@@ -863,3 +863,55 @@ test(module, 'GH-1791: should send NaN as null with application/json', function(
         t.end();
     });
 });
+
+test(
+    module,
+    'GH-1589: should preserve content-type parameters set by the user',
+    function(t) {
+        SERVER.get('/content-type-params', function(req, res, next) {
+            res.contentType = 'text/plain; version=0.0.4; charset=utf-8';
+            res.send('hello');
+            return next();
+        });
+
+        STRING_CLIENT.get('/content-type-params', function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.ifError(err);
+            t.equal(data, 'hello');
+            t.equal(
+                res.headers['content-type'],
+                'text/plain; version=0.0.4; charset=utf-8'
+            );
+            t.end();
+        });
+    }
+);
+
+test(
+    module,
+    'GH-1589: res.charSet still appends charset without duplicating params',
+    function(t) {
+        SERVER.get('/content-type-charset', function(req, res, next) {
+            res.contentType = 'text/plain';
+            res.charSet('utf-8');
+            res.send('hello');
+            return next();
+        });
+
+        STRING_CLIENT.get('/content-type-charset', function(
+            err,
+            req,
+            res,
+            data
+        ) {
+            t.ifError(err);
+            t.equal(data, 'hello');
+            t.equal(res.headers['content-type'], 'text/plain; charset=utf-8');
+            t.end();
+        });
+    }
+);
