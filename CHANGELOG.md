@@ -121,6 +121,16 @@
 * remove deprecated usage of pino.child ([#1902](https://www.github.com/restify/node-restify/issues/1902)) ([0a8cf83](https://www.github.com/restify/node-restify/commit/0a8cf8345de26f8ee98e87c0085f0f9439302d98))
 * **travisci:** revisit nodejs version. Change to: LTS active, LTS maintenance (4.x) and stable releases ([#1553](https://www.github.com/restify/node-restify/issues/1553)) ([49eb008](https://www.github.com/restify/node-restify/commit/49eb008d987f1c425989b78e2336e3583e05a88a))
 
+## [12.1.0](https://github.com/restify/node-restify/compare/v12.0.0...v12.1.0) (2026-10-22)
+
+
+### Features
+
+* default request body limit to 2 MiB ([#2018](https://github.com/restify/node-restify/issues/2018)) ([327f996](https://github.com/restify/node-restify/commit/327f99666a3220f265e207ae2b1334b367cdd738))
+* fix getUrl generation ([#2015](https://github.com/restify/node-restify/issues/2015)) ([9ee6e2f](https://github.com/restify/node-restify/commit/9ee6e2fd04367dd5b09623bec4a2c9776bcd3597))
+* fix path traversal ([#2019](https://github.com/restify/node-restify/issues/2019)) ([436217b](https://github.com/restify/node-restify/commit/436217b1a98ab21d2643c69862f9802c84e8c6b5))
+* limit decompressed request body size ([#2017](https://github.com/restify/node-restify/issues/2017)) ([8e10383](https://github.com/restify/node-restify/commit/8e103836d360ef7d1544682776689149230b6a27))
+
 ## [12.1.0-rc](https://github.com/restify/node-restify/compare/v12.0.0...v12.1.0-rc) (2026-10-22)
 
 
