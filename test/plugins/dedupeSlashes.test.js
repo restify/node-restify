@@ -72,4 +72,27 @@ describe('dedupe forward slashes in URL', function() {
             done();
         });
     });
+
+    it('should keep duplicate slashes in the query string', function(done) {
+        CLIENT.get('//foo//bar//?next=http://example.com//x', function(
+            err,
+            _,
+            res,
+            data
+        ) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.equal(data, '/foo/bar/?next=http://example.com//x');
+            done();
+        });
+    });
+
+    it('should keep an empty query string', function(done) {
+        CLIENT.get('//foo//bar//?', function(err, _, res, data) {
+            assert.ifError(err);
+            assert.equal(res.statusCode, 200);
+            assert.equal(data, '/foo/bar/?');
+            done();
+        });
+    });
 });
